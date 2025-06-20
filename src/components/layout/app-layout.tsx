@@ -50,14 +50,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               {navItems.map((item: NavItem) => (
                 <SidebarMenuItem key={item.href}>
-                  <Link href={item.href} legacyBehavior passHref>
+                  <Link href={item.href}>
                     <SidebarMenuButton
                       isActive={pathname === item.href}
                       tooltip={{ children: item.title, className:"font-body" }}
                       className="font-body"
+                      asChild={typeof SidebarMenuButton !== 'string'} // Ensure NextLink passes href correctly if SidebarMenuButton is a custom component not rendering <a>
                     >
-                      <item.icon />
-                      <span>{item.title}</span>
+                      <>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </>
                     </SidebarMenuButton>
                   </Link>
                 </SidebarMenuItem>
