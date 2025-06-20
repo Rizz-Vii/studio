@@ -1,5 +1,6 @@
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BarChartBig, Users, Activity, TrendingUp, CheckCircle, AlertTriangle, TrafficCone, Link, ScanText } from "lucide-react";
+import { BarChartBig, Users, Activity, TrendingUp, CheckCircle, AlertTriangle, TrafficCone, Link as LinkIcon, ScanText } from "lucide-react";
 
 interface MetricCardProps {
   title: string;
@@ -38,7 +39,7 @@ export default function DashboardPage() {
     { title: "Overall SEO Score", value: "85/100", description: "Based on recent audit", icon: CheckCircle, trend: 'up', trendValue: '+5 pts since last week' },
     { title: "Tracked Keywords", value: "1,250", description: "45 in Top 3", icon: BarChartBig, trend: 'up', trendValue: '+120 keywords' },
     { title: "Organic Traffic", value: "12,403", description: "Last 30 days", icon: TrafficCone, trend: 'down', trendValue: '-2.5% vs previous period' },
-    { title: "Referring Domains", value: "320", description: "Total unique domains", icon: Link, trend: 'up', trendValue: '+15 new domains' },
+    { title: "Referring Domains", value: "320", description: "Total unique domains", icon: LinkIcon, trend: 'up', trendValue: '+15 new domains' },
     { title: "Critical Issues", value: "5", description: "From technical audit", icon: AlertTriangle, trend: 'neutral', trendValue: '2 fixed this week' },
     { title: "Content Performance", value: "7.8/10", description: "Average content score", icon: ScanText, trend: 'up', trendValue: '+0.3 pts average' },
   ];
