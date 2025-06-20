@@ -1,9 +1,10 @@
-'use client'
+'use client';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, Link as LinkIcon, Star, MessageSquare, Image as ImageIcon, Loader2 } from "lucide-react";
+import useProtectedRoute from '@/hooks/useProtectedRoute';
 
 interface SerpResult {
   id: string;
@@ -20,6 +21,18 @@ export default function SerpViewPage() {
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [serpResults, setSerpResults] = useState<SerpResult[] | null>(null);
+    const { user, loading } = useProtectedRoute();
+
+  if (loading) {
+    // Show a loading indicator while checking authentication state
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    // This part should ideally not be reached due to the redirect,
+    // but it's a safeguard. You could render nothing or a message.
+    return null;
+  }
 
   const handleFetchSerp = () => {
     if (!keyword.trim()) return;

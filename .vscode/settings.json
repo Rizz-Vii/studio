@@ -1,4 +1,9 @@
 {
     "IDX.aI.enableInlineCompletion": true,
-    "IDX.aI.enableCodebaseIndexing": true
+    "IDX.aI.enableCodebaseIndexing": true,
+    "css.lint.unknownAtRules": "ignore",
+    "editor.fontSize": 18,
+    "editor.defaultFormatter": "GitHub.copilot",
+    "editor.formatOnPaste": true,
+    "editor.mouseWheelZoom": true
 }

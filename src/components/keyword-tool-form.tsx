@@ -2,9 +2,11 @@
 'use client';
 
 import type { SuggestKeywordsInput, SuggestKeywordsOutput } from '@/ai/flows/keyword-suggestions';
-import { suggestKeywords } from '@/ai/flows/keyword-suggestions';
+// Remove import for suggestKeywords as it will be called in the page component
+// import { suggestKeywords } from '@/ai/flows/keyword-suggestions';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition } from 'react'; // Keep useTransition if needed for form state transitions
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -22,9 +24,18 @@ const formSchema = z.object({
 
 type KeywordFormValues = z.infer<typeof formSchema>;
 
-export default function KeywordToolForm() {
-  const [isPending, startTransition] = useTransition();
-  const [keywordsResult, setKeywordsResult] = useState<SuggestKeywordsOutput | null>(null);
+// Define props for the KeywordToolForm component
+interface KeywordToolFormProps {
+  onSubmit: (values: SuggestKeywordsInput) => Promise<void>; // Function to call on submit
+  isLoading: boolean; // Loading state
+  results: SuggestKeywordsOutput | null; // Results to display
+}
+
+// Accept the props
+export default function KeywordToolForm({ onSubmit, isLoading, results }: KeywordToolFormProps) {
+  // Remove local state for results and isPending as they are now passed as props
+  // const [isPending, startTransition] = useTransition();
+  // const [keywordsResult, setKeywordsResult] = useState<SuggestKeywordsOutput | null>(null);
   const { toast } = useToast();
 
   const form = useForm<KeywordFormValues>({
@@ -35,21 +46,9 @@ export default function KeywordToolForm() {
     },
   });
 
-  async function onSubmit(values: KeywordFormValues) {
-    setKeywordsResult(null);
-    startTransition(async () => {
-      try {
-        const result = await suggestKeywords(values as SuggestKeywordsInput);
-        setKeywordsResult(result);
-      } catch (error) {
-        console.error('Error suggesting keywords:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to generate keyword suggestions. Please try again.",
-        });
-      }
-    });
+  // Modify onSubmit to call the prop function
+  async function handleFormSubmit(values: KeywordFormValues) {
+      await onSubmit(values as SuggestKeywordsInput); // Call the prop function
   }
 
   const copyToClipboard = (text: string) => {
@@ -70,21 +69,24 @@ export default function KeywordToolForm() {
           </CardDescription>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Call the new handleFormSubmit function */}
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
             <CardContent className="space-y-4">
               <FormField
                 control={form.control}
                 name="topic"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-body">Topic</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., sustainable gardening, AI in marketing" {...field} className="font-body" />
-                    </FormControl>
-                    <FormDescription className="font-body">
+                      <div>
+                    <FormLabel className="font-body">Topic</FormLabel>
+                      <Input placeholder="e.g., sustainable gardening, AI in marketing" {...field} className="font-body" disabled={isLoading} /> {/* Disable input while loading */}
+                      <FormDescription className="font-body">
                       What topic do you want keywords for?
                     </FormDescription>
                     <FormMessage />
+                    </div>
+                    </FormControl>
                   </FormItem>
                 )}
               />
@@ -94,12 +96,13 @@ export default function KeywordToolForm() {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
                     <FormControl>
+                    <div className="space-y-1 leading-none">
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        disabled={isLoading} // Disable checkbox while loading
                       />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
+
                       <FormLabel className="font-body">
                         Include Long-Tail Keywords
                       </FormLabel>
@@ -107,13 +110,15 @@ export default function KeywordToolForm() {
                         Get more specific, longer keyword phrases. The AI will determine if it's appropriate.
                       </FormDescription>
                     </div>
+                    </FormControl>
                   </FormItem>
                 )}
               />
             </CardContent>
             <CardFooter>
-              <Button type="submit" disabled={isPending} className="font-body w-full sm:w-auto">
-                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {/* Use the isLoading prop */}
+              <Button type="submit" disabled={isLoading} className="font-body w-full sm:w-auto">
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Suggest Keywords
               </Button>
             </CardFooter>
@@ -121,7 +126,8 @@ export default function KeywordToolForm() {
         </Form>
       </Card>
 
-      {isPending && (
+      {/* Display loading state using isLoading prop */}
+      {isLoading && (
         <Card className="shadow-md">
           <CardContent className="p-6 flex items-center justify-center">
             <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
@@ -130,12 +136,13 @@ export default function KeywordToolForm() {
         </Card>
       )}
 
-      {keywordsResult && keywordsResult.keywords.length > 0 && (
+      {/* Display results using the results prop */}
+      {results && results.keywords.length > 0 && (
         <Card className="shadow-lg">
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="font-headline">Suggested Keywords</CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(keywordsResult.keywords.join(', '))} className="font-body">
+              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(results.keywords.join(', '))} className="font-body">
                 <Copy className="mr-2 h-4 w-4" /> Copy All
               </Button>
             </div>
@@ -145,7 +152,7 @@ export default function KeywordToolForm() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {keywordsResult.keywords.map((keyword, index) => (
+              {results.keywords.map((keyword, index) => (
                 <li key={index} className="p-3 bg-secondary rounded-md text-secondary-foreground font-body text-sm shadow-sm">
                   {keyword}
                 </li>
@@ -154,7 +161,8 @@ export default function KeywordToolForm() {
           </CardContent>
         </Card>
       )}
-      {keywordsResult && keywordsResult.keywords.length === 0 && (
+      {/* Display empty state for results */}
+      {results && results.keywords.length === 0 && !isLoading && ( // Add !isLoading condition
          <Card className="shadow-md">
           <CardContent className="p-6">
             <p className="font-body text-muted-foreground text-center">No keywords found for this topic. Try a different one.</p>

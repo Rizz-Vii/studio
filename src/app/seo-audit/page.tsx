@@ -1,10 +1,11 @@
-'use client'
+'use client';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, AlertTriangle, ExternalLink, Loader2, FileText, ImageIcon, Link2Off, Zap, Smartphone } from "lucide-react";
+import useProtectedRoute from '@/hooks/useProtectedRoute';
 
 interface AuditItem {
   id: string;
@@ -24,13 +25,29 @@ const initialAuditItems: AuditItem[] = [
   { id: 'mobile-friendliness', name: 'Mobile-Friendliness', score: 0, details: 'Assessing responsive design and mobile usability.', icon: Smartphone, status: 'warning' },
 ];
 
-
+  function getValidUrl(input: string) {
+    if (!/^https?:\/\//i.test(input)) {
+      return `https://${input}`;
+    }
+    return input;
+  }
 export default function SeoAuditPage() {
   const [url, setUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [auditResults, setAuditResults] = useState<AuditItem[] | null>(null);
   const [overallScore, setOverallScore] = useState<number>(0);
+ const { user, loading } = useProtectedRoute();
 
+  if (loading) {
+    // Show a loading indicator while checking authentication state
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    // This part should ideally not be reached due to the redirect,
+    // but it's a safeguard. You could render nothing or a message.
+    return null;
+  }
   const handleStartAudit = () => {
     if (!url.trim()) return;
     setIsLoading(true);
@@ -120,7 +137,7 @@ export default function SeoAuditPage() {
       {auditResults && (
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="font-headline">Audit Report for {new URL(url).hostname}</CardTitle>
+            <CardTitle className="font-headline">Audit Report for {new URL(getValidUrl(url)).hostname}</CardTitle>
             <div className="flex items-center space-x-2 pt-2">
               <Progress value={overallScore} className="w-[60%]" indicatorClassName={getProgressColor(overallScore)} />
               <span className={`text-sm font-medium font-body ${overallScore > 85 ? 'text-green-500' : overallScore > 60 ? 'text-yellow-500' : 'text-red-500'}`}>
@@ -146,7 +163,7 @@ export default function SeoAuditPage() {
                   ) : (
                     <>
                       <div className="flex items-center space-x-2 mb-1">
-                        <Progress value={item.score} className="flex-1" indicatorClassName={getProgressColor(item.score)}/>
+                        <Progress value={item.score} className={`flex-1 ${getProgressColor(item.score)}`}/>
                         <span className={`text-xs font-medium ${item.status === 'good' ? 'text-green-500' : item.status === 'warning' ? 'text-yellow-500' : 'text-red-500'}`}>
                           {item.score}/100
                         </span>

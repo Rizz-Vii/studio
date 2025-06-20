@@ -1,11 +1,11 @@
-'use client'
+'use client';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tag, Tags, PlusCircle, Trash2, Loader2 } from "lucide-react";
-
+import useProtectedRoute from '@/hooks/useProtectedRoute';
 interface Competitor {
   id: string;
   url: string;
@@ -76,6 +76,18 @@ export default function CompetitorsPage() {
       setIsLoading(false);
     }, 2000);
   };
+    const { user, loading } = useProtectedRoute();
+  
+        if (loading) {
+          // Show a loading spinner or skeleton while authentication state is being checked
+          return <div>Loading...</div>;
+        }
+  
+        if (!user) {
+          // This part should ideally not be reached due to the redirect in useProtectedRoute,
+          // but it's good practice to handle the case where user is null.
+          return null;
+        }
 
   return (
     <div className="space-y-8">
@@ -221,3 +233,5 @@ export default function CompetitorsPage() {
     </div>
   );
 }
+
+

@@ -1,3 +1,4 @@
+'use client';
 import ContentAnalyzerForm from '@/components/content-analyzer-form';
 
 export default function ContentAnalyzerPage() {

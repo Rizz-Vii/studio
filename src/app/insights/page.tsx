@@ -1,8 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+'use client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lightbulb, Zap, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import useProtectedRoute from '@/hooks/useProtectedRoute';
 
 interface Insight {
   id: string;
@@ -82,6 +84,20 @@ const getImpactIcon = (impact: 'High' | 'Medium' | 'Low') => {
 
 
 export default function InsightsPage() {
+  const { user, loading } = useProtectedRoute();
+
+    if (loading) {
+      // Show a loading indicator while checking authentication state
+      return <div>Loading...</div>;
+    }
+
+    if (!user) {
+      // This part should ideally not be reached due to the redirect,
+      // but it's a safeguard. You could render nothing or a message.
+      return null;
+    }
+
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -111,14 +127,14 @@ export default function InsightsPage() {
               </div>
             </CardContent>
             {insight.actionLink && insight.actionText && (
-              <CardFooter>
-                <Link href={insight.actionLink} passHref legacyBehavior>
-                  <Button variant="outline" size="sm" className="w-full font-body">
-                    {insight.actionText} <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </CardFooter>
-            )}
+            <CardFooter>
+            <Button asChild variant="outline" size="sm" className="w-full font-body">
+              <Link href={insight.actionLink} passHref> {/* Remove legacyBehavior */}
+                  {insight.actionText} <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+           </Button>
+            </CardFooter>
+          )}
           </Card>
         ))}
       </div>

@@ -1,10 +1,11 @@
-'use client'
+'use client';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link as LinkIcon, Search, ExternalLink, Loader2, BarChart2, Globe } from "lucide-react";
+import useProtectedRoute from '@/hooks/useProtectedRoute';
 
 interface Backlink {
   id: string;
@@ -14,11 +15,30 @@ interface Backlink {
   domainAuthority: number; // Example metric
 }
 
+      function getValidUrl(url: string) {
+        if (!/^https?:\/\//i.test(url)) {
+          return `https://${url}`;
+        }
+        return url;
+      }
 export default function LinkViewPage() {
   const [targetUrl, setTargetUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [backlinks, setBacklinks] = useState<Backlink[] | null>(null);
   const [summary, setSummary] = useState<{ totalBacklinks: number; referringDomains: number } | null>(null);
+
+   const { user, loading } = useProtectedRoute();
+
+  if (loading) {
+    // Show a loading indicator while checking authentication state
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    // This part should ideally not be reached due to the redirect,
+    // but it's a safeguard. You could render nothing or a message.
+    return null;
+  }
 
   const handleAnalyzeLinks = () => {
     if (!targetUrl.trim()) return;
@@ -45,6 +65,8 @@ export default function LinkViewPage() {
     }, 2000);
   };
 
+
+    
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">Link Analysis</h1>
@@ -107,7 +129,7 @@ export default function LinkViewPage() {
       {backlinks && backlinks.length > 0 && (
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="font-headline">Backlinks for {new URL(targetUrl).hostname}</CardTitle>
+            <CardTitle className="font-headline">Backlinks for {new URL(getValidUrl(targetUrl)).hostname}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>

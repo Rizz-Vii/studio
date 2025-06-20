@@ -1,26 +1,42 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarInset,
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { navItems, AppLogo, AppName } from '@/config/nav';
-import type { NavItem } from '@/config/nav';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '../ui/separator';
+    import Link from 'next/link';
+    import { usePathname } from 'next/navigation';
+    import { useRouter } from 'next/navigation'; // Import useRouter
+    import {
+      SidebarProvider,
+      Sidebar,
+      SidebarHeader,
+      SidebarContent,
+      SidebarMenu,
+      SidebarMenuItem,
+      SidebarMenuButton,
+      SidebarFooter,
+      SidebarInset,
+      SidebarTrigger,
+    } from '@/components/ui/sidebar';
+    import { Button } from '@/components/ui/button';
+    import { navItems, AppLogo, AppName } from '@/config/nav';
+    import type { NavItem } from '@/config/nav';
+    import { ScrollArea } from '@/components/ui/scroll-area';
+    import { Separator } from '../ui/separator';
+    import { useAuth } from '@/context/AuthContext'; // Import useAuth
+    import { auth } from '@/lib/firebase'; // Import auth
 
 const AppHeader = () => {
+    const { user } = useAuth(); // Use useAuth to check if user is logged in
+      const router = useRouter(); // Use useRouter for redirection
+
+      const handleLogout = async () => {
+        try {
+          await auth.signOut();
+          // Redirect to login page after logout
+          router.push('/login');
+        } catch (error: any) {
+          console.error("Error logging out:", error.message);
+          // Display an error message
+        }
+      };
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
       <SidebarTrigger className="md:hidden" />
@@ -28,6 +44,12 @@ const AppHeader = () => {
         <AppLogo className="h-6 w-6 text-primary" />
         <h1 className="text-xl font-headline font-semibold">{AppName}</h1>
       </div>
+      {/* Add logout button here if user is logged in */}
+          {user && ( // Conditionally render logout button if user is logged in
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              Logout
+            </Button>
+          )}
       {/* Add other header elements like user profile button here if needed */}
     </header>
   );
@@ -50,19 +72,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               {navItems.map((item: NavItem) => (
                 <SidebarMenuItem key={item.href}>
-                  <Link href={item.href}>
-                    <SidebarMenuButton
+                  <SidebarMenuButton
                       isActive={pathname === item.href}
                       tooltip={{ children: item.title, className:"font-body" }}
-                      className="font-body"
+                      className="font-body pl-4" // Add pl-4 here
                       asChild={typeof SidebarMenuButton !== 'string'} // Ensure NextLink passes href correctly if SidebarMenuButton is a custom component not rendering <a>
                     >
-                      <>
+                  <Link href={item.href} className="flex items-center gap-2">
                         <item.icon />
                         <span>{item.title}</span>
-                      </>
+                      </Link>
                     </SidebarMenuButton>
-                  </Link>
+                 
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
