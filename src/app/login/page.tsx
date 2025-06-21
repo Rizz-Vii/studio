@@ -16,13 +16,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const { user, loading } = useAuth(); // Use the useAuth hook
+  const { user, loading, role, profile } = useAuth(); // Use the useAuth hook
 
   // Add this useEffect hook to check authentication state and redirect
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user ) {
       // Redirect to dashboard if user is already logged in and not loading
-      router.push('/');
+      if( role === 'admin') {
+      router.push('/adminonly');
+      }else if (role === 'user') {
+        router.push('/dashboard');
+      }
     }
   }, [user, loading, router]);
 
@@ -36,7 +40,11 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // Redirect to dashboard or desired page after successful login
-      router.push('/');
+        if( role !== null) {
+        router.push('/');
+        }
+        
+     
     } catch (error: any) {
       console.error("Error logging in:", error.message);
       // Display an error message to the user (e.g., using a toast notification)

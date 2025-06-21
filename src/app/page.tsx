@@ -29,7 +29,6 @@ export default function HomePage() {
         <a href="#pricing" className="text-sm text-blue-600 font-medium hover:underline">Pricing</a>
         <a href="#faq" className="text-sm text-blue-600 font-medium hover:underline">FAQ</a>
         <a href="#about" className="text-sm text-blue-600 font-medium hover:underline">About</a>
-        <a href="/login" className="text-sm text-white bg-blue-600 hover:bg-blue-700 font-medium px-3 py-1 rounded">Login</a>
         </motion.div>
         
       {/* Hero */}

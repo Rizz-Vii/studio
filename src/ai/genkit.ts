@@ -1,7 +1,21 @@
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
+// import the Genkit and Google AI plugin libraries
+import { gemini15Flash, googleAI } from '@genkit-ai/googleai';
+import { genkit } from 'genkit';
 
+// configure a Genkit instance
+export const registry = genkit({
+  plugins: [googleAI()],
+  model: gemini15Flash, // set default model
+});
 export const ai = genkit({
   plugins: [googleAI()],
-  model: 'googleai/gemini-2.0-flash',
+  model: gemini15Flash, // set default model
 });
+
+const helloFlow = ai.defineFlow('helloFlow', async (name) => {
+  // make a generation request
+  const { text } = await ai.generate(`Hello Gemini, my name is ${name}`);
+  console.log(text);
+});
+
+helloFlow('Chris');

@@ -6,7 +6,7 @@
     import { useAuth } from '@/context/AuthContext';
 
     export default function useProtectedRoute() {
-      const { user, loading } = useAuth();
+      const { user, loading,role } = useAuth();
       const router = useRouter();
 
       useEffect(() => {
@@ -14,7 +14,7 @@
           // Redirect to login page if not authenticated and not loading
           router.push('/login');
         }
-      }, [user, loading, router]);
+      }, [user, loading, router,role]);
 
-      return { user, loading };
+      return { user, loading, role };
     }

@@ -2,9 +2,10 @@
 'use client';
 
 import type { AnalyzeContentInput, AnalyzeContentOutput } from '@/ai/flows/content-optimization';
-import { analyzeContent } from '@/ai/flows/content-optimization';
+// Remove the direct import of analyzeContent as it will be passed via props
+// import { analyzeContent } from '@/ai/flows/content-optimization';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState, useTransition } from 'react';
+import React from 'react'; // Removed useState and useTransition
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
-import { useToast } from '@/hooks/use-toast';
+// Remove useToast as toast will be handled in the page component
+// import { useToast } from '@/hooks/use-toast';
 import { Loader2, BookOpen, CheckCircle, BarChart2 } from 'lucide-react';
 
 const formSchema = z.object({
@@ -24,10 +26,20 @@ const formSchema = z.object({
 
 type ContentAnalyzerFormValues = z.infer<typeof formSchema>;
 
-export default function ContentAnalyzerForm() {
-  const [isPending, startTransition] = useTransition();
-  const [analysisResult, setAnalysisResult] = useState<AnalyzeContentOutput | null>(null);
-  const { toast } = useToast();
+// Define the props interface
+interface ContentAnalyzerFormProps {
+  onSubmit: (values: AnalyzeContentInput) => Promise<void>; // Expecting an async function
+  isLoading: boolean;
+  analysisResult: AnalyzeContentOutput | null;
+}
+
+// Update the component signature to accept props
+export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResult }: ContentAnalyzerFormProps) {
+  // Remove local state for loading and analysisResult
+  // const [isPending, startTransition] = useTransition();
+  // const [analysisResult, setAnalysisResult] = useState<AnalyzeContentOutput | null>(null);
+  // Remove useToast
+  // const { toast } = useToast();
 
   const form = useForm<ContentAnalyzerFormValues>({
     resolver: zodResolver(formSchema),
@@ -37,21 +49,10 @@ export default function ContentAnalyzerForm() {
     },
   });
 
-  async function onSubmit(values: ContentAnalyzerFormValues) {
-    setAnalysisResult(null);
-    startTransition(async () => {
-      try {
-        const result = await analyzeContent(values as AnalyzeContentInput);
-        setAnalysisResult(result);
-      } catch (error) {
-        console.error('Error analyzing content:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to analyze content. Please try again.",
-        });
-      }
-    });
+  // Modify the onSubmit handler to call the prop function
+  async function handleFormSubmit(values: ContentAnalyzerFormValues) {
+    // The loading state and error handling will be managed by the parent component
+    await onSubmit(values as AnalyzeContentInput);
   }
 
   return (
@@ -64,7 +65,8 @@ export default function ContentAnalyzerForm() {
           </CardDescription>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Update the form onSubmit to use the new handler */}
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
             <CardContent className="space-y-4">
               <FormField
                 control={form.control}
@@ -77,6 +79,7 @@ export default function ContentAnalyzerForm() {
                         placeholder="Paste your article, blog post, or page content here..."
                         className="min-h-[200px] font-body"
                         {...field}
+                        disabled={isLoading} // Disable input while loading
                       />
                     </FormControl>
                     <FormDescription className="font-body">
@@ -93,7 +96,12 @@ export default function ContentAnalyzerForm() {
                   <FormItem>
                     <FormLabel className="font-body">Target Keywords</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., SEO best practices, content marketing" {...field} className="font-body" />
+                      <Input
+                        placeholder="e.g., SEO best practices, content marketing"
+                        {...field}
+                        className="font-body"
+                        disabled={isLoading} // Disable input while loading
+                      />
                     </FormControl>
                     <FormDescription className="font-body">
                       Comma-separated list of keywords you are targeting.
@@ -104,8 +112,9 @@ export default function ContentAnalyzerForm() {
               />
             </CardContent>
             <CardFooter>
-              <Button type="submit" disabled={isPending} className="font-body w-full sm:w-auto">
-                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {/* Use the isLoading prop to disable the button */}
+              <Button type="submit" disabled={isLoading} className="font-body w-full sm:w-auto">
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Analyze Content
               </Button>
             </CardFooter>
@@ -113,15 +122,17 @@ export default function ContentAnalyzerForm() {
         </Form>
       </Card>
 
-      {isPending && (
-         <Card className="shadow-md">
-          <CardContent className="p-6 flex items-center justify-center">
+      {/* Use the isLoading prop for the loading indicator */}
+          {isLoading && (
+        <Card className="shadow-md">
+         <CardContent className="p-6 flex items-center justify-center">
             <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
             <p className="font-body text-muted-foreground">Analyzing content...</p>
           </CardContent>
         </Card>
-      )}
+     )}
 
+      {/* Use the analysisResult prop to display results */}
       {analysisResult && (
         <Card className="shadow-lg">
           <CardHeader>

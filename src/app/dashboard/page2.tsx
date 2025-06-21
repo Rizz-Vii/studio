@@ -5,7 +5,7 @@ import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore'; // Import doc and getDoc
 
 interface MetricCardProps {
   title: string;
@@ -18,10 +18,10 @@ interface MetricCardProps {
 interface UserActivity {
   query: string;
   tool: string;
-  type: string;
-  timestamp: any;
-  details: any;
-  resultsSummary?: string;
+  type: string; // e.g., "Keyword Search", "Audit", "Content Analysis"
+  timestamp: any; // Firestore Timestamp
+  details: any; // Details of the activity
+  resultsSummary?: string; // Optional summary
 }
 interface DashboardProfileData {
     displayName?: string;
@@ -51,24 +51,24 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon
   );
 };
 
-export default function DashboardPage() {
-  const [seoMetrics, setSeoMetrics] = useState([
-    { title: "Overall SEO Score", value: "N/A", description: "Based on recent audit", icon: CheckCircle, trend: 'neutral', trendValue: '' },
-    { title: "Tracked Keywords", value: "N/A", description: "Keywords analyzed", icon: BarChartBig, trend: 'neutral', trendValue: '' },
-    { title: "Organic Traffic", value: "N/A", description: "Data from connected analytics", icon: TrafficCone, trend: 'neutral', trendValue: '' },
-    { title: "Referring Domains", value: "N/A", description: "From backlink analysis", icon: LinkIcon, trend: 'neutral', trendValue: '' },
-    { title: "Critical Issues", value: "N/A", description: "From technical audit", icon: AlertTriangle, trend: 'neutral', trendValue: '' },
-    { title: "Content Performance", value: "N/A", description: "Average content score", icon: ScanText, trend: 'neutral', trendValue: '' },
-  ]);
 
+export default function DashboardPage() {
+  const seoMetrics = [
+    { title: "Overall SEO Score", value: "85/100", description: "Based on recent audit", icon: CheckCircle, trend: 'up', trendValue: '+5 pts since last week' },
+    { title: "Tracked Keywords", value: "1,250", description: "45 in Top 3", icon: BarChartBig, trend: 'up', trendValue: '+120 keywords' },
+    { title: "Organic Traffic", value: "12,403", description: "Last 30 days", icon: TrafficCone, trend: 'down', trendValue: '-2.5% vs previous period' },
+    { title: "Referring Domains", value: "320", description: "Total unique domains", icon: LinkIcon, trend: 'up', trendValue: '+15 new domains' },
+    { title: "Critical Issues", value: "5", description: "From technical audit", icon: AlertTriangle, trend: 'neutral', trendValue: '2 fixed this week' },
+    { title: "Content Performance", value: "7.8/10", description: "Average content score", icon: ScanText, trend: 'up', trendValue: '+0.3 pts average' },
+  ];
   const { user, loading: authLoading } = useProtectedRoute();
   const { user: currentUser } = useAuth();
 
   const [dashboardProfile, setDashboardProfile] = useState<DashboardProfileData | null>(null);
-  const [recentActivities, setRecentActivities] = useState<UserActivity[]>([]);
+  const [recentActivities, setRecentActivities] = useState<UserActivity[]>([]); // Change from recentSearches
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+    
   useEffect(() => {
     const fetchData = async () => {
       if (!currentUser) {
@@ -86,39 +86,10 @@ export default function DashboardPage() {
 
         // Fetch recent activities
         const activitiesCollectionRef = collection(db, "users", currentUser.uid, "activities");
-        const recentActivitiesQuery = query(activitiesCollectionRef, orderBy("timestamp", "desc"), limit(20));
+        const recentActivitiesQuery = query(activitiesCollectionRef, orderBy("timestamp", "desc"), limit(5)); // Fetch last 5 activities
         const activitiesSnapshot = await getDocs(recentActivitiesQuery);
         const activitiesData = activitiesSnapshot.docs.map(doc => doc.data() as UserActivity);
-        setRecentActivities(activitiesData);
-
-        // --- Process activities to update metrics ---
-        let latestOverallScore: string | undefined;
-        let latestContentScore: string | undefined;
-        let totalKeywordsAnalyzed = 0;
-        let latestReferringDomains: string | undefined;
-        let latestCriticalIssues: string | undefined;
-
-        activitiesData.forEach(activity => {
-          if (activity.type === 'content_analysis' && activity.resultsSummary) {
-             const scoreMatch = activity.resultsSummary.match(/Score: (\d+)\/100/);
-             if (scoreMatch && scoreMatch[1]) {
-                latestContentScore = `${scoreMatch[1]}/100`;
-             }
-          } else if (activity.type === 'keyword_search' && activity.details?.topic) {
-            totalKeywordsAnalyzed += 1;
-          }
-        });
-
-        setSeoMetrics(prevMetrics => prevMetrics.map(metric => {
-            if (metric.title === "Content Performance" && latestContentScore !== undefined) {
-                return { ...metric, value: latestContentScore };
-            }
-             if (metric.title === "Tracked Keywords" && totalKeywordsAnalyzed > 0) {
-                return { ...metric, value: totalKeywordsAnalyzed.toString(), description: "Keyword searches performed" };
-            }
-            return metric;
-        }));
-        // --- End processing activities ---
+        setRecentActivities(activitiesData); // Set recentActivities
 
       } catch (err: any) {
         console.error("Error fetching dashboard data:", err.message);
@@ -132,7 +103,7 @@ export default function DashboardPage() {
       fetchData();
     }
 
-  }, [authLoading, currentUser]);
+  }, [authLoading, currentUser]); // Rerun effect when auth state changes
 
   if (authLoading || loadingData) {
     return <div>Loading dashboard...</div>;
@@ -143,7 +114,7 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-      return null;
+      return null; // Redirect handled by useProtectedRoute
   }
   return (
    <div className="p-4 md:p-6 lg:p-8">
@@ -165,6 +136,7 @@ export default function DashboardPage() {
         )}
       </div>
 
+
       {/* Display Recent Activity */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Recent Activity</h2>
@@ -173,6 +145,8 @@ export default function DashboardPage() {
             {recentActivities.map((activity, index) => (
               <li key={index} className="p-3 border rounded bg-gray-50">
                 <strong>{activity.tool}:</strong> {activity.type} on {activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}
+                {/* You can display details or summary here */}
+                {activity.details?.query && <p className="text-sm text-gray-600">Query: {activity.details.query}</p>}
                 {activity.resultsSummary && <p className="text-sm text-gray-600">Summary: {activity.resultsSummary}</p>}
               </li>
             ))}
@@ -181,7 +155,7 @@ export default function DashboardPage() {
           <p>No recent activity yet. Try using the tools!</p>
         )}
       </div>
-
+      
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {seoMetrics.map((metric) => (
           <MetricCard
@@ -208,32 +182,37 @@ export default function DashboardPage() {
               <BarChartBig className="h-16 w-16 text-muted-foreground" />
               <p className="text-muted-foreground ml-2 font-body">Ranking Distribution Chart Area</p>
             </div>
-            {/* This should also be updated with real data */}
-            <p className="text-xs text-muted-foreground pt-2 font-body">Top 3: N/A | Top 10: N/A | Top 50: N/A</p>
+            <p className="text-xs text-muted-foreground pt-2 font-body">Top 3: 45 | Top 10: 150 | Top 50: 600</p>
           </CardContent>
         </Card>
 
-        {/* The Recent Activity Card can potentially be removed or simplified now that activity is shown above */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle className="font-headline">Recent Activity Feed</CardTitle>
-            <CardDescription className="font-body">Latest updates and alerts from your tools.</CardDescription>
+            <CardTitle className="font-headline">Recent Activity</CardTitle>
+            <CardDescription className="font-body">Latest updates and alerts.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-             {recentActivities.length > 0 ? (
-                recentActivities.map((activity, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                        <Activity className="h-5 w-5 text-primary mt-1" />
-                        <div>
-                            <p className="text-sm font-medium font-body">{activity.tool}: {activity.type}</p>
-                             {activity.resultsSummary && <p className="text-xs text-muted-foreground font-body">Summary: {activity.resultsSummary}</p>}
-                            <p className="text-xs text-muted-foreground font-body">{activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
-                        </div>
-                    </div>
-                ))
-             ) : (
-                <p className="text-sm text-muted-foreground font-body">No recent activity to display.</p>
-             )}
+            <div className="flex items-start space-x-3">
+              <Activity className="h-5 w-5 text-primary mt-1" />
+              <div>
+                <p className="text-sm font-medium font-body">New keyword "AI SEO tools" entered Top 10.</p>
+                <p className="text-xs text-muted-foreground font-body">2 hours ago</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="h-5 w-5 text-green-500 mt-1" />
+              <div>
+                <p className="text-sm font-medium font-body">Technical audit completed for example.com.</p>
+                <p className="text-xs text-muted-foreground font-body">1 day ago</p>
+              </div>
+            </div>
+             <div className="flex items-start space-x-3">
+              <AlertTriangle className="h-5 w-5 text-yellow-500 mt-1" />
+              <div>
+                <p className="text-sm font-medium font-body">High bounce rate detected on /blog/article-1.</p>
+                <p className="text-xs text-muted-foreground font-body">3 days ago</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
