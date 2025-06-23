@@ -53,7 +53,7 @@
     };
     
   export default function SeoAuditPage() {
-    const [url, setUrl] = useState<string>('www.theairvantage.com');
+    const [url, setUrl] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [auditResults, setAuditResults] = useState<BackendAuditResult | null>(null);
     const [overallScore, setOverallScore] = useState<number>(0);
@@ -109,27 +109,13 @@
         if (!currentUser) {
             throw new Error("Authentication token not available.");
         }
-        const token = await currentUser.getIdToken();
-        const functionUrl = "https://auditurl-thevwhkpdq-uc.a.run.app"; 
         
         const validUrl = getValidUrl(url.trim());
         console.log("Calling 'auditUrl' function with payload:", { url: validUrl });
+        const auditUrlCallable = httpsCallable(functions, 'auditUrl');
         
-        const response = await fetch(functionUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ url: validUrl }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json() as BackendAuditResult;
+        const result = await auditUrlCallable({ url: validUrl });
+        const data = result.data as BackendAuditResult;
         
         setAuditResults(data);
         setOverallScore(data.overallScore);
