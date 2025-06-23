@@ -274,7 +274,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                  )}
-                 <div className="flex space-x-2 w-full justify-center">
+                 <div className="flex space-x-2 w-full justify-center overflow-hidden">
                     <AnimatePresence initial={false}>
                         {getVisibleBriefs().map((brief, i) => (
                              <motion.div
@@ -482,4 +482,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
 
