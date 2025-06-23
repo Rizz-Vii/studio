@@ -153,6 +153,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
           <Card className="shadow-lg mt-8">
             <CardHeader>
               <CardTitle className="font-headline">Analysis Results</CardTitle>
+              <CardDescription className="font-body">This analysis provides a holistic view of your content's quality. Use the suggestions to improve your scores and increase your chances of ranking.</CardDescription>
                <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
                 <div className="w-full sm:w-1/2">
                   <div className="flex items-center space-x-2">
@@ -179,7 +180,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
                   <AccordionTrigger className="font-body hover:no-underline">
                      <div className="flex w-full items-center justify-between pr-4">
                         <div className="flex items-center">
-                            <BookOpen className="mr-2 h-5 w-5 text-primary" /> Readability
+                            <BookOpen className="mr-2 h-6 w-6 text-primary" /> Readability
                         </div>
                         <div className="flex items-center gap-4">
                             <span className="text-sm font-semibold">{analysisResult.readabilityScore}/100</span>
@@ -197,7 +198,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
                   <AccordionTrigger className="font-body hover:no-underline">
                     <div className="flex w-full items-center justify-between pr-4">
                         <div className="flex items-center">
-                            <Target className="mr-2 h-5 w-5 text-primary" /> Keyword Optimization
+                            <Target className="mr-2 h-6 w-6 text-primary" /> Keyword Optimization
                         </div>
                         <div className="flex items-center gap-4">
                             <span className="text-sm font-semibold">{analysisResult.keywordScore}/100</span>
@@ -215,7 +216,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
                   <AccordionTrigger className="font-body hover:no-underline">
                     <div className="flex w-full items-center justify-between pr-4">
                         <div className="flex items-center">
-                            <CheckCircle className="mr-2 h-5 w-5 text-primary" /> Semantic Relevance
+                            <CheckCircle className="mr-2 h-6 w-6 text-primary" /> Semantic Relevance
                         </div>
                         <div className="flex items-center gap-4">
                             <span className="text-sm font-semibold">{analysisResult.semanticScore}/100</span>

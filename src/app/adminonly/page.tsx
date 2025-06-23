@@ -92,7 +92,7 @@ export default function AdminDashboardPage() {
         <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-body">Total Users</CardTitle>
-              <Users className="h-5 w-5 text-muted-foreground" />
+              <Users className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold font-headline">{stats.totalUsers}</div>
@@ -102,7 +102,7 @@ export default function AdminDashboardPage() {
         <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-body">Recent Signups</CardTitle>
-              <UserPlus className="h-5 w-5 text-muted-foreground" />
+              <UserPlus className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold font-headline">{stats.recentSignups}</div>
@@ -112,7 +112,7 @@ export default function AdminDashboardPage() {
         <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-body">Total Activities</CardTitle>
-              <ActivitySquare className="h-5 w-5 text-muted-foreground" />
+              <ActivitySquare className="h-6 w-6 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold font-headline">{stats.totalActivities}</div>

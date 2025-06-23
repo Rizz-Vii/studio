@@ -35,7 +35,7 @@ const RankCell = ({ rankInfo }: { rankInfo: RankInfo }) => {
           <TooltipTrigger asChild>
             <span className="flex items-center justify-center gap-1 cursor-help">
               {rankInfo.rank}
-              <Info className="h-3 w-3 text-muted-foreground" />
+              <Info className="h-4 w-4 text-muted-foreground" />
             </span>
           </TooltipTrigger>
           <TooltipContent>
@@ -189,6 +189,7 @@ export default function CompetitorsPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">Competitor Analysis</h1>
+      <p className="text-muted-foreground font-body">Compare your keyword rankings against your competitors to identify strategic advantages and uncover content gaps.</p>
 
       <Card className="shadow-lg">
         <CardHeader>
@@ -253,6 +254,7 @@ export default function CompetitorsPage() {
           <Card className="shadow-lg mt-8">
             <CardHeader>
               <CardTitle className="font-headline">Keyword Rankings Comparison</CardTitle>
+              <CardDescription className="font-body">This table shows the simulated search engine ranking for each keyword. "N/A" indicates a rank outside the top 100. Hover over results with an info icon for more details.</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -289,12 +291,12 @@ export default function CompetitorsPage() {
           <Card className="shadow-lg mt-8">
             <CardHeader>
               <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
-              <CardDescription className="font-body">Keywords your competitors rank for, but you might be missing.</CardDescription>
+              <CardDescription className="font-body">These are keywords where your competitors rank highly but you don't. Use these as inspiration for new content to capture more traffic.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               {analysisResult.contentGaps.map((gap, index) => (
                 <div key={index} className="flex items-center space-x-2 p-2 bg-secondary rounded-md">
-                  <Tag className="h-4 w-4 text-primary" />
+                  <Tag className="h-5 w-5 text-primary" />
                   <span className="font-body text-sm">{gap}</span>
                 </div>
               ))}

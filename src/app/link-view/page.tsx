@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link as LinkIcon, Search, ExternalLink, Loader2, Globe } from "lucide-react";
+import { Link as LinkIcon, Search, ExternalLink, Loader2, Globe, Info } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { analyzeLinks, LinkAnalysisOutput } from '@/ai/flows/link-analysis';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 interface Backlink {
   referringDomain: string;
@@ -115,6 +116,7 @@ export default function LinkViewPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">Link Analysis</h1>
+      <p className="text-muted-foreground font-body">Analyze the backlink profile of any URL to understand its authority and link-building strategy.</p>
 
       <Card className="shadow-lg">
         <CardHeader>
@@ -156,7 +158,7 @@ export default function LinkViewPage() {
                 <Card className="shadow-md">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium font-body">Total Backlinks</CardTitle>
-                        <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                        <LinkIcon className="h-6 w-6 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold font-headline">{summary.totalBacklinks.toLocaleString()}</div>
@@ -165,7 +167,7 @@ export default function LinkViewPage() {
                 <Card className="shadow-md">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium font-body">Referring Domains</CardTitle>
-                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <Globe className="h-6 w-6 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold font-headline">{summary.referringDomains.toLocaleString()}</div>
@@ -179,6 +181,7 @@ export default function LinkViewPage() {
             <Card className="shadow-lg mt-8">
               <CardHeader>
                 <CardTitle className="font-headline">Backlinks for {new URL(getValidUrl(targetUrl)).hostname}</CardTitle>
+                 <CardDescription className="font-body">A high number of backlinks from authoritative domains can significantly improve your search engine rankings.</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -187,7 +190,18 @@ export default function LinkViewPage() {
                       <TableHead className="font-body">Referring Domain</TableHead>
                       <TableHead className="font-body">Backlink URL</TableHead>
                       <TableHead className="font-body">Anchor Text</TableHead>
-                      <TableHead className="font-body text-right">DA</TableHead>
+                      <TableHead className="font-body text-right">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger className="cursor-help flex items-center gap-1 justify-end">
+                                    DA <Info className="h-3 w-3" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Domain Authority (DA) is a search engine<br />ranking score that predicts how likely a<br />website is to rank in search engine result pages.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

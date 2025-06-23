@@ -113,17 +113,17 @@ export default function SerpViewPage() {
                   <div key={result.id} className={`p-4 rounded-lg border ${result.isFeaturedSnippet ? 'border-primary bg-primary/10 shadow-md' : 'bg-card'}`}>
                     {result.isFeaturedSnippet && (
                       <div className="flex items-center text-sm text-primary font-medium mb-1 font-body">
-                        <Star className="h-5 w-5 mr-1 fill-primary" /> Featured Snippet
+                        <Star className="h-6 w-6 mr-1 fill-primary" /> Featured Snippet
                       </div>
                     )}
                      {result.isPeopleAlsoAsk && (
                       <div className="flex items-center text-sm text-accent-foreground font-medium mb-1 font-body">
-                        <MessageSquare className="h-5 w-5 mr-1 text-accent" /> People Also Ask
+                        <MessageSquare className="h-6 w-6 mr-1 text-accent" /> People Also Ask
                       </div>
                     )}
                     {result.isImagePack && (
                       <div className="flex items-center text-sm text-accent-foreground font-medium mb-1 font-body">
-                        <ImageIcon className="h-5 w-5 mr-1 text-accent" /> Image Pack
+                        <ImageIcon className="h-6 w-6 mr-1 text-accent" /> Image Pack
                       </div>
                     )}
                     <h3 className="text-lg font-medium text-primary hover:underline font-headline">

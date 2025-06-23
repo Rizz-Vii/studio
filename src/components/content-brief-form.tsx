@@ -30,7 +30,7 @@ const ResultCard = ({ title, icon: Icon, children }: { title: string; icon: Reac
     <Card>
         <CardHeader className="pb-4">
             <CardTitle className="font-headline text-lg flex items-center gap-2">
-                <Icon className="h-5 w-5 text-primary" />
+                <Icon className="h-6 w-6 text-primary" />
                 {title}
             </CardTitle>
         </CardHeader>
@@ -159,6 +159,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
               </div>
 
               <ResultCard title="Semantic Keywords (LSI)" icon={Tag}>
+                  <CardDescription className="mb-4 -mt-2">Incorporating these related terms helps search engines understand the context and depth of your content, improving its chances to rank for a wider range of queries.</CardDescription>
                   <div className="flex flex-wrap gap-2">
                       {briefResult.lsiKeywords.map((lsi, i) => (
                           <Badge key={i} variant={lsi.type === 'topic' ? 'default' : lsi.type === 'entity' ? 'secondary' : 'outline'}>
@@ -169,12 +170,14 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
               </ResultCard>
 
               <ResultCard title="Questions to Answer" icon={HelpCircle}>
+                 <CardDescription className="mb-4 -mt-2">Directly answering these common user questions can help you capture "People Also Ask" features in search results.</CardDescription>
                   <ul className="space-y-2 list-disc pl-5 font-body">
                       {briefResult.questionsToAnswer.map((q, i) => <li key={i}>{q}</li>)}
                   </ul>
               </ResultCard>
 
               <ResultCard title="Linking Suggestions" icon={LinkIcon}>
+                   <CardDescription className="mb-4 -mt-2">Internal links help search engines discover your content and understand the relationships between your pages, distributing link equity throughout your site.</CardDescription>
                    <ul className="space-y-2 list-disc pl-5 font-body">
                       {briefResult.internalLinkingSuggestions.map((link, i) => (
                           <li key={i}>

@@ -44,7 +44,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon
           <Card className={cn("group shadow-lg hover:shadow-xl hover:bg-accent hover:text-accent-foreground transition-all duration-300 cursor-pointer h-full", className)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-body group-hover:text-inherit">{title}</CardTitle>
-              <Icon className="h-5 w-5 text-muted-foreground group-hover:text-inherit" />
+              <Icon className="h-6 w-6 text-muted-foreground group-hover:text-inherit" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold font-headline group-hover:text-inherit">{value}</div>
@@ -76,18 +76,19 @@ const rankingData = [
 ];
 
 const trafficData = [
-  { month: 'Jan', traffic: 12403 },
-  { month: 'Feb', traffic: 13500 },
-  { month: 'Mar', traffic: 14200 },
-  { month: 'Apr', traffic: 15100 },
-  { month: 'May', traffic: 16000, projection: true },
-  { month: 'Jun', traffic: 17200, projection: true },
+  { month: 'Jan', traffic: 12403, projection: null },
+  { month: 'Feb', traffic: 13500, projection: null },
+  { month: 'Mar', traffic: 14200, projection: null },
+  { month: 'Apr', traffic: 15100, projection: 15100 }, // Start projection from last actual data point
+  { month: 'May', traffic: null, projection: 16000 },
+  { month: 'Jun', traffic: null, projection: 17200 },
 ];
 
 const chartConfig = {
   value: { label: "Keywords" },
   traffic: { label: "Traffic", color: "hsl(var(--chart-1))" },
-} satisfies ChartConfig
+  projection: { label: "Projection", color: "hsl(var(--chart-1))" },
+} satisfies ChartConfig;
 
 export default function DashboardPage() {
   const [seoMetrics, setSeoMetrics] = useState([
@@ -124,7 +125,7 @@ export default function DashboardPage() {
         const recentActivitiesQuery = query(activitiesCollectionRef, orderBy("timestamp", "desc"), limit(20));
         const activitiesSnapshot = await getDocs(recentActivitiesQuery);
         const activitiesData = activitiesSnapshot.docs.map(doc => doc.data() as UserActivity);
-        setRecentActivities(activitiesData);
+        setRecentActivities(activitiesData.slice(0, 5)); // Show only 5 in the feed
 
         let totalKeywordsAnalyzed = 0;
         let contentScores: number[] = [];
@@ -181,23 +182,11 @@ export default function DashboardPage() {
       return null;
   }
   return (
-   <div className="max-w-7xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold mb-4">
+   <div className="max-w-7xl mx-auto space-y-8">
+      <h1 className="text-3xl font-headline font-semibold text-foreground">
         Welcome, {profile?.displayName || currentUser.email}!
       </h1>
-
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Your SEO Focus</h2>
-        {profile?.targetWebsite && (
-          <p><strong>Target Website:</strong> {profile.targetWebsite}</p>
-        )}
-        {profile?.primaryKeywords && (
-          <p><strong>Primary Keywords:</strong> {profile.primaryKeywords}</p>
-        )}
-        {!profile?.targetWebsite && !profile?.primaryKeywords && (
-            <p>Go to your Profile to set your SEO focus!</p>
-        )}
-      </div>
+      <p className="text-muted-foreground font-body">Here's your SEO command center. Monitor key metrics, review recent activity, and discover AI-powered insights to guide your strategy.</p>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {seoMetrics.map((metric) => (
@@ -213,29 +202,31 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="shadow-lg">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="shadow-lg lg:col-span-4">
             <CardHeader>
-                <CardTitle className="font-headline">Keyword Ranking Distribution</CardTitle>
-                <CardDescription className="font-body">Breakdown of keywords by ranking position.</CardDescription>
+                <CardTitle className="font-headline">Organic Traffic Projection</CardTitle>
+                <CardDescription className="font-body">Simulated monthly traffic based on current trends. Connect your analytics for real data.</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                    <BarChart data={rankingData} layout="vertical" margin={{ left: 10, right: 10}}>
-                        <CartesianGrid horizontal={false} />
-                        <XAxis type="number" hide />
-                        <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} width={80} className="text-xs font-body"/>
-                        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-                        <Bar dataKey="value" fill="var(--color-traffic)" radius={4} />
-                    </BarChart>
+                  <ResponsiveContainer>
+                    <LineChart data={trafficData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} className="text-xs font-body"/>
+                      <YAxis tickFormatter={(value) => value.toLocaleString()} className="text-xs" />
+                      <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
+                      <Line type="monotone" dataKey="traffic" stroke="var(--color-traffic)" strokeWidth={2} dot={true} />
+                      <Line type="monotone" dataKey="projection" stroke="var(--color-projection)" strokeWidth={2} strokeDasharray="5 5" />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </ChartContainer>
             </CardContent>
         </Card>
-
-        <Card className="shadow-lg flex flex-col">
+        <Card className="shadow-lg lg:col-span-3 flex flex-col">
           <CardHeader>
-            <CardTitle className="font-headline">Recent Activity Feed</CardTitle>
-            <CardDescription className="font-body">Latest updates and alerts from your tools.</CardDescription>
+            <CardTitle className="font-headline">Recent Activity</CardTitle>
+            <CardDescription className="font-body">Your latest actions across the platform.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-1 flex-grow">
             {recentActivities.length > 0 ? (
@@ -243,16 +234,13 @@ export default function DashboardPage() {
                     <Dialog key={index}>
                         <DialogTrigger asChild>
                             <div className="group flex items-start space-x-3 p-2 rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors">
-                                <Activity className="h-5 w-5 text-primary mt-1 flex-shrink-0 group-hover:text-inherit" />
+                                <Activity className="h-6 w-6 text-primary mt-1 flex-shrink-0 group-hover:text-inherit" />
                                 <div className="flex-grow overflow-hidden">
                                     <p className="text-sm font-medium font-body capitalize">
                                         {activity.tool}: {activity.type.replace(/_/g, ' ')}
                                     </p>
                                     <p className="text-xs text-muted-foreground font-body truncate group-hover:text-inherit" title={activity.resultsSummary ?? ''}>
                                         {activity.resultsSummary}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground font-body group-hover:text-inherit">
-                                        {activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}
                                     </p>
                                 </div>
                             </div>

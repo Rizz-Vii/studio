@@ -1,5 +1,6 @@
 
 'use client';
+import React from 'react';
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Rocket, Search, TrendingUp } from 'lucide-react';
@@ -93,18 +94,11 @@ export default function HomePage() {
             </Dialog>
         ))}
       </section>
-      {/* About Us */}
-      <motion.section id="about" className="mt-24 w-full max-w-4xl text-center">
-        <h2 className="text-3xl font-bold mb-6">About RankPilot</h2>
-        <p className="text-gray-600 mb-6">
-          RankPilot is built to give SEO professionals a single dashboard that replaces half a dozen tools.
-          From crawling and content scoring to tracking and reporting — it's all here, powered by AI.
-        </p>
-      </motion.section>
+      
        {/* Screenshot */}
        <section className="mt-24 w-full max-w-6xl text-center">
         <h2 className="text-3xl md:text-4xl font-semibold mb-4">Your SEO Command Center</h2>
-        <p className="text-gray-600 mb-6">All your SEO tools — crawler, analyzer, optimizer — in one clean, intuitive dashboard.</p>
+        <p className="text-gray-600 mb-6">All your SEO tools — crawler, analyzer, optimizer — in one clean, intuitive dashboard designed to turn data into action.</p>
         <div className="rounded-xl shadow-2xl overflow-hidden border border-gray-200">
           <Image
             src="https://placehold.co/1200x700.png"
@@ -117,6 +111,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* About Us */}
+      <motion.section id="about" className="mt-24 w-full max-w-4xl text-center">
+        <h2 className="text-3xl font-bold mb-6">About RankPilot</h2>
+        <p className="text-gray-600 mb-6">
+          RankPilot is built to give SEO professionals a single dashboard that replaces half a dozen tools.
+          From crawling and content scoring to tracking and reporting — it's all here, powered by AI.
+        </p>
+      </motion.section>
        
         {/* CTA */}
         <motion.section initial="hidden" animate="visible" variants={fadeIn} custom={7} className="mt-32 max-w-4xl w-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-10 text-white text-center shadow-xl">
@@ -180,7 +182,7 @@ export default function HomePage() {
 function Feature({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
     return (
       <div className="p-6 border border-gray-200 rounded-2xl shadow hover:shadow-lg transition bg-white h-full">
-        <div className="text-blue-600 mb-4">{icon}</div>
+        <div className="text-blue-600 mb-4">{React.cloneElement(icon as React.ReactElement, { className: 'h-6 w-6' })}</div>
         <h4 className="text-xl font-semibold mb-2">{title}</h4>
         <p className="text-gray-600">{children}</p>
       </div>

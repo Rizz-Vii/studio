@@ -165,9 +165,9 @@
     };
 
     const getStatusIcon = (status: 'good' | 'warning' | 'error') => {
-      if (status === 'good') return <CheckCircle className="h-5 w-5 text-green-500" />;
-      if (status === 'warning') return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
-      return <AlertTriangle className="h-5 w-5 text-red-500" />;
+      if (status === 'good') return <CheckCircle className="h-6 w-6 text-green-500" />;
+      if (status === 'warning') return <AlertTriangle className="h-6 w-6 text-yellow-500" />;
+      return <AlertTriangle className="h-6 w-6 text-red-500" />;
     };
 
     const getProgressColor = (score: number) => {
@@ -179,6 +179,7 @@
     return (
       <div className="max-w-7xl mx-auto space-y-8">
         <h1 className="text-3xl font-headline font-semibold text-foreground">Technical SEO Audit</h1>
+        <p className="text-muted-foreground font-body">Analyze a URL to uncover technical issues and content optimization opportunities that could be affecting your search engine ranking.</p>
 
         <Card className="shadow-lg">
           <CardHeader>
@@ -227,6 +228,7 @@
                 <CardTitle className="font-headline">
                   Audit Report for {url.trim() ? new URL(getValidUrl(url)).hostname : 'your site'}
                 </CardTitle>
+                <CardDescription className="font-body">This report provides a prioritized list of SEO issues. Addressing the 'error' and 'warning' items will have the most impact on your ranking.</CardDescription>
                  <div className="flex items-center space-x-4 pt-2">
                     <div className="text-4xl font-bold font-headline" style={{color: getProgressColor(auditResults.overallScore).replace('bg-', 'var(--')}}>{auditResults.overallScore}/100</div>
                       <div>
@@ -253,7 +255,7 @@
                         <TableCell className="flex justify-center">{getStatusIcon(item.status)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                             {React.createElement(item.icon, { className: "h-5 w-5 text-muted-foreground" })}
+                             {React.createElement(item.icon, { className: "h-6 w-6 text-muted-foreground" })}
                              <span className="font-medium font-body">{item.name}</span>
                           </div>
                         </TableCell>

@@ -1,3 +1,4 @@
+
 // src/app/content-brief/page.tsx
 'use client';
 
@@ -63,6 +64,7 @@ export default function ContentBriefPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">AI Content Brief Generator</h1>
+      <p className="text-muted-foreground font-body">Create comprehensive, SEO-optimized content briefs in seconds to guide your writing team and ensure content ranks effectively.</p>
       <ContentBriefForm
         onSubmit={handleGenerateBrief}
         isLoading={isLoading}

@@ -154,7 +154,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
                 </Button>
               </div>
               <CardDescription className="font-body">
-                Here are some keywords related to "{form.getValues('topic')}".
+                Use these keywords to brainstorm content ideas, optimize existing pages, or inform your PPC campaigns. Long-tail keywords often have lower competition and higher conversion rates.
               </CardDescription>
             </CardHeader>
             <CardContent>
