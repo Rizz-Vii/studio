@@ -10,7 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const ContentBriefInputSchema = z.object({
+const ContentBriefInputSchema = z.object({
   keyword: z.string().describe('The primary target keyword for the content brief.'),
 });
 export type ContentBriefInput = z.infer<typeof ContentBriefInputSchema>;
@@ -20,7 +20,7 @@ const LSIKeywordSchema = z.object({
   type: z.enum(['topic', 'entity', 'question']).describe('The type of the keyword.'),
 });
 
-export const ContentBriefOutputSchema = z.object({
+const ContentBriefOutputSchema = z.object({
   suggestedTitle: z.string().describe('A compelling, SEO-optimized title for the article.'),
   metaDescription: z.string().describe('A concise and engaging meta description (155-160 characters).'),
   targetAudience: z.string().describe('A description of the target audience for this content.'),
