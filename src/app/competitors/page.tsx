@@ -191,7 +191,7 @@ export default function CompetitorsPage() {
       <h1 className="text-3xl font-headline font-semibold text-foreground">Competitor Analysis</h1>
       <p className="text-muted-foreground font-body">Compare your keyword rankings against your competitors to identify strategic advantages and uncover content gaps.</p>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-xl">
         <CardHeader>
           <CardTitle className="font-headline">Setup Analysis</CardTitle>
           <CardDescription className="font-body">Enter your URL, competitor URLs, and keywords to compare rankings.</CardDescription>
@@ -251,7 +251,7 @@ export default function CompetitorsPage() {
       
       <div ref={resultsRef}>
         {analysisResult && (
-          <Card className="shadow-lg mt-8">
+          <Card className="shadow-xl mt-8">
             <CardHeader>
               <CardTitle className="font-headline">Keyword Rankings Comparison</CardTitle>
               <CardDescription className="font-body">This table shows the simulated search engine ranking for each keyword. "N/A" indicates a rank outside the top 100. Hover over results with an info icon for more details.</CardDescription>
@@ -288,7 +288,7 @@ export default function CompetitorsPage() {
         )}
 
         {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length > 0 && (
-          <Card className="shadow-lg mt-8">
+          <Card className="shadow-xl mt-8">
             <CardHeader>
               <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
               <CardDescription className="font-body">These are keywords where your competitors rank highly but you don't. Use these as inspiration for new content to capture more traffic.</CardDescription>
@@ -314,5 +314,3 @@ export default function CompetitorsPage() {
     </div>
   );
 }
-
-    

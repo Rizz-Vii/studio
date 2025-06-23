@@ -67,7 +67,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-lg">
+      <Card className="shadow-xl">
         <CardHeader>
           <CardTitle className="font-headline">Discover Keywords</CardTitle>
           <CardDescription className="font-body">
@@ -145,7 +145,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
 
         {/* Display results using the results prop */}
         {results && results.keywords.length > 0 && (
-          <Card className="shadow-lg mt-8">
+          <Card className="shadow-xl mt-8">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="font-headline">Suggested Keywords</CardTitle>

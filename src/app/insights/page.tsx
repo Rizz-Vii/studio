@@ -128,7 +128,7 @@ export default function InsightsPage() {
           {insights.length > 0 ? (
             <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
               {insights.map(insight => (
-                <Card key={insight.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                <Card key={insight.id} className="shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col">
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
                       <CardTitle className="font-headline text-lg">{insight.title}</CardTitle>

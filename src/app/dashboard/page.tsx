@@ -260,17 +260,22 @@ const ToolActivityCard: React.FC<{
   const Icon = config.icon;
 
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+    <Card className="shadow-xl hover:shadow-2xl transition-shadow flex flex-col">
       <CardHeader>
-        <CardTitle className="font-headline flex items-center gap-2">
-          <Icon className={`h-6 w-6 ${config.color}`} />
-          {tool}
-        </CardTitle>
-        <CardDescription>{activities.length} recent activities</CardDescription>
+        <div className="flex justify-between items-center">
+            <CardTitle className="font-headline flex items-center gap-2">
+                <Icon className={`h-6 w-6 ${config.color}`} />
+                {tool}
+            </CardTitle>
+            <div className="flex items-center text-muted-foreground font-body gap-1.5">
+                <Activity className="h-4 w-4" />
+                <span className="font-semibold text-sm">{activities.length}</span>
+            </div>
+        </div>
       </CardHeader>
-      <CardContent className="flex-grow space-y-4">
+      <CardContent className="flex-grow space-y-4 pt-4">
         {children}
-        <div>
+        <div className="pt-4 border-t">
           <h4 className="font-semibold text-sm mb-2">Recent Logs:</h4>
           <ul className="space-y-3">
             {activities.slice(0, 5).map((activity) => (

@@ -55,7 +55,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-lg">
+      <Card className="shadow-xl">
         <CardHeader>
           <CardTitle className="font-headline">Generate a Content Brief</CardTitle>
           <CardDescription className="font-body">
