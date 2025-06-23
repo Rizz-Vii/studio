@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tag, Tags, PlusCircle, Trash2, Loader2 } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
+
 interface Competitor {
   id: string;
   url: string;
@@ -26,16 +27,32 @@ function getValidUrl(url: string): string {
     return url;
 }
 
+function getHostname(url: string): string {
+    if (!url.trim()) {
+        return '';
+    }
+    try {
+        return new URL(getValidUrl(url)).hostname;
+    } catch (e) {
+        // If the URL is invalid, return the original string, truncated if necessary
+        return url.length > 30 ? url.substring(0, 27) + '...' : url;
+    }
+}
+
+
 export default function CompetitorsPage() {
   const [yourUrl, setYourUrl] = useState<string>('');
-  const [competitors, setCompetitors] = useState<Competitor[]>([{ id: crypto.randomUUID(), url: '' }]);
+  // Use a simple number for unique IDs instead of crypto.randomUUID
+  const [nextId, setNextId] = useState(1);
+  const [competitors, setCompetitors] = useState<Competitor[]>([{ id: 'comp-0', url: '' }]);
   const [keywords, setKeywords] = useState<string[]>(['']);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [rankingData, setRankingData] = useState<RankingData[] | null>(null);
   const [contentGaps, setContentGaps] = useState<string[] | null>(null);
 
   const addCompetitor = () => {
-    setCompetitors([...competitors, { id: crypto.randomUUID(), url: '' }]);
+    setCompetitors([...competitors, { id: `comp-${nextId}`, url: '' }]);
+    setNextId(prevId => prevId + 1);
   };
 
   const removeCompetitor = (id: string) => {
@@ -196,7 +213,7 @@ export default function CompetitorsPage() {
                   <TableHead className="font-body">Keyword</TableHead>
                   <TableHead className="font-body text-center">Your Rank</TableHead>
                   {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                    <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={comp.url}>{new URL(getValidUrl(comp.url)).hostname}</TableHead>
+                    <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={comp.url}>{getHostname(comp.url)}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
