@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { BarChartBig, Users, Activity, TrendingUp, CheckCircle, AlertTriangle, TrafficCone, Link as LinkIcon, ScanText, ArrowRight } from "lucide-react";
@@ -38,7 +39,7 @@ interface DashboardProfileData {
 const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon: Icon, trend, trendValue, className }) => {
   const trendColor = trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-muted-foreground';
   return (
-    <Card className={cn("shadow-lg hover:shadow-xl hover:bg-accent/20 transition-all duration-300", className)}>
+    <Card className={cn("shadow-lg hover:shadow-xl hover:bg-primary/10 transition-all duration-300", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium font-body">{title}</CardTitle>
         <Icon className="h-5 w-5 text-muted-foreground" />
@@ -242,7 +243,7 @@ export default function DashboardPage() {
                 recentActivities.map((activity, index) => (
                     <Dialog key={index}>
                         <DialogTrigger asChild>
-                            <div className="flex items-start space-x-3 p-2 rounded-md hover:bg-muted cursor-pointer transition-colors">
+                            <div className="flex items-start space-x-3 p-2 rounded-md hover:bg-primary/10 cursor-pointer transition-colors">
                                 <Activity className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                                 <div className="flex-grow overflow-hidden">
                                     <p className="text-sm font-medium font-body capitalize">{activity.tool}: {activity.type.replace(/_/g, ' ')}</p>
