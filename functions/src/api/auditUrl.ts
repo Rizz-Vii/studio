@@ -2,7 +2,7 @@ import * as logger from "firebase-functions/logger";
 import type { onCall } from "firebase-functions/v2/https";
 import { HttpsError } from "firebase-functions/v2/https";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
-import { auditUrl, AuditUrlInput, AuditUrlOutput } from "@/ai/flows/seo-audit";
+import { auditUrl, AuditUrlInput, AuditUrlOutput } from "@/ai/flows/seo-audit.js";
 
 export const auditUrlHandler: Parameters<typeof onCall>[0] = async (request) => {
     if (!request.auth) {

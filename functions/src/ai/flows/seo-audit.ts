@@ -6,7 +6,7 @@
  * - AuditUrlOutput - The return type for the auditUrl function.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai } from '@/ai/genkit.js';
 import { z } from 'genkit';
 import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
 
