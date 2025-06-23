@@ -1,4 +1,3 @@
-// src/components/content-analyzer-form.tsx
 'use client';
 
 import type { AnalyzeContentInput, AnalyzeContentOutput } from '@/ai/flows/content-optimization';
@@ -12,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Progress } from "@/components/ui/progress";
 import { Loader2, BookOpen, CheckCircle, BarChart2, Target } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from 'recharts';
 
@@ -27,9 +25,10 @@ interface ContentAnalyzerFormProps {
   onSubmit: (values: AnalyzeContentInput) => Promise<void>;
   isLoading: boolean;
   analysisResult: AnalyzeContentOutput | null;
+  error: string | null;
 }
 
-export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResult }: ContentAnalyzerFormProps) {
+export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResult, error }: ContentAnalyzerFormProps) {
   const form = useForm<ContentAnalyzerFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -113,7 +112,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
         </Form>
       </Card>
 
-          {isLoading && (
+      {isLoading && (
         <Card className="shadow-md">
          <CardContent className="p-6 flex items-center justify-center">
             <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
@@ -121,6 +120,17 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
           </CardContent>
         </Card>
      )}
+
+      {error && (
+        <Card className="shadow-md border-destructive">
+          <CardHeader>
+            <CardTitle className="text-destructive font-headline">Analysis Failed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="font-body text-destructive-foreground">{error}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {analysisResult && (
         <Card className="shadow-lg">

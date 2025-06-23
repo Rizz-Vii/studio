@@ -12,7 +12,7 @@ export default function ContentAnalyzerPage() {
   const { user, loading: authLoading } = useProtectedRoute();
   const { user: currentUser } = useAuth();
 
-  const [analysisResult, setAnalysisResult] = useState<AnalyzeContentOutput | null>(null); // Use AI output type
+  const [analysisResult, setAnalysisResult] = useState<AnalyzeContentOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,34 +30,30 @@ export default function ContentAnalyzerPage() {
     setError(null);
 
     if (!currentUser) {
-      console.error("No authenticated user to save activity.");
-      setIsLoading(false);
       setError("Authentication error. Please try logging in again.");
+      setIsLoading(false);
       return;
     }
 
     try {
-      // **Call the AI flow**
       const aiResult = await analyzeContent(values);
       setAnalysisResult(aiResult);
 
-      // **Save the user activity to Firestore**
       const activitiesCollectionRef = collection(db, "users", currentUser.uid, "activities");
       await addDoc(activitiesCollectionRef, {
         type: "content_analysis",
         tool: "Content Analyzer",
         timestamp: serverTimestamp(),
-        details: { // Details of the analysis
-          // Avoid saving the full content here if it's large
+        details: {
           targetKeywords: values.targetKeywords,
           overallScore: aiResult.overallScore,
         },
-        resultsSummary: `Content analysis for "${values.targetKeywords}" completed. Score: ${aiResult.overallScore}/100.`, // Summarize the results
+        resultsSummary: `Content analysis for "${values.targetKeywords}" completed. Score: ${aiResult.overallScore}/100.`,
       });
 
     } catch (err: any) {
       console.error("Error performing content analysis or saving activity:", err.message);
-      setError("Failed to perform content analysis or save activity.");
+      setError("Failed to perform content analysis. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -67,9 +63,10 @@ export default function ContentAnalyzerPage() {
     <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">Content Optimization Tool</h1>
       <ContentAnalyzerForm
-        onSubmit={handleAnalyzeContent} // Pass the handler
-        isLoading={isLoading} // Pass loading state
-        analysisResult={analysisResult} // Pass results
+        onSubmit={handleAnalyzeContent}
+        isLoading={isLoading}
+        analysisResult={analysisResult}
+        error={error}
       />
     </div>
   );
