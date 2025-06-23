@@ -7,3 +7,4 @@ import '@/ai/flows/seo-audit.ts';
 import '@/ai/flows/competitor-analysis.ts';
 import '@/ai/flows/content-brief.ts';
 import '@/ai/flows/generate-insights.ts';
+import '@/ai/flows/link-analysis.ts';
