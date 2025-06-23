@@ -5,5 +5,5 @@ import { auditUrlHandler } from "./api/auditUrl.js";
 // Initialize Firebase Admin SDK
 initializeApp();
 
-// Export the auditUrl function
-export const auditUrl = onCall(auditUrlHandler);
+// Export the auditUrl function with CORS enabled for all origins
+export const auditUrl = onCall({ cors: true }, auditUrlHandler);

@@ -9,7 +9,7 @@
 
 import { ai } from '@/ai/genkit.js';
 import { z } from 'genkit';
-import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
+import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 
 // Define the input schema for the SEO audit flow
 export const AuditUrlInputSchema = z.object({
