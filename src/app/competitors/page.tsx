@@ -3,9 +3,10 @@
 import { useRef, useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tag, PlusCircle, Trash2, Loader2, Info } from "lucide-react";
+import { Tag, Loader2, Info } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { analyzeCompetitors, CompetitorAnalysisOutput } from '@/ai/flows/competitor-analysis';
 import { useToast } from '@/hooks/use-toast';
@@ -13,12 +14,6 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-
-interface Competitor {
-  id: string;
-  url: string;
-}
 
 type RankInfo = {
   rank: number | 'N/A';
@@ -89,11 +84,13 @@ function getHostname(url: string): string {
 
 export default function CompetitorsPage() {
   const [yourUrl, setYourUrl] = useState<string>('');
-  const [nextId, setNextId] = useState(1);
-  const [competitors, setCompetitors] = useState<Competitor[]>([{ id: 'comp-0', url: '' }]);
-  const [keywords, setKeywords] = useState<string[]>(['']);
+  const [competitorsInput, setCompetitorsInput] = useState<string>('');
+  const [keywordsInput, setKeywordsInput] = useState<string>('');
+  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [analysisResult, setAnalysisResult] = useState<CompetitorAnalysisOutput | null>(null);
+  const [analyzedCompetitors, setAnalyzedCompetitors] = useState<string[]>([]);
+
 
   const { user, loading } = useProtectedRoute();
   const { user: currentUser } = useAuth();
@@ -106,64 +103,37 @@ export default function CompetitorsPage() {
     }
   }, [analysisResult]);
 
-
-  const addCompetitor = () => {
-    setCompetitors([...competitors, { id: `comp-${nextId}`, url: '' }]);
-    setNextId(prevId => prevId + 1);
-  };
-
-  const removeCompetitor = (id: string) => {
-    setCompetitors(competitors.filter(c => c.id !== id));
-  };
-
-  const handleCompetitorChange = (id: string, value: string) => {
-    setCompetitors(competitors.map(c => c.id === id ? { ...c, url: value } : c));
-  };
-  
-  const addKeyword = () => {
-    setKeywords([...keywords, '']);
-  };
-
-  const removeKeyword = (index: number) => {
-    setKeywords(keywords.filter((_, i) => i !== index));
-  };
-
-  const handleKeywordChange = (index: number, value: string) => {
-    const newKeywords = [...keywords];
-    newKeywords[index] = value;
-    setKeywords(newKeywords);
-  };
-
-
   const handleAnalyze = async () => {
     const trimmedYourUrl = yourUrl.trim();
     if (!isValidUrl(trimmedYourUrl)) {
         toast({ title: "Invalid URL", description: "Please enter a valid URL for your website.", variant: "destructive" });
         return;
     }
-    const invalidCompetitor = competitors.find(c => c.url.trim() !== '' && !isValidUrl(c.url));
+
+    const competitorUrls = competitorsInput
+        .split(/[\n, ]+/)
+        .map(url => url.trim())
+        .filter(Boolean);
+
+    const invalidCompetitor = competitorUrls.find(url => !isValidUrl(url));
     if (invalidCompetitor) {
-        toast({ title: "Invalid Competitor URL", description: `Please check the URL: ${invalidCompetitor.url}`, variant: "destructive" });
+        toast({ title: "Invalid Competitor URL", description: `Please check the URL: ${invalidCompetitor}`, variant: "destructive" });
         return;
     }
-
-    setIsLoading(true);
-    setAnalysisResult(null);
-
-    const validCompetitorUrls = competitors
-      .map(c => c.url.trim())
-      .filter(url => url !== '');
       
     // Filter out empty keywords and remove duplicates (case-insensitive)
     const validKeywords = [
-        ...new Set(keywords.map(k => k.trim().toLowerCase()).filter(Boolean))
+        ...new Set(keywordsInput.split(/[\n,]+/).map(k => k.trim().toLowerCase()).filter(Boolean))
     ];
 
     if (validKeywords.length === 0) {
         toast({ title: "No Keywords", description: "Please enter at least one keyword.", variant: "destructive" });
-        setIsLoading(false);
         return;
     }
+    
+    setIsLoading(true);
+    setAnalysisResult(null);
+    setAnalyzedCompetitors(competitorUrls);
 
     try {
       if (!currentUser) {
@@ -172,7 +142,7 @@ export default function CompetitorsPage() {
 
       const result = await analyzeCompetitors({
         yourUrl: getValidUrl(yourUrl),
-        competitorUrls: validCompetitorUrls.map(url => getValidUrl(url)),
+        competitorUrls: competitorUrls.map(url => getValidUrl(url)),
         keywords: validKeywords,
       });
 
@@ -186,10 +156,10 @@ export default function CompetitorsPage() {
          timestamp: serverTimestamp(),
          details: {
            yourUrl,
-           competitors: validCompetitorUrls,
+           competitors: competitorUrls,
            keywords: validKeywords,
          },
-         resultsSummary: `Analyzed ${validCompetitorUrls.length} competitors for ${validKeywords.length} keywords.`,
+         resultsSummary: `Analyzed ${competitorUrls.length} competitors for ${validKeywords.length} keywords.`,
        });
 
     } catch (error) {
@@ -214,8 +184,7 @@ export default function CompetitorsPage() {
 
   const isAnalyzeDisabled = isLoading ||
                             !isValidUrl(yourUrl) ||
-                            keywords.every(k => !k.trim()) ||
-                            competitors.some(c => c.url.trim() !== '' && !isValidUrl(c.url));
+                            !keywordsInput.trim();
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -240,49 +209,25 @@ export default function CompetitorsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground font-body mb-1">Competitor URLs</label>
-            {competitors.map((competitor, index) => (
-              <div key={competitor.id} className="flex items-center space-x-2 mb-2">
-                <Input
-                  type="url"
-                  placeholder={`competitor${index + 1}.com`}
-                  value={competitor.url}
-                  onChange={(e) => handleCompetitorChange(competitor.id, e.target.value)}
-                  className="font-body"
-                />
-                {competitors.length > 1 && (
-                  <Button variant="ghost" size="icon" onClick={() => removeCompetitor(competitor.id)} aria-label="Remove competitor">
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button variant="outline" size="sm" onClick={addCompetitor} className="font-body">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Competitor
-            </Button>
+            <label htmlFor="competitorUrls" className="block text-sm font-medium text-foreground font-body mb-1">Competitor URLs</label>
+            <Textarea
+              id="competitorUrls"
+              placeholder="Enter one competitor URL per line or separated by commas"
+              value={competitorsInput}
+              onChange={(e) => setCompetitorsInput(e.target.value)}
+              className="font-body min-h-[80px]"
+            />
           </div>
 
           <div>
-             <label className="block text-sm font-medium text-foreground font-body mb-1">Keywords</label>
-            {keywords.map((keyword, index) => (
-              <div key={index} className="flex items-center space-x-2 mb-2">
-                <Input
-                  type="text"
-                  placeholder={`Keyword ${index + 1}`}
-                  value={keyword}
-                  onChange={(e) => handleKeywordChange(index, e.target.value)}
-                  className="font-body"
-                />
-                {keywords.length > 1 ? (
-                  <Button variant="ghost" size="icon" onClick={() => removeKeyword(index)} aria-label="Remove keyword">
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                ) : <div className="w-9 h-9"></div>}
-              </div>
-            ))}
-            <Button variant="outline" size="sm" onClick={addKeyword} className="font-body">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Keyword
-            </Button>
+             <label htmlFor="keywords" className="block text-sm font-medium text-foreground font-body mb-1">Keywords</label>
+             <Textarea
+               id="keywords"
+               placeholder="Enter one keyword per line or separated by commas"
+               value={keywordsInput}
+               onChange={(e) => setKeywordsInput(e.target.value)}
+               className="font-body min-h-[100px]"
+             />
           </div>
 
         </CardContent>
@@ -315,8 +260,8 @@ export default function CompetitorsPage() {
                   <TableRow>
                     <TableHead className="font-body">Keyword</TableHead>
                     <TableHead className="font-body text-center">Your Rank</TableHead>
-                    {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                      <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={getValidUrl(comp.url)}>{getHostname(comp.url)}</TableHead>
+                    {analyzedCompetitors.map((url, index) => (
+                      <TableHead key={`${url}-${index}`} className="font-body text-center truncate max-w-[150px]" title={getValidUrl(url)}>{getHostname(url)}</TableHead>
                     ))}
                   </TableRow>
                 </TableHeader>
@@ -327,9 +272,9 @@ export default function CompetitorsPage() {
                       <TableCell className="text-center font-body">
                           <RankCell rankInfo={row.yourRank} />
                       </TableCell>
-                      {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                        <TableCell key={comp.id} className="text-center font-body">
-                          <RankCell rankInfo={(row as any)[getValidUrl(comp.url)]} />
+                      {analyzedCompetitors.map((url, i) => (
+                        <TableCell key={`${url}-${i}`} className="text-center font-body">
+                          <RankCell rankInfo={(row as any)[getValidUrl(url)]} />
                         </TableCell>
                       ))}
                     </TableRow>
