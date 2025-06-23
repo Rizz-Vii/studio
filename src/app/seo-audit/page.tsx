@@ -109,8 +109,11 @@
     
       try {
         const validUrl = getValidUrl(url.trim());
+        const payload = { url: validUrl };
+        console.log("Calling 'auditUrl' function with payload:", payload);
+        
         const auditUrlFunction = httpsCallable< { url: string }, BackendAuditResult>(functions, 'auditUrl');
-        const result = await auditUrlFunction({ url: validUrl });
+        const result = await auditUrlFunction(payload);
         const data = result.data;
         
         setAuditResults(data);
@@ -319,3 +322,4 @@
       </div>
     );
   }
+
