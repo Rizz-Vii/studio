@@ -275,7 +275,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                     <AnimatePresence initial={false} custom={direction}>
                         <motion.div
                             key={index}
-                            className="flex space-x-2"
+                            className="absolute flex space-x-2"
                             custom={direction}
                             variants={sliderVariants}
                             initial="enter"
@@ -483,6 +483,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-
-
