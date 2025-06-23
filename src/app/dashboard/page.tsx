@@ -54,7 +54,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 font-headline">
+            <DialogTitle className="flex items-center gap-2 font-headline text-2xl">
               <Icon className="h-6 w-6 text-primary" />
               {title}
             </DialogTitle>
