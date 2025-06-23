@@ -81,10 +81,10 @@
         }));
     
       } catch (error: any) {
-        console.error("Error starting audit:", error);
+        console.error("Detailed audit error:", error);
         toast({
           title: "Audit Failed",
-          description: error.message || "An unexpected error occurred. Please try again.",
+          description: error.details?.errorMessage || error.message || "An unexpected error occurred. Please try again.",
           variant: "destructive"
         });
         setCurrentAuditItems(initialAuditItems.map(item => ({
@@ -95,6 +95,11 @@
       } finally {
         setIsLoading(false);
       }
+    };
+
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        handleStartAudit();
     };
 
     const getStatusIcon = (status: 'good' | 'warning' | 'error') => {
@@ -121,7 +126,7 @@
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex space-x-2">
+            <form onSubmit={handleFormSubmit} className="flex space-x-2">
               <Input
                 type="url"
                 placeholder="https://yourwebsite.com"
@@ -130,7 +135,7 @@
                 className="font-body"
                 disabled={isLoading}
               />
-              <Button onClick={handleStartAudit} disabled={isLoading || !url.trim()} className="font-body">
+              <Button type="submit" disabled={isLoading || !url.trim()} className="font-body">
                 {isLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -138,7 +143,7 @@
                 )}
                 Start Audit
               </Button>
-            </div>
+            </form>
           </CardContent>
         </Card>
     
