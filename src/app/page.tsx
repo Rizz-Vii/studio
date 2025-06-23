@@ -148,7 +148,7 @@ export default function HomePage() {
               text: "Everything I need — in one dashboard. No more switching tools constantly."
             }
           ].map((t, i) => (
-            <motion.div key={i} variants={fadeIn} initial="hidden" animate="visible" custom={i} className="p-6 border rounded-lg shadow-xl bg-white">
+            <motion.div key={i} variants={fadeIn} initial="hidden" animate="visible" custom={i} className="p-6 border rounded-lg shadow-2xl bg-white">
               <p className="text-gray-600 italic mb-4">“{t.text}”</p>
               <p className="text-sm font-semibold">— {t.name}, {t.company}</p>
             </motion.div>
@@ -181,7 +181,7 @@ export default function HomePage() {
 
 function Feature({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
     return (
-      <div className="p-6 border border-gray-200 rounded-2xl shadow-xl hover:shadow-2xl transition bg-white h-full">
+      <div className="p-6 border border-gray-200 rounded-2xl shadow-2xl transition bg-white h-full">
         <div className="text-blue-600 mb-4">{React.cloneElement(icon as React.ReactElement, { className: 'h-6 w-6' })}</div>
         <h4 className="text-xl font-semibold mb-2">{title}</h4>
         <p className="text-gray-600">{children}</p>
@@ -191,7 +191,7 @@ function Feature({ icon, title, children }: { icon: React.ReactNode; title: stri
 
 function PricingCard({ title, price, features }: { title: string, price: string, features: string[] }) {
     return (
-      <div className="border p-6 rounded-xl shadow-xl hover:shadow-2xl bg-white">
+      <div className="border p-6 rounded-xl shadow-2xl bg-white">
         <h4 className="text-lg font-bold mb-1">{title}</h4>
         <p className="text-2xl font-semibold mb-4">{price}</p>
         <ul className="text-left space-y-2 text-gray-600">

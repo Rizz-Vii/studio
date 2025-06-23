@@ -260,17 +260,14 @@ const ToolActivityCard: React.FC<{
   const Icon = config.icon;
 
   return (
-    <Card className="shadow-xl hover:shadow-2xl transition-shadow flex flex-col">
+    <Card className="shadow-2xl transition-shadow flex flex-col">
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-start">
             <CardTitle className="font-headline flex items-center gap-2">
                 <Icon className={`h-6 w-6 ${config.color}`} />
                 {tool}
             </CardTitle>
-            <div className="flex items-center text-muted-foreground font-body gap-1.5">
-                <Activity className="h-4 w-4" />
-                <span className="font-semibold text-sm">{activities.length}</span>
-            </div>
+            <Badge variant="secondary">{activities.length} Activities</Badge>
         </div>
       </CardHeader>
       <CardContent className="flex-grow space-y-4 pt-4">
@@ -359,7 +356,7 @@ export default function DashboardPage() {
           })}
         </div>
       ) : (
-        <Card>
+        <Card className="shadow-lg">
           <CardContent className="p-10 text-center">
             <h3 className="text-xl font-headline mb-2">No Activity Yet</h3>
             <p className="font-body text-muted-foreground">Start using the tools to see your activity summary here.</p>

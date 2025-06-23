@@ -67,7 +67,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-xl">
+      <Card className="shadow-2xl">
         <CardHeader>
           <CardTitle className="font-headline">Discover Keywords</CardTitle>
           <CardDescription className="font-body">
@@ -135,7 +135,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
       <div ref={resultsRef}>
         {/* Display loading state using isLoading prop */}
         {isLoading && (
-          <Card className="shadow-md mt-8">
+          <Card className="shadow-lg mt-8">
             <CardContent className="p-6 flex items-center justify-center">
               <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
               <p className="font-body text-muted-foreground">Generating suggestions...</p>
@@ -145,7 +145,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
 
         {/* Display results using the results prop */}
         {results && results.keywords.length > 0 && (
-          <Card className="shadow-xl mt-8">
+          <Card className="shadow-2xl mt-8">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="font-headline">Suggested Keywords</CardTitle>
@@ -170,7 +170,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
         )}
         {/* Display empty state for results */}
         {results && results.keywords.length === 0 && !isLoading && ( // Add !isLoading condition
-           <Card className="shadow-md mt-8">
+           <Card className="shadow-lg mt-8">
             <CardContent className="p-6">
               <p className="font-body text-muted-foreground text-center">No keywords found for this topic. Try a different one.</p>
             </CardContent>

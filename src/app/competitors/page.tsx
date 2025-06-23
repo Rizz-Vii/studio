@@ -191,7 +191,7 @@ export default function CompetitorsPage() {
       <h1 className="text-3xl font-headline font-semibold text-foreground">Competitor Analysis</h1>
       <p className="text-muted-foreground font-body">Compare your keyword rankings against your competitors to identify strategic advantages and uncover content gaps.</p>
 
-      <Card className="shadow-xl">
+      <Card className="shadow-2xl">
         <CardHeader>
           <CardTitle className="font-headline">Setup Analysis</CardTitle>
           <CardDescription className="font-body">Enter your URL, competitor URLs, and keywords to compare rankings.</CardDescription>
@@ -241,7 +241,7 @@ export default function CompetitorsPage() {
       </Card>
 
       {isLoading && (
-        <Card className="shadow-md">
+        <Card className="shadow-lg">
           <CardContent className="p-6 flex items-center justify-center">
             <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
             <p className="font-body text-muted-foreground">Analyzing... this may take a moment.</p>
@@ -251,10 +251,10 @@ export default function CompetitorsPage() {
       
       <div ref={resultsRef}>
         {analysisResult && (
-          <Card className="shadow-xl mt-8">
+          <Card className="shadow-2xl mt-8">
             <CardHeader>
               <CardTitle className="font-headline">Keyword Rankings Comparison</CardTitle>
-              <CardDescription className="font-body">This table shows the simulated search engine ranking for each keyword. "N/A" indicates a rank outside the top 100. Hover over results with an info icon for more details.</CardDescription>
+              <CardDescription className="font-body">This is a simulated search engine ranking for each keyword. "N/A" indicates a rank outside the top 100. Hover over results with an info icon for more details.</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -288,7 +288,7 @@ export default function CompetitorsPage() {
         )}
 
         {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length > 0 && (
-          <Card className="shadow-xl mt-8">
+          <Card className="shadow-2xl mt-8">
             <CardHeader>
               <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
               <CardDescription className="font-body">These are keywords where your competitors rank highly but you don't. Use these as inspiration for new content to capture more traffic.</CardDescription>
@@ -304,7 +304,7 @@ export default function CompetitorsPage() {
           </Card>
         )}
         {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length === 0 && (
-           <Card className="shadow-md mt-8">
+           <Card className="shadow-lg mt-8">
             <CardContent className="p-6">
                <p className="font-body text-muted-foreground text-center">No significant content gaps found compared to these competitors.</p>
             </CardContent>

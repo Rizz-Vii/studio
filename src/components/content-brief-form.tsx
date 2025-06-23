@@ -27,7 +27,7 @@ interface ContentBriefFormProps {
 }
 
 const ResultCard = ({ title, icon: Icon, children }: { title: string; icon: React.ElementType, children: React.ReactNode }) => (
-    <Card>
+    <Card className="shadow-lg">
         <CardHeader className="pb-4">
             <CardTitle className="font-headline text-lg flex items-center gap-2">
                 <Icon className="h-6 w-6 text-primary" />
@@ -55,7 +55,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-xl">
+      <Card className="shadow-2xl">
         <CardHeader>
           <CardTitle className="font-headline">Generate a Content Brief</CardTitle>
           <CardDescription className="font-body">
@@ -99,7 +99,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
 
       <div ref={resultsRef}>
         {isLoading && (
-          <Card className="shadow-md mt-8">
+          <Card className="shadow-lg mt-8">
             <CardContent className="p-6 flex items-center justify-center">
               <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
               <p className="font-body text-muted-foreground">Generating your content brief...</p>
@@ -108,7 +108,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
         )}
 
         {error && (
-          <Card className="shadow-md border-destructive mt-8">
+          <Card className="shadow-lg border-destructive mt-8">
             <CardHeader>
               <CardTitle className="text-destructive font-headline">Generation Failed</CardTitle>
             </CardHeader>

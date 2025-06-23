@@ -181,7 +181,7 @@
         <h1 className="text-3xl font-headline font-semibold text-foreground">Technical SEO Audit</h1>
         <p className="text-muted-foreground font-body">Analyze a URL to uncover technical issues and content optimization opportunities that could be affecting your search engine ranking.</p>
 
-        <Card className="shadow-xl">
+        <Card className="shadow-2xl">
           <CardHeader>
             <CardTitle className="font-headline">Audit Your Site</CardTitle>
             <CardDescription className="font-body">
@@ -211,7 +211,7 @@
         </Card>
 
         {isLoading && (
-          <Card className="shadow-md">
+          <Card className="shadow-lg">
             <CardContent className="p-6 flex items-center justify-center">
               <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
               <p className="font-body text-muted-foreground">
@@ -223,7 +223,7 @@
 
         <div ref={resultsRef}>
           {auditResults && !isLoading && (
-            <Card className="shadow-xl mt-8">
+            <Card className="shadow-2xl mt-8">
               <CardHeader>
                 <CardTitle className="font-headline">
                   Audit Report for {url.trim() ? new URL(getValidUrl(url)).hostname : 'your site'}

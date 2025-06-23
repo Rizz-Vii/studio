@@ -104,7 +104,7 @@ export default function InsightsPage() {
       </div>
       
       {isLoading && (
-        <Card className="shadow-md">
+        <Card className="shadow-lg">
           <CardContent className="p-6 flex items-center justify-center">
             <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
             <p className="font-body text-muted-foreground">Generating personalized insights...</p>
@@ -113,7 +113,7 @@ export default function InsightsPage() {
       )}
 
       {!isLoading && error && (
-          <Card className="shadow-md border-destructive">
+          <Card className="shadow-lg border-destructive">
              <CardHeader>
                 <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Error</CardTitle>
             </CardHeader>
@@ -128,7 +128,7 @@ export default function InsightsPage() {
           {insights.length > 0 ? (
             <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
               {insights.map(insight => (
-                <Card key={insight.id} className="shadow-xl hover:shadow-2xl transition-shadow duration-300 flex flex-col">
+                <Card key={insight.id} className="shadow-2xl transition-shadow duration-300 flex flex-col">
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
                       <CardTitle className="font-headline text-lg">{insight.title}</CardTitle>
@@ -159,7 +159,7 @@ export default function InsightsPage() {
               ))}
             </div>
           ) : (
-            <Card className="shadow-md">
+            <Card className="shadow-lg">
               <CardContent className="p-10 text-center">
                   <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
                   <h3 className="text-xl font-headline mb-2">No Insights Available</h3>

@@ -118,7 +118,7 @@ export default function LinkViewPage() {
       <h1 className="text-3xl font-headline font-semibold text-foreground">Link Analysis</h1>
       <p className="text-muted-foreground font-body">Analyze the backlink profile of any URL to understand its authority and link-building strategy.</p>
 
-      <Card className="shadow-xl">
+      <Card className="shadow-2xl">
         <CardHeader>
           <CardTitle className="font-headline">Analyze Backlinks</CardTitle>
           <CardDescription className="font-body">Enter a URL to discover its backlink profile.</CardDescription>
@@ -144,7 +144,7 @@ export default function LinkViewPage() {
       </Card>
 
       {isLoading && (
-        <Card className="shadow-md">
+        <Card className="shadow-lg">
           <CardContent className="p-6 flex items-center justify-center">
             <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
             <p className="font-body text-muted-foreground">Fetching backlink data...</p>
@@ -155,7 +155,7 @@ export default function LinkViewPage() {
       <div ref={resultsRef}>
           {summary && (
             <div className="grid gap-6 md:grid-cols-2">
-                <Card className="shadow-xl">
+                <Card className="shadow-2xl">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium font-body">Total Backlinks</CardTitle>
                         <LinkIcon className="h-6 w-6 text-muted-foreground" />
@@ -164,7 +164,7 @@ export default function LinkViewPage() {
                         <div className="text-2xl font-bold font-headline">{summary.totalBacklinks.toLocaleString()}</div>
                     </CardContent>
                 </Card>
-                <Card className="shadow-xl">
+                <Card className="shadow-2xl">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium font-body">Referring Domains</CardTitle>
                         <Globe className="h-6 w-6 text-muted-foreground" />
@@ -178,7 +178,7 @@ export default function LinkViewPage() {
 
 
           {backlinks && backlinks.length > 0 && (
-            <Card className="shadow-xl mt-8">
+            <Card className="shadow-2xl mt-8">
               <CardHeader>
                 <CardTitle className="font-headline">Backlinks for {new URL(getValidUrl(targetUrl)).hostname}</CardTitle>
                  <CardDescription className="font-body">A high number of backlinks from authoritative domains can significantly improve your search engine rankings.</CardDescription>
@@ -224,7 +224,7 @@ export default function LinkViewPage() {
             </Card>
           )}
           {backlinks && backlinks.length === 0 && !isLoading && (
-             <Card className="shadow-md mt-8">
+             <Card className="shadow-lg mt-8">
                 <CardContent className="p-6">
                     <p className="font-body text-muted-foreground text-center">No backlinks found for this URL.</p>
                 </CardContent>
