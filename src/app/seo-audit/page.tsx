@@ -1,28 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auditUrl } from '@/ai/flows/seo-audit';
-import { z } from 'zod';
 
-const RequestBodySchema = z.object({
-  url: z.string().url(),
-});
-
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const validationResult = RequestBodySchema.safeParse(body);
-
-    if (!validationResult.success) {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-    }
-
-    const { url } = validationResult.data;
-    const auditResult = await auditUrl({ url });
-    return NextResponse.json(auditResult);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'An error occurred during the audit' }, { status: 500 });
-  }
-}
-  'use client';
+'use client';
   import { useState } from 'react';
   import { Button } from "@/components/ui/button";
   import { Input } from "@/components/ui/input";
@@ -65,18 +42,7 @@ export async function POST(req: NextRequest) {
       }
       return input;
     }
-    const getStatusIcon = (status: 'good' | 'warning' | 'error') => {
-      if (status === 'good') return <CheckCircle className="h-5 w-5 text-green-500" />;
-      if (status === 'warning') return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
-      return <AlertTriangle className="h-5 w-5 text-red-500" />;
-    };
     
-    const getProgressColor = (score: number) => {
-      if (score > 85) return "bg-green-500";
-      if (score > 60) return "bg-yellow-500";
-      return "bg-red-500";
-    };
-
   export default function SeoAuditPage() {
     const [url, setUrl] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
