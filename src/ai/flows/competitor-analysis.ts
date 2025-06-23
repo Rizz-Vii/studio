@@ -53,24 +53,38 @@ const analysisPrompt = ai.definePrompt({
   name: 'competitorAnalysisPrompt',
   input: {schema: CompetitorAnalysisInputSchema},
   output: {schema: CompetitorAnalysisOutputSchema},
-  prompt: `You are an expert SEO analyst. Your task is to perform a competitor analysis based on the provided URLs and keywords.
+  prompt: `You are a world-class SEO strategist with deep expertise in competitive analysis and content strategy. Your primary goal is to provide actionable intelligence by analyzing search engine ranking positions and identifying strategic content gaps.
 
-  Your Website URL: {{{yourUrl}}}
-  Competitor URLs:
-  {{#each competitorUrls}}
-  - {{{this}}}
-  {{/each}}
+**Analysis Context:**
 
-  Keywords to analyze:
-  {{#each keywords}}
-  - {{{this}}}
-  {{/each}}
+*   **My Website URL:** {{{yourUrl}}}
+*   **Competitor URLs:**
+    {{#each competitorUrls}}
+    - {{{this}}}
+    {{/each}}
+*   **Keywords for Analysis:**
+    {{#each keywords}}
+    - {{{this}}}
+    {{/each}}
 
-  Instructions:
-  1. For each keyword, provide a simulated ranking position (an integer from 1 to 100) for my URL and each competitor URL. If a site likely doesn't rank in the top 100, use "N/A".
-  2. The output for rankings should be an array of objects. Each object must have a "keyword" property, a "yourRank" property for my URL, and properties for each competitor URL (use the full competitor URL as the key).
-  3. Analyze the provided keywords and competitor URLs to identify potential "content gaps." These are topics or keywords that the competitors rank for, which my site is missing. Provide these as an array of strings.
-  4. Return the full response as a valid JSON object adhering to the specified output schema.
+**Instructions:**
+
+1.  **Simulate Keyword Rankings:**
+    *   For each provided keyword, perform a realistic, simulated analysis of where each URL would rank in the top 100 search results.
+    *   Your simulation should consider typical factors like domain authority, content relevance, and on-page optimization for the given URLs and keywords.
+    *   The ranking for "My Website" should be assigned to the \`yourRank\` property.
+    *   For each competitor, create a property in the ranking object where the key is the **full competitor URL** and the value is its simulated rank.
+    *   If a URL is unlikely to rank in the top 100 for a keyword, assign it the string "N/A".
+
+2.  **Identify Content Gaps:**
+    *   Based on the ranking analysis, identify keywords or topic clusters where competitors have a strong presence (e.g., ranking in the top 20) but my website ranks poorly (e.g., rank > 50 or "N/A").
+    *   These gaps represent significant opportunities for content creation.
+    *   List these content gap opportunities as an array of descriptive strings. For example, instead of just "AI tools", suggest "blog post comparing AI SEO tools" or "landing page for AI-powered content generation".
+
+3.  **Strictly Adhere to Output Format:**
+    *   Your entire output MUST be a single, valid JSON object that conforms to the provided output schema.
+    *   Ensure all property keys and string values are correctly quoted.
+    *   The competitor ranks must use the full URL as the key.
   `,
 });
 
