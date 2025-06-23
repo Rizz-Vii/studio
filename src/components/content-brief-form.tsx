@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Loader2, FileText, Link as LinkIcon, HelpCircle, UserCheck, BarChart2, Tag } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { ContentBriefInput, ContentBriefOutput } from '@/ai/flows/content-brief';
+import { useRef, useEffect } from 'react';
 
 const formSchema = z.object({
   keyword: z.string().min(3, { message: 'Keyword must be at least 3 characters long.' }),
@@ -43,6 +45,13 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
     resolver: zodResolver(formSchema),
     defaultValues: { keyword: '' },
   });
+
+  const resultsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (briefResult || error) {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [briefResult, error]);
 
   return (
     <div className="space-y-6">
@@ -88,93 +97,95 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
         </Form>
       </Card>
 
-      {isLoading && (
-        <Card className="shadow-md">
-          <CardContent className="p-6 flex items-center justify-center">
-            <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
-            <p className="font-body text-muted-foreground">Generating your content brief...</p>
-          </CardContent>
-        </Card>
-      )}
+      <div ref={resultsRef}>
+        {isLoading && (
+          <Card className="shadow-md mt-8">
+            <CardContent className="p-6 flex items-center justify-center">
+              <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
+              <p className="font-body text-muted-foreground">Generating your content brief...</p>
+            </CardContent>
+          </Card>
+        )}
 
-      {error && (
-        <Card className="shadow-md border-destructive">
-          <CardHeader>
-            <CardTitle className="text-destructive font-headline">Generation Failed</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-body text-destructive-foreground">{error}</p>
-          </CardContent>
-        </Card>
-      )}
+        {error && (
+          <Card className="shadow-md border-destructive mt-8">
+            <CardHeader>
+              <CardTitle className="text-destructive font-headline">Generation Failed</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="font-body text-destructive-foreground">{error}</p>
+            </CardContent>
+          </Card>
+        )}
 
-      {briefResult && (
-        <div className="space-y-6">
-            <ResultCard title="Title and Meta" icon={FileText}>
-                <div className="space-y-4">
-                    <div>
-                        <h4 className="font-semibold font-body">Suggested Title</h4>
-                        <p className="text-muted-foreground font-body">{briefResult.suggestedTitle}</p>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold font-body">Meta Description</h4>
-                        <p className="text-muted-foreground font-body">{briefResult.metaDescription}</p>
-                    </div>
-                </div>
-            </ResultCard>
+        {briefResult && (
+          <div className="space-y-6 mt-8">
+              <ResultCard title="Title and Meta" icon={FileText}>
+                  <div className="space-y-4">
+                      <div>
+                          <h4 className="font-semibold font-body">Suggested Title</h4>
+                          <p className="text-muted-foreground font-body">{briefResult.suggestedTitle}</p>
+                      </div>
+                      <div>
+                          <h4 className="font-semibold font-body">Meta Description</h4>
+                          <p className="text-muted-foreground font-body">{briefResult.metaDescription}</p>
+                      </div>
+                  </div>
+              </ResultCard>
 
-            <div className="grid md:grid-cols-2 gap-6">
-                <ResultCard title="Targeting" icon={UserCheck}>
-                    <div className="space-y-4">
-                         <div>
-                            <h4 className="font-semibold font-body">Target Audience</h4>
-                            <p className="text-muted-foreground font-body">{briefResult.targetAudience}</p>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold font-body">Word Count</h4>
-                            <p className="text-muted-foreground font-body">{briefResult.wordCount.min} - {briefResult.wordCount.max} words</p>
-                        </div>
-                    </div>
-                </ResultCard>
+              <div className="grid md:grid-cols-2 gap-6">
+                  <ResultCard title="Targeting" icon={UserCheck}>
+                      <div className="space-y-4">
+                           <div>
+                              <h4 className="font-semibold font-body">Target Audience</h4>
+                              <p className="text-muted-foreground font-body">{briefResult.targetAudience}</p>
+                          </div>
+                          <div>
+                              <h4 className="font-semibold font-body">Word Count</h4>
+                              <p className="text-muted-foreground font-body">{briefResult.wordCount.min} - {briefResult.wordCount.max} words</p>
+                          </div>
+                      </div>
+                  </ResultCard>
 
-                <ResultCard title="Content Structure" icon={BarChart2}>
-                    <ul className="space-y-2 list-disc pl-5">
-                        {briefResult.suggestedHeadings.map((heading, i) => (
-                            <li key={i} className={`font-body ${heading.startsWith('H3') ? 'ml-4' : 'font-semibold'}`}>
-                                {heading.replace(/^H[23]: /, '')}
-                            </li>
-                        ))}
-                    </ul>
-                </ResultCard>
-            </div>
+                  <ResultCard title="Content Structure" icon={BarChart2}>
+                      <ul className="space-y-2 list-disc pl-5">
+                          {briefResult.suggestedHeadings.map((heading, i) => (
+                              <li key={i} className={`font-body ${heading.startsWith('H3') ? 'ml-4' : 'font-semibold'}`}>
+                                  {heading.replace(/^H[23]: /, '')}
+                              </li>
+                          ))}
+                      </ul>
+                  </ResultCard>
+              </div>
 
-            <ResultCard title="Semantic Keywords (LSI)" icon={Tag}>
-                <div className="flex flex-wrap gap-2">
-                    {briefResult.lsiKeywords.map((lsi, i) => (
-                        <Badge key={i} variant={lsi.type === 'topic' ? 'default' : lsi.type === 'entity' ? 'secondary' : 'outline'}>
-                            {lsi.keyword}
-                        </Badge>
-                    ))}
-                </div>
-            </ResultCard>
+              <ResultCard title="Semantic Keywords (LSI)" icon={Tag}>
+                  <div className="flex flex-wrap gap-2">
+                      {briefResult.lsiKeywords.map((lsi, i) => (
+                          <Badge key={i} variant={lsi.type === 'topic' ? 'default' : lsi.type === 'entity' ? 'secondary' : 'outline'}>
+                              {lsi.keyword}
+                          </Badge>
+                      ))}
+                  </div>
+              </ResultCard>
 
-            <ResultCard title="Questions to Answer" icon={HelpCircle}>
-                <ul className="space-y-2 list-disc pl-5 font-body">
-                    {briefResult.questionsToAnswer.map((q, i) => <li key={i}>{q}</li>)}
-                </ul>
-            </ResultCard>
+              <ResultCard title="Questions to Answer" icon={HelpCircle}>
+                  <ul className="space-y-2 list-disc pl-5 font-body">
+                      {briefResult.questionsToAnswer.map((q, i) => <li key={i}>{q}</li>)}
+                  </ul>
+              </ResultCard>
 
-            <ResultCard title="Linking Suggestions" icon={LinkIcon}>
-                 <ul className="space-y-2 list-disc pl-5 font-body">
-                    {briefResult.internalLinkingSuggestions.map((link, i) => (
-                        <li key={i}>
-                            Anchor Text: <span className="font-semibold text-primary">{link.anchorText}</span> &rarr; Link to: <span className="italic">{link.linkTo}</span>
-                        </li>
-                    ))}
-                </ul>
-            </ResultCard>
-        </div>
-      )}
+              <ResultCard title="Linking Suggestions" icon={LinkIcon}>
+                   <ul className="space-y-2 list-disc pl-5 font-body">
+                      {briefResult.internalLinkingSuggestions.map((link, i) => (
+                          <li key={i}>
+                              Anchor Text: <span className="font-semibold text-primary">{link.anchorText}</span> &rarr; Link to: <span className="italic">{link.linkTo}</span>
+                          </li>
+                      ))}
+                  </ul>
+              </ResultCard>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

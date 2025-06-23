@@ -1,5 +1,6 @@
+
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,11 +18,24 @@ interface SerpResult {
   isImagePack?: boolean;
 }
 
+      function getValidUrl(url: string) {
+        if (!/^https?:\/\//i.test(url)) {
+          return `https://${url}`;
+        }
+        return url;
+      }
 export default function SerpViewPage() {
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [serpResults, setSerpResults] = useState<SerpResult[] | null>(null);
     const { user, loading } = useProtectedRoute();
+    const resultsRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (serpResults) {
+            resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [serpResults]);
 
   if (loading) {
     // Show a loading indicator while checking authentication state
@@ -87,51 +101,52 @@ export default function SerpViewPage() {
           </CardContent>
         </Card>
       )}
-
-      {serpResults && (
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="font-headline">Search Results for "{keyword}"</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {serpResults.map(result => (
-              <div key={result.id} className={`p-4 rounded-lg border ${result.isFeaturedSnippet ? 'border-primary bg-primary/10 shadow-md' : 'bg-card'}`}>
-                {result.isFeaturedSnippet && (
-                  <div className="flex items-center text-sm text-primary font-medium mb-1 font-body">
-                    <Star className="h-4 w-4 mr-1 fill-primary" /> Featured Snippet
+        <div ref={resultsRef}>
+          {serpResults && (
+            <Card className="shadow-lg mt-8">
+              <CardHeader>
+                <CardTitle className="font-headline">Search Results for "{keyword}"</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {serpResults.map(result => (
+                  <div key={result.id} className={`p-4 rounded-lg border ${result.isFeaturedSnippet ? 'border-primary bg-primary/10 shadow-md' : 'bg-card'}`}>
+                    {result.isFeaturedSnippet && (
+                      <div className="flex items-center text-sm text-primary font-medium mb-1 font-body">
+                        <Star className="h-4 w-4 mr-1 fill-primary" /> Featured Snippet
+                      </div>
+                    )}
+                     {result.isPeopleAlsoAsk && (
+                      <div className="flex items-center text-sm text-accent-foreground font-medium mb-1 font-body">
+                        <MessageSquare className="h-4 w-4 mr-1 text-accent" /> People Also Ask
+                      </div>
+                    )}
+                    {result.isImagePack && (
+                      <div className="flex items-center text-sm text-accent-foreground font-medium mb-1 font-body">
+                        <ImageIcon className="h-4 w-4 mr-1 text-accent" /> Image Pack
+                      </div>
+                    )}
+                    <h3 className="text-lg font-medium text-primary hover:underline font-headline">
+                      <a href={result.url} target="_blank" rel="noopener noreferrer">{result.position > 0 && `${result.position}. `}{result.title}</a>
+                    </h3>
+                    {!result.isImagePack && !result.isPeopleAlsoAsk && (
+                        <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-sm text-green-600 dark:text-green-400 block truncate font-body">{result.url}</a>
+                    )}
+                    <p className="text-sm text-muted-foreground mt-1 font-body">{result.snippet}</p>
+                    {result.isImagePack && (
+                        <div className="mt-2 grid grid-cols-3 gap-2">
+                            {[1,2,3].map(i => (
+                                <div key={i} className="aspect-square bg-muted rounded flex items-center justify-center">
+                                    <ImageIcon className="w-1/2 h-1/2 text-muted-foreground/50" data-ai-hint="abstract photo" />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                   </div>
-                )}
-                 {result.isPeopleAlsoAsk && (
-                  <div className="flex items-center text-sm text-accent-foreground font-medium mb-1 font-body">
-                    <MessageSquare className="h-4 w-4 mr-1 text-accent" /> People Also Ask
-                  </div>
-                )}
-                {result.isImagePack && (
-                  <div className="flex items-center text-sm text-accent-foreground font-medium mb-1 font-body">
-                    <ImageIcon className="h-4 w-4 mr-1 text-accent" /> Image Pack
-                  </div>
-                )}
-                <h3 className="text-lg font-medium text-primary hover:underline font-headline">
-                  <a href={result.url} target="_blank" rel="noopener noreferrer">{result.position > 0 && `${result.position}. `}{result.title}</a>
-                </h3>
-                {!result.isImagePack && !result.isPeopleAlsoAsk && (
-                    <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-sm text-green-600 dark:text-green-400 block truncate font-body">{result.url}</a>
-                )}
-                <p className="text-sm text-muted-foreground mt-1 font-body">{result.snippet}</p>
-                {result.isImagePack && (
-                    <div className="mt-2 grid grid-cols-3 gap-2">
-                        {[1,2,3].map(i => (
-                            <div key={i} className="aspect-square bg-muted rounded flex items-center justify-center">
-                                <ImageIcon className="w-1/2 h-1/2 text-muted-foreground/50" data-ai-hint="abstract photo" />
-                            </div>
-                        ))}
-                    </div>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+                ))}
+              </CardContent>
+            </Card>
+          )}
+        </div>
       {serpResults?.length === 0 && !isLoading && (
         <Card className="shadow-md">
             <CardContent className="p-6">

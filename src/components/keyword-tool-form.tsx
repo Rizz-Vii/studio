@@ -1,3 +1,4 @@
+
 // src/components/keyword-tool-form.tsx
 'use client';
 
@@ -6,7 +7,7 @@ import type { SuggestKeywordsInput, SuggestKeywordsOutput } from '@/ai/flows/key
 // import { suggestKeywords } from '@/ai/flows/keyword-suggestions';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState, useTransition } from 'react'; // Keep useTransition if needed for form state transitions
+import React, { useState, useTransition, useRef, useEffect } from 'react'; // Keep useTransition if needed for form state transitions
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -33,10 +34,15 @@ interface KeywordToolFormProps {
 
 // Accept the props
 export default function KeywordToolForm({ onSubmit, isLoading, results }: KeywordToolFormProps) {
-  // Remove local state for results and isPending as they are now passed as props
-  // const [isPending, startTransition] = useTransition();
-  // const [keywordsResult, setKeywordsResult] = useState<SuggestKeywordsOutput | null>(null);
   const { toast } = useToast();
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+      if (results) {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+  }, [results]);
+
 
   const form = useForm<KeywordFormValues>({
     resolver: zodResolver(formSchema),
@@ -126,49 +132,51 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
         </Form>
       </Card>
 
-      {/* Display loading state using isLoading prop */}
-      {isLoading && (
-        <Card className="shadow-md">
-          <CardContent className="p-6 flex items-center justify-center">
-            <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
-            <p className="font-body text-muted-foreground">Generating suggestions...</p>
-          </CardContent>
-        </Card>
-      )}
+      <div ref={resultsRef}>
+        {/* Display loading state using isLoading prop */}
+        {isLoading && (
+          <Card className="shadow-md mt-8">
+            <CardContent className="p-6 flex items-center justify-center">
+              <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
+              <p className="font-body text-muted-foreground">Generating suggestions...</p>
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Display results using the results prop */}
-      {results && results.keywords.length > 0 && (
-        <Card className="shadow-lg">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="font-headline">Suggested Keywords</CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(results.keywords.join(', '))} className="font-body">
-                <Copy className="mr-2 h-4 w-4" /> Copy All
-              </Button>
-            </div>
-            <CardDescription className="font-body">
-              Here are some keywords related to "{form.getValues('topic')}".
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {results.keywords.map((keyword, index) => (
-                <li key={index} className="p-3 bg-secondary rounded-md text-secondary-foreground font-body text-sm shadow-sm">
-                  {keyword}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
-      {/* Display empty state for results */}
-      {results && results.keywords.length === 0 && !isLoading && ( // Add !isLoading condition
-         <Card className="shadow-md">
-          <CardContent className="p-6">
-            <p className="font-body text-muted-foreground text-center">No keywords found for this topic. Try a different one.</p>
-          </CardContent>
-        </Card>
-      )}
+        {/* Display results using the results prop */}
+        {results && results.keywords.length > 0 && (
+          <Card className="shadow-lg mt-8">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="font-headline">Suggested Keywords</CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(results.keywords.join(', '))} className="font-body">
+                  <Copy className="mr-2 h-4 w-4" /> Copy All
+                </Button>
+              </div>
+              <CardDescription className="font-body">
+                Here are some keywords related to "{form.getValues('topic')}".
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {results.keywords.map((keyword, index) => (
+                  <li key={index} className="p-3 bg-secondary rounded-md text-secondary-foreground font-body text-sm shadow-sm">
+                    {keyword}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+        {/* Display empty state for results */}
+        {results && results.keywords.length === 0 && !isLoading && ( // Add !isLoading condition
+           <Card className="shadow-md mt-8">
+            <CardContent className="p-6">
+              <p className="font-body text-muted-foreground text-center">No keywords found for this topic. Try a different one.</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

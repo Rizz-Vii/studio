@@ -1,7 +1,7 @@
 
 'use client';
   import * as React from 'react';
-  import { useEffect, useState } from 'react';
+  import { useEffect, useRef, useState } from 'react';
   import { Button } from "@/components/ui/button";
   import { Input } from "@/components/ui/input";
   import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,6 +65,7 @@
     const { user, loading: authLoading } = useProtectedRoute();
     const { profile, user: currentUser } = useAuth();
     const { toast } = useToast();
+    const resultsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!authLoading) {
@@ -73,6 +74,12 @@
             }
         }
     }, [authLoading, profile]);
+
+    useEffect(() => {
+        if (auditResults) {
+            resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [auditResults]);
 
 
     if (authLoading) {
@@ -213,51 +220,53 @@
           </Card>
         )}
 
-        {auditResults && !isLoading && (
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="font-headline">
-                Audit Report for {url.trim() ? new URL(getValidUrl(url)).hostname : 'your site'}
-              </CardTitle>
-               <div className="flex items-center space-x-4 pt-2">
-                  <div className="text-4xl font-bold font-headline" style={{color: getProgressColor(auditResults.overallScore).replace('bg-', 'var(--')}}>{auditResults.overallScore}/100</div>
-                    <div>
-                      <h3 className="font-semibold">Overall Score</h3>
-                      <p className="text-sm text-muted-foreground">A summary of your site&apos;s SEO health.</p>
-                    </div>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <h4 className="font-headline text-lg font-semibold mb-2">Summary</h4>
-                <p className="text-sm text-muted-foreground font-body mb-6">{auditResults.summary}</p>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[80px] text-center">Status</TableHead>
-                    <TableHead>Audit Check</TableHead>
-                    <TableHead className="text-right">Score</TableHead>
-                    <TableHead>Recommendation</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {auditResults.items.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="flex justify-center">{getStatusIcon(item.status)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                           {React.createElement(item.icon, { className: "h-5 w-5 text-muted-foreground" })}
-                           <span className="font-medium font-body">{item.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right font-mono">{item.score}/100</TableCell>
-                      <TableCell className="text-sm text-muted-foreground font-body">{item.details}</TableCell>
+        <div ref={resultsRef}>
+          {auditResults && !isLoading && (
+            <Card className="shadow-lg mt-8">
+              <CardHeader>
+                <CardTitle className="font-headline">
+                  Audit Report for {url.trim() ? new URL(getValidUrl(url)).hostname : 'your site'}
+                </CardTitle>
+                 <div className="flex items-center space-x-4 pt-2">
+                    <div className="text-4xl font-bold font-headline" style={{color: getProgressColor(auditResults.overallScore).replace('bg-', 'var(--')}}>{auditResults.overallScore}/100</div>
+                      <div>
+                        <h3 className="font-semibold">Overall Score</h3>
+                        <p className="text-sm text-muted-foreground">A summary of your site&apos;s SEO health.</p>
+                      </div>
+                  </div>
+              </CardHeader>
+              <CardContent>
+                  <h4 className="font-headline text-lg font-semibold mb-2">Summary</h4>
+                  <p className="text-sm text-muted-foreground font-body mb-6">{auditResults.summary}</p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[80px] text-center">Status</TableHead>
+                      <TableHead>Audit Check</TableHead>
+                      <TableHead className="text-right">Score</TableHead>
+                      <TableHead>Recommendation</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
+                  </TableHeader>
+                  <TableBody>
+                    {auditResults.items.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell className="flex justify-center">{getStatusIcon(item.status)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                             {React.createElement(item.icon, { className: "h-5 w-5 text-muted-foreground" })}
+                             <span className="font-medium font-body">{item.name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-mono">{item.score}/100</TableCell>
+                        <TableCell className="text-sm text-muted-foreground font-body">{item.details}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     );
   }

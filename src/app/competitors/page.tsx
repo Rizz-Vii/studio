@@ -1,6 +1,6 @@
 
 'use client';
-import { useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,6 +98,14 @@ export default function CompetitorsPage() {
   const { user, loading } = useProtectedRoute();
   const { user: currentUser } = useAuth();
   const { toast } = useToast();
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (analysisResult) {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [analysisResult]);
+
 
   const addCompetitor = () => {
     setCompetitors([...competitors, { id: `comp-${nextId}`, url: '' }]);
@@ -285,66 +293,68 @@ export default function CompetitorsPage() {
           </CardContent>
         </Card>
       )}
-
-      {analysisResult && (
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="font-headline">Keyword Rankings Comparison</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="font-body">Keyword</TableHead>
-                  <TableHead className="font-body text-center">Your Rank</TableHead>
-                  {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                    <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={getValidUrl(comp.url)}>{getHostname(comp.url)}</TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {analysisResult.rankings.map((row, index) => (
-                  <TableRow key={`${row.keyword}-${index}`}>
-                    <TableCell className="font-medium font-body">{row.keyword}</TableCell>
-                    <TableCell className="text-center font-body">
-                        <RankCell rankInfo={row.yourRank} />
-                    </TableCell>
+      
+      <div ref={resultsRef}>
+        {analysisResult && (
+          <Card className="shadow-lg mt-8">
+            <CardHeader>
+              <CardTitle className="font-headline">Keyword Rankings Comparison</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-body">Keyword</TableHead>
+                    <TableHead className="font-body text-center">Your Rank</TableHead>
                     {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                      <TableCell key={comp.id} className="text-center font-body">
-                        <RankCell rankInfo={(row as any)[getValidUrl(comp.url)]} />
-                      </TableCell>
+                      <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={getValidUrl(comp.url)}>{getHostname(comp.url)}</TableHead>
                     ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
+                </TableHeader>
+                <TableBody>
+                  {analysisResult.rankings.map((row, index) => (
+                    <TableRow key={`${row.keyword}-${index}`}>
+                      <TableCell className="font-medium font-body">{row.keyword}</TableCell>
+                      <TableCell className="text-center font-body">
+                          <RankCell rankInfo={row.yourRank} />
+                      </TableCell>
+                      {competitors.filter(c => c.url.trim() !== '').map(comp => (
+                        <TableCell key={comp.id} className="text-center font-body">
+                          <RankCell rankInfo={(row as any)[getValidUrl(comp.url)]} />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
 
-      {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length > 0 && (
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
-            <CardDescription className="font-body">Keywords your competitors rank for, but you might be missing.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {analysisResult.contentGaps.map((gap, index) => (
-              <div key={index} className="flex items-center space-x-2 p-2 bg-secondary rounded-md">
-                <Tag className="h-4 w-4 text-primary" />
-                <span className="font-body text-sm">{gap}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-      {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length === 0 && (
-         <Card className="shadow-md">
-          <CardContent className="p-6">
-             <p className="font-body text-muted-foreground text-center">No significant content gaps found compared to these competitors.</p>
-          </CardContent>
-        </Card>
-      )}
+        {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length > 0 && (
+          <Card className="shadow-lg mt-8">
+            <CardHeader>
+              <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
+              <CardDescription className="font-body">Keywords your competitors rank for, but you might be missing.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {analysisResult.contentGaps.map((gap, index) => (
+                <div key={index} className="flex items-center space-x-2 p-2 bg-secondary rounded-md">
+                  <Tag className="h-4 w-4 text-primary" />
+                  <span className="font-body text-sm">{gap}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+        {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length === 0 && (
+           <Card className="shadow-md mt-8">
+            <CardContent className="p-6">
+               <p className="font-body text-muted-foreground text-center">No significant content gaps found compared to these competitors.</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
