@@ -12,13 +12,13 @@ import { z } from 'genkit';
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 
 // Define the input schema for the SEO audit flow
-export const AuditUrlInputSchema = z.object({
+const AuditUrlInputSchema = z.object({
   url: z.string().describe('The URL to audit.'),
 });
 export type AuditUrlInput = z.infer<typeof AuditUrlInputSchema>;
 
 // Define the output schema for the SEO audit flow
-export const AuditUrlOutputSchema = z.object({
+const AuditUrlOutputSchema = z.object({
   overallScore: z.number().describe('The overall SEO score for the URL (0-100).'),
   items: z.array(z.object({
     id: z.string().describe('A unique identifier for the audit item.'),
