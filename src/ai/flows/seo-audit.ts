@@ -83,6 +83,9 @@ const auditUrlPrompt = ai.definePrompt({
 
   **Your JSON Output:**
   `,
+  config: {
+    temperature: 0.2,
+  },
 });
 
 // Define the Genkit flow
@@ -118,7 +121,6 @@ const auditUrlFlow = ai.defineFlow(
     return output;
   }
 );
-
 
 export async function auditUrl(input: AuditUrlInput): Promise<AuditUrlOutput> {
   return auditUrlFlow(input);
