@@ -160,7 +160,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
             <CardContent>
               <ul className="space-y-2">
                 {results.keywords.map((keyword, index) => (
-                  <li key={index} className="p-3 bg-secondary rounded-md text-secondary-foreground font-body text-sm shadow-sm hover:bg-muted hover:shadow-md transition-all">
+                  <li key={index} className="p-3 bg-secondary rounded-md text-secondary-foreground font-body text-sm shadow-sm transition-all duration-200 hover:bg-muted hover:shadow-lg hover:scale-105">
                     {keyword}
                   </li>
                 ))}

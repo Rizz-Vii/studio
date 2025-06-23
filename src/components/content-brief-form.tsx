@@ -150,7 +150,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
                   <ResultCard title="Content Structure" icon={BarChart2}>
                       <ul className="space-y-2 list-disc pl-5">
                           {briefResult.suggestedHeadings.map((heading, i) => (
-                              <li key={i} className={`font-body ${heading.startsWith('H3') ? 'ml-4' : 'font-semibold'}`}>
+                              <li key={i} className={`font-body p-1 -ml-1 rounded hover:bg-muted/50 transition-colors ${heading.startsWith('H3') ? 'ml-4' : 'font-semibold'}`}>
                                   {heading.replace(/^H[23]: /, '')}
                               </li>
                           ))}
@@ -172,7 +172,9 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
               <ResultCard title="Questions to Answer" icon={HelpCircle}>
                  <CardDescription className="mb-4 -mt-2">Directly answering these common user questions can help you capture "People Also Ask" features in search results.</CardDescription>
                   <ul className="space-y-2 list-disc pl-5 font-body">
-                      {briefResult.questionsToAnswer.map((q, i) => <li key={i}>{q}</li>)}
+                      {briefResult.questionsToAnswer.map((q, i) => (
+                          <li key={i} className="p-1 rounded hover:bg-muted/50 transition-colors">{q}</li>
+                      ))}
                   </ul>
               </ResultCard>
 
@@ -180,7 +182,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
                    <CardDescription className="mb-4 -mt-2">Internal links help search engines discover your content and understand the relationships between your pages, distributing link equity throughout your site.</CardDescription>
                    <ul className="space-y-2 list-disc pl-5 font-body">
                       {briefResult.internalLinkingSuggestions.map((link, i) => (
-                          <li key={i}>
+                          <li key={i} className="p-1 rounded hover:bg-muted/50 transition-colors">
                               Anchor Text: <span className="font-semibold text-primary">{link.anchorText}</span> &rarr; Link to: <span className="italic">{link.linkTo}</span>
                           </li>
                       ))}

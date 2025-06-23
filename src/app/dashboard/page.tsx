@@ -276,7 +276,7 @@ const ToolActivityCard: React.FC<{
           <h4 className="font-semibold text-sm mb-2">Recent Logs:</h4>
           <ul className="space-y-3">
             {activities.slice(0, 5).map((activity) => (
-              <li key={activity.id} className="text-xs text-muted-foreground font-body flex gap-2">
+              <li key={activity.id} className="text-xs text-muted-foreground font-body flex gap-2 p-2 -mx-2 rounded-md transition-colors hover:bg-muted/50">
                 <span className="font-semibold text-foreground whitespace-nowrap">
                   {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}:
                 </span>

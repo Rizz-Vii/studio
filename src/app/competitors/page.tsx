@@ -295,7 +295,7 @@ export default function CompetitorsPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               {analysisResult.contentGaps.map((gap, index) => (
-                <div key={index} className="flex items-center space-x-2 p-2 bg-secondary rounded-md">
+                <div key={index} className="flex items-center space-x-2 p-2 bg-secondary rounded-md transition-all duration-200 hover:bg-muted hover:shadow-md hover:scale-105">
                   <Tag className="h-5 w-5 text-primary" />
                   <span className="font-body text-sm">{gap}</span>
                 </div>
