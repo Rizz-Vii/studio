@@ -1,11 +1,13 @@
 'use client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BarChartBig, Users, Activity, TrendingUp, CheckCircle, AlertTriangle, TrafficCone, Link as LinkIcon, ScanText } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { BarChartBig, Users, Activity, TrendingUp, CheckCircle, AlertTriangle, TrafficCone, Link as LinkIcon, ScanText, ArrowRight } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
+import Link from 'next/link';
+import { Button } from "@/components/ui/button";
 
 interface MetricCardProps {
   title: string;
@@ -86,7 +88,7 @@ export default function DashboardPage() {
 
         // Fetch recent activities
         const activitiesCollectionRef = collection(db, "users", currentUser.uid, "activities");
-        const recentActivitiesQuery = query(activitiesCollectionRef, orderBy("timestamp", "desc"), limit(20));
+        const recentActivitiesQuery = query(activitiesCollectionRef, orderBy("timestamp", "desc"), limit(5));
         const activitiesSnapshot = await getDocs(recentActivitiesQuery);
         const activitiesData = activitiesSnapshot.docs.map(doc => doc.data() as UserActivity);
         setRecentActivities(activitiesData);
@@ -165,18 +167,14 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Display Recent Activity */}
+      {/* Display Most Recent Activity */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Recent Activity</h2>
+        <h2 className="text-xl font-semibold mb-2">Most Recent Activity</h2>
         {recentActivities.length > 0 ? (
-          <ul className="space-y-2">
-            {recentActivities.map((activity, index) => (
-              <li key={index} className="p-3 border rounded bg-gray-50">
-                <strong>{activity.tool}:</strong> {activity.type} on {activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}
-                {activity.resultsSummary && <p className="text-sm text-gray-600">Summary: {activity.resultsSummary}</p>}
-              </li>
-            ))}
-          </ul>
+          <div className="p-3 border rounded bg-gray-50">
+            <strong>{recentActivities[0].tool}:</strong> {recentActivities[0].type} on {recentActivities[0].timestamp ? new Date(recentActivities[0].timestamp.toDate()).toLocaleString() : 'N/A'}
+            {recentActivities[0].resultsSummary && <p className="text-sm text-gray-600">Summary: {recentActivities[0].resultsSummary}</p>}
+          </div>
         ) : (
           <p>No recent activity yet. Try using the tools!</p>
         )}
@@ -213,13 +211,12 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* The Recent Activity Card can potentially be removed or simplified now that activity is shown above */}
-        <Card className="shadow-lg">
+        <Card className="shadow-lg flex flex-col">
           <CardHeader>
             <CardTitle className="font-headline">Recent Activity Feed</CardTitle>
             <CardDescription className="font-body">Latest updates and alerts from your tools.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 flex-grow">
              {recentActivities.length > 0 ? (
                 recentActivities.map((activity, index) => (
                     <div key={index} className="flex items-start space-x-3">
@@ -235,6 +232,13 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground font-body">No recent activity to display.</p>
              )}
           </CardContent>
+          <CardFooter>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/activity">
+                 View All Activity <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </div>
