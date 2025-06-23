@@ -30,7 +30,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } fro
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 
 // ----- TYPES AND CONFIGS -----
@@ -58,7 +58,6 @@ const toolConfig: Record<string, { icon: React.ElementType; color: string }> = {
 
 const chartConfig = {
   score: { label: "Score", color: "hsl(var(--chart-1))" },
-  analyses: { label: "Analyses", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig;
 
 
@@ -87,7 +86,7 @@ const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
         <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
       </div>
       {auditData.length > 1 && (
-         <div className="h-[120px] w-full">
+         <div className="aspect-video w-full">
             <ChartContainer config={chartConfig}>
               <ResponsiveContainer>
                 <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -401,5 +400,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
