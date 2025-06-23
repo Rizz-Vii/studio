@@ -92,7 +92,7 @@ const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
             <span className="font-bold text-lg text-blue-500 flex-shrink-0">{avgScore}/100</span>
         </div>
       {auditData.length > 1 && (
-         <div className="h-40 w-full">
+         <div className="w-full" style={{aspectRatio: '2 / 1'}}>
             <ChartContainer config={chartConfig}>
               <ResponsiveContainer>
                 <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -249,7 +249,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
         enter: (direction: number) => ({
             x: direction > 0 ? 100 : -100,
             opacity: 0,
-            scale: 0.8,
+            scale: 1,
         }),
         center: {
             zIndex: 1,
@@ -261,7 +261,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
             zIndex: 0,
             x: direction < 0 ? 100 : -100,
             opacity: 0,
-            scale: 0.8,
+            scale: 1,
         }),
     };
 
@@ -287,7 +287,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                                 transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
                                 className="w-1/3"
                             >
-                                <Card className="h-36 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
+                                <Card className="h-40 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
                                     <CardContent className="p-0">
                                         <p className="text-sm font-semibold font-body px-2">{brief.title}</p>
                                     </CardContent>
@@ -483,4 +483,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
