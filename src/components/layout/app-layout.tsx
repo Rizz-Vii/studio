@@ -1,4 +1,5 @@
 
+
 'use client';
 import React from 'react';
     import Link from 'next/link';
@@ -43,7 +44,7 @@ const AppHeader = () => {
 const UserNav = () => {
   const { user, profile } = useAuth();
   const router = useRouter();
-  const { open, setOpen, isMobile } = useSidebar();
+  const { open, setOpen, isMobile, setUserMenuOpen } = useSidebar();
   const [openedByMe, setOpenedByMe] = React.useState(false);
 
   const handleLogout = async () => {
@@ -56,6 +57,7 @@ const UserNav = () => {
   };
 
   const handleOpenChange = (isOpen: boolean) => {
+    setUserMenuOpen(isOpen);
     if (isMobile) {
         return;
     }
