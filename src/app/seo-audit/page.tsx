@@ -42,6 +42,18 @@
       }
       return input;
     }
+
+    const isValidUrl = (urlString: string): boolean => {
+      try {
+        // Use the URL constructor for validation, which is a modern and robust approach.
+        // It requires a protocol, which getValidUrl ensures is present.
+        const url = new URL(getValidUrl(urlString));
+        // A simple regex to ensure it looks like a domain name and not just "https://abc"
+        return /\.[a-z]{2,}$/i.test(url.hostname);
+      } catch (e) {
+        return false;
+      }
+    };
     
   export default function SeoAuditPage() {
     const [url, setUrl] = useState<string>('');
@@ -58,8 +70,6 @@
         if (!authLoading) {
             if (profile && profile.targetWebsite) {
                 setUrl(profile.targetWebsite);
-            } else {
-                setUrl('www.theairvantage.com');
             }
         }
     }, [authLoading, profile]);
@@ -73,7 +83,25 @@
       return null;
     }
     const handleStartAudit = async () => {
-      if (!url.trim()) return;
+      const trimmedUrl = url.trim();
+      if (!trimmedUrl) {
+          toast({
+              title: "URL is empty",
+              description: "Please enter a URL to start the audit.",
+              variant: "destructive",
+          });
+          return;
+      }
+
+      if (!isValidUrl(trimmedUrl)) {
+          toast({
+              title: "Invalid URL",
+              description: "Please enter a valid website URL to start the audit (e.g., example.com).",
+              variant: "destructive",
+          });
+          return;
+      }
+
       setIsLoading(true);
       setAuditResults(null);
       setOverallScore(0);
@@ -95,11 +123,38 @@
     
       } catch (error: any) {
         console.error("Detailed audit error:", error);
+        
+        let title = "Audit Failed";
+        let description = "An unexpected error occurred. Please try again.";
+
+        if (error.code && error.message) {
+            switch(error.code) {
+                case 'invalid-argument':
+                    title = 'Invalid URL';
+                    description = error.details?.errorMessage || "The URL provided could not be reached. Please check the URL and try again.";
+                    break;
+                case 'unauthenticated':
+                    title = 'Authentication Error';
+                    description = 'You must be logged in to perform an audit.';
+                    break;
+                case 'internal':
+                    title = 'Server Error';
+                    description = "An internal server error occurred on our end. Our team has been notified. Please try again later.";
+                    break;
+                default:
+                    title = `Error: ${error.code.replace(/-/g, ' ')}`;
+                    description = error.message;
+            }
+        } else if (error.message) {
+            description = error.message;
+        }
+
         toast({
-          title: "Audit Failed",
-          description: error.details?.errorMessage || error.message || "An unexpected error occurred. Please try again.",
+          title: title,
+          description: description,
           variant: "destructive"
         });
+
         setCurrentAuditItems(initialAuditItems.map(item => ({
           ...item,
           details: 'Failed to analyze.',
