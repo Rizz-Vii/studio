@@ -7,9 +7,10 @@
   import { Progress } from "@/components/ui/progress";
   import { CheckCircle, AlertTriangle, ExternalLink, Loader2, FileText, ImageIcon, Link2Off, Zap, Smartphone } from "lucide-react";
   import useProtectedRoute from '@/hooks/useProtectedRoute';
-  import { useAuth } from '@/context/AuthContext'; // Import useAuth
-  import { db } from '@/lib/firebase'; // Import db
-  import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
+  import { useAuth } from '@/context/AuthContext';
+  import { functions } from '@/lib/firebase';
+  import { httpsCallable } from 'firebase/functions';
+  import { useToast } from '@/hooks/use-toast';
 
 
   interface BackendAuditResultItem {
@@ -17,17 +18,15 @@
     name: string;
     score: number; // 0-100
     details: string;
-    icon: React.ElementType;
     status: 'good' | 'warning' | 'error';
   }
   interface BackendAuditResult {
     overallScore: number;
-    items: BackendAuditResultItem[];
-    // potentially other summary data
+    items: (BackendAuditResultItem & { icon: React.ElementType })[];
   }
 
 
-  const initialAuditItems: BackendAuditResultItem[] = [
+  const initialAuditItems: (BackendAuditResultItem & { icon: React.ElementType })[] = [
     { id: 'title-tags', name: 'Title Tags', score: 0, details: 'Analyzing title tag length, keyword usage, and uniqueness.', icon: FileText, status: 'warning' },
     { id: 'meta-descriptions', name: 'Meta Descriptions', score: 0, details: 'Checking meta description length and compelling copy.', icon: FileText, status: 'warning' },
     { id: 'image-alts', name: 'Image Alt Texts', score: 0, details: 'Verifying presence and relevance of image alt attributes.', icon: ImageIcon, status: 'warning' },
@@ -51,17 +50,13 @@
     const [currentAuditItems, setCurrentAuditItems] = useState<typeof initialAuditItems>(initialAuditItems); // State for displaying progress
 
     const { user, loading: authLoading } = useProtectedRoute();
-    const { user: currentUser } = useAuth();
-
+    const { toast } = useToast();
 
     if (authLoading) {
-      // Show a loading indicator while checking authentication state
       return <div>Loading...</div>;
     }
 
     if (!user) {
-      // This part should ideally not be reached due to the redirect,
-      // but it's a safeguard. You could render nothing or a message.
       return null;
     }
     const handleStartAudit = async () => {
@@ -69,65 +64,34 @@
       setIsLoading(true);
       setAuditResults(null);
       setOverallScore(0);
-      setCurrentAuditItems(initialAuditItems); // Reset displayed items
-    
-      if (!currentUser) {
-        console.error("No authenticated user to save activity.");
-        setIsLoading(false);
-        // Optionally show an error message
-        return;
-      }
+      setCurrentAuditItems(initialAuditItems); 
     
       try {
-        // **Make API call to your backend audit endpoint**
         const validUrl = getValidUrl(url.trim());
-        const response = await fetch('/api/audit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Bearer ${await currentUser.getIdToken()}`,
-          },
-          body: JSON.stringify({ url: validUrl }),
-        });
-    
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-    
-        const data: BackendAuditResult = await response.json();
+        const auditUrlFunction = httpsCallable< { url: string }, BackendAuditResult>(functions, 'auditUrl');
+        const result = await auditUrlFunction({ url: validUrl });
+        const data = result.data;
+        
         setAuditResults(data);
         setOverallScore(data.overallScore);
     
-        // Update the displayed items with results from the backend
         setCurrentAuditItems(initialAuditItems.map(initialItem => {
           const backendItem = data.items.find(item => item.id === initialItem.id);
           return backendItem ? { ...initialItem, ...backendItem } : initialItem;
         }));
     
-        // **Save the user activity to Firestore**
-        const activitiesCollectionRef = collection(db, "users", currentUser.uid, "activities");
-        await addDoc(activitiesCollectionRef, {
-          type: "seo_audit",
-          tool: "SEO Audit",
-          timestamp: serverTimestamp(),
-          details: {
-            url: validUrl,
-            overallScore: data.overallScore,
-            criticalIssuesCount: data.items.filter(item => item.status === 'error').length,
-            warningIssuesCount: data.items.filter(item => item.status === 'warning').length,
-          },
-          resultsSummary: `Audit of ${validUrl} completed. Score: ${data.overallScore}/100. Critical Issues: ${data.items.filter(item => item.status === 'error').length}`,
-        });
-    
       } catch (error: any) {
         console.error("Error starting audit:", error);
-        // Update the displayed items to show error or completion status
+        toast({
+          title: "Audit Failed",
+          description: error.message || "An unexpected error occurred. Please try again.",
+          variant: "destructive"
+        });
         setCurrentAuditItems(initialAuditItems.map(item => ({
           ...item,
-          details: item.score === 0 ? 'Failed to analyze.' : item.details,
-          status: item.score === 0 ? 'error' : item.status,
+          details: 'Failed to analyze.',
+          status: 'error',
         })));
-        // Optionally show an error message to the user using toast
       } finally {
         setIsLoading(false);
       }
@@ -189,14 +153,12 @@
           </Card>
         )}
     
-        {/* Always display audit items once audit is started, show progress or results */}
-        {currentAuditItems.length > 0 && (
+        {(isLoading || auditResults) && (
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle className="font-headline">
                 Audit Report for {url.trim() ? new URL(getValidUrl(url)).hostname : 'your site'}
               </CardTitle>
-              {/* Show overall score only if results are available */}
               {auditResults && overallScore > 0 && (
                 <div className="flex items-center space-x-2 pt-2">
                   <Progress value={overallScore} className="w-[60%]" indicatorClassName={getProgressColor(overallScore)} />
@@ -237,7 +199,6 @@
                       />
                       <CardTitle className="text-md font-medium font-body">{item.name}</CardTitle>
                     </div>
-                    {/* Show status icon only if score is available or not loading */}
                     {item.score > 0 && getStatusIcon(item.status)}
                   </CardHeader>
                   <CardContent>
@@ -247,10 +208,9 @@
                       </div>
                     ) : (
                       <>
-                        {/* Show progress bar and score only if score is available */}
                         {item.score > 0 && (
                           <div className="flex items-center space-x-2 mb-1">
-                            <Progress value={item.score} className={`flex-1 ${getProgressColor(item.score)}`} />
+                            <Progress value={item.score} className={`flex-1`} indicatorClassName={getProgressColor(item.score)} />
                             <span
                               className={`text-xs font-medium ${
                                 item.status === 'good'
@@ -274,18 +234,6 @@
           </Card>
         )}
     
-        {/* Show a message if auditResults is null and not loading (e.g., after an error or initial state) */}
-        {!auditResults && !isLoading && url.trim() && (
-          <Card className="shadow-md">
-            <CardContent className="p-6">
-              <p className="font-body text-muted-foreground text-center">
-                Failed to load audit results. Please try again.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-    
-        {/* Message for when no URL is entered yet */}
         {!auditResults && !isLoading && !url.trim() && (
           <Card className="shadow-md">
             <CardContent className="p-6">

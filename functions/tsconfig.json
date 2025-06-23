@@ -1,39 +1,30 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",  
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "target": "ES2017",
     "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+      "es2017"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "moduleResolution": "nodenext",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
     "outDir": "lib",
     "sourceMap": true,
     "strict": true,
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "baseUrl": "../",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    "forceConsistentCasingInFileNames": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
   },
   "compileOnSave": true,
   "include": [
-    "src" ],
+    "src"
+  ],
   "exclude": [
     "node_modules"
   ]
-
 }

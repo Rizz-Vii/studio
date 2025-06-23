@@ -8,8 +8,7 @@
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log",
-    "type": "module"
+    "logs": "firebase functions:log"
   },
   "engines": {
     "node": "22"
@@ -19,7 +18,12 @@
     "@google-cloud/storage": "^7.16.0",
     "cors": "^2.8.5",
     "firebase-admin": "^12.7.0",
-    "firebase-functions": "^6.3.2"
+    "firebase-functions": "^6.3.2",
+    "@genkit-ai/googleai": "^1.13.0",
+    "genkit": "^1.8.0",
+    "zod": "^3.24.2",
+    "langchain": "^0.3.29",
+    "cheerio": "^1.0.0-rc.12"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
