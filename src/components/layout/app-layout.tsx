@@ -77,7 +77,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       isActive={pathname === item.href}
                       tooltip={{ children: item.title, className:"font-body" }}
                       className="font-body"
-                      asChild={typeof SidebarMenuButton !== 'string'} // Ensure NextLink passes href correctly if SidebarMenuButton is a custom component not rendering <a>
+                      asChild
                     >
                   <Link href={item.href} className="flex items-center gap-2">
                         <item.icon />
