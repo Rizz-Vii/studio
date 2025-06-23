@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  transpilePackages: ['handlebars', 'dotprompt'],
+  transpilePackages: ['handlebars', 'dotprompt', 'cheerio', '@langchain/community'],
 };
 
 export default nextConfig;
