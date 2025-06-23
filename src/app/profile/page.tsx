@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 interface UserProfile {
   email: string;
@@ -133,7 +134,7 @@ export default function ProfilePage() {
 
 
   if (authLoading || loadingProfile) {
-    return <div>Loading profile...</div>;
+    return <LoadingScreen />;
   }
 
   if (error && !userProfile) {

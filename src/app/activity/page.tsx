@@ -12,6 +12,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import LoadingScreen from '@/components/ui/loading-screen';
 
 // Interface for user activity from Firestore
 interface UserActivity {
@@ -80,11 +81,7 @@ export default function ActivityPage() {
   }, [user, authLoading]);
 
   if (authLoading || loadingData) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   // Define a mapping of tool names to their respective summary components
