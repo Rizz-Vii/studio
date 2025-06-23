@@ -17,6 +17,11 @@ export const navItems: NavItem[] = [
     icon: LayoutDashboard,
   },
   {
+    title: 'Insights',
+    href: '/insights',
+    icon: TrendingUp,
+  },
+  {
     title: 'Content Brief',
     href: '/content-brief',
     icon: BookText,
@@ -32,7 +37,7 @@ export const navItems: NavItem[] = [
     icon: ScanText,
   },
   {
-    title: 'SEO Competitors',
+    title: 'Competitors',
     href: '/competitors',
     icon: Users,
   },
@@ -50,16 +55,6 @@ export const navItems: NavItem[] = [
     title: 'Link View',
     href: '/link-view',
     icon: Link,
-  },
-  {
-    title: 'Insights',
-    href: '/insights',
-    icon: TrendingUp,
-  },
-  {
-    title: 'Activity',
-    href: '/activity',
-    icon: Activity,
   },
   {
     title: 'Admin',
