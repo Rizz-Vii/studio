@@ -1,3 +1,4 @@
+
 'use client';
 import React from 'react';
 import Image from 'next/image'
@@ -209,3 +210,5 @@ function PricingCard({ title, price, features }: { title: string, price: string,
       </div>
     )
   }
+
+    
