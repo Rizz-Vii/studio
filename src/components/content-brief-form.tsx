@@ -27,7 +27,7 @@ interface ContentBriefFormProps {
 }
 
 const ResultCard = ({ title, icon: Icon, children }: { title: string; icon: React.ElementType, children: React.ReactNode }) => (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
         <CardHeader className="pb-4">
             <CardTitle className="font-headline text-lg flex items-center gap-2">
                 <Icon className="h-6 w-6 text-primary" />
@@ -55,7 +55,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-2xl">
+      <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
         <CardHeader>
           <CardTitle className="font-headline">Generate a Content Brief</CardTitle>
           <CardDescription className="font-body">

@@ -90,7 +90,7 @@ export default function AdminDashboardPage() {
       <p className="text-muted-foreground font-body">Monitor platform usage, manage users, and view key system metrics.</p>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="shadow-2xl">
+        <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-body">Total Users</CardTitle>
               <Users className="h-6 w-6 text-muted-foreground" />
@@ -100,7 +100,7 @@ export default function AdminDashboardPage() {
               <p className="text-xs text-muted-foreground pt-1 font-body">Total registered users in the system.</p>
             </CardContent>
         </Card>
-        <Card className="shadow-2xl">
+        <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-body">Recent Signups</CardTitle>
               <UserPlus className="h-6 w-6 text-muted-foreground" />
@@ -110,7 +110,7 @@ export default function AdminDashboardPage() {
               <p className="text-xs text-muted-foreground pt-1 font-body">New users in the last 7 days.</p>
             </CardContent>
         </Card>
-        <Card className="shadow-2xl">
+        <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-body">Total Activities</CardTitle>
               <ActivitySquare className="h-6 w-6 text-muted-foreground" />
@@ -122,7 +122,7 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      <Card className="shadow-2xl">
+      <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
         <CardHeader>
             <CardTitle className="font-headline">User Management</CardTitle>
             <CardDescription className="font-body">A list of all users in the system.</CardDescription>

@@ -67,7 +67,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-2xl">
+      <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
         <CardHeader>
           <CardTitle className="font-headline">Discover Keywords</CardTitle>
           <CardDescription className="font-body">
@@ -145,7 +145,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
 
         {/* Display results using the results prop */}
         {results && results.keywords.length > 0 && (
-          <Card className="shadow-2xl mt-8">
+          <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 mt-8">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="font-headline">Suggested Keywords</CardTitle>
@@ -160,7 +160,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
             <CardContent>
               <ul className="space-y-2">
                 {results.keywords.map((keyword, index) => (
-                  <li key={index} className="p-3 bg-secondary rounded-md text-secondary-foreground font-body text-sm shadow-sm">
+                  <li key={index} className="p-3 bg-secondary rounded-md text-secondary-foreground font-body text-sm shadow-sm hover:bg-muted hover:shadow-md transition-all">
                     {keyword}
                   </li>
                 ))}
@@ -170,7 +170,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
         )}
         {/* Display empty state for results */}
         {results && results.keywords.length === 0 && !isLoading && ( // Add !isLoading condition
-           <Card className="shadow-lg mt-8">
+           <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 mt-8">
             <CardContent className="p-6">
               <p className="font-body text-muted-foreground text-center">No keywords found for this topic. Try a different one.</p>
             </CardContent>
