@@ -45,10 +45,7 @@
 
     const isValidUrl = (urlString: string): boolean => {
       try {
-        // Use the URL constructor for validation, which is a modern and robust approach.
-        // It requires a protocol, which getValidUrl ensures is present.
         const url = new URL(getValidUrl(urlString));
-        // A simple regex to ensure it looks like a domain name and not just "https://abc"
         return /\.[a-z]{2,}$/i.test(url.hostname);
       } catch (e) {
         return false;
@@ -82,6 +79,7 @@
     if (!user) {
       return null;
     }
+    
     const handleStartAudit = async () => {
       const trimmedUrl = url.trim();
       if (!trimmedUrl) {
@@ -109,11 +107,28 @@
     
       try {
         const validUrl = getValidUrl(url.trim());
-        const payload = { url: validUrl };
-        console.log("Calling 'auditUrl' function with payload:", payload);
+        const payload = { data: { url: validUrl } };
+
+        console.log("Calling 'auditUrl' function with payload:", payload.data);
         
-        const auditUrlFunction = httpsCallable< { url: string }, BackendAuditResult>(functions, 'auditUrl');
-        const result = await auditUrlFunction(payload);
+        const idToken = await user.getIdToken();
+        const functionUrl = "https://auditurl-thevwhkpdq-uc.a.run.app";
+
+        const response = await fetch(functionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
         const data = result.data;
         
         setAuditResults(data);
@@ -127,34 +142,9 @@
       } catch (error: any) {
         console.error("Detailed audit error:", error);
         
-        let title = "Audit Failed";
-        let description = "An unexpected error occurred. Please try again.";
-
-        if (error.code && error.message) {
-            switch(error.code) {
-                case 'invalid-argument':
-                    title = 'Invalid URL';
-                    description = error.details?.errorMessage || "The URL provided could not be reached. Please check the URL and try again.";
-                    break;
-                case 'unauthenticated':
-                    title = 'Authentication Error';
-                    description = 'You must be logged in to perform an audit.';
-                    break;
-                case 'internal':
-                    title = 'Server Error';
-                    description = "An internal server error occurred on our end. Our team has been notified. Please try again later.";
-                    break;
-                default:
-                    title = `Error: ${error.code.replace(/-/g, ' ')}`;
-                    description = error.message;
-            }
-        } else if (error.message) {
-            description = error.message;
-        }
-
         toast({
-          title: title,
-          description: description,
+          title: "Audit Failed",
+          description: error.message || "An unexpected error occurred. Please try again.",
           variant: "destructive"
         });
 
@@ -322,4 +312,3 @@
       </div>
     );
   }
-

@@ -1,65 +1,84 @@
 import * as logger from "firebase-functions/logger";
-import type { onCall } from "firebase-functions/v2/https";
-import { HttpsError } from "firebase-functions/v2/https";
+import type { Request, Response } from "firebase-functions";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
+import cors from "cors";
+
 import { auditUrl, AuditUrlInput, AuditUrlOutput } from "@/ai/flows/seo-audit.js";
 
-export const auditUrlHandler: Parameters<typeof onCall>[0] = async (request) => {
-    if (!request.auth) {
-        throw new HttpsError("unauthenticated", "You must be logged in to call this function.");
-    }
+const corsMiddleware = cors({ origin: true });
 
-    const { url } = request.data as AuditUrlInput;
-    if (!url) {
-        throw new HttpsError("invalid-argument", "The function must be called with a 'url' argument.");
-    }
-
-    const userId = request.auth.uid;
-
-    try {
-        const result: AuditUrlOutput = await auditUrl({ url });
-
-        // The audit data to be stored
-        const auditData = {
-            userId,
-            url,
-            ...result,
-            createdAt: Timestamp.now(),
-        };
-
-        const db = getFirestore();
-        const auditRef = db.collection("audits").doc(); // Create a new document reference
-        
-        // Store in a user-specific subcollection
-        await db.collection("users").doc(userId).collection("audits").doc(auditRef.id).set(auditData);
-
-        // Also save a summary to user's general activities
-        const activitiesCollectionRef = db.collection("users").doc(userId).collection("activities");
-        await activitiesCollectionRef.add({
-          type: "seo_audit",
-          tool: "SEO Audit",
-          timestamp: Timestamp.now(),
-          details: {
-            url: url,
-            overallScore: result.overallScore,
-            criticalIssuesCount: result.items.filter(item => item.status === 'error').length,
-            warningIssuesCount: result.items.filter(item => item.status === 'warning').length,
-          },
-          resultsSummary: `Audit of ${url} completed. Score: ${result.overallScore}/100.`,
-        });
-
-        // Return a shape that matches what the frontend expects
-        return {
-            ...result,
-            items: result.items.map(item => ({...item})) // Ensure items are plain objects if needed
-        };
-    } catch (error) {
-        logger.error("Error during SEO audit:", error);
-        if (error instanceof Error) {
-            throw new HttpsError("internal", "An internal error occurred during the SEO audit.", {
-                errorMessage: error.message,
-            });
+export const auditUrlHandler = (req: Request, res: Response) => {
+    corsMiddleware(req, res, async () => {
+        // Handle preflight request for CORS
+        if (req.method === 'OPTIONS') {
+            res.status(204).send('');
+            return;
         }
-        throw new HttpsError("internal", "An unexpected error occurred.");
-    }
+
+        const authorization = req.headers.authorization;
+        if (!authorization || !authorization.startsWith('Bearer ')) {
+            logger.warn("Unauthenticated access attempt to auditUrl");
+            res.status(403).send("Unauthorized");
+            return;
+        }
+
+        const idToken = authorization.split('Bearer ')[1];
+        let decodedToken;
+        try {
+            decodedToken = await getAuth().verifyIdToken(idToken);
+        } catch (error) {
+            logger.error("Error verifying Firebase ID token:", error);
+            res.status(403).send("Unauthorized");
+            return;
+        }
+
+        const userId = decodedToken.uid;
+        const { url } = req.body.data as AuditUrlInput;
+
+        if (!url) {
+            logger.warn("auditUrl called without 'url' argument.");
+            res.status(400).json({ error: { message: "The function must be called with a 'url' argument." } });
+            return;
+        }
+
+        try {
+            const result: AuditUrlOutput = await auditUrl({ url });
+
+            const auditData = {
+                userId,
+                url,
+                ...result,
+                createdAt: Timestamp.now(),
+            };
+
+            const db = getFirestore();
+            const auditRef = db.collection("audits").doc(); // Create a new document reference
+            
+            await db.collection("users").doc(userId).collection("audits").doc(auditRef.id).set(auditData);
+
+            const activitiesCollectionRef = db.collection("users").doc(userId).collection("activities");
+            await activitiesCollectionRef.add({
+              type: "seo_audit",
+              tool: "SEO Audit",
+              timestamp: Timestamp.now(),
+              details: {
+                url: url,
+                overallScore: result.overallScore,
+                criticalIssuesCount: result.items.filter(item => item.status === 'error').length,
+                warningIssuesCount: result.items.filter(item => item.status === 'warning').length,
+              },
+              resultsSummary: `Audit of ${url} completed. Score: ${result.overallScore}/100.`,
+            });
+            
+            res.status(200).json({ data: result });
+        } catch (error) {
+            logger.error("Error during SEO audit:", error);
+            if (error instanceof Error) {
+                 res.status(500).json({ error: { message: "An internal error occurred during the SEO audit.", errorMessage: error.message }});
+            } else {
+                 res.status(500).json({ error: { message: "An unexpected error occurred." }});
+            }
+        }
+    });
 };
