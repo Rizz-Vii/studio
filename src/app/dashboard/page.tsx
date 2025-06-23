@@ -58,6 +58,7 @@ const toolConfig: Record<string, { icon: React.ElementType; color: string }> = {
 
 const chartConfig = {
   score: { label: "Score", color: "hsl(var(--chart-1))" },
+  analyses: { label: "Analyses", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig;
 
 
@@ -144,7 +145,7 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
             <h4 className="font-semibold text-sm mb-2">Top Searched Topics:</h4>
             <div className="flex flex-wrap gap-2">
                 {topTopics.map(([topic, count]) => (
-                    <Badge key={topic} variant="secondary" className="hover:scale-105 transition-transform">{topic} ({count})</Badge>
+                    <Badge key={topic} variant="secondary" className="transition-transform hover:scale-105">{topic} ({count})</Badge>
                 ))}
             </div>
         </div>
@@ -152,37 +153,43 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
 };
 
 const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const competitors = activities
-        .flatMap(a => a.details?.competitors || [])
-        .filter(Boolean);
-        
-    if (competitors.length === 0) return null;
-    
-    const competitorCounts = competitors.reduce((acc, url) => {
-        try {
-            const hostname = new URL(url).hostname;
-            acc[hostname] = (acc[hostname] || 0) + 1;
-        } catch (e) {
-            // Ignore invalid URLs
-        }
+    const analysisByDate = activities.reduce((acc, activity) => {
+        const dateStr = format(activity.timestamp.toDate(), 'yyyy-MM-dd');
+        acc[dateStr] = (acc[dateStr] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);
+
+    const chartData = Object.entries(analysisByDate)
+        .map(([date, count]) => ({
+            date: new Date(date),
+            analyses: count,
+        }))
+        .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    if (chartData.length < 2) {
+        const totalAnalyses = activities.length;
+        return (
+            <div>
+                <h4 className="font-semibold text-sm mb-2">Total Analyses</h4>
+                <p className="text-3xl font-bold">{totalAnalyses}</p>
+            </div>
+        );
+    }
     
-    const topCompetitors = Object.entries(competitorCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5);
-        
     return (
-         <div>
-            <h4 className="font-semibold text-sm mb-2">Most Analyzed Competitors:</h4>
-            <ul className="space-y-1">
-                {topCompetitors.map(([hostname, count]) => (
-                     <li key={hostname} className="text-xs flex justify-between p-1 rounded-md hover:bg-muted/50 transition-colors">
-                        <span>{hostname}</span>
-                        <span className="font-bold">{count} times</span>
-                    </li>
-                ))}
-            </ul>
+         <div className="h-[100px] w-full">
+            <h4 className="font-semibold text-sm mb-2">Analyses Over Time</h4>
+            <ChartContainer config={chartConfig}>
+              <ResponsiveContainer>
+                <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
+                  <XAxis dataKey="date" tickFormatter={(time) => format(time, 'MMM d')} className="text-xs"/>
+                  <YAxis allowDecimals={false} className="text-xs" />
+                  <ChartTooltip content={<ChartTooltipContent indicator="line" labelFormatter={(label) => format(new Date(label), 'PP')} formatter={(value) => `${value} analyses`} />} />
+                  <Line type="monotone" dataKey="analyses" stroke="var(--color-analyses)" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
         </div>
     );
 };
@@ -208,7 +215,7 @@ const ContentBriefSummary: React.FC<{ activities: UserActivity[] }> = ({ activit
             <h4 className="font-semibold text-sm mb-2">Recent Briefs Generated For:</h4>
             <div className="flex flex-wrap gap-2">
                 {topKeywords.map(([keyword]) => (
-                    <Badge key={keyword} variant="outline" className="hover:scale-105 transition-transform">{keyword}</Badge>
+                    <Badge key={keyword} variant="outline" className="transition-transform hover:scale-105">{keyword}</Badge>
                 ))}
             </div>
         </div>
@@ -246,7 +253,7 @@ const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
             <h4 className="font-semibold text-sm mb-2">Most Analyzed Domains:</h4>
             <div className="flex flex-wrap gap-2">
                 {topDomains.map(([domain, count]) => (
-                    <Badge key={domain} variant="secondary" className="hover:scale-105 transition-transform">{domain} ({count})</Badge>
+                    <Badge key={domain} variant="secondary" className="transition-transform hover:scale-105">{domain} ({count})</Badge>
                 ))}
             </div>
         </div>
