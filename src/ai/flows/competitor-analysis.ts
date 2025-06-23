@@ -11,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const CompetitorAnalysisInputSchema = z.object({
+const CompetitorAnalysisInputSchema = z.object({
   yourUrl: z.string().url().describe('The URL of your website.'),
   competitorUrls: z
     .array(z.string().url())
@@ -27,7 +27,7 @@ const RankingDataItemSchema = z.object({
     yourRank: z.union([z.number(), z.string()]).optional(),
   }).catchall(z.union([z.number(), z.string()]).optional());
 
-export const CompetitorAnalysisOutputSchema = z.object({
+const CompetitorAnalysisOutputSchema = z.object({
   rankings: z
     .array(RankingDataItemSchema)
     .describe(
