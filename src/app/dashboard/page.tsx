@@ -2,6 +2,14 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   KeyRound,
   ScanText,
   Users,
@@ -21,6 +29,8 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 
 // ----- TYPES AND CONFIGS -----
 
@@ -50,7 +60,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 
-// ----- HELPER & SUMMARY COMPONENTS (DEFINED BEFORE USE) -----
+// ----- HELPER & SUMMARY COMPONENTS -----
 
 const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
   const auditData = activities
@@ -133,7 +143,7 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
             <h4 className="font-semibold text-sm mb-2">Top Searched Topics:</h4>
             <div className="flex flex-wrap gap-2">
                 {topTopics.map(([topic, count]) => (
-                    <Badge key={topic} variant="secondary">{topic} ({count})</Badge>
+                    <Badge key={topic} variant="secondary" className="hover:scale-105 transition-transform">{topic} ({count})</Badge>
                 ))}
             </div>
         </div>
@@ -166,7 +176,7 @@ const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ a
             <h4 className="font-semibold text-sm mb-2">Most Analyzed Competitors:</h4>
             <ul className="space-y-1">
                 {topCompetitors.map(([hostname, count]) => (
-                     <li key={hostname} className="text-xs flex justify-between">
+                     <li key={hostname} className="text-xs flex justify-between p-1 rounded-md hover:bg-muted/50 transition-colors">
                         <span>{hostname}</span>
                         <span className="font-bold">{count} times</span>
                     </li>
@@ -197,7 +207,7 @@ const ContentBriefSummary: React.FC<{ activities: UserActivity[] }> = ({ activit
             <h4 className="font-semibold text-sm mb-2">Recent Briefs Generated For:</h4>
             <div className="flex flex-wrap gap-2">
                 {topKeywords.map(([keyword]) => (
-                    <Badge key={keyword} variant="outline">{keyword}</Badge>
+                    <Badge key={keyword} variant="outline" className="hover:scale-105 transition-transform">{keyword}</Badge>
                 ))}
             </div>
         </div>
@@ -235,7 +245,7 @@ const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
             <h4 className="font-semibold text-sm mb-2">Most Analyzed Domains:</h4>
             <div className="flex flex-wrap gap-2">
                 {topDomains.map(([domain, count]) => (
-                    <Badge key={domain} variant="secondary">{domain} ({count})</Badge>
+                    <Badge key={domain} variant="secondary" className="hover:scale-105 transition-transform">{domain} ({count})</Badge>
                 ))}
             </div>
         </div>
@@ -249,47 +259,6 @@ const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[
   "Competitor Analysis": CompetitorAnalysisSummary,
   "Content Brief": ContentBriefSummary,
   "Link View": LinkViewSummary,
-};
-
-const ToolActivityCard: React.FC<{
-  tool: string;
-  activities: UserActivity[];
-  children?: React.ReactNode;
-}> = ({ tool, activities, children }) => {
-  const config = toolConfig[tool] || toolConfig["Default"];
-  const Icon = config.icon;
-
-  return (
-    <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-            <CardTitle className="font-headline flex items-center gap-2">
-                <Icon className={`h-6 w-6 ${config.color}`} />
-                {tool}
-            </CardTitle>
-            <Badge variant="secondary">{activities.length} Activities</Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-grow space-y-4 pt-4">
-        {children}
-        <div className="pt-4 border-t">
-          <h4 className="font-semibold text-sm mb-2">Recent Logs:</h4>
-          <ul className="space-y-3">
-            {activities.slice(0, 5).map((activity) => (
-              <li key={activity.id} className="text-xs text-muted-foreground font-body flex gap-2 p-2 -mx-2 rounded-md transition-colors hover:bg-muted/50">
-                <span className="font-semibold text-foreground whitespace-nowrap">
-                  {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}:
-                </span>
-                <span className="truncate" title={activity.resultsSummary}>
-                  {activity.resultsSummary ?? 'Activity performed.'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </CardContent>
-    </Card>
-  );
 };
 
 
@@ -348,10 +317,66 @@ export default function DashboardPage() {
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           {Object.entries(groupedActivities).map(([tool, activities]) => {
             const ToolSummary = toolSummaryComponents[tool];
+            const config = toolConfig[tool] || toolConfig["Default"];
+            const Icon = config.icon;
+
             return (
-              <ToolActivityCard key={tool} tool={tool} activities={activities}>
-                {ToolSummary && <ToolSummary activities={activities} />}
-              </ToolActivityCard>
+                <Dialog key={tool}>
+                    <DialogTrigger asChild>
+                        <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col cursor-pointer">
+                            <CardHeader>
+                                <div className="flex justify-between items-start">
+                                    <CardTitle className="font-headline flex items-center gap-2">
+                                        <Icon className={`h-6 w-6 ${config.color}`} />
+                                        {tool}
+                                    </CardTitle>
+                                    <Badge variant="outline" className="text-xs">{activities.length} {activities.length === 1 ? 'Activity' : 'Activities'}</Badge>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="flex-grow space-y-4 pt-4">
+                                {ToolSummary && <ToolSummary activities={activities} />}
+                            </CardContent>
+                        </Card>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                            <DialogTitle className="font-headline flex items-center gap-2 text-2xl">
+                                <Icon className={`h-6 w-6 ${config.color}`} />
+                                {tool} Activity Log
+                            </DialogTitle>
+                            <DialogDescription>A detailed log of your recent activity using this tool.</DialogDescription>
+                        </DialogHeader>
+                        <div className="max-h-[60vh] overflow-y-auto pr-4">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-transparent">
+                                        <TableHead>Details</TableHead>
+                                        <TableHead className="w-[180px] text-right">Date</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {activities.map((activity) => (
+                                        <TableRow key={activity.id}>
+                                            <TableCell className="font-medium font-body">{activity.resultsSummary || activity.type}</TableCell>
+                                            <TableCell className="text-right text-muted-foreground font-body">
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            {format(activity.timestamp.toDate(), 'PPpp')}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             );
           })}
         </div>
