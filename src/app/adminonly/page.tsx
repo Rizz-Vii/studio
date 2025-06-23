@@ -5,10 +5,10 @@ import useAdminRoute from '@/hooks/useAdminRoute';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Loader2 } from "lucide-react";
+import { Users, Loader2, UserPlus, ActivitySquare } from "lucide-react";
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
 
 interface UserData {
@@ -20,11 +20,13 @@ interface UserData {
 
 interface DashboardStats {
     totalUsers: number;
+    recentSignups: number;
+    totalActivities: number;
 }
 
 export default function AdminDashboardPage() {
   const { user, loading, role } = useAdminRoute();
-  const [stats, setStats] = useState<DashboardStats>({ totalUsers: 0 });
+  const [stats, setStats] = useState<DashboardStats>({ totalUsers: 0, recentSignups: 0, totalActivities: 0 });
   const [users, setUsers] = useState<UserData[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -32,16 +34,35 @@ export default function AdminDashboardPage() {
     const fetchData = async () => {
         if (role === 'admin') {
             try {
+                // Fetch users
                 const usersCollectionRef = collection(db, 'users');
                 const usersSnapshot = await getDocs(usersCollectionRef);
-
                 const usersList = usersSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 } as UserData));
-
                 setUsers(usersList);
-                setStats({ totalUsers: usersList.length });
+                
+                // Calculate stats
+                const totalUsers = usersList.length;
+
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
+
+                const recentSignupsQuery = query(usersCollectionRef, where("createdAt", ">=", sevenDaysAgoTimestamp));
+                const recentSignupsSnapshot = await getDocs(recentSignupsQuery);
+                const recentSignups = recentSignupsSnapshot.size;
+                
+                let totalActivities = 0;
+                // This is not scalable for many users, but fine for a prototype.
+                // A better approach would be using a distributed counter.
+                await Promise.all(usersList.map(async (u) => {
+                    const activitiesSnapshot = await getDocs(collection(db, 'users', u.id, 'activities'));
+                    totalActivities += activitiesSnapshot.size;
+                }));
+
+                setStats({ totalUsers, recentSignups, totalActivities });
 
             } catch (error) {
                 console.error("Error fetching admin data:", error);
@@ -76,7 +97,26 @@ export default function AdminDashboardPage() {
               <p className="text-xs text-muted-foreground pt-1 font-body">Total registered users in the system.</p>
             </CardContent>
         </Card>
-        {/* More metric cards can be added here */}
+        <Card className="shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-body">Recent Signups</CardTitle>
+              <UserPlus className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold font-headline">{stats.recentSignups}</div>
+              <p className="text-xs text-muted-foreground pt-1 font-body">New users in the last 7 days.</p>
+            </CardContent>
+        </Card>
+        <Card className="shadow-lg">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-body">Total Activities</CardTitle>
+              <ActivitySquare className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold font-headline">{stats.totalActivities}</div>
+              <p className="text-xs text-muted-foreground pt-1 font-body">Total tool uses across all users.</p>
+            </CardContent>
+        </Card>
       </div>
 
       <Card className="shadow-lg">
