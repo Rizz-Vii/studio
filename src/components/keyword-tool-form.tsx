@@ -1,4 +1,3 @@
-
 // src/components/keyword-tool-form.tsx
 'use client';
 
@@ -158,13 +157,13 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
-                {results.keywords.map((keyword, index) => (
-                  <li key={index} className="p-3 bg-secondary rounded-md text-secondary-foreground font-body text-sm shadow-sm transition-all duration-200 hover:bg-muted hover:shadow-lg hover:scale-105">
-                    {keyword}
-                  </li>
-                ))}
-              </ul>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {results.keywords.map((keyword, index) => (
+                    <Card key={index} className="p-4 flex items-center justify-center text-center shadow-md hover:shadow-lg transition-shadow bg-card h-24">
+                        <p className="font-medium font-body">{keyword}</p>
+                    </Card>
+                  ))}
+                </div>
             </CardContent>
           </Card>
         )}
