@@ -1,6 +1,6 @@
 
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
     import Link from 'next/link';
     import { usePathname } from 'next/navigation';
     import { useRouter } from 'next/navigation'; // Import useRouter
@@ -21,14 +21,14 @@ import React from 'react';
     import { navItems, AppLogo, AppName } from '@/config/nav';
     import type { NavItem } from '@/config/nav';
     import { ScrollArea } from '@/components/ui/scroll-area';
-    import { Separator } from '@/components/ui/separator';
     import { useAuth } from '@/context/AuthContext'; // Import useAuth
     import { auth } from '@/lib/firebase'; // Import auth
-    import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+    import { Avatar, AvatarFallback } from '@/components/ui/avatar';
     import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
     import { User, LogOut } from 'lucide-react';
     import { motion, AnimatePresence } from 'framer-motion';
     import { cn } from '@/lib/utils';
+    import LoadingScreen from '@/components/ui/loading-screen';
 
 
 const AppHeader = () => {
@@ -119,10 +119,20 @@ const UserNav = () => {
   );
 };
 
-const AppNav = () => {
+interface AppNavProps {
+  setIsNavigating: (isNavigating: boolean) => void;
+}
+
+const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
     const pathname = usePathname();
     const { state } = useSidebar();
     const { role } = useAuth();
+
+    const handleNavigation = (href: string) => {
+        if (pathname !== href) {
+            setIsNavigating(true);
+        }
+    };
 
     return (
         <SidebarMenu>
@@ -136,7 +146,7 @@ const AppNav = () => {
                   className="font-body"
                   asChild
                 >
-              <Link href={item.href}>
+              <Link href={item.href} onClick={() => handleNavigation(item.href)}>
                     <item.icon />
                     <AnimatePresence>
                     {state === 'expanded' && (
@@ -161,6 +171,17 @@ const AppNav = () => {
 };
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const [isNavigating, setIsNavigating] = useState(false);
+  const pathname = usePathname();
+
+  // Listen for route changes to stop the loader.
+  useEffect(() => {
+    if (isNavigating) {
+      setIsNavigating(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   return (
     <SidebarProvider defaultOpen={false}>
       <Sidebar collapsible="icon">
@@ -172,7 +193,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <ScrollArea className="h-full">
-            <AppNav />
+            <AppNav setIsNavigating={setIsNavigating} />
           </ScrollArea>
         </SidebarContent>
         <SidebarFooter className="p-2">
@@ -181,7 +202,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </Sidebar>
       <SidebarInset>
         <AppHeader />
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
+        <main className="relative flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
+          <AnimatePresence>
+            {isNavigating && <LoadingScreen />}
+          </AnimatePresence>
           {children}
         </main>
       </SidebarInset>
