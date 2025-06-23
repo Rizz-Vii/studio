@@ -1,0 +1,42 @@
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "australia-southeast2",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix functions run lint --fix",
+        "npm --prefix functions run build "
+      ]
+    }
+  ],
+  "emulators": {
+    "apphosting": {
+      "port": 8888,
+      "rootDirectory": "",
+      "start": "npm run dev-no-turbopack"
+    },
+    "functions": {
+      "port": 9050,
+      "start": "npm run dev-no-turbopack"
+    },
+    "firestore": {
+      "port": 9010    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
+  }
+}
