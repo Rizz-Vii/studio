@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,7 +56,14 @@ export default function InsightsPage() {
         const activitiesRef = collection(db, "users", currentUser.uid, "activities");
         const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(20));
         const querySnapshot = await getDocs(q);
-        const activities = querySnapshot.docs.map(doc => doc.data());
+        const activities = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            // Firestore Timestamps are not serializable, so we remove it.
+            // The AI flow doesn't need it anyway.
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { timestamp, ...rest } = data;
+            return rest;
+        });
 
         // 2. Call the AI flow with the activities
         if (activities.length > 0) {
