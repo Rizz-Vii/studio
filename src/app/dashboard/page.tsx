@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, Line, LineChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 
 interface MetricCardProps {
