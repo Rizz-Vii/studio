@@ -20,20 +20,16 @@ const AnalyzeContentInputSchema = z.object({
 export type AnalyzeContentInput = z.infer<typeof AnalyzeContentInputSchema>;
 
 const AnalyzeContentOutputSchema = z.object({
-  readabilitySuggestions: z
-    .string()
-    .describe('Suggestions to improve the readability of the content.'),
-  keywordDensitySuggestions: z
-    .string()
-    .describe(
-      'Suggestions to optimize keyword density in the content, including recommendations for primary, secondary and long-tail keywords.'
-    ),
-  semanticRelevanceSuggestions: z
-    .string()
-    .describe(
-      'Suggestions to improve the semantic relevance of the content, including related terms and concepts.'
-    ),
-  overallScore: z.number().describe('The overall score of the content.'),
+    readabilityScore: z.number().int().min(0).max(100).describe('Readability score (0-100). A higher score is better.'),
+    readabilitySuggestions: z.array(z.string()).describe('A list of actionable suggestions to improve readability.'),
+
+    keywordScore: z.number().int().min(0).max(100).describe('Keyword optimization score (0-100).'),
+    keywordSuggestions: z.array(z.string()).describe('A list of actionable suggestions for keyword density and placement.'),
+
+    semanticScore: z.number().int().min(0).max(100).describe('Semantic relevance score (0-100).'),
+    semanticSuggestions: z.array(z.string()).describe('A list of actionable suggestions to improve semantic relevance, including related terms.'),
+
+    overallScore: z.number().int().min(0).max(100).describe('A weighted average of the other scores, representing overall content quality.'),
 });
 export type AnalyzeContentOutput = z.infer<typeof AnalyzeContentOutputSchema>;
 
@@ -45,17 +41,31 @@ const analyzeContentPrompt = ai.definePrompt({
   name: 'analyzeContentPrompt',
   input: {schema: AnalyzeContentInputSchema},
   output: {schema: AnalyzeContentOutputSchema},
-  prompt: `You are an SEO expert who specializes in content optimization. Your task is to analyze the given content and provide actionable suggestions to improve its ranking and user engagement.
+  prompt: `You are an expert SEO content strategist. Analyze the following content based on readability, keyword usage, and semantic relevance for the given target keywords. Provide specific, actionable suggestions for improvement and a score for each category from 0 to 100.
 
-  Analyze the following content for readability, keyword density, and semantic relevance, and provide specific suggestions for improvement.
+  **Content to Analyze:**
+  \`\`\`
+  {{{content}}}
+  \`\`\`
 
-  Content: {{{content}}}
-  Target Keywords: {{{targetKeywords}}}
+  **Target Keywords:** {{{targetKeywords}}}
 
-  Readability Suggestions:
-  Keyword Density Suggestions:
-  Semantic Relevance Suggestions:
-  Overall Score:`, // Consider setting overall score 0-100
+  **Analysis and Suggestions:**
+
+  1.  **Readability (Score: 0-100):**
+      *   Assess the content's complexity (e.g., sentence length, jargon, paragraph structure).
+      *   Provide a list of suggestions to make the content clearer and more engaging for a general audience.
+  2.  **Keyword Optimization (Score: 0-100):**
+      *   Analyze the density and placement of the primary and secondary keywords.
+      *   Provide a list of suggestions for better keyword integration (e.g., "Add '{a keyword}' to an H2 heading", "Reduce usage of '{a keyword}' in the introduction").
+  3.  **Semantic Relevance (Score: 0-100):**
+      *   Assess how well the content covers related topics, entities, and user questions.
+      *   Provide a list of suggestions for semantically related terms or concepts to include to improve topical authority.
+  4.  **Overall Score:**
+      *   Calculate a weighted average of the above scores to give a single, overall content quality score.
+
+  Return the entire analysis as a single, valid JSON object that strictly conforms to the provided output schema.
+  `,
 });
 
 const analyzeContentFlow = ai.defineFlow(

@@ -1,7 +1,7 @@
 
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { BarChartBig, Users, Activity, TrendingUp, CheckCircle, AlertTriangle, TrafficCone, Link as LinkIcon, ScanText, ArrowRight } from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle, AlertTriangle, TrafficCone, Link as LinkIcon, ScanText } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 
 
 interface MetricCardProps {
@@ -18,8 +20,6 @@ interface MetricCardProps {
   value: string;
   description?: string;
   icon: React.ElementType;
-  trend?: 'up' | 'down' | 'neutral';
-  trendValue?: string;
   className?: string;
   detailedDescription: string;
 }
@@ -37,36 +37,66 @@ interface DashboardProfileData {
     primaryKeywords?: string;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon: Icon, trend, trendValue, className }) => {
-  const trendColor = trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-muted-foreground';
+const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon: Icon, className, detailedDescription }) => {
   return (
-    <Card className={cn("group shadow-lg hover:shadow-xl hover:bg-accent hover:text-accent-foreground transition-all duration-300", className)}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium font-body group-hover:text-inherit">{title}</CardTitle>
-        <Icon className="h-5 w-5 text-muted-foreground group-hover:text-inherit" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-bold font-headline group-hover:text-inherit">{value}</div>
-        {description && <p className="text-xs text-muted-foreground pt-1 font-body group-hover:text-inherit">{description}</p>}
-        {trend && trendValue && (
-          <p className={cn('text-xs pt-1 font-body flex items-center', trendColor)}>
-            {trend === 'up' ? <TrendingUp className="h-4 w-4 mr-1" /> : trend === 'down' ? <TrendingUp className="h-4 w-4 mr-1 transform rotate-180" /> : null}
-            {trendValue}
-          </p>
-        )}
-      </CardContent>
-    </Card>
+    <Dialog>
+        <DialogTrigger asChild>
+          <Card className={cn("group shadow-lg hover:shadow-xl hover:bg-accent hover:text-accent-foreground transition-all duration-300 cursor-pointer h-full", className)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-body group-hover:text-inherit">{title}</CardTitle>
+              <Icon className="h-5 w-5 text-muted-foreground group-hover:text-inherit" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold font-headline group-hover:text-inherit">{value}</div>
+              {description && <p className="text-xs text-muted-foreground pt-1 font-body group-hover:text-inherit">{description}</p>}
+            </CardContent>
+          </Card>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 font-headline">
+              <Icon className="h-6 w-6 text-primary" />
+              {title}
+            </DialogTitle>
+            <DialogDescription className="pt-4 font-body text-base">
+              {detailedDescription}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
   );
 };
 
+
+const rankingData = [
+    { name: 'Top 3', value: 45 },
+    { name: 'Top 10', value: 150 },
+    { name: 'Top 50', value: 600 },
+    { name: '51-100', value: 455 },
+];
+
+const trafficData = [
+  { month: 'Jan', traffic: 12403 },
+  { month: 'Feb', traffic: 13500 },
+  { month: 'Mar', traffic: 14200 },
+  { month: 'Apr', traffic: 15100 },
+  { month: 'May', traffic: 16000, projection: true },
+  { month: 'Jun', traffic: 17200, projection: true },
+];
+
+const chartConfig = {
+  value: { label: "Keywords" },
+  traffic: { label: "Traffic", color: "hsl(var(--chart-1))" },
+} satisfies ChartConfig
+
 export default function DashboardPage() {
   const [seoMetrics, setSeoMetrics] = useState([
-    { title: "Overall SEO Score", value: "N/A", description: "Based on recent audit", icon: CheckCircle, trend: 'neutral', trendValue: '', detailedDescription: "This score is a cumulative measure of your site's technical health, content relevance, and backlink authority. It's calculated based on the latest data from our SEO Audit tool. A higher score indicates better overall SEO performance." },
-    { title: "Tracked Keywords", value: "N/A", description: "Keywords analyzed", icon: BarChartBig, trend: 'neutral', trendValue: '', detailedDescription: "This is the total number of unique keywords you have analyzed using our Keyword Tool. Tracking more relevant keywords helps you understand your visibility across a broader range of search queries." },
-    { title: "Organic Traffic", value: "N/A", description: "Data from connected analytics", icon: TrafficCone, trend: 'neutral', trendValue: '', detailedDescription: "Represents the number of visitors who arrived at your site from a search engine, excluding paid ads. This metric requires connecting your web analytics platform (e.g., Google Analytics). Higher organic traffic is a key indicator of strong SEO." },
-    { title: "Referring Domains", value: "N/A", description: "From backlink analysis", icon: LinkIcon, trend: 'neutral', trendValue: '', detailedDescription: "The total number of unique domains that have at least one link pointing to your website. A higher number of quality referring domains is a strong signal to search engines that your site is authoritative." },
-    { title: "Critical Issues", value: "N/A", description: "From technical audit", icon: AlertTriangle, trend: 'neutral', trendValue: '', detailedDescription: "These are high-priority technical problems found during the SEO Audit, such as server errors (5xx), broken critical pages, or major indexing issues. Resolving these should be your top priority." },
-    { title: "Content Performance", value: "N/A", description: "Average content score", icon: ScanText, trend: 'neutral', trendValue: '', detailedDescription: "This is the average score of all pages analyzed with our Content Optimization tool. It reflects how well your content is optimized for readability, keyword density, and semantic relevance." },
+    { title: "Overall SEO Score", value: "N/A", description: "Based on recent audit", icon: CheckCircle, detailedDescription: "This score is a cumulative measure of your site's technical health, content relevance, and backlink authority. It's calculated based on the latest data from our SEO Audit tool. A higher score indicates better overall SEO performance." },
+    { title: "Tracked Keywords", value: "N/A", description: "Keywords analyzed", icon: BarChart3, detailedDescription: "This is the total number of unique keywords you have analyzed using our Keyword Tool. Tracking more relevant keywords helps you understand your visibility across a broader range of search queries." },
+    { title: "Organic Traffic", value: "N/A", description: "Data from connected analytics", icon: TrafficCone, detailedDescription: "Represents the number of visitors who arrived at your site from a search engine, excluding paid ads. This metric requires connecting your web analytics platform (e.g., Google Analytics). Higher organic traffic is a key indicator of strong SEO." },
+    { title: "Referring Domains", value: "N/A", description: "From backlink analysis", icon: LinkIcon, detailedDescription: "The total number of unique domains that have at least one link pointing to your website. A higher number of quality referring domains is a strong signal to search engines that your site is authoritative." },
+    { title: "Critical Issues", value: "N/A", description: "From technical audit", icon: AlertTriangle, detailedDescription: "These are high-priority technical problems found during the SEO Audit, such as server errors (5xx), broken critical pages, or major indexing issues. Resolving these should be your top priority." },
+    { title: "Content Performance", value: "N/A", description: "Average content score", icon: ScanText, detailedDescription: "This is the average score of all pages analyzed with our Content Optimization tool. It reflects how well your content is optimized for readability, keyword density, and semantic relevance." },
   ]);
 
   const { user, loading: authLoading } = useProtectedRoute();
@@ -85,21 +115,18 @@ export default function DashboardPage() {
       }
 
       try {
-        // Fetch user profile data
         const userDocRef = doc(db, "users", currentUser.uid);
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists()) {
           setDashboardProfile(userDocSnap.data() as DashboardProfileData);
         }
 
-        // Fetch recent activities
         const activitiesCollectionRef = collection(db, "users", currentUser.uid, "activities");
         const recentActivitiesQuery = query(activitiesCollectionRef, orderBy("timestamp", "desc"), limit(5));
         const activitiesSnapshot = await getDocs(recentActivitiesQuery);
         const activitiesData = activitiesSnapshot.docs.map(doc => doc.data() as UserActivity);
         setRecentActivities(activitiesData);
 
-        // --- Process activities to update metrics ---
         let totalKeywordsAnalyzed = 0;
         let contentScores: number[] = [];
         const latestAudit = activitiesData.find(act => act.type === 'seo_audit');
@@ -128,7 +155,6 @@ export default function DashboardPage() {
             }
             return metric;
         }));
-        // --- End processing activities ---
 
       } catch (err: any) {
         console.error("Error fetching dashboard data:", err.message);
@@ -161,7 +187,6 @@ export default function DashboardPage() {
         Welcome, {dashboardProfile?.displayName || currentUser.email}!
       </h1>
 
-      {/* Display Profile-Relevant Data */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Your SEO Focus</h2>
         {dashboardProfile?.targetWebsite && (
@@ -175,66 +200,37 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Display Most Recent Activity */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Most Recent Activity</h2>
-        {recentActivities.length > 0 ? (
-          <div className="p-3 border rounded bg-gray-50">
-            <strong>{recentActivities[0].tool}:</strong> {recentActivities[0].type} on {recentActivities[0].timestamp ? new Date(recentActivities[0].timestamp.toDate()).toLocaleString() : 'N/A'}
-            {recentActivities[0].resultsSummary && <p className="text-sm text-gray-600">Summary: {recentActivities[0].resultsSummary}</p>}
-          </div>
-        ) : (
-          <p>No recent activity yet. Try using the tools!</p>
-        )}
-      </div>
-
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {seoMetrics.map((metric) => (
-          <Dialog key={metric.title}>
-            <DialogTrigger asChild>
-              <div className="h-full">
-                <MetricCard
-                  title={metric.title}
-                  value={metric.value}
-                  description={metric.description}
-                  icon={metric.icon}
-                  trend={metric.trend as 'up' | 'down' | 'neutral' | undefined}
-                  trendValue={metric.trendValue}
-                  className="cursor-pointer h-full"
-                  detailedDescription={metric.detailedDescription}
-                />
-              </div>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 font-headline">
-                  <metric.icon className="h-6 w-6 text-primary" />
-                  {metric.title}
-                </DialogTitle>
-                <DialogDescription className="pt-4 font-body text-base">
-                  {metric.detailedDescription}
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+            <MetricCard
+              key={metric.title}
+              title={metric.title}
+              value={metric.value}
+              description={metric.description}
+              icon={metric.icon}
+              className="h-full"
+              detailedDescription={metric.detailedDescription}
+            />
         ))}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="font-headline">Keyword Ranking Distribution</CardTitle>
-            <CardDescription className="font-body">Breakdown of keywords by ranking position.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* Placeholder for a chart */}
-            <div className="h-64 bg-muted rounded-md flex items-center justify-center">
-              <BarChartBig className="h-16 w-16 text-muted-foreground" />
-              <p className="text-muted-foreground ml-2 font-body">Ranking Distribution Chart Area</p>
-            </div>
-            {/* This should also be updated with real data */}
-            <p className="text-xs text-muted-foreground pt-2 font-body">Top 3: N/A | Top 10: N/A | Top 50: N/A</p>
-          </CardContent>
+            <CardHeader>
+                <CardTitle className="font-headline">Keyword Ranking Distribution</CardTitle>
+                <CardDescription className="font-body">Breakdown of keywords by ranking position.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                    <BarChart data={rankingData} layout="vertical" margin={{ left: 10, right: 10}}>
+                        <CartesianGrid horizontal={false} />
+                        <XAxis type="number" hide />
+                        <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={10} width={80} className="text-xs font-body"/>
+                        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                        <Bar dataKey="value" fill="var(--color-traffic)" radius={4} />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
         </Card>
 
         <Card className="shadow-lg flex flex-col">

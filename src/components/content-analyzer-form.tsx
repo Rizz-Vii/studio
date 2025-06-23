@@ -2,10 +2,8 @@
 'use client';
 
 import type { AnalyzeContentInput, AnalyzeContentOutput } from '@/ai/flows/content-optimization';
-// Remove the direct import of analyzeContent as it will be passed via props
-// import { analyzeContent } from '@/ai/flows/content-optimization';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react'; // Removed useState and useTransition
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -15,9 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
-// Remove useToast as toast will be handled in the page component
-// import { useToast } from '@/hooks/use-toast';
-import { Loader2, BookOpen, CheckCircle, BarChart2 } from 'lucide-react';
+import { Loader2, BookOpen, CheckCircle, BarChart2, Target } from 'lucide-react';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from 'recharts';
 
 const formSchema = z.object({
   content: z.string().min(50, { message: 'Content must be at least 50 characters long.' }),
@@ -26,21 +23,13 @@ const formSchema = z.object({
 
 type ContentAnalyzerFormValues = z.infer<typeof formSchema>;
 
-// Define the props interface
 interface ContentAnalyzerFormProps {
-  onSubmit: (values: AnalyzeContentInput) => Promise<void>; // Expecting an async function
+  onSubmit: (values: AnalyzeContentInput) => Promise<void>;
   isLoading: boolean;
   analysisResult: AnalyzeContentOutput | null;
 }
 
-// Update the component signature to accept props
 export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResult }: ContentAnalyzerFormProps) {
-  // Remove local state for loading and analysisResult
-  // const [isPending, startTransition] = useTransition();
-  // const [analysisResult, setAnalysisResult] = useState<AnalyzeContentOutput | null>(null);
-  // Remove useToast
-  // const { toast } = useToast();
-
   const form = useForm<ContentAnalyzerFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,11 +38,15 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
     },
   });
 
-  // Modify the onSubmit handler to call the prop function
   async function handleFormSubmit(values: ContentAnalyzerFormValues) {
-    // The loading state and error handling will be managed by the parent component
     await onSubmit(values as AnalyzeContentInput);
   }
+
+  const chartData = analysisResult ? [
+    { subject: 'Readability', score: analysisResult.readabilityScore, fullMark: 100 },
+    { subject: 'Keywords', score: analysisResult.keywordScore, fullMark: 100 },
+    { subject: 'Semantics', score: analysisResult.semanticScore, fullMark: 100 },
+  ] : [];
 
   return (
     <div className="space-y-6">
@@ -65,7 +58,6 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
           </CardDescription>
         </CardHeader>
         <Form {...form}>
-          {/* Update the form onSubmit to use the new handler */}
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
             <CardContent className="space-y-4">
               <FormField
@@ -79,7 +71,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
                         placeholder="Paste your article, blog post, or page content here..."
                         className="min-h-[200px] font-body"
                         {...field}
-                        disabled={isLoading} // Disable input while loading
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormDescription className="font-body">
@@ -100,7 +92,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
                         placeholder="e.g., SEO best practices, content marketing"
                         {...field}
                         className="font-body"
-                        disabled={isLoading} // Disable input while loading
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormDescription className="font-body">
@@ -112,7 +104,6 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
               />
             </CardContent>
             <CardFooter>
-              {/* Use the isLoading prop to disable the button */}
               <Button type="submit" disabled={isLoading} className="font-body w-full sm:w-auto">
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Analyze Content
@@ -122,7 +113,6 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
         </Form>
       </Card>
 
-      {/* Use the isLoading prop for the loading indicator */}
           {isLoading && (
         <Card className="shadow-md">
          <CardContent className="p-6 flex items-center justify-center">
@@ -132,49 +122,66 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
         </Card>
      )}
 
-      {/* Use the analysisResult prop to display results */}
       {analysisResult && (
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="font-headline">Analysis Results</CardTitle>
-            <div className="flex items-center space-x-2 pt-2">
-              <Progress value={analysisResult.overallScore} className="w-[60%]" />
-              <span className="text-sm font-medium font-body text-primary">{analysisResult.overallScore}/100</span>
+             <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+              <div className="w-full sm:w-1/2">
+                <div className="flex items-center space-x-2">
+                    <span className="text-4xl font-bold font-headline text-primary">{analysisResult.overallScore}/100</span>
+                    <h3 className="font-semibold font-body">Overall Score</h3>
+                </div>
+                <p className="text-sm text-muted-foreground font-body mt-1">A summary of your content's SEO health.</p>
+              </div>
+              <div className="w-full sm:w-1/2 h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="subject" className="text-xs font-body" />
+                      <PolarRadiusAxis angle={30} domain={[0, 100]} className="text-xs" />
+                      <Radar name="Score" dataKey="score" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+              </div>
             </div>
-            <CardDescription className="font-body">
-              Overall content score and detailed suggestions.
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <Accordion type="single" collapsible defaultValue="readability" className="w-full">
               <AccordionItem value="readability">
                 <AccordionTrigger className="font-body hover:no-underline">
                   <div className="flex items-center">
-                    <BookOpen className="mr-2 h-5 w-5 text-primary" /> Readability Suggestions
+                    <BookOpen className="mr-2 h-5 w-5 text-primary" /> Readability ({analysisResult.readabilityScore}/100)
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="font-body text-sm p-2 bg-secondary/30 rounded-md">
-                  {analysisResult.readabilitySuggestions}
+                <AccordionContent className="font-body text-sm p-2 rounded-md">
+                  <ul className="list-disc pl-5 space-y-1">
+                    {analysisResult.readabilitySuggestions.map((s, i) => <li key={i}>{s}</li>)}
+                  </ul>
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="keyword-density">
                 <AccordionTrigger className="font-body hover:no-underline">
                    <div className="flex items-center">
-                    <BarChart2 className="mr-2 h-5 w-5 text-primary" /> Keyword Density Suggestions
+                    <Target className="mr-2 h-5 w-5 text-primary" /> Keyword Optimization ({analysisResult.keywordScore}/100)
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="font-body text-sm p-2 bg-secondary/30 rounded-md">
-                  {analysisResult.keywordDensitySuggestions}
+                <AccordionContent className="font-body text-sm p-2 rounded-md">
+                   <ul className="list-disc pl-5 space-y-1">
+                    {analysisResult.keywordSuggestions.map((s, i) => <li key={i}>{s}</li>)}
+                  </ul>
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="semantic-relevance">
                 <AccordionTrigger className="font-body hover:no-underline">
                    <div className="flex items-center">
-                    <CheckCircle className="mr-2 h-5 w-5 text-primary" /> Semantic Relevance Suggestions
+                    <CheckCircle className="mr-2 h-5 w-5 text-primary" /> Semantic Relevance ({analysisResult.semanticScore}/100)
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="font-body text-sm p-2 bg-secondary/30 rounded-md">
-                  {analysisResult.semanticRelevanceSuggestions}
+                <AccordionContent className="font-body text-sm p-2 rounded-md">
+                  <ul className="list-disc pl-5 space-y-1">
+                    {analysisResult.semanticSuggestions.map((s, i) => <li key={i}>{s}</li>)}
+                  </ul>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
