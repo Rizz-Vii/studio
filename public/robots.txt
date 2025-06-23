@@ -1,0 +1,17 @@
+# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+
+User-agent: *
+
+# Disallow crawling of user-specific and admin pages
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /adminonly/
+Disallow: /login/
+Disallow: /register/
+
+# Allow all other content
+Allow: /
+
+# Point to the sitemap
+Sitemap: https://yourdomain.com/sitemap.xml
