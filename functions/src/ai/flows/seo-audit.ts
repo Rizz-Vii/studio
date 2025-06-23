@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview SEO Audit flow that analyzes a URL for technical and content SEO factors.
  *
@@ -35,30 +36,74 @@ const auditUrlPrompt = ai.definePrompt({
   name: 'seoAuditPrompt',
   input: { schema: AuditUrlInputSchema.extend({ content: z.string().optional() }) },
   output: { schema: AuditUrlOutputSchema },
-  prompt: `You are an expert technical SEO auditor. Your task is to analyze the provided URL and provide a detailed technical and content SEO audit report.
+  prompt: `You are a world-class SEO expert, providing a detailed technical and content audit for a given URL. Your analysis must be thorough, actionable, and formatted as a JSON object adhering to the provided schema.
 
-  Focus on the following key areas and provide a score (0-100), status (good, warning, error), and detailed suggestions for each:
-
-  1.  **Title Tags:** Analyze the title tag length, relevance to content, and presence of target keywords.
-  2.  **Meta Descriptions:** Evaluate meta description length, compellingness, and keyword inclusion.
-  3.  **Image Alt Texts:** Check for the presence and relevance of alt attributes on images.
-  4.  **Broken Links:** Identify internal and external broken links (simulate this if you cannot crawl deeply).
-  5.  **Site Speed:** Provide an assessment of page load performance (simulate if you cannot directly measure).
-  6.  **Mobile-Friendliness:** Assess the responsiveness and usability on mobile devices (simulate if you cannot directly analyze).
-
-  Based on the analysis of these items, provide an overall SEO score for the URL (0-100).
-
-  Provide the output in a JSON format that strictly adheres to the AuditUrlOutputSchema. Ensure the 'details' field provides actionable insights.
-
-  URL to audit: {{{url}}}
-  Page content (if accessible):
-  {{#if content}}
+  **Analysis Instructions:**
+  
+  For the given URL and its content, perform the following checks. For each check, provide a score (0-100), a status ('good', 'warning', 'error'), and a 'details' string with clear, actionable advice.
+  
+  1.  **Title Tag (\`title-tags\`)**:
+      *   **Score:** Based on length (ideal: 50-60 chars), keyword presence, and uniqueness.
+      *   **Details:** Comment on length, if the primary keyword is present, and if it's compelling. Suggest a better title if needed.
+  2.  **Meta Description (\`meta-descriptions\`)**:
+      *   **Score:** Based on length (ideal: 120-158 chars), clarity, and inclusion of a call-to-action.
+      *   **Details:** Note the length and provide specific suggestions for improvement.
+  3.  **H1 Tag (\`h1-tags\`)**:
+      *   **Score:** Based on presence (exactly one H1 tag) and relevance to the title and content.
+      *   **Details:** State if one and only one H1 is present. Comment on its relevance.
+  4.  **Content Readability (\`content-readability\`)**:
+      *   **Score:** Assess the complexity of the text (e.g., Flesch-Kincaid score). Aim for a score that matches the target audience (e.g., grade 8-10 for general public).
+      *   **Details:** Provide a brief assessment of readability and suggest simplifying complex sentences or jargon.
+  5.  **Image Alt Text (\`image-alts\`)**:
+      *   **Score:** Based on the percentage of images with non-empty alt text.
+      *   **Details:** Note the number of images found and how many are missing alt text. Provide examples if possible.
+  6.  **Site Speed (Simulated) (\`site-speed\`)**:
+      *   **Score:** Based on content structure (e.g., number of images, scripts). A high number of render-blocking resources should lower the score.
+      *   **Details:** Provide a qualitative assessment (e.g., "Appears fast," "May be slow due to numerous large images"). Suggest general performance improvements like image compression.
+  7.  **Mobile-Friendliness (Simulated) (\`mobile-friendliness\`)**:
+      *   **Score:** Assess based on the presence of a viewport meta tag and the absence of deprecated HTML tags like \`<font>\`.
+      *   **Details:** Confirm if a viewport tag is present. Mention any structural elements that could negatively impact mobile usability.
+  
+  **Overall Score and Summary:**
+  *   Calculate an \`overallScore\` by averaging the individual item scores.
+  *   Write a concise \`summary\` of the most critical findings.
+  
+  **URL to audit:** {{{url}}}
+  **Page content:**
   <PAGE_CONTENT>
   {{{content}}}
   </PAGE_CONTENT>
-  {{/if}}
-
-  JSON Output:
+  
+  **JSON Output Example:**
+  {
+    "overallScore": 85,
+    "summary": "The page has a strong foundation but could improve mobile usability and image SEO.",
+    "items": [
+      {
+        "id": "title-tags",
+        "name": "Title Tags",
+        "score": 90,
+        "status": "good",
+        "details": "Title tag is 58 characters long and includes the primary keyword. It's well-optimized."
+      },
+      {
+        "id": "h1-tags",
+        "name": "H1 Heading",
+        "score": 100,
+        "status": "good",
+        "details": "A single, relevant H1 tag was found, which is excellent for page structure."
+      },
+      {
+        "id": "image-alts",
+        "name": "Image Alt Texts",
+        "score": 65,
+        "status": "warning",
+        "details": "Found 10 images, but 3 are missing descriptive alt text. This impacts accessibility and image search potential. Add alt text describing the content of each image."
+      }
+    ]
+  }
+  
+  **Your JSON Output:**
   `,
 });
 
