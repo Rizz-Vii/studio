@@ -15,6 +15,7 @@ import React from 'react';
       SidebarFooter,
       SidebarInset,
       SidebarTrigger,
+      useSidebar,
     } from '@/components/ui/sidebar';
     import { Button } from '@/components/ui/button';
     import { navItems, AppLogo, AppName } from '@/config/nav';
@@ -42,6 +43,8 @@ const AppHeader = () => {
 const UserNav = () => {
   const { user, profile } = useAuth();
   const router = useRouter();
+  const { open, setOpen, isMobile } = useSidebar();
+  const [openedByMe, setOpenedByMe] = React.useState(false);
 
   const handleLogout = async () => {
     try {
@@ -52,6 +55,24 @@ const UserNav = () => {
     }
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isMobile) {
+        return;
+    }
+    if (isOpen) {
+      if (!open) {
+        setOpenedByMe(true);
+        setOpen(true);
+      }
+    } else {
+      if (openedByMe) {
+        setOpenedByMe(false);
+        setOpen(false);
+      }
+    }
+  };
+
+
   if (!user) {
     return null; // Or a login button if preferred
   }
@@ -59,7 +80,7 @@ const UserNav = () => {
   const userInitial = (profile?.displayName || user.email || 'U').charAt(0).toUpperCase();
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"

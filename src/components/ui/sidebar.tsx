@@ -73,22 +73,7 @@ const SidebarProvider = React.forwardRef<
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen)
-    const open = openProp ?? _open
-    const setOpen = React.useCallback(
-      (value: boolean | ((value: boolean) => boolean)) => {
-        const openState = typeof value === "function" ? value(open) : value
-        if (setOpenProp) {
-          setOpenProp(openState)
-        } else {
-          _setOpen(openState)
-        }
-
-        // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
-      },
-      [setOpenProp, open]
-    )
+    const [open, setOpen] = React.useState(defaultOpen)
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
@@ -176,19 +161,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, setOpen, openMobile, setOpenMobile } = useSidebar()
-
-    const handleMouseEnter = React.useCallback(() => {
-        if (!isMobile) {
-            setOpen(true)
-        }
-    }, [isMobile, setOpen])
-
-    const handleMouseLeave = React.useCallback(() => {
-        if (!isMobile) {
-            setOpen(false)
-        }
-    }, [isMobile, setOpen])
+    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 
 
     if (collapsible === "none") {
@@ -234,8 +207,6 @@ const Sidebar = React.forwardRef<
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
-        onMouseEnter={collapsible === 'icon' ? handleMouseEnter : undefined}
-        onMouseLeave={collapsible === 'icon' ? handleMouseLeave : undefined}
       >
         {/* This is what handles the sidebar gap on desktop */}
         <div
