@@ -87,7 +87,7 @@ const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
         <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
       </div>
       {auditData.length > 1 && (
-         <div className="h-[100px] w-full">
+         <div className="h-[120px] w-full">
             <ChartContainer config={chartConfig}>
               <ResponsiveContainer>
                 <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -153,46 +153,48 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
 };
 
 const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const analysisByDate = activities.reduce((acc, activity) => {
-        const dateStr = format(activity.timestamp.toDate(), 'yyyy-MM-dd');
-        acc[dateStr] = (acc[dateStr] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
+    const competitors = activities
+        .flatMap(a => a.details?.competitors || [])
+        .filter(Boolean)
+        .map(url => {
+            try {
+                return new URL(url).hostname;
+            } catch (e) {
+                return url.length > 30 ? url.substring(0, 27) + '...' : url;
+            }
+        });
 
-    const chartData = Object.entries(analysisByDate)
-        .map(([date, count]) => ({
-            date: new Date(date),
-            analyses: count,
-        }))
-        .sort((a, b) => a.date.getTime() - b.date.getTime());
-
-    if (chartData.length < 2) {
-        const totalAnalyses = activities.length;
+    if (competitors.length === 0) {
         return (
             <div>
-                <h4 className="font-semibold text-sm mb-2">Total Analyses</h4>
-                <p className="text-3xl font-bold">{totalAnalyses}</p>
+                <p className="text-sm text-muted-foreground">No recent competitor analyses.</p>
             </div>
         );
     }
     
+    const competitorCounts = competitors.reduce((acc, competitor) => {
+        if(competitor) {
+            acc[competitor] = (acc[competitor] || 0) + 1;
+        }
+        return acc;
+    }, {} as Record<string, number>);
+
+    const topCompetitors = Object.entries(competitorCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 5);
+
     return (
-         <div className="h-[100px] w-full">
-            <h4 className="font-semibold text-sm mb-2">Analyses Over Time</h4>
-            <ChartContainer config={chartConfig}>
-              <ResponsiveContainer>
-                <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
-                  <XAxis dataKey="date" tickFormatter={(time) => format(time, 'MMM d')} className="text-xs"/>
-                  <YAxis allowDecimals={false} className="text-xs" />
-                  <ChartTooltip content={<ChartTooltipContent indicator="line" labelFormatter={(label) => format(new Date(label), 'PP')} formatter={(value) => `${value} analyses`} />} />
-                  <Line type="monotone" dataKey="analyses" stroke="var(--color-analyses)" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+        <div>
+            <h4 className="font-semibold text-sm mb-2">Most Analyzed Competitors:</h4>
+            <div className="flex flex-wrap gap-2">
+                {topCompetitors.map(([competitor, count]) => (
+                    <Badge key={competitor} variant="secondary" className="transition-transform hover:scale-105">{competitor} ({count})</Badge>
+                ))}
+            </div>
         </div>
     );
 };
+
 
 const ContentBriefSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
     const keywords = activities
@@ -399,3 +401,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
