@@ -34,6 +34,17 @@ function getValidUrl(url: string): string {
     return url;
 }
 
+const isValidUrl = (urlString: string): boolean => {
+    if (!urlString.trim()) return false;
+    try {
+        const url = new URL(getValidUrl(urlString));
+        // A simple check for a TLD to avoid single-word inputs like "test"
+        return /\.[a-z]{2,}$/i.test(url.hostname);
+    } catch (e) {
+        return false;
+    }
+};
+
 function getHostname(url: string): string {
     if (!url.trim()) {
         return '';
@@ -88,6 +99,17 @@ export default function CompetitorsPage() {
 
 
   const handleAnalyze = async () => {
+    const trimmedYourUrl = yourUrl.trim();
+    if (!isValidUrl(trimmedYourUrl)) {
+        toast({ title: "Invalid URL", description: "Please enter a valid URL for your website.", variant: "destructive" });
+        return;
+    }
+    const invalidCompetitor = competitors.find(c => c.url.trim() !== '' && !isValidUrl(c.url));
+    if (invalidCompetitor) {
+        toast({ title: "Invalid Competitor URL", description: `Please check the URL: ${invalidCompetitor.url}`, variant: "destructive" });
+        return;
+    }
+
     setIsLoading(true);
     setAnalysisResult(null);
 
@@ -143,6 +165,11 @@ export default function CompetitorsPage() {
   if (!user) {
     return null;
   }
+
+  const isAnalyzeDisabled = isLoading ||
+                            !isValidUrl(yourUrl) ||
+                            keywords.every(k => !k.trim()) ||
+                            competitors.some(c => c.url.trim() !== '' && !isValidUrl(c.url));
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -214,7 +241,7 @@ export default function CompetitorsPage() {
 
         </CardContent>
         <CardFooter>
-          <Button onClick={handleAnalyze} disabled={isLoading || !yourUrl.trim() || keywords.every(k => !k.trim())} className="font-body w-full sm:w-auto">
+          <Button onClick={handleAnalyze} disabled={isAnalyzeDisabled} className="font-body w-full sm:w-auto">
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Analyze Rankings
           </Button>
