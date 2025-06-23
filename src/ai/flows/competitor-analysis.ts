@@ -105,7 +105,7 @@ const analysisPrompt = ai.definePrompt({
     *   Your entire output MUST be a single, valid JSON object that conforms to the provided output schema.
     *   Ensure all property keys and string values are correctly quoted.
     *   The competitor ranks must use the full URL as the key.
-    *   Your output MUST contain exactly one ranking data object in the \`rankings\` array for each unique keyword provided in the input. Do not duplicate results.
+    *   The 'rankings' array must contain exactly one entry for each keyword listed in the "Keywords for Analysis" section above. Do not create multiple entries for the same keyword.
   `,
 });
 
