@@ -99,8 +99,7 @@ export default function DashboardPage() {
     { title: "Content Performance", value: "N/A", description: "Average content score", icon: ScanText, detailedDescription: "This is the average score of all pages analyzed with our Content Optimization tool. It reflects how well your content is optimized for readability, keyword density, and semantic relevance." },
   ]);
 
-  const { user, loading: authLoading } = useProtectedRoute();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, loading: authLoading, profile } = useProtectedRoute();
 
   const [dashboardProfile, setDashboardProfile] = useState<DashboardProfileData | null>(null);
   const [recentActivities, setRecentActivities] = useState<UserActivity[]>([]);
@@ -122,7 +121,7 @@ export default function DashboardPage() {
         }
 
         const activitiesCollectionRef = collection(db, "users", currentUser.uid, "activities");
-        const recentActivitiesQuery = query(activitiesCollectionRef, orderBy("timestamp", "desc"), limit(5));
+        const recentActivitiesQuery = query(activitiesCollectionRef, orderBy("timestamp", "desc"), limit(20));
         const activitiesSnapshot = await getDocs(recentActivitiesQuery);
         const activitiesData = activitiesSnapshot.docs.map(doc => doc.data() as UserActivity);
         setRecentActivities(activitiesData);
@@ -178,24 +177,24 @@ export default function DashboardPage() {
     return <div>Error: {error}</div>;
   }
 
-  if (!user) {
+  if (!currentUser) {
       return null;
   }
   return (
    <div className="max-w-7xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold mb-4">
-        Welcome, {dashboardProfile?.displayName || currentUser.email}!
+        Welcome, {profile?.displayName || currentUser.email}!
       </h1>
 
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Your SEO Focus</h2>
-        {dashboardProfile?.targetWebsite && (
-          <p><strong>Target Website:</strong> {dashboardProfile.targetWebsite}</p>
+        {profile?.targetWebsite && (
+          <p><strong>Target Website:</strong> {profile.targetWebsite}</p>
         )}
-        {dashboardProfile?.primaryKeywords && (
-          <p><strong>Primary Keywords:</strong> {dashboardProfile.primaryKeywords}</p>
+        {profile?.primaryKeywords && (
+          <p><strong>Primary Keywords:</strong> {profile.primaryKeywords}</p>
         )}
-        {!dashboardProfile?.targetWebsite && !dashboardProfile?.primaryKeywords && (
+        {!profile?.targetWebsite && !profile?.primaryKeywords && (
             <p>Go to your Profile to set your SEO focus!</p>
         )}
       </div>
