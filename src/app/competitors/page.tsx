@@ -303,8 +303,8 @@ export default function CompetitorsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {analysisResult.rankings.map((row) => (
-                  <TableRow key={row.keyword}>
+                {analysisResult.rankings.map((row, index) => (
+                  <TableRow key={`${row.keyword}-${index}`}>
                     <TableCell className="font-medium font-body">{row.keyword}</TableCell>
                     <TableCell className="text-center font-body">
                         <RankCell rankInfo={row.yourRank} />
