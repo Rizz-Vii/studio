@@ -24,9 +24,9 @@ export type CompetitorAnalysisInput = z.infer<
 
 const RankInfoSchema = z.object({
   rank: z
-    .union([z.number(), z.literal('N/A')])
+    .union([z.number(), z.string()])
     .describe(
-      "The simulated search engine rank, or 'N/A' if not in the top 100."
+      "The simulated search engine rank (as a number), or 'N/A' (as a string) if not in the top 100."
     ),
   reason: z
     .string()
