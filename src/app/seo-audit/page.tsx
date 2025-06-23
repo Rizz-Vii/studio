@@ -107,29 +107,11 @@
     
       try {
         const validUrl = getValidUrl(url.trim());
-        const payload = { data: { url: validUrl } };
+        console.log("Calling 'auditUrl' function with payload:", { url: validUrl });
+        const auditUrlFunction = httpsCallable(functions, 'auditUrl');
+        const result = await auditUrlFunction({ url: validUrl });
 
-        console.log("Calling 'auditUrl' function with payload:", payload.data);
-        
-        const idToken = await user.getIdToken();
-        const functionUrl = "https://auditurl-thevwhkpdq-uc.a.run.app";
-
-        const response = await fetch(functionUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${idToken}`,
-            },
-            body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        const data = result.data;
+        const data = result.data as BackendAuditResult;
         
         setAuditResults(data);
         setOverallScore(data.overallScore);
