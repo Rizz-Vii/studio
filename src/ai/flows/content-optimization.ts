@@ -20,16 +20,16 @@ const AnalyzeContentInputSchema = z.object({
 export type AnalyzeContentInput = z.infer<typeof AnalyzeContentInputSchema>;
 
 const AnalyzeContentOutputSchema = z.object({
-    readabilityScore: z.number().int().min(0).max(100).describe('Readability score (0-100). A higher score is better.'),
+    readabilityScore: z.number().describe('Readability score (0-100). A higher score is better.'),
     readabilitySuggestions: z.array(z.string()).describe('A list of actionable suggestions to improve readability.'),
 
-    keywordScore: z.number().int().min(0).max(100).describe('Keyword optimization score (0-100).'),
+    keywordScore: z.number().describe('Keyword optimization score (0-100).'),
     keywordSuggestions: z.array(z.string()).describe('A list of actionable suggestions for keyword density and placement.'),
 
-    semanticScore: z.number().int().min(0).max(100).describe('Semantic relevance score (0-100).'),
+    semanticScore: z.number().describe('Semantic relevance score (0-100).'),
     semanticSuggestions: z.array(z.string()).describe('A list of actionable suggestions to improve semantic relevance, including related terms.'),
 
-    overallScore: z.number().int().min(0).max(100).describe('A weighted average of the other scores, representing overall content quality.'),
+    overallScore: z.number().describe('A weighted average of the other scores, representing overall content quality.'),
 });
 export type AnalyzeContentOutput = z.infer<typeof AnalyzeContentOutputSchema>;
 
