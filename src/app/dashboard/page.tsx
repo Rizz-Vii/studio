@@ -63,6 +63,7 @@ const toolConfig: Record<string, { icon: React.ElementType; color: string }> = {
 
 const chartConfig = {
   score: { label: "Score", color: "hsl(var(--chart-1))" },
+  analyses: { label: "Analyses", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig;
 
 
@@ -91,7 +92,7 @@ const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
             <span className="font-bold text-lg text-blue-500 flex-shrink-0">{avgScore}/100</span>
         </div>
       {auditData.length > 1 && (
-         <div className="aspect-video w-full">
+         <div className="h-40 w-full">
             <ChartContainer config={chartConfig}>
               <ResponsiveContainer>
                 <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -267,7 +268,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
     return (
         <div>
             <h4 className="font-semibold text-sm mb-2">Relevant Briefs For You:</h4>
-            <div className="relative h-28 flex items-center justify-center -mx-2">
+            <div className="relative h-40 flex items-center justify-center -mx-2">
                  {uniqueBriefs.length > 3 && (
                     <Button variant="ghost" size="icon" className="absolute left-0 z-10" onClick={() => slide('prev')}>
                         <ChevronLeft className="h-4 w-4" />
@@ -286,9 +287,9 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                                 transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
                                 className="w-1/3"
                             >
-                                <Card className="h-24 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
+                                <Card className="h-36 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
                                     <CardContent className="p-0">
-                                        <p className="text-xs font-semibold font-body truncate">{brief.title}</p>
+                                        <p className="text-sm font-semibold font-body px-2">{brief.title}</p>
                                     </CardContent>
                                 </Card>
                             </motion.div>
@@ -482,3 +483,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
