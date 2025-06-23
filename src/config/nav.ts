@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, KeyRound, ScanText, Users, Search, ListChecks, Link, TrendingUp, Rocket, User, Activity, BookText } from 'lucide-react';
+import { LayoutDashboard, KeyRound, ScanText, Users, Search, ListChecks, Link, TrendingUp, Rocket, User, Activity, BookText, Shield } from 'lucide-react';
 
 export interface NavItem {
   title: string;
@@ -7,6 +7,7 @@ export interface NavItem {
   icon: LucideIcon;
   label?: string;
   disabled?: boolean;
+  adminOnly?: boolean;
 }
 
 export const navItems: NavItem[] = [
@@ -59,6 +60,12 @@ export const navItems: NavItem[] = [
     title: 'Activity',
     href: '/activity',
     icon: Activity,
+  },
+  {
+    title: 'Admin',
+    href: '/adminonly',
+    icon: Shield,
+    adminOnly: true,
   },
 ];
 

@@ -122,10 +122,13 @@ const UserNav = () => {
 const AppNav = () => {
     const pathname = usePathname();
     const { state } = useSidebar();
+    const { role } = useAuth();
 
     return (
         <SidebarMenu>
-          {navItems.map((item: NavItem) => (
+          {navItems
+            .filter(item => !item.adminOnly || role === 'admin')
+            .map((item: NavItem) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                   isActive={pathname === item.href}
