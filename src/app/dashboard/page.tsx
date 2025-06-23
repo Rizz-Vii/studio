@@ -222,7 +222,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
 
 
     useEffect(() => {
-        if (uniqueBriefs.length <= 3) return;
+        if (uniqueBriefs.length <= 4) return;
 
         const interval = setInterval(() => {
             slide(1); // Auto-slide next
@@ -236,10 +236,10 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
     
     const getVisibleBriefs = () => {
         const total = uniqueBriefs.length;
-        if (total <= 3) return uniqueBriefs;
+        if (total <= 4) return uniqueBriefs;
         
         const items: ContentBrief[] = [];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 4; i++) {
             items.push(uniqueBriefs[wrappedIndex(index + i)]);
         }
         return items;
@@ -265,39 +265,37 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
     return (
         <div>
             <h4 className="font-semibold text-sm mb-2">Relevant Briefs For You:</h4>
-            <div className="relative h-[250px] flex items-center justify-center -mx-2 overflow-hidden">
-                 {uniqueBriefs.length > 3 && (
-                    <Button variant="ghost" size="icon" className="absolute left-0 z-10" onClick={() => slide(-1)}>
+            <div className="relative h-[260px] -mx-2 overflow-hidden">
+                 {uniqueBriefs.length > 4 && (
+                    <Button variant="ghost" size="icon" className="absolute left-0 top-1/2 -translate-y-1/2 z-10" onClick={() => slide(-1)}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                  )}
-                 <div className="flex w-full justify-center">
-                    <AnimatePresence initial={false} custom={direction}>
-                        <motion.div
-                            key={index}
-                            className="absolute flex space-x-2"
-                            custom={direction}
-                            variants={sliderVariants}
-                            initial="enter"
-                            animate="center"
-                            exit="exit"
-                            transition={{
-                                x: { type: "spring", stiffness: 300, damping: 30 },
-                                opacity: { duration: 0.2 }
-                            }}
-                        >
-                        {getVisibleBriefs().map((brief) => (
-                             <Card key={brief.id} className="h-[250px] w-[160px] flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
-                                <CardContent className="p-0">
-                                    <p className="text-sm font-semibold font-body px-2">{brief.title}</p>
-                                </CardContent>
-                            </Card>
-                        ))}
-                        </motion.div>
-                    </AnimatePresence>
-                 </div>
-                 {uniqueBriefs.length > 3 && (
-                    <Button variant="ghost" size="icon" className="absolute right-0 z-10" onClick={() => slide(1)}>
+                <AnimatePresence initial={false} custom={direction}>
+                    <motion.div
+                        key={index}
+                        className="absolute inset-0 flex items-center justify-center space-x-2"
+                        custom={direction}
+                        variants={sliderVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{
+                            x: { type: "spring", stiffness: 300, damping: 30 },
+                            opacity: { duration: 0.2 }
+                        }}
+                    >
+                    {getVisibleBriefs().map((brief) => (
+                         <Card key={brief.id} className="h-[250px] w-[140px] flex flex-col items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
+                            <CardContent className="p-0">
+                                <p className="text-sm font-semibold font-body px-2">{brief.title}</p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                    </motion.div>
+                </AnimatePresence>
+                 {uniqueBriefs.length > 4 && (
+                    <Button variant="ghost" size="icon" className="absolute right-0 top-1/2 -translate-y-1/2 z-10" onClick={() => slide(1)}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 )}
