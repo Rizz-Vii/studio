@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Link analysis flow that simulates finding backlinks for a target URL.
@@ -17,7 +18,7 @@ export type LinkAnalysisInput = z.infer<typeof LinkAnalysisInputSchema>;
 
 const BacklinkSchema = z.object({
     referringDomain: z.string().describe("The domain of the page containing the backlink."),
-    backlinkUrl: z.string().url().describe("The full URL of the page containing the backlink."),
+    backlinkUrl: z.string().describe("The full URL of the page containing the backlink."),
     anchorText: z.string().describe("The anchor text of the backlink."),
     domainAuthority: z.number().min(0).max(100).describe("A simulated Domain Authority score (0-100) for the referring domain."),
 });
