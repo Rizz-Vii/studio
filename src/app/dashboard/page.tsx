@@ -100,28 +100,30 @@ export default function DashboardPage() {
         setRecentActivities(activitiesData);
 
         // --- Process activities to update metrics ---
-        let latestOverallScore: string | undefined;
-        let latestContentScore: string | undefined;
         let totalKeywordsAnalyzed = 0;
-        let latestReferringDomains: string | undefined;
-        let latestCriticalIssues: string | undefined;
+        let contentScores: number[] = [];
+        const latestAudit = activitiesData.find(act => act.type === 'seo_audit');
 
         activitiesData.forEach(activity => {
-          if (activity.type === 'content_analysis' && activity.resultsSummary) {
-             const scoreMatch = activity.resultsSummary.match(/Score: (\d+)\/100/);
-             if (scoreMatch && scoreMatch[1]) {
-                latestContentScore = `${scoreMatch[1]}/100`;
-             }
-          } else if (activity.type === 'keyword_search' && activity.details?.topic) {
-            totalKeywordsAnalyzed += 1;
+          if (activity.type === 'content_analysis' && activity.details?.overallScore) {
+            contentScores.push(activity.details.overallScore);
+          } else if (activity.type === 'keyword_search') {
+            totalKeywordsAnalyzed++;
           }
         });
 
         setSeoMetrics(prevMetrics => prevMetrics.map(metric => {
-            if (metric.title === "Content Performance" && latestContentScore !== undefined) {
-                return { ...metric, value: latestContentScore };
+            if (metric.title === "Overall SEO Score" && latestAudit?.details.overallScore) {
+                return { ...metric, value: `${latestAudit.details.overallScore}/100` };
             }
-             if (metric.title === "Tracked Keywords" && totalKeywordsAnalyzed > 0) {
+            if (metric.title === "Critical Issues" && latestAudit?.details.criticalIssuesCount !== undefined) {
+                return { ...metric, value: latestAudit.details.criticalIssuesCount.toString() };
+            }
+            if (metric.title === "Content Performance" && contentScores.length > 0) {
+                const avgScore = contentScores.reduce((a, b) => a + b, 0) / contentScores.length;
+                return { ...metric, value: `${Math.round(avgScore)}/100` };
+            }
+            if (metric.title === "Tracked Keywords" && totalKeywordsAnalyzed > 0) {
                 return { ...metric, value: totalKeywordsAnalyzed.toString(), description: "Keyword searches performed" };
             }
             return metric;

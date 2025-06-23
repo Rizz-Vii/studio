@@ -50,9 +50,9 @@ export default function ContentAnalyzerPage() {
         details: { // Details of the analysis
           // Avoid saving the full content here if it's large
           targetKeywords: values.targetKeywords,
-          // Add other relevant analysis parameters here
+          overallScore: aiResult.overallScore,
         },
-        resultsSummary: `Score: ${aiResult.overallScore}/100. Suggestions for readability, keywords, relevance.`, // Summarize the results
+        resultsSummary: `Content analysis for "${values.targetKeywords}" completed. Score: ${aiResult.overallScore}/100.`, // Summarize the results
       });
 
     } catch (err: any) {

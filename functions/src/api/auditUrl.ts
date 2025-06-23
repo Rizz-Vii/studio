@@ -48,7 +48,11 @@ export const auditUrlHandler: Parameters<typeof onCall>[0] = async (request) => 
           resultsSummary: `Audit of ${url} completed. Score: ${result.overallScore}/100.`,
         });
 
-        return result;
+        // Return a shape that matches what the frontend expects
+        return {
+            ...result,
+            items: result.items.map(item => ({...item})) // Ensure items are plain objects if needed
+        };
     } catch (error) {
         logger.error("Error during SEO audit:", error);
         if (error instanceof Error) {
