@@ -25,9 +25,9 @@
   ],
   "emulators": {
     "apphosting": {
-      "port": 8888,
+      "port": 9002,
       "rootDirectory": "",
-      "start": "npm run dev-no-turbopack"
+      "start": "npm run dev"
     },
     "functions": {
       "port": 9050
@@ -35,7 +35,8 @@
     "firestore": {
       "port": 9010    },
     "ui": {
-      "enabled": true
+      "enabled": true,
+      "port": 9000
     },
     "singleProjectMode": true
   }
