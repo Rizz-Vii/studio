@@ -1,3 +1,4 @@
+
 'use client';
 import React from 'react';
     import Link from 'next/link';
@@ -62,9 +63,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <SidebarProvider defaultOpen={false}>
       <Sidebar collapsible="icon">
         <SidebarHeader className="p-4">
-          <Link href="/" className="flex items-center gap-2">
-            <AppLogo className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-headline font-bold text-primary">{AppName}</span>
+          <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
+            <AppLogo className="h-8 w-8 text-primary shrink-0" />
+            <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
           </Link>
         </SidebarHeader>
         <SidebarContent>
@@ -75,7 +76,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <SidebarMenuButton
                       isActive={pathname === item.href}
                       tooltip={{ children: item.title, className:"font-body" }}
-                      className="font-body pl-4" // Add pl-4 here
+                      className="font-body"
                       asChild={typeof SidebarMenuButton !== 'string'} // Ensure NextLink passes href correctly if SidebarMenuButton is a custom component not rendering <a>
                     >
                   <Link href={item.href} className="flex items-center gap-2">
@@ -89,9 +90,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
           </ScrollArea>
         </SidebarContent>
-        <SidebarFooter className="p-4">
-           <Separator className="my-2" />
-           <p className="text-xs text-muted-foreground font-body">&copy; {new Date().getFullYear()} {AppName}</p>
+        <SidebarFooter className="p-4 flex flex-col items-center">
+           <Separator className="my-2 group-data-[state=collapsed]:w-8" />
+           <p className="text-xs text-muted-foreground font-body group-data-[state=collapsed]:hidden">&copy; {new Date().getFullYear()} {AppName}</p>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
