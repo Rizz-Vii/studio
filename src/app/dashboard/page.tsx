@@ -268,7 +268,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
     return (
         <div>
             <h4 className="font-semibold text-sm mb-2">Relevant Briefs For You:</h4>
-            <div className="relative h-40 flex items-center justify-center -mx-2">
+            <div className="relative h-[250px] flex items-center justify-center -mx-2">
                  {uniqueBriefs.length > 3 && (
                     <Button variant="ghost" size="icon" className="absolute left-0 z-10" onClick={() => slide('prev')}>
                         <ChevronLeft className="h-4 w-4" />
@@ -285,9 +285,8 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                                 animate="center"
                                 exit="exit"
                                 transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
-                                className="w-1/3"
                             >
-                                <Card className="h-40 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
+                                <Card className="h-[250px] w-[160px] flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
                                     <CardContent className="p-0">
                                         <p className="text-sm font-semibold font-body px-2">{brief.title}</p>
                                     </CardContent>
@@ -457,7 +456,7 @@ export default function DashboardPage() {
                                                             {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}
                                                         </TooltipTrigger>
                                                         <TooltipContent>
-                                                            {format(activity.timestamp.toDate(), 'PPpp')}
+                                                            {format(activity.timestamp.toDate(), 'PPp')}
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
@@ -483,3 +482,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
