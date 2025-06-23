@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 interface UserData {
     id: string;
@@ -80,7 +81,7 @@ export default function AdminDashboardPage() {
 
 
   if (loading || loadingData) {
-    return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    return <LoadingScreen />;
   }
 
   return (

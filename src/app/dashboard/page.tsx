@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
 import { BarChart, Bar, Line, LineChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import LoadingScreen from '@/components/ui/loading-screen';
 
 
 interface MetricCardProps {
@@ -171,7 +172,7 @@ export default function DashboardPage() {
   }, [authLoading, currentUser]);
 
   if (authLoading || loadingData) {
-    return <div>Loading dashboard...</div>;
+    return <LoadingScreen />;
   }
 
   if (error) {

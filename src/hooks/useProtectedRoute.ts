@@ -4,6 +4,7 @@
     import { useEffect } from 'react';
     import { useRouter } from 'next/navigation';
     import { useAuth } from '@/context/AuthContext';
+    import LoadingScreen from '@/components/ui/loading-screen';
 
     export default function useProtectedRoute() {
       const { user, loading,role } = useAuth();
@@ -15,6 +16,10 @@
           router.push('/login');
         }
       }, [user, loading, router,role]);
+      
+      if (loading) {
+        return { user: null, loading: true, role: null, profile: null };
+      }
 
       return { user, loading, role };
     }
