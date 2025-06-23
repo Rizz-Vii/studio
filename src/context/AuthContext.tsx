@@ -1,3 +1,4 @@
+
 // src/context/AuthContext.tsx
     'use client';
 
@@ -24,7 +25,7 @@
       useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
           setUser(user);
-          setLoading(true);if (user) {
+          if (user) {
             // Fetch user document from Firestore
             const userDocRef = doc(db, "users", user.uid);
             const userDocSnap = await getDoc(userDocRef);
@@ -32,7 +33,7 @@
             if (userDocSnap.exists()) {
               const userData = userDocSnap.data();
               setRole(userData?.role || null); // Set the role from the document
-              setProfile(userData?.profile || null ); // Set other profile data
+              setProfile(userData || null ); // Set other profile data
             } else {
               setRole(null); // User document not found
               setProfile(null);

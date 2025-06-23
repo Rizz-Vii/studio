@@ -13,7 +13,7 @@ import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
 
 // Define the input schema for the SEO audit flow
 export const AuditUrlInputSchema = z.object({
-  url: z.string().url().describe('The URL to audit.'),
+  url: z.string().describe('The URL to audit.'),
 });
 export type AuditUrlInput = z.infer<typeof AuditUrlInputSchema>;
 

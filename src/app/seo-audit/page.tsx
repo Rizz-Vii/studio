@@ -1,6 +1,6 @@
 
 'use client';
-  import { useState } from 'react';
+  import { useEffect, useState } from 'react';
   import { Button } from "@/components/ui/button";
   import { Input } from "@/components/ui/input";
   import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,14 +44,26 @@
     }
     
   export default function SeoAuditPage() {
-    const [url, setUrl] = useState<string>('www.theairvantage.com');
+    const [url, setUrl] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [auditResults, setAuditResults] = useState<BackendAuditResult | null>(null);
     const [overallScore, setOverallScore] = useState<number>(0);
     const [currentAuditItems, setCurrentAuditItems] = useState<typeof initialAuditItems>(initialAuditItems); // State for displaying progress
 
     const { user, loading: authLoading } = useProtectedRoute();
+    const { profile } = useAuth();
     const { toast } = useToast();
+
+    useEffect(() => {
+        if (!authLoading) {
+            if (profile && profile.targetWebsite) {
+                setUrl(profile.targetWebsite);
+            } else {
+                setUrl('www.theairvantage.com');
+            }
+        }
+    }, [authLoading, profile]);
+
 
     if (authLoading) {
       return <div>Loading...</div>;
