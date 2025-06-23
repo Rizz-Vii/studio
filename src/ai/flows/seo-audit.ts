@@ -100,9 +100,28 @@ const auditUrlFlow = ai.defineFlow(
     let pageContent: string | undefined;
 
     try {
-      const loader = new CheerioWebBaseLoader(url);
+        console.log(`Attempting to fetch content for: ${url}`);
+        const loader = new CheerioWebBaseLoader(url, {
+            timeout: 15000, // 15-second timeout
+            fetchOptions: {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+            }
+        });
       const docs = await loader.load();
       pageContent = docs.length > 0 ? docs[0].pageContent : undefined;
+
+      if (pageContent) {
+          console.log(`Successfully fetched ${pageContent.length} characters.`);
+          // Truncate content to avoid overwhelming the model and hitting token limits.
+          if (pageContent.length > 100000) {
+              console.log('Content is very long, truncating to 100,000 characters.');
+              pageContent = pageContent.substring(0, 100000);
+          }
+      } else {
+          console.log('No content fetched.');
+      }
     } catch (e) {
       console.error(`Could not fetch content for ${url}:`, e);
       pageContent = undefined;
