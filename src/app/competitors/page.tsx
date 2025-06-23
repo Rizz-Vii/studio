@@ -154,7 +154,16 @@ export default function CompetitorsPage() {
       .map(c => c.url.trim())
       .filter(url => url !== '');
       
-    const validKeywords = keywords.filter(k => k.trim() !== '');
+    // Filter out empty keywords and remove duplicates (case-insensitive)
+    const validKeywords = [
+        ...new Set(keywords.map(k => k.trim().toLowerCase()).filter(Boolean))
+    ];
+
+    if (validKeywords.length === 0) {
+        toast({ title: "No Keywords", description: "Please enter at least one keyword.", variant: "destructive" });
+        setIsLoading(false);
+        return;
+    }
 
     try {
       if (!currentUser) {
