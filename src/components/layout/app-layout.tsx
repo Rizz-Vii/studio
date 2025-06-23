@@ -23,37 +23,78 @@ import React from 'react';
     import { Separator } from '../ui/separator';
     import { useAuth } from '@/context/AuthContext'; // Import useAuth
     import { auth } from '@/lib/firebase'; // Import auth
+    import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+    import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+    import { User, LogOut } from 'lucide-react';
+
 
 const AppHeader = () => {
-    const { user } = useAuth(); // Use useAuth to check if user is logged in
-      const router = useRouter(); // Use useRouter for redirection
-
-      const handleLogout = async () => {
-        try {
-          await auth.signOut();
-          // Redirect to login page after logout
-          router.push('/login');
-        } catch (error: any) {
-          console.error("Error logging out:", error.message);
-          // Display an error message
-        }
-      };
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
       <SidebarTrigger className="md:hidden" />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 md:hidden">
         <h1 className="text-xl font-headline font-semibold">{AppName}</h1>
       </div>
-      {user && (
-        <div className="ml-auto">
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              Logout
-            </Button>
-        </div>
-      )}
     </header>
   );
 };
+
+const UserNav = () => {
+  const { user, profile } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      router.push('/login');
+    } catch (error: any) {
+      console.error("Error logging out:", error.message);
+    }
+  };
+
+  if (!user) {
+    return null; // Or a login button if preferred
+  }
+
+  const userInitial = (profile?.displayName || user.email || 'U').charAt(0).toUpperCase();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-lg p-2 text-left text-sm group-data-[state=collapsed]:h-12 group-data-[state=collapsed]:w-12 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:p-0"
+        >
+          <Avatar className="h-8 w-8">
+            {/* If user has a photoURL, you can use it here */}
+            {/* <AvatarImage src={user.photoURL} alt={profile?.displayName || user.email} /> */}
+            <AvatarFallback>{userInitial}</AvatarFallback>
+          </Avatar>
+          <div className="group-data-[state=collapsed]:hidden">
+            <p className="max-w-[7rem] truncate font-medium">
+              {profile?.displayName || user.email}
+            </p>
+          </div>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="right" align="start" sideOffset={12}>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+           <Link href="/profile">
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+           </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -68,7 +109,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </SidebarHeader>
         <SidebarContent>
-          <ScrollArea className="h-[calc(100vh-8rem)]"> {/* Adjust height based on header/footer */}
+          <ScrollArea className="h-full">
             <SidebarMenu>
               {navItems.map((item: NavItem) => (
                 <SidebarMenuItem key={item.href}>
@@ -78,7 +119,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       className="font-body"
                       asChild
                     >
-                  <Link href={item.href} className="flex items-center gap-2">
+                  <Link href={item.href}>
                         <item.icon />
                         <span>{item.title}</span>
                       </Link>
@@ -89,9 +130,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
           </ScrollArea>
         </SidebarContent>
-        <SidebarFooter className="p-4 flex flex-col items-center">
-           <Separator className="my-2 group-data-[state=collapsed]:w-8" />
-           <p className="text-xs text-muted-foreground font-body group-data-[state=collapsed]:hidden">&copy; {new Date().getFullYear()} {AppName}</p>
+        <SidebarFooter className="p-2">
+            <UserNav />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

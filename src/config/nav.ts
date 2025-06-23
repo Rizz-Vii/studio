@@ -16,11 +16,6 @@ export const navItems: NavItem[] = [
     icon: LayoutDashboard,
   },
   {
-    title: 'Profile',
-    href: '/profile',
-    icon: User,
-  },
-  {
     title: 'Keyword Tool',
     href: '/keyword-tool',
     icon: KeyRound,
