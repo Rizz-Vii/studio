@@ -1,5 +1,4 @@
 
-
 'use client';
 import React from 'react';
     import Link from 'next/link';
@@ -22,7 +21,7 @@ import React from 'react';
     import { navItems, AppLogo, AppName } from '@/config/nav';
     import type { NavItem } from '@/config/nav';
     import { ScrollArea } from '@/components/ui/scroll-area';
-    import { Separator } from '../ui/separator';
+    import { Separator } from '@/components/ui/separator';
     import { useAuth } from '@/context/AuthContext'; // Import useAuth
     import { auth } from '@/lib/firebase'; // Import auth
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
