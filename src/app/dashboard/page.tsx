@@ -40,13 +40,13 @@ interface DashboardProfileData {
 const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon: Icon, trend, trendValue, className }) => {
   const trendColor = trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-muted-foreground';
   return (
-    <Card className={cn("group shadow-lg hover:shadow-xl hover:bg-sidebar-accent transition-all duration-300", className)}>
+    <Card className={cn("group shadow-lg hover:shadow-xl hover:bg-accent hover:text-accent-foreground transition-all duration-300", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium font-body group-hover:text-sidebar-accent-foreground">{title}</CardTitle>
+        <CardTitle className="text-sm font-medium font-body group-hover:text-inherit">{title}</CardTitle>
         <Icon className="h-5 w-5 text-muted-foreground group-hover:text-inherit" />
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-bold font-headline group-hover:text-sidebar-accent-foreground">{value}</div>
+        <div className="text-3xl font-bold font-headline group-hover:text-inherit">{value}</div>
         {description && <p className="text-xs text-muted-foreground pt-1 font-body group-hover:text-inherit">{description}</p>}
         {trend && trendValue && (
           <p className={cn('text-xs pt-1 font-body flex items-center', trendColor)}>
@@ -247,7 +247,7 @@ export default function DashboardPage() {
                 recentActivities.map((activity, index) => (
                     <Dialog key={index}>
                         <DialogTrigger asChild>
-                            <div className="group flex items-start space-x-3 p-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer transition-colors">
+                            <div className="group flex items-start space-x-3 p-2 rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors">
                                 <Activity className="h-5 w-5 text-primary mt-1 flex-shrink-0 group-hover:text-inherit" />
                                 <div className="flex-grow overflow-hidden">
                                     <p className="text-sm font-medium font-body capitalize">
