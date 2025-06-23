@@ -1,3 +1,4 @@
+
 'use client';
 import ContentAnalyzerForm from '@/components/content-analyzer-form';
 import { useState } from 'react';
@@ -62,6 +63,7 @@ export default function ContentAnalyzerPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">Content Optimization Tool</h1>
+      <p className="text-muted-foreground font-body">Analyze your content for readability, keyword usage, and semantic relevance to improve its SEO performance.</p>
       <ContentAnalyzerForm
         onSubmit={handleAnalyzeContent}
         isLoading={isLoading}

@@ -70,7 +70,7 @@ export default function SerpViewPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">SERP Visualization</h1>
-
+      <p className="text-muted-foreground font-body">Visualize the Search Engine Results Page for any keyword to understand the competitive landscape and identify different content types.</p>
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="font-headline">Analyze SERP</CardTitle>
@@ -106,30 +106,31 @@ export default function SerpViewPage() {
             <Card className="shadow-lg mt-8">
               <CardHeader>
                 <CardTitle className="font-headline">Search Results for "{keyword}"</CardTitle>
+                <CardDescription className="font-body">This is a simulated SERP. Understanding who ranks and what kind of content they have (e.g., guides, products, videos) is key to developing a winning strategy.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {serpResults.map(result => (
                   <div key={result.id} className={`p-4 rounded-lg border ${result.isFeaturedSnippet ? 'border-primary bg-primary/10 shadow-md' : 'bg-card'}`}>
                     {result.isFeaturedSnippet && (
                       <div className="flex items-center text-sm text-primary font-medium mb-1 font-body">
-                        <Star className="h-4 w-4 mr-1 fill-primary" /> Featured Snippet
+                        <Star className="h-5 w-5 mr-1 fill-primary" /> Featured Snippet
                       </div>
                     )}
                      {result.isPeopleAlsoAsk && (
                       <div className="flex items-center text-sm text-accent-foreground font-medium mb-1 font-body">
-                        <MessageSquare className="h-4 w-4 mr-1 text-accent" /> People Also Ask
+                        <MessageSquare className="h-5 w-5 mr-1 text-accent" /> People Also Ask
                       </div>
                     )}
                     {result.isImagePack && (
                       <div className="flex items-center text-sm text-accent-foreground font-medium mb-1 font-body">
-                        <ImageIcon className="h-4 w-4 mr-1 text-accent" /> Image Pack
+                        <ImageIcon className="h-5 w-5 mr-1 text-accent" /> Image Pack
                       </div>
                     )}
                     <h3 className="text-lg font-medium text-primary hover:underline font-headline">
                       <a href={result.url} target="_blank" rel="noopener noreferrer">{result.position > 0 && `${result.position}. `}{result.title}</a>
                     </h3>
                     {!result.isImagePack && !result.isPeopleAlsoAsk && (
-                        <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-sm text-green-600 dark:text-green-400 block truncate font-body">{result.url}</a>
+                        <a href={getValidUrl(result.url)} target="_blank" rel="noopener noreferrer" className="text-sm text-green-600 dark:text-green-400 block truncate font-body">{result.url}</a>
                     )}
                     <p className="text-sm text-muted-foreground mt-1 font-body">{result.snippet}</p>
                     {result.isImagePack && (

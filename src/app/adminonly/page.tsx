@@ -1,3 +1,4 @@
+
 // src/app/adminonly/page.tsx
 'use client';
 
@@ -85,6 +86,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">Admin Dashboard</h1>
+      <p className="text-muted-foreground font-body">Monitor platform usage, manage users, and view key system metrics.</p>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="shadow-lg">

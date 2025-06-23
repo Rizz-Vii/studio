@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -106,8 +107,9 @@ export default function HomePage() {
         <p className="text-gray-600 mb-6">All your SEO tools — crawler, analyzer, optimizer — in one clean, intuitive dashboard.</p>
         <div className="rounded-xl shadow-2xl overflow-hidden border border-gray-200">
           <Image
-            src="/screenshot-dashboard.png"
+            src="https://placehold.co/1200x700.png"
             alt="SEO Dashboard Screenshot"
+            data-ai-hint="dashboard computer screen"
             width={1200}
             height={700}
             className="w-full h-auto"

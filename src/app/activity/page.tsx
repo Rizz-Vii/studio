@@ -6,7 +6,7 @@ import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, KeyRound, ScanText, Users, ListChecks, Activity } from "lucide-react";
+import { Loader2, KeyRound, ScanText, Users, ListChecks, Activity, BookText } from "lucide-react";
 import { format, formatDistanceToNow } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
@@ -32,7 +32,7 @@ const toolConfig: Record<string, { icon: React.ElementType; color: string }> = {
   "Keyword Tool": { icon: KeyRound, color: "text-green-500" },
   "Content Analyzer": { icon: ScanText, color: "text-purple-500" },
   "Competitor Analysis": { icon: Users, color: "text-orange-500" },
-  "Content Brief": { icon: ScanText, color: "text-indigo-500" },
+  "Content Brief": { icon: BookText, color: "text-indigo-500" },
   "Default": { icon: Activity, color: "text-gray-500" },
 };
 
@@ -99,6 +99,7 @@ export default function ActivityPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">Activity Dashboard</h1>
+       <p className="text-muted-foreground font-body">Review your recent activity, track trends, and see how you're using our SEO tools.</p>
       {Object.keys(groupedActivities).length > 0 ? (
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           {Object.entries(groupedActivities).map(([tool, activities]) => {
@@ -259,7 +260,7 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
 // Summary for Competitor Analysis
 const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
     const competitors = activities
-        .flatMap(a => a.details?.competitors || [])
+        .flatMap(a => a.details?.competitorUrls || [])
         .filter(Boolean);
         
     if (competitors.length === 0) return null;

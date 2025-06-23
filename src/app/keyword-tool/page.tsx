@@ -1,3 +1,4 @@
+
 // src/app/keyword-tool/page.tsx
 'use client';
 
@@ -55,7 +56,7 @@ export default function KeywordToolPage() {
             includeLongTailKeywords: values.includeLongTailKeywords,
             // Add other relevant search parameters here
         },
-        resultsSummary: aiResult.keywords.slice(0, 5).join(', ') + (aiResult.keywords.length > 5 ? '...' : ''), // Save a summary of keywords
+        resultsSummary: `Found ${aiResult.keywords.length} keywords for "${values.topic}".`,
       });
 
     } catch (err: any) {
@@ -68,8 +69,9 @@ export default function KeywordToolPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-      <h1 className="text-2xl font-bold mb-4">AI Keyword Tool</h1>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <h1 className="text-3xl font-headline font-semibold text-foreground">AI Keyword Tool</h1>
+      <p className="text-muted-foreground font-body">Discover new keyword opportunities, including questions and long-tail variations, to drive targeted traffic.</p>
       {error && <div className="text-red-500 mb-4">{error}</div>} {/* Display errors */}
       <KeywordToolForm
         onSubmit={handleKeywordSearch} // Pass the search handler

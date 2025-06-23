@@ -1,3 +1,4 @@
+
 // src/app/profile/page.tsx
 'use client';
 
@@ -141,11 +142,12 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-      <h1 className="text-2xl font-bold mb-4">User Profile</h1>
+      <h1 className="text-3xl font-headline font-semibold text-foreground">User Profile</h1>
+      <p className="text-muted-foreground font-body mt-2">Manage your personal information and SEO preferences.</p>
 
        {/* Read-only view */}
        {!isEditing && userProfile && (
-        <div className="space-y-4"> {/* Use space-y-4 for consistent spacing */}
+        <div className="mt-8 space-y-4"> {/* Use space-y-4 for consistent spacing */}
           <p><strong>Email:</strong> {userProfile.email}</p>
           <p><strong>Role:</strong> {userProfile.role}</p>
           <p><strong>Member Since:</strong> {userProfile.createdAt ? new Date(userProfile.createdAt.toDate()).toLocaleDateString() : 'N/A'}</p>
@@ -161,7 +163,7 @@ export default function ProfilePage() {
 
        {/* Editable form view */}
        {isEditing && (
-        <form id="profile-form" onSubmit={handleSaveProfile} className="space-y-4">
+        <form id="profile-form" onSubmit={handleSaveProfile} className="mt-8 space-y-4">
           <div>
             <Label htmlFor="displayName">Display Name</Label>
             <Input
@@ -208,7 +210,7 @@ export default function ProfilePage() {
       )}
       {/* Add other editable fields here */}
       {isEditing && (
-          <div className="flex space-x-4"> {/* Flex container for buttons */}
+          <div className="flex space-x-4 mt-6"> {/* Flex container for buttons */}
             <Button type="submit" form="profile-form" disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save Profile'}
             </Button>
