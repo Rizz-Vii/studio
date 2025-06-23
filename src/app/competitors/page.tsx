@@ -293,10 +293,10 @@ export default function CompetitorsPage() {
               <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
               <CardDescription className="font-body">These are keywords where your competitors rank highly but you don't. Use these as inspiration for new content to capture more traffic.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="flex flex-wrap gap-2">
               {analysisResult.contentGaps.map((gap, index) => (
-                <div key={index} className="flex items-center space-x-2 p-2 bg-secondary rounded-md transition-all duration-200 hover:bg-muted hover:shadow-md hover:scale-105">
-                  <Tag className="h-5 w-5 text-primary" />
+                <div key={index} className="flex items-center p-2 bg-secondary rounded-md transition-all duration-200 hover:bg-muted shadow-sm hover:shadow-md">
+                  <Tag className="h-5 w-5 text-primary mr-2" />
                   <span className="font-body text-sm">{gap}</span>
                 </div>
               ))}

@@ -31,9 +31,9 @@ interface ContentAnalyzerFormProps {
 }
 
 const getProgressColor = (score: number) => {
-  if (score > 85) return "bg-green-500";
-  if (score > 60) return "bg-yellow-500";
-  return "bg-red-500";
+  if (score > 85) return "bg-success";
+  if (score > 60) return "bg-warning";
+  return "bg-destructive";
 };
 
 export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResult, error }: ContentAnalyzerFormProps) {

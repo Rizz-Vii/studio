@@ -165,15 +165,15 @@
     };
 
     const getStatusIcon = (status: 'good' | 'warning' | 'error') => {
-      if (status === 'good') return <CheckCircle className="h-6 w-6 text-green-500" />;
-      if (status === 'warning') return <AlertTriangle className="h-6 w-6 text-yellow-500" />;
-      return <AlertTriangle className="h-6 w-6 text-red-500" />;
+      if (status === 'good') return <CheckCircle className="h-6 w-6 text-success" />;
+      if (status === 'warning') return <AlertTriangle className="h-6 w-6 text-warning" />;
+      return <AlertTriangle className="h-6 w-6 text-destructive" />;
     };
 
     const getProgressColor = (score: number) => {
-      if (score > 85) return "bg-green-500";
-      if (score > 60) return "bg-yellow-500";
-      return "bg-red-500";
+      if (score > 85) return "bg-success";
+      if (score > 60) return "bg-warning";
+      return "bg-destructive";
     }
 
     return (
@@ -228,18 +228,15 @@
                 <CardTitle className="font-headline">
                   Audit Report for {url.trim() ? new URL(getValidUrl(url)).hostname : 'your site'}
                 </CardTitle>
-                <CardDescription className="font-body">This report provides a prioritized list of SEO issues. Addressing the 'error' and 'warning' items will have the most impact on your ranking.</CardDescription>
-                 <div className="flex items-center space-x-4 pt-2">
-                    <div className="text-4xl font-bold font-headline" style={{color: getProgressColor(auditResults.overallScore).replace('bg-', 'var(--')}}>{auditResults.overallScore}/100</div>
+                <div className="flex items-center space-x-4 pt-4">
+                    <div className="text-5xl font-bold font-headline" style={{color: `hsl(var(--${getProgressColor(auditResults.overallScore).replace('bg-', '')}))`}}>{auditResults.overallScore}/100</div>
                       <div>
-                        <h3 className="font-semibold">Overall Score</h3>
-                        <p className="text-sm text-muted-foreground">A summary of your site&apos;s SEO health.</p>
+                        <h3 className="font-semibold text-lg">Overall Score</h3>
+                        <p className="text-sm text-muted-foreground">{auditResults.summary}</p>
                       </div>
                   </div>
               </CardHeader>
               <CardContent>
-                  <h4 className="font-headline text-lg font-semibold mb-2">Summary</h4>
-                  <p className="text-sm text-muted-foreground font-body mb-6">{auditResults.summary}</p>
                 <Table>
                   <TableHeader>
                     <TableRow>

@@ -26,7 +26,7 @@ interface ContentBriefFormProps {
 }
 
 const ResultCard = ({ title, icon: Icon, children, description }: { title: string; icon: React.ElementType; children: React.ReactNode, description?: string }) => (
-    <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
+    <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col">
         <CardHeader className="pb-4">
             <CardTitle className="font-headline text-lg flex items-center gap-2">
                 <Icon className="h-6 w-6 text-primary" />
@@ -34,7 +34,7 @@ const ResultCard = ({ title, icon: Icon, children, description }: { title: strin
             </CardTitle>
             {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-grow">
             {children}
         </CardContent>
     </Card>
@@ -123,7 +123,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
               <ResultCard title="Executive Summary" icon={BrainCircuit} description="Core strategy and targets for this content piece.">
                  <div className="space-y-3">
                     <p className="text-muted-foreground font-body">{briefResult.briefSummary}</p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center pt-2">
                         <div>
                             <p className="font-bold text-lg text-primary font-headline">{briefResult.primaryKeyword}</p>
                             <p className="text-xs text-muted-foreground font-body">Primary Keyword</p>
@@ -140,37 +140,37 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
                   </div>
               </ResultCard>
 
-              <ResultCard title="Title and Meta" icon={FileText}>
-                  <div className="space-y-4">
-                      <div>
-                          <h4 className="font-semibold font-body">Suggested Title</h4>
-                          <p className="text-muted-foreground font-body">{briefResult.recommendedMeta.title}</p>
+              <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                    <ResultCard title="Title and Meta" icon={FileText}>
+                      <div className="space-y-4">
+                          <div>
+                              <h4 className="font-semibold font-body">Suggested Title</h4>
+                              <p className="text-muted-foreground font-body">{briefResult.recommendedMeta.title}</p>
+                          </div>
+                          <div>
+                              <h4 className="font-semibold font-body">Meta Description</h4>
+                              <p className="text-muted-foreground font-body">{briefResult.recommendedMeta.description}</p>
+                          </div>
                       </div>
-                      <div>
-                          <h4 className="font-semibold font-body">Meta Description</h4>
-                          <p className="text-muted-foreground font-body">{briefResult.recommendedMeta.description}</p>
-                      </div>
-                  </div>
-              </ResultCard>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                 <ResultCard title="Content Outline" icon={BarChart2} description="A logical structure for the article.">
-                      <ul className="space-y-2 list-disc pl-5">
-                          {briefResult.llmGeneratedOutline.map((heading, i) => (
-                              <li key={i} className="font-body p-1 -ml-1 rounded transition-colors hover:bg-muted/50">
-                                  {heading}
-                              </li>
-                          ))}
-                      </ul>
-                  </ResultCard>
-
-                  <ResultCard title="Competitor Insights" icon={Users} description="What top-ranking pages are doing right.">
-                    <ul className="space-y-2 list-disc pl-5 font-body">
-                        {briefResult.competitorInsights.map((insight, i) => (
-                            <li key={i} className="p-1 rounded transition-colors hover:bg-muted/50">{insight}</li>
+                    </ResultCard>
+                    <ResultCard title="Competitor Insights" icon={Users} description="What top-ranking pages are doing right.">
+                        <ul className="space-y-2 list-disc pl-5 font-body">
+                            {briefResult.competitorInsights.map((insight, i) => (
+                                <li key={i} className="p-1 rounded transition-colors hover:bg-muted/50">{insight}</li>
+                            ))}
+                        </ul>
+                    </ResultCard>
+                </div>
+                <ResultCard title="Content Outline" icon={BarChart2} description="A logical structure for the article.">
+                    <ul className="space-y-2 list-disc pl-5">
+                        {briefResult.llmGeneratedOutline.map((heading, i) => (
+                            <li key={i} className="font-body p-1 -ml-1 rounded transition-colors hover:bg-muted/50">
+                                {heading}
+                            </li>
                         ))}
                     </ul>
-                  </ResultCard>
+                </ResultCard>
               </div>
           </div>
         )}
