@@ -28,7 +28,6 @@ html {
 
     --primary: 250 60% 45%; /* Rich Purple */
     --primary-foreground: 0 0% 98%; /* Very light gray text on purple */
-    --primary-hover: 250 60% 95%; /* A subtle light purple for hover */
 
     --secondary: 240 10% 90%; /* Lighter gray for secondary elements */
     --secondary-foreground: 240 10% 30%; /* Darker gray text on light secondary */
@@ -75,7 +74,6 @@ html {
 
     --primary: 250 60% 65%; /* Lighter, more saturated purple for dark mode */
     --primary-foreground: 240 10% 10%; /* Dark text on light primary */
-    --primary-hover: 240 10% 20%; /* A subtle light gray for hover */
 
     --secondary: 240 10% 20%; /* Slightly lighter dark for secondary */
     --secondary-foreground: 0 0% 85%;

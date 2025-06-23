@@ -40,16 +40,16 @@ interface DashboardProfileData {
 const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon: Icon, trend, trendValue, className }) => {
   const trendColor = trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-muted-foreground';
   return (
-    <Card className={cn("shadow-lg hover:shadow-xl hover:bg-primary-hover transition-all duration-300", className)}>
+    <Card className={cn("group shadow-lg hover:shadow-xl hover:bg-sidebar-accent transition-all duration-300", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium font-body">{title}</CardTitle>
-        <Icon className="h-5 w-5 text-muted-foreground" />
+        <CardTitle className="text-sm font-medium font-body group-hover:text-sidebar-accent-foreground">{title}</CardTitle>
+        <Icon className="h-5 w-5 text-muted-foreground group-hover:text-inherit" />
       </CardHeader>
       <CardContent>
-        <div className="text-3xl font-bold font-headline">{value}</div>
-        {description && <p className="text-xs text-muted-foreground pt-1 font-body">{description}</p>}
+        <div className="text-3xl font-bold font-headline group-hover:text-sidebar-accent-foreground">{value}</div>
+        {description && <p className="text-xs text-muted-foreground pt-1 font-body group-hover:text-inherit">{description}</p>}
         {trend && trendValue && (
-          <p className={`text-xs ${trendColor} pt-1 font-body flex items-center`}>
+          <p className={cn('text-xs pt-1 font-body flex items-center', trendColor)}>
             {trend === 'up' ? <TrendingUp className="h-4 w-4 mr-1" /> : trend === 'down' ? <TrendingUp className="h-4 w-4 mr-1 transform rotate-180" /> : null}
             {trendValue}
           </p>
@@ -154,7 +154,7 @@ export default function DashboardPage() {
       return null;
   }
   return (
-   <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+   <div className="max-w-7xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold mb-4">
         Welcome, {dashboardProfile?.displayName || currentUser.email}!
       </h1>
@@ -245,14 +245,18 @@ export default function DashboardPage() {
                 recentActivities.map((activity, index) => (
                     <Dialog key={index}>
                         <DialogTrigger asChild>
-                            <div className="flex items-start space-x-3 p-2 rounded-md hover:bg-primary-hover cursor-pointer transition-colors">
-                                <Activity className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                            <div className="group flex items-start space-x-3 p-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer transition-colors">
+                                <Activity className="h-5 w-5 text-primary mt-1 flex-shrink-0 group-hover:text-inherit" />
                                 <div className="flex-grow overflow-hidden">
-                                    <p className="text-sm font-medium font-body capitalize">{activity.tool}: {activity.type.replace(/_/g, ' ')}</p>
-                                    <p className="text-xs text-muted-foreground font-body truncate" title={activity.resultsSummary}>
+                                    <p className="text-sm font-medium font-body capitalize">
+                                        {activity.tool}: {activity.type.replace(/_/g, ' ')}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground font-body truncate group-hover:text-inherit" title={activity.resultsSummary ?? ''}>
                                         {activity.resultsSummary}
                                     </p>
-                                    <p className="text-xs text-muted-foreground font-body">{activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
+                                    <p className="text-xs text-muted-foreground font-body group-hover:text-inherit">
+                                        {activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}
+                                    </p>
                                 </div>
                             </div>
                         </DialogTrigger>
