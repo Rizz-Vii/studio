@@ -4,3 +4,4 @@ config();
 import '@/ai/flows/keyword-suggestions.ts';
 import '@/ai/flows/content-optimization.ts';
 import '@/ai/flows/seo-audit.ts';
+import '@/ai/flows/competitor-analysis.ts';

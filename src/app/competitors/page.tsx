@@ -5,14 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tag, Tags, PlusCircle, Trash2, Loader2 } from "lucide-react";
+import { Tag, PlusCircle, Trash2, Loader2 } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
+import { analyzeCompetitors, CompetitorAnalysisOutput } from '@/ai/flows/competitor-analysis';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 
 interface Competitor {
   id: string;
   url: string;
 }
 
+// This interface is now primarily for the display component's state
 interface RankingData {
   keyword: string;
   yourRank?: number | string;
@@ -42,13 +49,15 @@ function getHostname(url: string): string {
 
 export default function CompetitorsPage() {
   const [yourUrl, setYourUrl] = useState<string>('');
-  // Use a simple number for unique IDs instead of crypto.randomUUID
   const [nextId, setNextId] = useState(1);
   const [competitors, setCompetitors] = useState<Competitor[]>([{ id: 'comp-0', url: '' }]);
   const [keywords, setKeywords] = useState<string[]>(['']);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [rankingData, setRankingData] = useState<RankingData[] | null>(null);
-  const [contentGaps, setContentGaps] = useState<string[] | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<CompetitorAnalysisOutput | null>(null);
+
+  const { user, loading } = useProtectedRoute();
+  const { user: currentUser } = useAuth();
+  const { toast } = useToast();
 
   const addCompetitor = () => {
     setCompetitors([...competitors, { id: `comp-${nextId}`, url: '' }]);
@@ -78,42 +87,62 @@ export default function CompetitorsPage() {
   };
 
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     setIsLoading(true);
-    setRankingData(null);
-    setContentGaps(null);
-    // Simulate API call
-    setTimeout(() => {
-      const mockRankings: RankingData[] = keywords.filter(k => k.trim() !== '').map(kw => {
-        const data: RankingData = { keyword: kw, yourRank: Math.random() > 0.2 ? Math.floor(Math.random() * 50) + 1 : 'N/A' };
-        competitors.forEach(comp => {
-          if (comp.url.trim() !== '') {
-            data[comp.url] = Math.random() > 0.1 ? Math.floor(Math.random() * 50) + 1 : 'N/A';
-          }
-        });
-        return data;
-      });
-      setRankingData(mockRankings);
+    setAnalysisResult(null);
 
-      const mockGaps = ['long-tail keyword example', 'competitor specific term']
-        .filter(() => Math.random() > 0.5); // Randomly include some gaps
-      setContentGaps(mockGaps);
+    const validCompetitorUrls = competitors
+      .map(c => c.url.trim())
+      .filter(url => url !== '');
       
-      setIsLoading(false);
-    }, 2000);
+    const validKeywords = keywords.filter(k => k.trim() !== '');
+
+    try {
+      if (!currentUser) {
+        throw new Error("Authentication token not available.");
+      }
+
+      const result = await analyzeCompetitors({
+        yourUrl: getValidUrl(yourUrl),
+        competitorUrls: validCompetitorUrls.map(url => getValidUrl(url)),
+        keywords: validKeywords,
+      });
+
+      setAnalysisResult(result);
+
+      // Log activity
+       const activitiesCollectionRef = collection(db, "users", currentUser.uid, "activities");
+       await addDoc(activitiesCollectionRef, {
+         type: "competitor_analysis",
+         tool: "Competitor Analysis",
+         timestamp: serverTimestamp(),
+         details: {
+           yourUrl,
+           competitors: validCompetitorUrls,
+           keywords: validKeywords,
+         },
+         resultsSummary: `Analyzed ${validCompetitorUrls.length} competitors for ${validKeywords.length} keywords.`,
+       });
+
+    } catch (error) {
+        console.error("Competitor analysis failed:", error);
+        toast({
+            title: "Analysis Failed",
+            description: "Could not retrieve competitor data. Please try again.",
+            variant: "destructive"
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
-    const { user, loading } = useProtectedRoute();
   
-        if (loading) {
-          // Show a loading spinner or skeleton while authentication state is being checked
-          return <div>Loading...</div>;
-        }
-  
-        if (!user) {
-          // This part should ideally not be reached due to the redirect in useProtectedRoute,
-          // but it's good practice to handle the case where user is null.
-          return null;
-        }
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -201,7 +230,7 @@ export default function CompetitorsPage() {
         </Card>
       )}
 
-      {rankingData && (
+      {analysisResult && (
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="font-headline">Keyword Rankings Comparison</CardTitle>
@@ -213,17 +242,17 @@ export default function CompetitorsPage() {
                   <TableHead className="font-body">Keyword</TableHead>
                   <TableHead className="font-body text-center">Your Rank</TableHead>
                   {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                    <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={comp.url}>{getHostname(comp.url)}</TableHead>
+                    <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={getValidUrl(comp.url)}>{getHostname(comp.url)}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rankingData.map((row) => (
+                {analysisResult.rankings.map((row) => (
                   <TableRow key={row.keyword}>
                     <TableCell className="font-medium font-body">{row.keyword}</TableCell>
                     <TableCell className="text-center font-body">{row.yourRank ?? 'N/A'}</TableCell>
                     {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                      <TableCell key={comp.id} className="text-center font-body">{row[comp.url] ?? 'N/A'}</TableCell>
+                      <TableCell key={comp.id} className="text-center font-body">{row[getValidUrl(comp.url)] ?? 'N/A'}</TableCell>
                     ))}
                   </TableRow>
                 ))}
@@ -233,14 +262,14 @@ export default function CompetitorsPage() {
         </Card>
       )}
 
-      {contentGaps && contentGaps.length > 0 && (
+      {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length > 0 && (
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
             <CardDescription className="font-body">Keywords your competitors rank for, but you might be missing.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            {contentGaps.map((gap, index) => (
+            {analysisResult.contentGaps.map((gap, index) => (
               <div key={index} className="flex items-center space-x-2 p-2 bg-secondary rounded-md">
                 <Tag className="h-4 w-4 text-primary" />
                 <span className="font-body text-sm">{gap}</span>
@@ -249,7 +278,7 @@ export default function CompetitorsPage() {
           </CardContent>
         </Card>
       )}
-      {rankingData && contentGaps && contentGaps.length === 0 && (
+      {analysisResult && analysisResult.contentGaps && analysisResult.contentGaps.length === 0 && (
          <Card className="shadow-md">
           <CardContent className="p-6">
              <p className="font-body text-muted-foreground text-center">No significant content gaps found compared to these competitors.</p>
