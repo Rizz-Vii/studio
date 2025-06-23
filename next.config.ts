@@ -18,21 +18,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (config, { isServer }) => {
-    config.module.rules.push({
-      test: /\.js$/,
-      include: /node_modules\/handlebars/,
-      use: {
-        loader: 'babel-loader', // We'll use babel-loader
-        options: {
-          presets: ['@babel/preset-env'],
-        },
-      },
-    });
-
-    // Return the modified config
-    return config;
-  },
+  transpilePackages: ['handlebars', 'dotprompt'],
 };
 
 export default nextConfig;
