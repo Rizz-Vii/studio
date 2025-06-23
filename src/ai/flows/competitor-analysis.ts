@@ -22,10 +22,27 @@ export type CompetitorAnalysisInput = z.infer<
   typeof CompetitorAnalysisInputSchema
 >;
 
-const RankingDataItemSchema = z.object({
+const RankInfoSchema = z.object({
+  rank: z
+    .union([z.number(), z.literal('N/A')])
+    .describe(
+      "The simulated search engine rank, or 'N/A' if not in the top 100."
+    ),
+  reason: z
+    .string()
+    .optional()
+    .describe(
+      "A brief explanation for the rank, especially if 'N/A' (e.g., 'Domain is a search engine', 'Lacks content on this topic')."
+    ),
+});
+type RankInfo = z.infer<typeof RankInfoSchema>;
+
+const RankingDataItemSchema = z
+  .object({
     keyword: z.string(),
-    yourRank: z.union([z.number(), z.string()]).optional(),
-  }).catchall(z.union([z.number(), z.string()]).optional());
+    yourRank: RankInfoSchema.optional(),
+  })
+  .catchall(RankInfoSchema.optional());
 
 const CompetitorAnalysisOutputSchema = z.object({
   rankings: z
@@ -71,10 +88,12 @@ const analysisPrompt = ai.definePrompt({
 
 1.  **Simulate Keyword Rankings:**
     *   For each provided keyword, perform a realistic, simulated analysis of where each URL would rank in the top 100 search results.
-    *   Your simulation should consider typical factors like domain authority, content relevance, and on-page optimization for the given URLs and keywords.
-    *   The ranking for "My Website" should be assigned to the \`yourRank\` property.
-    *   For each competitor, create a property in the ranking object where the key is the **full competitor URL** and the value is its simulated rank.
-    *   If a URL is unlikely to rank in the top 100 for a keyword, assign it the string "N/A".
+    *   Your simulation should consider typical factors like domain authority, content relevance, and on-page optimization.
+    *   The ranking information for each URL must be an object with two properties: \`rank\` and \`reason\`.
+    *   \`rank\`: This should be the simulated numerical rank. If a URL is unlikely to rank in the top 100, set this to the string "N/A".
+    *   \`reason\`: Provide a concise explanation for the rank. If the rank is "N/A", **you must explain why**. For example: "URL is a generic search engine, not a content site", "Page lacks specific content about this keyword", or "Low domain authority for a competitive term". This reason is crucial.
+    *   The ranking object for "My Website" should be assigned to the \`yourRank\` property.
+    *   For each competitor, create a property in the ranking object where the key is the **full competitor URL** and the value is its corresponding ranking object.
 
 2.  **Identify Content Gaps:**
     *   Based on the ranking analysis, identify keywords or topic clusters where competitors have a strong presence (e.g., ranking in the top 20) but my website ranks poorly (e.g., rank > 50 or "N/A").

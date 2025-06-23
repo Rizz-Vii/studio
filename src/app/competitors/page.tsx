@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tag, PlusCircle, Trash2, Loader2 } from "lucide-react";
+import { Tag, PlusCircle, Trash2, Loader2, Info } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { analyzeCompetitors, CompetitorAnalysisOutput } from '@/ai/flows/competitor-analysis';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 
 interface Competitor {
@@ -19,12 +20,40 @@ interface Competitor {
   url: string;
 }
 
-// This interface is now primarily for the display component's state
-interface RankingData {
-  keyword: string;
-  yourRank?: number | string;
-  [competitorUrl: string]: number | string | undefined;
-}
+type RankInfo = {
+  rank: number | 'N/A';
+  reason?: string;
+} | undefined;
+
+
+const RankCell = ({ rankInfo }: { rankInfo: RankInfo }) => {
+  if (!rankInfo || rankInfo.rank === undefined) {
+    return <span className="text-muted-foreground">N/A</span>;
+  }
+
+  const hasReason = rankInfo.reason && rankInfo.reason.trim() !== '';
+
+  if (hasReason) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="flex items-center justify-center gap-1 cursor-help">
+              {rankInfo.rank}
+              <Info className="h-3 w-3 text-muted-foreground" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{rankInfo.reason}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return <span>{rankInfo.rank}</span>;
+};
+
 
 function getValidUrl(url: string): string {
     if (!url.trim()) return '';
@@ -277,9 +306,13 @@ export default function CompetitorsPage() {
                 {analysisResult.rankings.map((row) => (
                   <TableRow key={row.keyword}>
                     <TableCell className="font-medium font-body">{row.keyword}</TableCell>
-                    <TableCell className="text-center font-body">{row.yourRank ?? 'N/A'}</TableCell>
+                    <TableCell className="text-center font-body">
+                        <RankCell rankInfo={row.yourRank} />
+                    </TableCell>
                     {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                      <TableCell key={comp.id} className="text-center font-body">{row[getValidUrl(comp.url)] ?? 'N/A'}</TableCell>
+                      <TableCell key={comp.id} className="text-center font-body">
+                        <RankCell rankInfo={(row as any)[getValidUrl(comp.url)]} />
+                      </TableCell>
                     ))}
                   </TableRow>
                 ))}
