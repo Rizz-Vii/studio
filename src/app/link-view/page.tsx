@@ -68,7 +68,7 @@ export default function LinkViewPage() {
 
     
   return (
-    <div className="space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-headline font-semibold text-foreground">Link Analysis</h1>
 
       <Card className="shadow-lg">

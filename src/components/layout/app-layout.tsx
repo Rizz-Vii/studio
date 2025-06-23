@@ -28,6 +28,8 @@ import React from 'react';
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
     import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
     import { User, LogOut } from 'lucide-react';
+    import { motion, AnimatePresence } from 'framer-motion';
+    import { cn } from '@/lib/utils';
 
 
 const AppHeader = () => {
@@ -118,10 +120,45 @@ const UserNav = () => {
   );
 };
 
+const AppNav = () => {
+    const pathname = usePathname();
+    const { state } = useSidebar();
+
+    return (
+        <SidebarMenu>
+          {navItems.map((item: NavItem) => (
+            <SidebarMenuItem key={item.href}>
+              <SidebarMenuButton
+                  isActive={pathname === item.href}
+                  tooltip={{ children: item.title, className:"font-body" }}
+                  className="font-body"
+                  asChild
+                >
+              <Link href={item.href}>
+                    <item.icon />
+                    <AnimatePresence>
+                    {state === 'expanded' && (
+                        <motion.span
+                            initial={{ opacity: 0, width: 0 }}
+                            animate={{ opacity: 1, width: 'auto' }}
+                            exit={{ opacity: 0, width: 0 }}
+                            transition={{ duration: 0.2, ease: "easeInOut" }}
+                            className="whitespace-nowrap overflow-hidden"
+                        >
+                            {item.title}
+                        </motion.span>
+                    )}
+                    </AnimatePresence>
+                  </Link>
+                </SidebarMenuButton>
+
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+    );
+};
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
   return (
     <SidebarProvider defaultOpen={false}>
       <Sidebar collapsible="icon">
@@ -133,24 +170,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <ScrollArea className="h-full">
-            <SidebarMenu>
-              {navItems.map((item: NavItem) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                      isActive={pathname === item.href}
-                      tooltip={{ children: item.title, className:"font-body" }}
-                      className="font-body"
-                      asChild
-                    >
-                  <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <AppNav />
           </ScrollArea>
         </SidebarContent>
         <SidebarFooter className="p-2">

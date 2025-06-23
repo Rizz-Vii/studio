@@ -99,7 +99,7 @@ export default function InsightsPage() {
 
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-3xl font-headline font-semibold text-foreground">Actionable Insights</h1>
         <p className="text-muted-foreground font-body">Prioritized recommendations to boost your SEO performance.</p>

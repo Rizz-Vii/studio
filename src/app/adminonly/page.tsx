@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
 
   // Render your admin dashboard content here
   return (
-    <div>
+    <div className="max-w-7xl mx-auto">
       <h1>Admin Dashboard</h1>
       <p>Welcome, Admin {user.email}!</p>
       {/* ... admin-specific content */}

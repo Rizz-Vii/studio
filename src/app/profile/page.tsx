@@ -140,7 +140,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
       <h1 className="text-2xl font-bold mb-4">User Profile</h1>
 
        {/* Read-only view */}
