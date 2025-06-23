@@ -36,6 +36,7 @@
   ];
 
     function getValidUrl(input: string) {
+      if (!input.trim()) return '';
       if (!/^https?:\/\//i.test(input)) {
         return `https://${input}`;
       }
@@ -129,7 +130,7 @@
             <form onSubmit={handleFormSubmit} className="flex space-x-2">
               <Input
                 type="url"
-                placeholder="https://yourwebsite.com"
+                placeholder="yourwebsite.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 className="font-body"

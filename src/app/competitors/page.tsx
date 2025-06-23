@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,14 @@ interface RankingData {
   keyword: string;
   yourRank?: number | string;
   [competitorUrl: string]: number | string | undefined;
+}
+
+function getValidUrl(url: string): string {
+    if (!url.trim()) return '';
+    if (!/^https?:\/\//i.test(url)) {
+      return `https://${url}`;
+    }
+    return url;
 }
 
 export default function CompetitorsPage() {
@@ -117,7 +126,7 @@ export default function CompetitorsPage() {
               <div key={competitor.id} className="flex items-center space-x-2 mb-2">
                 <Input
                   type="url"
-                  placeholder={`https://competitor${index + 1}.com`}
+                  placeholder={`competitor${index + 1}.com`}
                   value={competitor.url}
                   onChange={(e) => handleCompetitorChange(competitor.id, e.target.value)}
                   className="font-body"
@@ -187,7 +196,7 @@ export default function CompetitorsPage() {
                   <TableHead className="font-body">Keyword</TableHead>
                   <TableHead className="font-body text-center">Your Rank</TableHead>
                   {competitors.filter(c => c.url.trim() !== '').map(comp => (
-                    <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={comp.url}>{new URL(comp.url).hostname}</TableHead>
+                    <TableHead key={comp.id} className="font-body text-center truncate max-w-[150px]" title={comp.url}>{new URL(getValidUrl(comp.url)).hostname}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
