@@ -17,6 +17,8 @@ import {
   Activity,
   BookText,
   Link as LinkIcon,
+  ChevronLeft, 
+  ChevronRight,
 } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { useEffect, useState } from 'react';
@@ -31,6 +33,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 // ----- TYPES AND CONFIGS -----
@@ -194,30 +197,108 @@ const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ a
     );
 };
 
-
-const ContentBriefSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const keywords = activities
-        .map(a => a.details?.keyword)
-        .filter(Boolean);
-
-    if (keywords.length === 0) return null;
+const ContentBriefSummary: React.FC<{ activities: UserActivity[]; profile: any | null }> = ({ activities, profile }) => {
+    const recentKeywords = [...new Set(activities.map(a => a.details?.keyword).filter(Boolean))];
+    const profileKeywords = profile?.primaryKeywords?.split(',').map((k: string) => k.trim().toLowerCase()) || [];
     
-    const keywordCounts = keywords.reduce((acc, keyword) => {
-        acc[keyword] = (acc[keyword] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
+    const prioritizedKeywords = [
+        ...new Set([
+            ...recentKeywords.filter(k => profileKeywords.includes(k.toLowerCase())),
+            ...recentKeywords
+        ])
+    ];
 
-    const topKeywords = Object.entries(keywordCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5);
+    const [index, setIndex] = useState(0);
+
+    useEffect(() => {
+        if (prioritizedKeywords.length <= 3) return;
+
+        const interval = setInterval(() => {
+            setIndex(prevIndex => (prevIndex + 1) % prioritizedKeywords.length);
+        }, 5000); // Rotate every 5 seconds
+        return () => clearInterval(interval);
+    }, [prioritizedKeywords.length]);
+
+    if (prioritizedKeywords.length === 0) {
+        return <p className="text-sm text-muted-foreground">Generate a content brief to see suggestions here.</p>;
+    }
+
+    const slide = (direction: 'next' | 'prev') => {
+        const total = prioritizedKeywords.length;
+        if (direction === 'next') {
+            setIndex((prev) => (prev + 1) % total);
+        } else {
+            setIndex((prev) => (prev - 1 + total) % total);
+        }
+    };
+    
+    const getVisibleKeywords = () => {
+        const total = prioritizedKeywords.length;
+        if (total <= 3) return prioritizedKeywords;
+        
+        const items = [];
+        for (let i = 0; i < 3; i++) {
+            items.push(prioritizedKeywords[(index + i) % total]);
+        }
+        return items;
+    }
+
+    const sliderVariants = {
+        enter: (direction: number) => ({
+            x: direction > 0 ? 100 : -100,
+            opacity: 0,
+            scale: 0.8,
+        }),
+        center: {
+            zIndex: 1,
+            x: 0,
+            opacity: 1,
+            scale: 1,
+        },
+        exit: (direction: number) => ({
+            zIndex: 0,
+            x: direction < 0 ? 100 : -100,
+            opacity: 0,
+            scale: 0.8,
+        }),
+    };
 
     return (
         <div>
-            <h4 className="font-semibold text-sm mb-2">Recent Briefs Generated For:</h4>
-            <div className="flex flex-wrap gap-2">
-                {topKeywords.map(([keyword]) => (
-                    <Badge key={keyword} variant="outline" className="transition-transform hover:scale-105">{keyword}</Badge>
-                ))}
+            <h4 className="font-semibold text-sm mb-2">Relevant Briefs For You:</h4>
+            <div className="relative h-28 flex items-center justify-center -mx-2">
+                 {prioritizedKeywords.length > 3 && (
+                    <Button variant="ghost" size="icon" className="absolute left-0 z-10" onClick={() => slide('prev')}>
+                        <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                 )}
+                 <div className="flex space-x-2 w-full justify-center">
+                    <AnimatePresence initial={false}>
+                        {getVisibleKeywords().map((keyword, i) => (
+                             <motion.div
+                                key={`${index}-${keyword}`}
+                                custom={i}
+                                variants={sliderVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
+                                className="w-1/3"
+                            >
+                                <Card className="h-24 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors">
+                                    <CardContent className="p-0">
+                                        <p className="text-xs font-semibold font-body truncate">{keyword}</p>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                 </div>
+                 {prioritizedKeywords.length > 3 && (
+                    <Button variant="ghost" size="icon" className="absolute right-0 z-10" onClick={() => slide('next')}>
+                        <ChevronRight className="h-4 w-4" />
+                    </Button>
+                )}
             </div>
         </div>
     );
@@ -261,7 +342,7 @@ const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
     );
 };
 
-const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[] }>> = {
+const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[]; profile?: any | null }>> = {
   "SEO Audit": SeoAuditSummary,
   "Content Analyzer": ContentAnalyzerSummary,
   "Keyword Tool": KeywordToolSummary,
@@ -343,7 +424,7 @@ export default function DashboardPage() {
                                 </div>
                             </CardHeader>
                             <CardContent className="flex-grow space-y-4 pt-4">
-                                {ToolSummary && <ToolSummary activities={activities} />}
+                                {ToolSummary && <ToolSummary activities={activities} profile={profile} />}
                             </CardContent>
                         </Card>
                     </DialogTrigger>
