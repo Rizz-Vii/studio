@@ -59,8 +59,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <SidebarProvider defaultOpen>
-      <Sidebar>
+    <SidebarProvider defaultOpen={false}>
+      <Sidebar collapsible="icon">
         <SidebarHeader className="p-4">
           <Link href="/" className="flex items-center gap-2">
             <AppLogo className="h-8 w-8 text-primary" />
