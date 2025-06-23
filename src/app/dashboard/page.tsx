@@ -21,7 +21,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
@@ -89,7 +89,7 @@ const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
                 <span className="font-semibold text-sm">Average Score</span>
                 <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
             </div>
-            <span className="font-bold text-lg text-blue-500 flex-shrink-0">{avgScore}/100</span>
+            <span className="font-bold text-lg text-primary flex-shrink-0">{avgScore}/100</span>
         </div>
       {auditData.length > 1 && (
          <div className="w-full" style={{aspectRatio: '2 / 1'}}>
@@ -124,7 +124,7 @@ const ContentAnalyzerSummary: React.FC<{ activities: UserActivity[] }> = ({ acti
                 <span className="font-semibold text-sm">Average Content Score</span>
                 <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
             </div>
-            <span className="font-bold text-lg text-purple-500 flex-shrink-0">{avgScore}/100</span>
+            <span className="font-bold text-lg text-primary flex-shrink-0">{avgScore}/100</span>
         </div>
     );
 };
@@ -210,29 +210,29 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
     
     const uniqueBriefs = Array.from(new Map(prioritizedBriefs.map(item => [item.id, item])).values());
 
-    const [index, setIndex] = useState(0);
+    const [[index, direction], setPage] = useState([0, 0]);
+
+    const wrappedIndex = (idx: number) => {
+        return (idx % uniqueBriefs.length + uniqueBriefs.length) % uniqueBriefs.length;
+    };
+
+    const slide = useCallback((newDirection: number) => {
+        setPage(([prevIndex, prevDirection]) => [prevIndex + newDirection, newDirection]);
+    }, []);
+
 
     useEffect(() => {
         if (uniqueBriefs.length <= 3) return;
 
         const interval = setInterval(() => {
-            setIndex(prevIndex => (prevIndex + 1) % uniqueBriefs.length);
+            slide(1); // Auto-slide next
         }, 5000); // Rotate every 5 seconds
         return () => clearInterval(interval);
-    }, [uniqueBriefs.length]);
+    }, [uniqueBriefs.length, slide]);
 
     if (uniqueBriefs.length === 0) {
         return <p className="text-sm text-muted-foreground">Generate a content brief to see suggestions here.</p>;
     }
-
-    const slide = (direction: 'next' | 'prev') => {
-        const total = uniqueBriefs.length;
-        if (direction === 'next') {
-            setIndex((prev) => (prev + 1) % total);
-        } else {
-            setIndex((prev) => (prev - 1 + total) % total);
-        }
-    };
     
     const getVisibleBriefs = () => {
         const total = uniqueBriefs.length;
@@ -240,63 +240,64 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
         
         const items: ContentBrief[] = [];
         for (let i = 0; i < 3; i++) {
-            items.push(uniqueBriefs[(index + i) % total]);
+            items.push(uniqueBriefs[wrappedIndex(index + i)]);
         }
         return items;
     }
 
     const sliderVariants = {
         enter: (direction: number) => ({
-            x: direction > 0 ? 100 : -100,
+            x: direction > 0 ? '100%' : '-100%',
             opacity: 0,
-            scale: 1,
         }),
         center: {
             zIndex: 1,
             x: 0,
             opacity: 1,
-            scale: 1,
         },
         exit: (direction: number) => ({
             zIndex: 0,
-            x: direction < 0 ? 100 : -100,
+            x: direction < 0 ? '100%' : '-100%',
             opacity: 0,
-            scale: 1,
         }),
     };
 
     return (
         <div>
             <h4 className="font-semibold text-sm mb-2">Relevant Briefs For You:</h4>
-            <div className="relative h-[250px] flex items-center justify-center -mx-2">
+            <div className="relative h-[250px] flex items-center justify-center -mx-2 overflow-hidden">
                  {uniqueBriefs.length > 3 && (
-                    <Button variant="ghost" size="icon" className="absolute left-0 z-10" onClick={() => slide('prev')}>
+                    <Button variant="ghost" size="icon" className="absolute left-0 z-10" onClick={() => slide(-1)}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                  )}
-                 <div className="flex space-x-2 w-full justify-center overflow-hidden">
-                    <AnimatePresence initial={false}>
-                        {getVisibleBriefs().map((brief, i) => (
-                             <motion.div
-                                key={`${index}-${brief.id}`}
-                                custom={i}
-                                variants={sliderVariants}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
-                            >
-                                <Card className="h-[250px] w-[160px] flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
-                                    <CardContent className="p-0">
-                                        <p className="text-sm font-semibold font-body px-2">{brief.title}</p>
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
+                 <div className="flex w-full justify-center">
+                    <AnimatePresence initial={false} custom={direction}>
+                        <motion.div
+                            key={index}
+                            className="flex space-x-2"
+                            custom={direction}
+                            variants={sliderVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{
+                                x: { type: "spring", stiffness: 300, damping: 30 },
+                                opacity: { duration: 0.2 }
+                            }}
+                        >
+                        {getVisibleBriefs().map((brief) => (
+                             <Card key={brief.id} className="h-[250px] w-[160px] flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
+                                <CardContent className="p-0">
+                                    <p className="text-sm font-semibold font-body px-2">{brief.title}</p>
+                                </CardContent>
+                            </Card>
                         ))}
+                        </motion.div>
                     </AnimatePresence>
                  </div>
                  {uniqueBriefs.length > 3 && (
-                    <Button variant="ghost" size="icon" className="absolute right-0 z-10" onClick={() => slide('next')}>
+                    <Button variant="ghost" size="icon" className="absolute right-0 z-10" onClick={() => slide(1)}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 )}
@@ -482,5 +483,6 @@ export default function DashboardPage() {
     </div>
   );
 }
+
 
 
