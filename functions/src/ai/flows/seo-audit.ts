@@ -9,7 +9,7 @@
 
 import { ai } from '@/ai/genkit.js';
 import { z } from 'genkit';
-import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
+// import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio"; // Temporarily removed for debugging
 
 // Define the input schema for the SEO audit flow
 export const AuditUrlInputSchema = z.object({
@@ -69,10 +69,17 @@ const auditUrlPrompt = ai.definePrompt({
   *   Write a concise \`summary\` of the most critical findings.
   
   **URL to audit:** {{{url}}}
+  {{#if content}}
   **Page content:**
   <PAGE_CONTENT>
   {{{content}}}
   </PAGE_CONTENT>
+  {{else}}
+  **Page content:**
+  <PAGE_CONTENT>
+  Content not available. Please perform the audit based on the URL and general SEO best practices. For content-specific checks like H1 and Readability, state that the content could not be retrieved.
+  </PAGE_CONTENT>
+  {{/if}}
   
   **JSON Output Example:**
   {
@@ -117,21 +124,23 @@ const auditUrlFlow = ai.defineFlow(
   async (input: AuditUrlInput): Promise<AuditUrlOutput> => {
     const { url } = input;
 
-    let pageContent = '';
-    try {
-      const loader = new CheerioWebBaseLoader(url);
-      const docs = await loader.load();
-      if (docs && docs.length > 0 && docs[0].pageContent) {
-        // Limit content to avoid overly large prompts
-        pageContent = docs[0].pageContent.substring(0, 20000);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error(`Error loading page content for ${url}:`, error.message);
-      } else {
-        console.error(`Unknown error loading page content for ${url}:`, error);
-      }
-    }
+    // **Temporarily bypass web scraping for debugging.**
+    // Instead of fetching live content, we'll use a hardcoded string.
+    // This helps determine if the issue is with web scraping or the AI call itself.
+    const pageContent = `
+      <html>
+        <head>
+          <title>Test Page for SEO Audit</title>
+          <meta name="description" content="This is a sample meta description for testing the audit tool.">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body>
+          <h1>Main Headline for Testing</h1>
+          <p>This is a paragraph of sample content to analyze readability and keyword usage. The audit should check this.</p>
+          <img src="image1.jpg" alt="A descriptive alt text for the first image.">
+          <img src="image2.jpg">
+        </body>
+      </html>`;
 
     const promptInput = {
       url,
