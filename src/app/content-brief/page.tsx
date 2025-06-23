@@ -10,6 +10,7 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import type { ContentBriefInput, ContentBriefOutput } from '@/ai/flows/content-brief';
 import { generateContentBrief } from '@/ai/flows/content-brief';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 export default function ContentBriefPage() {
   const { user, loading: authLoading } = useProtectedRoute();
@@ -20,7 +21,7 @@ export default function ContentBriefPage() {
   const [error, setError] = useState<string | null>(null);
 
   if (authLoading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (!user) {

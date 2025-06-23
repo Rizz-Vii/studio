@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview AI-powered content brief generation.
@@ -15,26 +16,18 @@ const ContentBriefInputSchema = z.object({
 });
 export type ContentBriefInput = z.infer<typeof ContentBriefInputSchema>;
 
-const LSIKeywordSchema = z.object({
-  keyword: z.string().describe('The LSI keyword.'),
-  type: z.enum(['topic', 'entity', 'question']).describe('The type of the keyword.'),
-});
-
 const ContentBriefOutputSchema = z.object({
-  suggestedTitle: z.string().describe('A compelling, SEO-optimized title for the article.'),
-  metaDescription: z.string().describe('A concise and engaging meta description (155-160 characters).'),
-  targetAudience: z.string().describe('A description of the target audience for this content.'),
-  suggestedHeadings: z.array(z.string()).describe('An ordered list of suggested H2 and H3 headings to structure the content.'),
-  lsiKeywords: z.array(LSIKeywordSchema).describe('A list of semantically related keywords (LSI keywords) to include.'),
-  questionsToAnswer: z.array(z.string()).describe('A list of common user questions related to the topic (like "People Also Ask").'),
-  internalLinkingSuggestions: z.array(z.object({
-      anchorText: z.string(),
-      linkTo: z.string().describe("A suggested internal page slug (e.g., '/blog/related-post')."),
-    })).describe('Suggestions for internal links to other relevant pages.'),
-  wordCount: z.object({
-    min: z.number(),
-    max: z.number(),
-  }).describe('The recommended word count range for the content.'),
+  title: z.string().describe('A compelling, SEO-optimized title for the article.'),
+  primaryKeyword: z.string().describe('The primary keyword the brief is targeting.'),
+  searchIntent: z.string().describe('The user\'s likely intent (e.g., "Informational", "Commercial", "Transactional").'),
+  seoScore: z.string().describe('A simulated SEO potential score for this brief (e.g., "82/100").'),
+  llmGeneratedOutline: z.array(z.string()).describe('An ordered list of suggested headings to structure the content.'),
+  recommendedMeta: z.object({
+    title: z.string().describe('The suggested meta title.'),
+    description: z.string().describe('A concise and engaging meta description (155-160 characters).'),
+  }),
+  competitorInsights: z.array(z.string()).describe('A list of insights about competitors for this keyword.'),
+  briefSummary: z.string().describe('A summary of the brief and the main strategy to follow.'),
 });
 export type ContentBriefOutput = z.infer<typeof ContentBriefOutputSchema>;
 
@@ -51,15 +44,18 @@ const briefPrompt = ai.definePrompt({
 **Target Keyword:** {{{keyword}}}
 
 **Instructions:**
+Based on the target keyword, generate the following components for the content brief:
 
-1.  **Suggested Title:** Create a compelling, SEO-friendly title that includes the target keyword. It should be engaging and likely to get clicks.
-2.  **Meta Description:** Write a meta description between 155-160 characters. It should summarize the content and include the target keyword.
-3.  **Target Audience:** Briefly describe the ideal reader for this content. (e.g., "Beginners in digital marketing", "Experienced developers looking for advanced techniques").
-4.  **Suggested Headings:** Provide a logical structure for the article using H2 and H3 headings. This outline should cover the topic comprehensively.
-5.  **LSI Keywords:** List at least 10-15 semantically related keywords, entities, and concepts that should be naturally integrated into the content. Categorize each as 'topic', 'entity', or 'question'.
-6.  **Questions to Answer:** Identify 3-5 key questions that users are asking about this topic. These are often found in "People Also Ask" sections.
-7.  **Internal Linking:** Suggest 2-3 relevant internal linking opportunities with appropriate anchor text. Use placeholder slugs like '/blog/relevant-topic'.
-8.  **Word Count:** Recommend a word count range (min, max) based on the depth required to cover the topic thoroughly, informed by typical content for this keyword.
+1.  **title:** The main headline for the article. Make it compelling and include the keyword.
+2.  **primaryKeyword:** The main keyword to target. This should be the same as the input keyword.
+3.  **searchIntent:** Classify the search intent. Is it "Informational", "Commercial", "Transactional", or "Navigational"?
+4.  **seoScore:** Provide a simulated SEO potential score out of 100 (e.g., "85/100"). This score should reflect how likely content based on this brief is to succeed, considering competition and opportunity.
+5.  **llmGeneratedOutline:** Create a logical content structure with an array of H2 and H3 headings.
+6.  **recommendedMeta:**
+    *   **title:** An SEO-optimized meta title (50-60 characters).
+    *   **description:** An engaging meta description (155-160 characters).
+7.  **competitorInsights:** Provide 2-3 bullet points about what top-ranking competitors are doing for this keyword.
+8.  **briefSummary:** A final summary of the core strategy for the writer.
 
 Your entire output MUST be a single, valid JSON object that conforms to the provided output schema.
 `,

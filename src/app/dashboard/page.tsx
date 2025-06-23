@@ -35,6 +35,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
+import { dummyContentBriefs, ContentBrief } from '@/lib/dummy-data';
 
 
 // ----- TYPES AND CONFIGS -----
@@ -198,34 +199,33 @@ const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ a
     );
 };
 
-const ContentBriefSummary: React.FC<{ activities: UserActivity[]; profile: any | null }> = ({ activities, profile }) => {
-    const recentKeywords = [...new Set(activities.map(a => a.details?.keyword).filter(Boolean))];
+const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => {
     const profileKeywords = profile?.primaryKeywords?.split(',').map((k: string) => k.trim().toLowerCase()) || [];
     
-    const prioritizedKeywords = [
-        ...new Set([
-            ...recentKeywords.filter(k => profileKeywords.includes(k.toLowerCase())),
-            ...recentKeywords
-        ])
+    const prioritizedBriefs = [
+      ...dummyContentBriefs.filter(brief => profileKeywords.includes(brief.primaryKeyword.toLowerCase())),
+      ...dummyContentBriefs.filter(brief => !profileKeywords.includes(brief.primaryKeyword.toLowerCase()))
     ];
+    
+    const uniqueBriefs = Array.from(new Map(prioritizedBriefs.map(item => [item.id, item])).values());
 
     const [index, setIndex] = useState(0);
 
     useEffect(() => {
-        if (prioritizedKeywords.length <= 3) return;
+        if (uniqueBriefs.length <= 3) return;
 
         const interval = setInterval(() => {
-            setIndex(prevIndex => (prevIndex + 1) % prioritizedKeywords.length);
+            setIndex(prevIndex => (prevIndex + 1) % uniqueBriefs.length);
         }, 5000); // Rotate every 5 seconds
         return () => clearInterval(interval);
-    }, [prioritizedKeywords.length]);
+    }, [uniqueBriefs.length]);
 
-    if (prioritizedKeywords.length === 0) {
+    if (uniqueBriefs.length === 0) {
         return <p className="text-sm text-muted-foreground">Generate a content brief to see suggestions here.</p>;
     }
 
     const slide = (direction: 'next' | 'prev') => {
-        const total = prioritizedKeywords.length;
+        const total = uniqueBriefs.length;
         if (direction === 'next') {
             setIndex((prev) => (prev + 1) % total);
         } else {
@@ -233,13 +233,13 @@ const ContentBriefSummary: React.FC<{ activities: UserActivity[]; profile: any |
         }
     };
     
-    const getVisibleKeywords = () => {
-        const total = prioritizedKeywords.length;
-        if (total <= 3) return prioritizedKeywords;
+    const getVisibleBriefs = () => {
+        const total = uniqueBriefs.length;
+        if (total <= 3) return uniqueBriefs;
         
-        const items = [];
+        const items: ContentBrief[] = [];
         for (let i = 0; i < 3; i++) {
-            items.push(prioritizedKeywords[(index + i) % total]);
+            items.push(uniqueBriefs[(index + i) % total]);
         }
         return items;
     }
@@ -268,16 +268,16 @@ const ContentBriefSummary: React.FC<{ activities: UserActivity[]; profile: any |
         <div>
             <h4 className="font-semibold text-sm mb-2">Relevant Briefs For You:</h4>
             <div className="relative h-28 flex items-center justify-center -mx-2">
-                 {prioritizedKeywords.length > 3 && (
+                 {uniqueBriefs.length > 3 && (
                     <Button variant="ghost" size="icon" className="absolute left-0 z-10" onClick={() => slide('prev')}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                  )}
                  <div className="flex space-x-2 w-full justify-center">
                     <AnimatePresence initial={false}>
-                        {getVisibleKeywords().map((keyword, i) => (
+                        {getVisibleBriefs().map((brief, i) => (
                              <motion.div
-                                key={`${index}-${keyword}`}
+                                key={`${index}-${brief.id}`}
                                 custom={i}
                                 variants={sliderVariants}
                                 initial="enter"
@@ -288,14 +288,14 @@ const ContentBriefSummary: React.FC<{ activities: UserActivity[]; profile: any |
                             >
                                 <Card className="h-24 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors">
                                     <CardContent className="p-0">
-                                        <p className="text-xs font-semibold font-body truncate">{keyword}</p>
+                                        <p className="text-xs font-semibold font-body truncate">{brief.title}</p>
                                     </CardContent>
                                 </Card>
                             </motion.div>
                         ))}
                     </AnimatePresence>
                  </div>
-                 {prioritizedKeywords.length > 3 && (
+                 {uniqueBriefs.length > 3 && (
                     <Button variant="ghost" size="icon" className="absolute right-0 z-10" onClick={() => slide('next')}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>

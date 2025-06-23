@@ -8,8 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, FileText, Link as LinkIcon, HelpCircle, UserCheck, BarChart2, Tag } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Loader2, FileText, Compass, BarChart2, Star, Users, BrainCircuit } from 'lucide-react';
 import type { ContentBriefInput, ContentBriefOutput } from '@/ai/flows/content-brief';
 import { useRef, useEffect } from 'react';
 
@@ -26,13 +25,14 @@ interface ContentBriefFormProps {
   error: string | null;
 }
 
-const ResultCard = ({ title, icon: Icon, children }: { title: string; icon: React.ElementType, children: React.ReactNode }) => (
+const ResultCard = ({ title, icon: Icon, children, description }: { title: string; icon: React.ElementType; children: React.ReactNode, description?: string }) => (
     <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
         <CardHeader className="pb-4">
             <CardTitle className="font-headline text-lg flex items-center gap-2">
                 <Icon className="h-6 w-6 text-primary" />
                 {title}
             </CardTitle>
+            {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
         <CardContent>
             {children}
@@ -120,74 +120,58 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
 
         {briefResult && (
           <div className="space-y-6 mt-8">
+              <ResultCard title="Executive Summary" icon={BrainCircuit} description="Core strategy and targets for this content piece.">
+                 <div className="space-y-3">
+                    <p className="text-muted-foreground font-body">{briefResult.briefSummary}</p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p className="font-bold text-lg text-primary font-headline">{briefResult.primaryKeyword}</p>
+                            <p className="text-xs text-muted-foreground font-body">Primary Keyword</p>
+                        </div>
+                        <div>
+                            <p className="font-bold text-lg text-primary font-headline">{briefResult.searchIntent}</p>
+                            <p className="text-xs text-muted-foreground font-body">Search Intent</p>
+                        </div>
+                        <div>
+                            <p className="font-bold text-lg text-primary font-headline">{briefResult.seoScore}</p>
+                            <p className="text-xs text-muted-foreground font-body">SEO Potential</p>
+                        </div>
+                    </div>
+                  </div>
+              </ResultCard>
+
               <ResultCard title="Title and Meta" icon={FileText}>
                   <div className="space-y-4">
                       <div>
                           <h4 className="font-semibold font-body">Suggested Title</h4>
-                          <p className="text-muted-foreground font-body">{briefResult.suggestedTitle}</p>
+                          <p className="text-muted-foreground font-body">{briefResult.recommendedMeta.title}</p>
                       </div>
                       <div>
                           <h4 className="font-semibold font-body">Meta Description</h4>
-                          <p className="text-muted-foreground font-body">{briefResult.metaDescription}</p>
+                          <p className="text-muted-foreground font-body">{briefResult.recommendedMeta.description}</p>
                       </div>
                   </div>
               </ResultCard>
 
               <div className="grid md:grid-cols-2 gap-6">
-                  <ResultCard title="Targeting" icon={UserCheck}>
-                      <div className="space-y-4">
-                           <div>
-                              <h4 className="font-semibold font-body">Target Audience</h4>
-                              <p className="text-muted-foreground font-body">{briefResult.targetAudience}</p>
-                          </div>
-                          <div>
-                              <h4 className="font-semibold font-body">Word Count</h4>
-                              <p className="text-muted-foreground font-body">{briefResult.wordCount.min} - {briefResult.wordCount.max} words</p>
-                          </div>
-                      </div>
-                  </ResultCard>
-
-                  <ResultCard title="Content Structure" icon={BarChart2}>
+                 <ResultCard title="Content Outline" icon={BarChart2} description="A logical structure for the article.">
                       <ul className="space-y-2 list-disc pl-5">
-                          {briefResult.suggestedHeadings.map((heading, i) => (
-                              <li key={i} className={`font-body p-1 -ml-1 rounded hover:bg-muted/50 transition-colors ${heading.startsWith('H3') ? 'ml-4' : 'font-semibold'}`}>
-                                  {heading.replace(/^H[23]: /, '')}
+                          {briefResult.llmGeneratedOutline.map((heading, i) => (
+                              <li key={i} className="font-body p-1 -ml-1 rounded transition-colors hover:bg-muted/50">
+                                  {heading}
                               </li>
                           ))}
                       </ul>
                   </ResultCard>
+
+                  <ResultCard title="Competitor Insights" icon={Users} description="What top-ranking pages are doing right.">
+                    <ul className="space-y-2 list-disc pl-5 font-body">
+                        {briefResult.competitorInsights.map((insight, i) => (
+                            <li key={i} className="p-1 rounded transition-colors hover:bg-muted/50">{insight}</li>
+                        ))}
+                    </ul>
+                  </ResultCard>
               </div>
-
-              <ResultCard title="Semantic Keywords (LSI)" icon={Tag}>
-                  <CardDescription className="mb-4 -mt-2">Incorporating these related terms helps search engines understand the context and depth of your content, improving its chances to rank for a wider range of queries.</CardDescription>
-                  <div className="flex flex-wrap gap-2">
-                      {briefResult.lsiKeywords.map((lsi, i) => (
-                          <Badge key={i} variant={lsi.type === 'topic' ? 'default' : lsi.type === 'entity' ? 'secondary' : 'outline'}>
-                              {lsi.keyword}
-                          </Badge>
-                      ))}
-                  </div>
-              </ResultCard>
-
-              <ResultCard title="Questions to Answer" icon={HelpCircle}>
-                 <CardDescription className="mb-4 -mt-2">Directly answering these common user questions can help you capture "People Also Ask" features in search results.</CardDescription>
-                  <ul className="space-y-2 list-disc pl-5 font-body">
-                      {briefResult.questionsToAnswer.map((q, i) => (
-                          <li key={i} className="p-1 rounded hover:bg-muted/50 transition-colors">{q}</li>
-                      ))}
-                  </ul>
-              </ResultCard>
-
-              <ResultCard title="Linking Suggestions" icon={LinkIcon}>
-                   <CardDescription className="mb-4 -mt-2">Internal links help search engines discover your content and understand the relationships between your pages, distributing link equity throughout your site.</CardDescription>
-                   <ul className="space-y-2 list-disc pl-5 font-body">
-                      {briefResult.internalLinkingSuggestions.map((link, i) => (
-                          <li key={i} className="p-1 rounded hover:bg-muted/50 transition-colors">
-                              Anchor Text: <span className="font-semibold text-primary">{link.anchorText}</span> &rarr; Link to: <span className="italic">{link.linkTo}</span>
-                          </li>
-                      ))}
-                  </ul>
-              </ResultCard>
           </div>
         )}
       </div>
