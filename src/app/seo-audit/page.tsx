@@ -53,14 +53,14 @@
     };
     
   export default function SeoAuditPage() {
-    const [url, setUrl] = useState<string>('');
+    const [url, setUrl] = useState<string>('www.theairvantage.com');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [auditResults, setAuditResults] = useState<BackendAuditResult | null>(null);
     const [overallScore, setOverallScore] = useState<number>(0);
     const [currentAuditItems, setCurrentAuditItems] = useState<typeof initialAuditItems>(initialAuditItems); // State for displaying progress
 
     const { user, loading: authLoading } = useProtectedRoute();
-    const { profile } = useAuth();
+    const { profile, user: currentUser } = useAuth();
     const { toast } = useToast();
 
     useEffect(() => {
@@ -106,12 +106,30 @@
       setCurrentAuditItems(initialAuditItems); 
     
       try {
+        if (!currentUser) {
+            throw new Error("Authentication token not available.");
+        }
+        const token = await currentUser.getIdToken();
+        const functionUrl = "https://auditurl-thevwhkpdq-uc.a.run.app"; 
+        
         const validUrl = getValidUrl(url.trim());
         console.log("Calling 'auditUrl' function with payload:", { url: validUrl });
-        const auditUrlFunction = httpsCallable(functions, 'auditUrl');
-        const result = await auditUrlFunction({ url: validUrl });
+        
+        const response = await fetch(functionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ url: validUrl }),
+        });
 
-        const data = result.data as BackendAuditResult;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json() as BackendAuditResult;
         
         setAuditResults(data);
         setOverallScore(data.overallScore);
@@ -124,9 +142,22 @@
       } catch (error: any) {
         console.error("Detailed audit error:", error);
         
+        let title = "Audit Failed";
+        let description = "An unexpected error occurred. Please try again.";
+
+        if (error.code === 'functions/unauthenticated') {
+            title = "Authentication Error";
+            description = "You must be logged in to perform an audit.";
+        } else if (error.code === 'functions/invalid-argument') {
+            title = "Invalid URL";
+            description = "The URL provided is not valid. Please check and try again.";
+        } else if (error.message) {
+            description = error.message;
+        }
+        
         toast({
-          title: "Audit Failed",
-          description: error.message || "An unexpected error occurred. Please try again.",
+          title: title,
+          description: description,
           variant: "destructive"
         });
 
