@@ -265,7 +265,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
     return (
         <div>
             <h4 className="font-semibold text-sm mb-2">Relevant Briefs For You:</h4>
-            <div className="relative h-[260px] -mx-2 overflow-hidden">
+            <div className="relative h-[250px] -mx-2 overflow-hidden">
                  {uniqueBriefs.length > 4 && (
                     <Button variant="ghost" size="icon" className="absolute left-0 top-1/2 -translate-y-1/2 z-10" onClick={() => slide(-1)}>
                         <ChevronLeft className="h-4 w-4" />
@@ -281,7 +281,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                         animate="center"
                         exit="exit"
                         transition={{
-                            x: { type: "spring", stiffness: 300, damping: 30 },
+                            x: { type: "spring", stiffness: 240, damping: 30 },
                             opacity: { duration: 0.2 }
                         }}
                     >
