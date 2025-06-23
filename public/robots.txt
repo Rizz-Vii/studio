@@ -1,8 +1,5 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
-
+# Block crawlers from accessing private user areas and API routes
 User-agent: *
-
-# Disallow crawling of user-specific and admin pages
 Disallow: /api/
 Disallow: /dashboard/
 Disallow: /profile/
@@ -10,8 +7,8 @@ Disallow: /adminonly/
 Disallow: /login/
 Disallow: /register/
 
-# Allow all other content
+# Allow crawlers to access all other public pages
 Allow: /
 
-# Point to the sitemap
+# Location of sitemap
 Sitemap: https://yourdomain.com/sitemap.xml

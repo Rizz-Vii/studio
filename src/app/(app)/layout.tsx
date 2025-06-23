@@ -1,35 +1,41 @@
-
+// src/app/(app)/layout.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
-    import Link from 'next/link';
-    import { usePathname } from 'next/navigation';
-    import { useRouter } from 'next/navigation'; // Import useRouter
-    import {
-      SidebarProvider,
-      Sidebar,
-      SidebarHeader,
-      SidebarContent,
-      SidebarMenu,
-      SidebarMenuItem,
-      SidebarMenuButton,
-      SidebarFooter,
-      SidebarInset,
-      SidebarTrigger,
-      useSidebar,
-    } from '@/components/ui/sidebar';
-    import { Button } from '@/components/ui/button';
-    import { navItems, AppLogo, AppName } from '@/config/nav';
-    import type { NavItem } from '@/config/nav';
-    import { ScrollArea } from '@/components/ui/scroll-area';
-    import { useAuth } from '@/context/AuthContext'; // Import useAuth
-    import { auth } from '@/lib/firebase'; // Import auth
-    import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-    import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-    import { User, LogOut } from 'lucide-react';
-    import { motion, AnimatePresence } from 'framer-motion';
-    import { cn } from '@/lib/utils';
-    import LoadingScreen from '@/components/ui/loading-screen';
-
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter,
+  SidebarInset,
+  SidebarTrigger,
+  useSidebar,
+} from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
+import { navItems, AppLogo, AppName } from '@/constants/nav';
+import type { NavItem } from '@/constants/nav';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAuth } from '@/context/AuthContext';
+import { auth } from '@/lib/firebase';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { User, LogOut } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 const AppHeader = () => {
   return (
@@ -90,8 +96,6 @@ const UserNav = () => {
           className="flex h-12 w-full items-center justify-center gap-2 rounded-lg p-2 text-left text-sm group-data-[state=collapsed]:h-12 group-data-[state=collapsed]:w-12 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:p-0"
         >
           <Avatar className="h-8 w-8">
-            {/* If user has a photoURL, you can use it here */}
-            {/* <AvatarImage src={user.photoURL} alt={profile?.displayName || user.email} /> */}
             <AvatarFallback>{userInitial}</AvatarFallback>
           </Avatar>
           <div className="group-data-[state=collapsed]:hidden">

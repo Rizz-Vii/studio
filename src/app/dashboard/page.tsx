@@ -1,4 +1,4 @@
-
+// src/app/dashboard/page.tsx
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import {
@@ -36,7 +36,6 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/comp
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { dummyContentBriefs, ContentBrief } from '@/lib/dummy-data';
-
 
 // ----- TYPES AND CONFIGS -----
 
@@ -263,16 +262,19 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
         enter: (direction: number) => ({
             x: direction > 0 ? '100%' : '-100%',
             opacity: 0,
+            scale: 1,
         }),
         center: {
             zIndex: 1,
             x: 0,
             opacity: 1,
+            scale: 1,
         },
         exit: (direction: number) => ({
             zIndex: 0,
             x: direction < 0 ? '100%' : '-100%',
             opacity: 0,
+            scale: 1,
         }),
     };
 
@@ -300,7 +302,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                         }}
                     >
                     {getVisibleBriefs().map((brief) => (
-                        <Card key={brief.id} className="h-full w-[160px] flex flex-col shadow-md bg-muted/50 hover:bg-muted transition-colors">
+                        <Card key={brief.id} className="h-full w-[160px] flex flex-col shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
                             <CardHeader className="p-3 pb-2">
                                 <CardTitle className="text-sm font-bold font-headline truncate" title={brief.title}>{brief.title}</CardTitle>
                             </CardHeader>
