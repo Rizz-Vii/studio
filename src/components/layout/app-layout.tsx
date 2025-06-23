@@ -42,16 +42,15 @@ const AppHeader = () => {
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
       <SidebarTrigger className="md:hidden" />
       <div className="flex items-center gap-2">
-        <AppLogo className="h-6 w-6 text-primary" />
         <h1 className="text-xl font-headline font-semibold">{AppName}</h1>
       </div>
-      {/* Add logout button here if user is logged in */}
-          {user && ( // Conditionally render logout button if user is logged in
+      {user && (
+        <div className="ml-auto">
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               Logout
             </Button>
-          )}
-      {/* Add other header elements like user profile button here if needed */}
+        </div>
+      )}
     </header>
   );
 };
@@ -84,7 +83,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
-                 
+
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
