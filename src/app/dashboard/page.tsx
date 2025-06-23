@@ -83,13 +83,13 @@ const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
   
   return (
     <div className="space-y-3">
-      <div>
-        <div className="flex justify-between items-center mb-1">
-            <span className="font-semibold text-sm">Average Score</span>
-            <span className="font-bold text-lg text-blue-500">{avgScore}/100</span>
+        <div className="flex items-center gap-4">
+            <div className="flex-grow space-y-1">
+                <span className="font-semibold text-sm">Average Score</span>
+                <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
+            </div>
+            <span className="font-bold text-lg text-blue-500 flex-shrink-0">{avgScore}/100</span>
         </div>
-        <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
-      </div>
       {auditData.length > 1 && (
          <div className="aspect-video w-full">
             <ChartContainer config={chartConfig}>
@@ -118,12 +118,12 @@ const ContentAnalyzerSummary: React.FC<{ activities: UserActivity[] }> = ({ acti
 
     const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     return (
-        <div>
-            <div className="flex justify-between items-center mb-1">
+        <div className="flex items-center gap-4">
+            <div className="flex-grow space-y-1">
                 <span className="font-semibold text-sm">Average Content Score</span>
-                <span className="font-bold text-lg text-purple-500">{avgScore}/100</span>
+                <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
             </div>
-            <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
+            <span className="font-bold text-lg text-purple-500 flex-shrink-0">{avgScore}/100</span>
         </div>
     );
 };
@@ -286,7 +286,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                                 transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
                                 className="w-1/3"
                             >
-                                <Card className="h-24 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors">
+                                <Card className="h-24 flex items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
                                     <CardContent className="p-0">
                                         <p className="text-xs font-semibold font-body truncate">{brief.title}</p>
                                     </CardContent>
