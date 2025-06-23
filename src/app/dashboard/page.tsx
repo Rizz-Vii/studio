@@ -1,7 +1,7 @@
 
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { ArrowRight, BarChart3, CheckCircle, AlertTriangle, TrafficCone, Link as LinkIcon, ScanText } from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle, AlertTriangle, TrafficCone, Link as LinkIcon, ScanText, Activity } from "lucide-react";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
