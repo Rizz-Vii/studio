@@ -8,6 +8,9 @@ import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
 
 interface MetricCardProps {
   title: string;
@@ -16,6 +19,7 @@ interface MetricCardProps {
   icon: React.ElementType;
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string;
+  className?: string;
 }
 interface UserActivity {
   query: string;
@@ -31,10 +35,10 @@ interface DashboardProfileData {
     primaryKeywords?: string;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon: Icon, trend, trendValue }) => {
+const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon: Icon, trend, trendValue, className }) => {
   const trendColor = trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-muted-foreground';
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className={cn("shadow-lg hover:shadow-xl hover:bg-accent/20 transition-all duration-300", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium font-body">{title}</CardTitle>
         <Icon className="h-5 w-5 text-muted-foreground" />
@@ -55,12 +59,12 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, icon
 
 export default function DashboardPage() {
   const [seoMetrics, setSeoMetrics] = useState([
-    { title: "Overall SEO Score", value: "N/A", description: "Based on recent audit", icon: CheckCircle, trend: 'neutral', trendValue: '' },
-    { title: "Tracked Keywords", value: "N/A", description: "Keywords analyzed", icon: BarChartBig, trend: 'neutral', trendValue: '' },
-    { title: "Organic Traffic", value: "N/A", description: "Data from connected analytics", icon: TrafficCone, trend: 'neutral', trendValue: '' },
-    { title: "Referring Domains", value: "N/A", description: "From backlink analysis", icon: LinkIcon, trend: 'neutral', trendValue: '' },
-    { title: "Critical Issues", value: "N/A", description: "From technical audit", icon: AlertTriangle, trend: 'neutral', trendValue: '' },
-    { title: "Content Performance", value: "N/A", description: "Average content score", icon: ScanText, trend: 'neutral', trendValue: '' },
+    { title: "Overall SEO Score", value: "N/A", description: "Based on recent audit", icon: CheckCircle, trend: 'neutral', trendValue: '', detailedDescription: "This score is a cumulative measure of your site's technical health, content relevance, and backlink authority. It's calculated based on the latest data from our SEO Audit tool. A higher score indicates better overall SEO performance." },
+    { title: "Tracked Keywords", value: "N/A", description: "Keywords analyzed", icon: BarChartBig, trend: 'neutral', trendValue: '', detailedDescription: "This is the total number of unique keywords you have analyzed using our Keyword Tool. Tracking more relevant keywords helps you understand your visibility across a broader range of search queries." },
+    { title: "Organic Traffic", value: "N/A", description: "Data from connected analytics", icon: TrafficCone, trend: 'neutral', trendValue: '', detailedDescription: "Represents the number of visitors who arrived at your site from a search engine, excluding paid ads. This metric requires connecting your web analytics platform (e.g., Google Analytics). Higher organic traffic is a key indicator of strong SEO." },
+    { title: "Referring Domains", value: "N/A", description: "From backlink analysis", icon: LinkIcon, trend: 'neutral', trendValue: '', detailedDescription: "The total number of unique domains that have at least one link pointing to your website. A higher number of quality referring domains is a strong signal to search engines that your site is authoritative." },
+    { title: "Critical Issues", value: "N/A", description: "From technical audit", icon: AlertTriangle, trend: 'neutral', trendValue: '', detailedDescription: "These are high-priority technical problems found during the SEO Audit, such as server errors (5xx), broken critical pages, or major indexing issues. Resolving these should be your top priority." },
+    { title: "Content Performance", value: "N/A", description: "Average content score", icon: ScanText, trend: 'neutral', trendValue: '', detailedDescription: "This is the average score of all pages analyzed with our Content Optimization tool. It reflects how well your content is optimized for readability, keyword density, and semantic relevance." },
   ]);
 
   const { user, loading: authLoading } = useProtectedRoute();
@@ -182,15 +186,32 @@ export default function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {seoMetrics.map((metric) => (
-          <MetricCard
-            key={metric.title}
-            title={metric.title}
-            value={metric.value}
-            description={metric.description}
-            icon={metric.icon}
-            trend={metric.trend as 'up' | 'down' | 'neutral' | undefined}
-            trendValue={metric.trendValue}
-          />
+          <Dialog key={metric.title}>
+            <DialogTrigger asChild>
+              <div className="h-full">
+                <MetricCard
+                  title={metric.title}
+                  value={metric.value}
+                  description={metric.description}
+                  icon={metric.icon}
+                  trend={metric.trend as 'up' | 'down' | 'neutral' | undefined}
+                  trendValue={metric.trendValue}
+                  className="cursor-pointer h-full"
+                />
+              </div>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 font-headline">
+                  <metric.icon className="h-6 w-6 text-primary" />
+                  {metric.title}
+                </DialogTitle>
+                <DialogDescription className="pt-4 font-body text-base">
+                  {metric.detailedDescription}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         ))}
       </div>
 
