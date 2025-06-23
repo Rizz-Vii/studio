@@ -110,10 +110,10 @@ export default function CompetitorsPage() {
         return;
     }
 
-    const competitorUrls = competitorsInput
-        .split(/[\n, ]+/)
+    const competitorUrls = [...new Set(competitorsInput
+        .split(/[\n,]+/)
         .map(url => url.trim())
-        .filter(Boolean);
+        .filter(Boolean))];
 
     const invalidCompetitor = competitorUrls.find(url => !isValidUrl(url));
     if (invalidCompetitor) {
