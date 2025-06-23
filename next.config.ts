@@ -19,6 +19,9 @@ const nextConfig: NextConfig = {
     ],
   },
   transpilePackages: ['handlebars', 'dotprompt'],
+  experimental: {
+    allowedDevOrigins: ['https://6000-firebase-studio-1750335091008.cluster-fkltigo73ncaixtmokrzxhwsfc.cloudworkstations.dev'],
+  },
 };
 
 export default nextConfig;
