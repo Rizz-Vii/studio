@@ -200,7 +200,7 @@ export default function CompetitorsPage() {
             <label htmlFor="yourUrl" className="block text-sm font-medium text-foreground font-body mb-1">Your URL</label>
             <Input
               id="yourUrl"
-              type="url"
+              type="text"
               placeholder="https://yourwebsite.com"
               value={yourUrl}
               onChange={(e) => setYourUrl(e.target.value)}

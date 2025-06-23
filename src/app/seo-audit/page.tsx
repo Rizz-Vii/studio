@@ -190,7 +190,7 @@
           <CardContent>
             <form onSubmit={handleFormSubmit} className="flex flex-col sm:flex-row gap-2">
               <Input
-                type="url"
+                type="text"
                 placeholder="yourwebsite.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}

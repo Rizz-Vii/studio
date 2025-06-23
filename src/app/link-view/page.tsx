@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const isValidUrl = (urlString: string): boolean => {
     if (!urlString.trim()) return false;
     try {
         const url = new URL(getValidUrl(urlString));
+        // A simple check for a TLD to avoid single-word inputs like "test"
         return /\.[a-z]{2,}$/i.test(url.hostname);
     } catch (e) {
         return false;
@@ -123,7 +125,7 @@ export default function LinkViewPage() {
             <CardContent>
               <div className="flex space-x-2">
                 <Input
-                  type="url"
+                  type="text"
                   placeholder="https://yourwebsite.com"
                   value={targetUrl}
                   onChange={(e) => setTargetUrl(e.target.value)}
