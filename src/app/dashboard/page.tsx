@@ -50,132 +50,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 
-// ----- MAIN COMPONENT -----
-
-export default function DashboardPage() {
-  const { user: currentUser, loading: authLoading, profile } = useProtectedRoute();
-  
-  const [groupedActivities, setGroupedActivities] = useState<GroupedActivities>({});
-  const [loadingData, setLoadingData] = useState(true);
-
-  useEffect(() => {
-    const fetchActivities = async () => {
-      if (currentUser) {
-        setLoadingData(true);
-        const activitiesRef = collection(db, "users", currentUser.uid, "activities");
-        const q = query(activitiesRef, orderBy("timestamp", "desc"));
-        const querySnapshot = await getDocs(q);
-
-        const fetchedActivities = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        } as UserActivity));
-
-        const grouped = fetchedActivities.reduce((acc, activity) => {
-          const tool = activity.tool || "Other";
-          if (!acc[tool]) {
-            acc[tool] = [];
-          }
-          acc[tool].push(activity);
-          return acc;
-        }, {} as GroupedActivities);
-
-        setGroupedActivities(grouped);
-        setLoadingData(false);
-      }
-    };
-
-    if (!authLoading) {
-      fetchActivities();
-    }
-  }, [currentUser, authLoading]);
-
-  if (authLoading || loadingData) {
-    return <LoadingScreen />;
-  }
-
-  return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <h1 className="text-3xl font-headline font-semibold text-foreground">
-        Welcome, {profile?.displayName || currentUser?.email}!
-      </h1>
-      <p className="text-muted-foreground font-body">Here's your SEO command center. Monitor key metrics and review your activity across all tools.</p>
-      
-      {Object.keys(groupedActivities).length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-          {Object.entries(groupedActivities).map(([tool, activities]) => {
-            const ToolSummary = toolSummaryComponents[tool];
-            return (
-              <ToolActivityCard key={tool} tool={tool} activities={activities}>
-                {ToolSummary && <ToolSummary activities={activities} />}
-              </ToolActivityCard>
-            );
-          })}
-        </div>
-      ) : (
-        <Card>
-          <CardContent className="p-10 text-center">
-            <h3 className="text-xl font-headline mb-2">No Activity Yet</h3>
-            <p className="font-body text-muted-foreground">Start using the tools to see your activity summary here.</p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-
-// ----- HELPER & SUMMARY COMPONENTS -----
-
-// Define a mapping of tool names to their respective summary components
-const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[] }>> = {
-  "SEO Audit": SeoAuditSummary,
-  "Content Analyzer": ContentAnalyzerSummary,
-  "Keyword Tool": KeywordToolSummary,
-  "Competitor Analysis": CompetitorAnalysisSummary,
-  "Content Brief": ContentBriefSummary,
-  "Link View": LinkViewSummary,
-};
-
-
-const ToolActivityCard: React.FC<{
-  tool: string;
-  activities: UserActivity[];
-  children?: React.ReactNode;
-}> = ({ tool, activities, children }) => {
-  const config = toolConfig[tool] || toolConfig["Default"];
-  const Icon = config.icon;
-
-  return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow flex flex-col">
-      <CardHeader>
-        <CardTitle className="font-headline flex items-center gap-2">
-          <Icon className={`h-6 w-6 ${config.color}`} />
-          {tool}
-        </CardTitle>
-        <CardDescription>{activities.length} recent activities</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow space-y-4">
-        {children}
-        <div>
-          <h4 className="font-semibold text-sm mb-2">Recent Logs:</h4>
-          <ul className="space-y-3">
-            {activities.slice(0, 5).map((activity) => (
-              <li key={activity.id} className="text-xs text-muted-foreground font-body flex gap-2">
-                <span className="font-semibold text-foreground whitespace-nowrap">
-                  {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}:
-                </span>
-                <span className="truncate" title={activity.resultsSummary}>
-                  {activity.resultsSummary ?? 'Activity performed.'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+// ----- HELPER & SUMMARY COMPONENTS (DEFINED BEFORE USE) -----
 
 const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
   const auditData = activities
@@ -366,3 +241,126 @@ const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
         </div>
     );
 };
+
+const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[] }>> = {
+  "SEO Audit": SeoAuditSummary,
+  "Content Analyzer": ContentAnalyzerSummary,
+  "Keyword Tool": KeywordToolSummary,
+  "Competitor Analysis": CompetitorAnalysisSummary,
+  "Content Brief": ContentBriefSummary,
+  "Link View": LinkViewSummary,
+};
+
+const ToolActivityCard: React.FC<{
+  tool: string;
+  activities: UserActivity[];
+  children?: React.ReactNode;
+}> = ({ tool, activities, children }) => {
+  const config = toolConfig[tool] || toolConfig["Default"];
+  const Icon = config.icon;
+
+  return (
+    <Card className="shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+      <CardHeader>
+        <CardTitle className="font-headline flex items-center gap-2">
+          <Icon className={`h-6 w-6 ${config.color}`} />
+          {tool}
+        </CardTitle>
+        <CardDescription>{activities.length} recent activities</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-grow space-y-4">
+        {children}
+        <div>
+          <h4 className="font-semibold text-sm mb-2">Recent Logs:</h4>
+          <ul className="space-y-3">
+            {activities.slice(0, 5).map((activity) => (
+              <li key={activity.id} className="text-xs text-muted-foreground font-body flex gap-2">
+                <span className="font-semibold text-foreground whitespace-nowrap">
+                  {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}:
+                </span>
+                <span className="truncate" title={activity.resultsSummary}>
+                  {activity.resultsSummary ?? 'Activity performed.'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+
+// ----- MAIN COMPONENT -----
+
+export default function DashboardPage() {
+  const { user: currentUser, loading: authLoading, profile } = useProtectedRoute();
+  
+  const [groupedActivities, setGroupedActivities] = useState<GroupedActivities>({});
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      if (currentUser) {
+        setLoadingData(true);
+        const activitiesRef = collection(db, "users", currentUser.uid, "activities");
+        const q = query(activitiesRef, orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        const fetchedActivities = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as UserActivity));
+
+        const grouped = fetchedActivities.reduce((acc, activity) => {
+          const tool = activity.tool || "Other";
+          if (!acc[tool]) {
+            acc[tool] = [];
+          }
+          acc[tool].push(activity);
+          return acc;
+        }, {} as GroupedActivities);
+
+        setGroupedActivities(grouped);
+        setLoadingData(false);
+      }
+    };
+
+    if (!authLoading) {
+      fetchActivities();
+    }
+  }, [currentUser, authLoading]);
+
+  if (authLoading || loadingData) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-8">
+      <h1 className="text-3xl font-headline font-semibold text-foreground">
+        Welcome, {profile?.displayName || currentUser?.email}!
+      </h1>
+      <p className="text-muted-foreground font-body">Here's your SEO command center. Monitor key metrics and review your activity across all tools.</p>
+      
+      {Object.keys(groupedActivities).length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+          {Object.entries(groupedActivities).map(([tool, activities]) => {
+            const ToolSummary = toolSummaryComponents[tool];
+            return (
+              <ToolActivityCard key={tool} tool={tool} activities={activities}>
+                {ToolSummary && <ToolSummary activities={activities} />}
+              </ToolActivityCard>
+            );
+          })}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="p-10 text-center">
+            <h3 className="text-xl font-headline mb-2">No Activity Yet</h3>
+            <p className="font-body text-muted-foreground">Start using the tools to see your activity summary here.</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
