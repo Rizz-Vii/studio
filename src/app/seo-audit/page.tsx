@@ -44,7 +44,7 @@
     }
     
   export default function SeoAuditPage() {
-    const [url, setUrl] = useState<string>('');
+    const [url, setUrl] = useState<string>('www.theairvantage.com');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [auditResults, setAuditResults] = useState<BackendAuditResult | null>(null);
     const [overallScore, setOverallScore] = useState<number>(0);
