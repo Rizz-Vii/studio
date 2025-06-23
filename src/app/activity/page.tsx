@@ -189,15 +189,17 @@ const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
       </div>
       {auditData.length > 1 && (
          <div className="h-[100px] w-full">
-            <ResponsiveContainer>
-              <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
-                <XAxis dataKey="date" tickFormatter={(time) => format(time, 'MMM d')} className="text-xs"/>
-                <YAxis domain={[0, 100]} className="text-xs" />
-                <ChartTooltip content={<ChartTooltipContent indicator="line" labelFormatter={(label, payload) => `${format(label, 'PPp')}`} formatter={(value) => `${value}/100`} />} />
-                <Line type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
+            <ChartContainer config={chartConfig}>
+              <ResponsiveContainer>
+                <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
+                  <XAxis dataKey="date" tickFormatter={(time) => format(time, 'MMM d')} className="text-xs"/>
+                  <YAxis domain={[0, 100]} className="text-xs" />
+                  <ChartTooltip content={<ChartTooltipContent indicator="line" labelFormatter={(label, payload) => `${format(label, 'PPp')}`} formatter={(value) => `${value}/100`} />} />
+                  <Line type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
          </div>
       )}
     </div>
