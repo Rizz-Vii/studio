@@ -1,6 +1,6 @@
 
 'use client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -70,44 +70,47 @@ const chartConfig = {
 // ----- HELPER & SUMMARY COMPONENTS -----
 
 const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-  const auditData = activities
-    .map(a => ({
-      score: a.details?.overallScore,
-      date: a.timestamp.toDate(),
-    }))
-    .filter(a => typeof a.score === 'number')
-    .reverse();
+    const auditData = activities
+        .map(a => ({
+            score: a.details?.overallScore,
+            date: a.timestamp.toDate(),
+        }))
+        .filter(a => typeof a.score === 'number')
+        .reverse();
 
-  if (auditData.length === 0) return null;
+    if (auditData.length === 0) return <p className="text-sm text-muted-foreground font-body">No recent SEO audits.</p>;
 
-  const avgScore = Math.round(auditData.reduce((sum, a) => sum + a.score, 0) / auditData.length);
+    const avgScore = Math.round(auditData.reduce((sum, a) => sum + a.score, 0) / auditData.length);
   
-  return (
-    <div className="space-y-3">
-        <div className="flex items-center gap-4">
-            <div className="flex-grow space-y-1">
-                <span className="font-semibold text-sm">Average Score</span>
-                <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
+    return (
+        <div className="space-y-4">
+            <div className="flex justify-around text-center border-b pb-3">
+                <div>
+                    <p className="text-2xl font-bold font-headline">{activities.length}</p>
+                    <p className="text-xs text-muted-foreground font-body">Audits</p>
+                </div>
+                <div>
+                    <p className="text-2xl font-bold font-headline">{avgScore}</p>
+                    <p className="text-xs text-muted-foreground font-body">Avg Score</p>
+                </div>
             </div>
-            <span className="font-bold text-lg text-primary flex-shrink-0">{avgScore}/100</span>
+            {auditData.length > 1 && (
+                <div style={{ aspectRatio: '16 / 9' }}>
+                    <ChartContainer config={chartConfig}>
+                        <ResponsiveContainer>
+                            <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
+                                <XAxis dataKey="date" tickFormatter={(time) => format(time, 'MMM d')} className="text-xs font-body"/>
+                                <YAxis domain={[0, 100]} className="text-xs" />
+                                <ChartTooltip content={<ChartTooltipContent indicator="line" labelFormatter={(label) => format(new Date(label), 'PPp')} formatter={(value) => `${value}/100`} />} />
+                                <Line type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={2} dot={false} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </ChartContainer>
+                </div>
+            )}
         </div>
-      {auditData.length > 1 && (
-         <div className="w-full" style={{aspectRatio: '2 / 1'}}>
-            <ChartContainer config={chartConfig}>
-              <ResponsiveContainer>
-                <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
-                  <XAxis dataKey="date" tickFormatter={(time) => format(time, 'MMM d')} className="text-xs"/>
-                  <YAxis domain={[0, 100]} className="text-xs" />
-                  <ChartTooltip content={<ChartTooltipContent indicator="line" labelFormatter={(label) => format(new Date(label), 'PPp')} formatter={(value) => `${value}/100`} />} />
-                  <Line type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 const ContentAnalyzerSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
@@ -115,16 +118,27 @@ const ContentAnalyzerSummary: React.FC<{ activities: UserActivity[] }> = ({ acti
         .map(a => a.details?.overallScore)
         .filter(score => typeof score === 'number');
 
-    if (scores.length === 0) return null;
+    if (scores.length === 0) return <p className="text-sm text-muted-foreground font-body">No recent content analyses.</p>;
 
     const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     return (
-        <div className="flex items-center gap-4">
-            <div className="flex-grow space-y-1">
-                <span className="font-semibold text-sm">Average Content Score</span>
-                <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
+         <div className="space-y-4">
+            <div className="flex justify-around text-center border-b pb-3">
+                <div>
+                    <p className="text-2xl font-bold font-headline">{activities.length}</p>
+                    <p className="text-xs text-muted-foreground font-body">Analyses</p>
+                </div>
+                <div>
+                    <p className="text-2xl font-bold font-headline">{avgScore}</p>
+                    <p className="text-xs text-muted-foreground font-body">Avg Score</p>
+                </div>
             </div>
-            <span className="font-bold text-lg text-primary flex-shrink-0">{avgScore}/100</span>
+            <div className="flex items-center gap-4 pt-2">
+                <div className="flex-grow space-y-1">
+                    <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
+                </div>
+                <span className="font-bold text-lg text-primary flex-shrink-0">{avgScore}/100</span>
+            </div>
         </div>
     );
 };
@@ -134,7 +148,7 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
         .map(a => a.details?.topic)
         .filter(Boolean);
 
-    if (topics.length === 0) return null;
+    if (topics.length === 0) return <p className="text-sm text-muted-foreground font-body">No recent keyword research.</p>;
     
     const topicCounts = topics.reduce((acc, topic) => {
         acc[topic] = (acc[topic] || 0) + 1;
@@ -147,10 +161,10 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
 
     return (
         <div>
-            <h4 className="font-semibold text-sm mb-2">Top Searched Topics:</h4>
+            <h4 className="font-semibold text-sm mb-2 font-body">Top Searched Topics:</h4>
             <div className="flex flex-wrap gap-2">
                 {topTopics.map(([topic, count]) => (
-                    <Badge key={topic} variant="secondary" className="transition-transform hover:scale-105">{topic} ({count})</Badge>
+                    <Badge key={topic} variant="secondary" className="transition-transform hover:scale-105 font-body">{topic} ({count})</Badge>
                 ))}
             </div>
         </div>
@@ -172,7 +186,7 @@ const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ a
     if (competitors.length === 0) {
         return (
             <div>
-                <p className="text-sm text-muted-foreground">No recent competitor analyses.</p>
+                <p className="text-sm text-muted-foreground font-body">No recent competitor analyses.</p>
             </div>
         );
     }
@@ -190,10 +204,10 @@ const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ a
 
     return (
         <div>
-            <h4 className="font-semibold text-sm mb-2">Most Analyzed Competitors:</h4>
+            <h4 className="font-semibold text-sm mb-2 font-body">Most Analyzed Competitors:</h4>
             <div className="flex flex-wrap gap-2">
                 {topCompetitors.map(([competitor, count]) => (
-                    <Badge key={competitor} variant="secondary" className="transition-transform hover:scale-105">{competitor} ({count})</Badge>
+                    <Badge key={competitor} variant="secondary" className="transition-transform hover:scale-105 font-body">{competitor} ({count})</Badge>
                 ))}
             </div>
         </div>
@@ -231,7 +245,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
     }, [uniqueBriefs.length, slide]);
 
     if (uniqueBriefs.length === 0) {
-        return <p className="text-sm text-muted-foreground">Generate a content brief to see suggestions here.</p>;
+        return <p className="text-sm text-muted-foreground font-body">Generate a content brief to see suggestions here.</p>;
     }
     
     const getVisibleBriefs = () => {
@@ -264,8 +278,8 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
 
     return (
         <div>
-            <h4 className="font-semibold text-sm mb-2">Relevant Briefs For You:</h4>
-            <div className="relative h-[250px] -mx-2 overflow-hidden">
+            <h4 className="font-semibold text-sm mb-2 font-body">Relevant Briefs For You:</h4>
+            <div className="relative h-[250px] overflow-hidden">
                  {uniqueBriefs.length > 4 && (
                     <Button variant="ghost" size="icon" className="absolute left-0 top-1/2 -translate-y-1/2 z-10" onClick={() => slide(-1)}>
                         <ChevronLeft className="h-4 w-4" />
@@ -286,10 +300,22 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                         }}
                     >
                     {getVisibleBriefs().map((brief) => (
-                         <Card key={brief.id} className="h-[250px] w-[140px] flex flex-col items-center justify-center p-2 text-center shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
-                            <CardContent className="p-0">
-                                <p className="text-sm font-semibold font-body px-2">{brief.title}</p>
+                        <Card key={brief.id} className="h-full w-[160px] flex flex-col shadow-md bg-muted/50 hover:bg-muted transition-colors">
+                            <CardHeader className="p-3 pb-2">
+                                <CardTitle className="text-sm font-bold font-headline truncate" title={brief.title}>{brief.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-3 pt-0 flex-grow space-y-2 text-left">
+                                <Badge variant="secondary" className="font-body">{brief.primaryKeyword}</Badge>
+                                <div className="text-xs">
+                                    <span className="font-semibold font-body">Intent:</span> <span className="font-body">{brief.searchIntent}</span>
+                                </div>
                             </CardContent>
+                            <CardFooter className="p-3 pt-0">
+                                <div className="w-full">
+                                    <span className="text-xs text-muted-foreground font-body">SEO Score: {brief.seoScore}</span>
+                                    <Progress value={parseInt(brief.seoScore.split('/')[0])} className="h-2 mt-1" indicatorClassName={parseInt(brief.seoScore.split('/')[0]) > 80 ? "bg-green-500" : parseInt(brief.seoScore.split('/')[0]) > 60 ? "bg-yellow-500" : "bg-red-500"} />
+                                </div>
+                            </CardFooter>
                         </Card>
                     ))}
                     </motion.div>
@@ -317,7 +343,7 @@ const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
         })
         .filter(Boolean);
 
-    if (domains.length === 0) return null;
+    if (domains.length === 0) return <p className="text-sm text-muted-foreground font-body">No recent link analyses.</p>;
     
     const domainCounts = domains.reduce((acc, domain) => {
         if(domain) {
@@ -332,10 +358,10 @@ const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
 
     return (
         <div>
-            <h4 className="font-semibold text-sm mb-2">Most Analyzed Domains:</h4>
+            <h4 className="font-semibold text-sm mb-2 font-body">Most Analyzed Domains:</h4>
             <div className="flex flex-wrap gap-2">
                 {topDomains.map(([domain, count]) => (
-                    <Badge key={domain} variant="secondary" className="transition-transform hover:scale-105">{domain} ({count})</Badge>
+                    <Badge key={domain} variant="secondary" className="transition-transform hover:scale-105 font-body">{domain} ({count})</Badge>
                 ))}
             </div>
         </div>
@@ -420,7 +446,7 @@ export default function DashboardPage() {
                                         <Icon className={`h-6 w-6 ${config.color}`} />
                                         {tool}
                                     </CardTitle>
-                                    <Badge variant="outline" className="text-xs">{activities.length} {activities.length === 1 ? 'Activity' : 'Activities'}</Badge>
+                                    <Badge variant="outline" className="text-xs font-body">{activities.length} {activities.length === 1 ? 'Activity' : 'Activities'}</Badge>
                                 </div>
                             </CardHeader>
                             <CardContent className="flex-grow space-y-4 pt-4">
@@ -434,7 +460,7 @@ export default function DashboardPage() {
                                 <Icon className={`h-6 w-6 ${config.color}`} />
                                 {tool} Activity Log
                             </DialogTitle>
-                            <DialogDescription>A detailed log of your recent activity using this tool.</DialogDescription>
+                            <DialogDescription className="font-body">A detailed log of your recent activity using this tool.</DialogDescription>
                         </DialogHeader>
                         <div className="max-h-[60vh] overflow-y-auto pr-4">
                             <Table>

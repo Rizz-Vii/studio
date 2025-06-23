@@ -2,7 +2,7 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Lightbulb, Zap, CheckCircle, AlertTriangle, ArrowRight, Loader2 } from "lucide-react";
+import { Lightbulb, Zap, AlertTriangle, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import useProtectedRoute from '@/hooks/useProtectedRoute';
@@ -11,6 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { generateInsights } from '@/ai/flows/generate-insights';
+import LoadingScreen from "@/components/ui/loading-screen";
 
 interface Insight {
   id: string;
@@ -23,10 +24,10 @@ interface Insight {
   actionText?: string;
 }
 
-const getPriorityBadgeVariant = (priority: 'High' | 'Medium' | 'Low'): "destructive" | "secondary" | "outline" => {
+const getPriorityBadgeVariant = (priority: 'High' | 'Medium' | 'Low'): "destructive" | "warning" | "secondary" => {
   if (priority === 'High') return 'destructive';
-  if (priority === 'Medium') return 'secondary';
-  return 'outline';
+  if (priority === 'Medium') return 'warning';
+  return 'secondary';
 };
 
 const getImpactIcon = (impact: 'High' | 'Medium' | 'Low') => {
@@ -58,8 +59,6 @@ export default function InsightsPage() {
         const querySnapshot = await getDocs(q);
         const activities = querySnapshot.docs.map(doc => {
             const data = doc.data();
-            // Firestore Timestamps are not serializable, so we remove it.
-            // The AI flow doesn't need it anyway.
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { timestamp, ...rest } = data;
             return rest;
@@ -88,7 +87,7 @@ export default function InsightsPage() {
 
 
   if (authLoading) {
-    return <div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    return <LoadingScreen />;
   }
   if (!user) {
     return null;
@@ -118,7 +117,7 @@ export default function InsightsPage() {
                 <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Error</CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="font-body text-destructive-foreground">{error}</p>
+                <p className="font-body">{error}</p>
             </CardContent>
           </Card>
       )}
@@ -128,41 +127,35 @@ export default function InsightsPage() {
           {insights.length > 0 ? (
             <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
               {insights.map(insight => (
-                <Card key={insight.id} className="shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col">
-                  <CardHeader>
-                    <div className="flex justify-between items-start mb-2">
-                      <CardTitle className="font-headline text-lg">{insight.title}</CardTitle>
-                      <Lightbulb className="h-6 w-6 text-primary" />
+                <Card key={insight.id} className="shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                        <h3 className="font-headline font-semibold text-foreground pr-2">{insight.title}</h3>
+                        <Lightbulb className="h-5 w-5 text-primary shrink-0" />
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant={getPriorityBadgeVariant(insight.priority)} className="font-body">{insight.priority} Priority</Badge>
-                      <Badge variant="outline" className="font-body">{insight.category}</Badge>
+                    <p className="text-sm text-muted-foreground font-body flex-grow">{insight.description}</p>
+                    <div className="flex flex-wrap items-center gap-2 pt-2">
+                        <Badge variant={getPriorityBadgeVariant(insight.priority)}>{insight.priority}</Badge>
+                        <Badge variant="outline">{insight.category}</Badge>
+                         <div className="flex items-center text-xs text-muted-foreground font-body gap-1">
+                            {getImpactIcon(insight.estimatedImpact)}
+                            <span>{insight.estimatedImpact} Impact</span>
+                        </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-sm text-muted-foreground font-body mb-3">{insight.description}</p>
-                    <div className="flex items-center text-xs text-muted-foreground font-body">
-                      {getImpactIcon(insight.estimatedImpact)}
-                      <span className="ml-1">Estimated Impact: {insight.estimatedImpact}</span>
-                    </div>
-                  </CardContent>
-                  {insight.actionLink && insight.actionText && (
-                    <CardFooter>
-                      <Button asChild variant="outline" size="sm" className="w-full font-body">
+                    {insight.actionLink && insight.actionText && (
+                        <Button asChild variant="ghost" size="sm" className="w-full justify-start p-0 h-auto text-primary hover:text-primary/90">
                         <Link href={insight.actionLink}>
                             {insight.actionText} <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
-                      </Button>
-                    </CardFooter>
-                  )}
+                        </Button>
+                    )}
                 </Card>
               ))}
             </div>
           ) : (
-            <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
+             <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
               <CardContent className="p-10 text-center">
-                  <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-headline mb-2">No Insights Available</h3>
+                  <Lightbulb className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-headline mb-2">No Insights Yet</h3>
                   <p className="font-body text-muted-foreground">Use the tools to perform some activities, and we'll generate personalized insights for you here.</p>
               </CardContent>
             </Card>
@@ -172,3 +165,4 @@ export default function InsightsPage() {
     </div>
   );
 }
+
