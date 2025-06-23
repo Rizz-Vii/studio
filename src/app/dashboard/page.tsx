@@ -152,7 +152,7 @@ export default function DashboardPage() {
       return null;
   }
   return (
-   <div className="p-4 md:p-6 lg:p-8">
+   <div className="p-4 md:p-6 lg:p-8 space-y-6">
       <h1 className="text-2xl font-bold mb-4">
         Welcome, {dashboardProfile?.displayName || currentUser.email}!
       </h1>
@@ -237,21 +237,71 @@ export default function DashboardPage() {
             <CardTitle className="font-headline">Recent Activity Feed</CardTitle>
             <CardDescription className="font-body">Latest updates and alerts from your tools.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 flex-grow">
-             {recentActivities.length > 0 ? (
+          <CardContent className="space-y-1 flex-grow">
+            {recentActivities.length > 0 ? (
                 recentActivities.map((activity, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                        <Activity className="h-5 w-5 text-primary mt-1" />
-                        <div>
-                            <p className="text-sm font-medium font-body">{activity.tool}: {activity.type}</p>
-                             {activity.resultsSummary && <p className="text-xs text-muted-foreground font-body">Summary: {activity.resultsSummary}</p>}
-                            <p className="text-xs text-muted-foreground font-body">{activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
-                        </div>
-                    </div>
+                    <Dialog key={index}>
+                        <DialogTrigger asChild>
+                            <div className="flex items-start space-x-3 p-2 rounded-md hover:bg-muted cursor-pointer transition-colors">
+                                <Activity className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                                <div className="flex-grow overflow-hidden">
+                                    <p className="text-sm font-medium font-body capitalize">{activity.tool}: {activity.type.replace(/_/g, ' ')}</p>
+                                    <p className="text-xs text-muted-foreground font-body truncate" title={activity.resultsSummary}>
+                                        {activity.resultsSummary}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground font-body">{activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
+                                </div>
+                            </div>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle className="font-headline flex items-center gap-2">
+                                    <Activity className="h-6 w-6 text-primary" />
+                                    Activity Details
+                                </DialogTitle>
+                                <DialogDescription className="font-body pt-2">
+                                    Details for your recent activity from {activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A'}.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="font-body space-y-3 py-4">
+                                <p><strong>Tool:</strong> {activity.tool}</p>
+                                <p><strong>Action:</strong> <span className="capitalize">{activity.type.replace(/_/g, ' ')}</span></p>
+
+                                {activity.type === 'keyword_search' && activity.details && (
+                                    <div className="pt-2 border-t mt-2">
+                                        <h4 className="font-semibold mb-1">Details</h4>
+                                        <p><strong>Topic:</strong> {activity.details.topic}</p>
+                                        <p><strong>Included Long-Tail:</strong> {activity.details.includeLongTailKeywords ? 'Yes' : 'No'}</p>
+                                    </div>
+                                )}
+                                {activity.type === 'content_analysis' && activity.details && (
+                                    <div className="pt-2 border-t mt-2">
+                                        <h4 className="font-semibold mb-1">Details</h4>
+                                        <p><strong>Target Keywords:</strong> {activity.details.targetKeywords}</p>
+                                    </div>
+                                )}
+                                {activity.type === 'seo_audit' && activity.details && (
+                                    <div className="pt-2 border-t mt-2">
+                                        <h4 className="font-semibold mb-1">Details</h4>
+                                        <p><strong>Audited URL:</strong> <a href={activity.details.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{activity.details.url}</a></p>
+                                        <p><strong>Overall Score:</strong> {activity.details.overallScore}/100</p>
+                                        <p><strong>Critical Issues:</strong> {activity.details.criticalIssuesCount}</p>
+                                        <p><strong>Warnings:</strong> {activity.details.warningIssuesCount}</p>
+                                    </div>
+                                )}
+                                {activity.resultsSummary && (
+                                    <div className="pt-2 border-t mt-2">
+                                        <h4 className="font-semibold mb-1">Result Summary</h4>
+                                        <p>{activity.resultsSummary}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 ))
-             ) : (
-                <p className="text-sm text-muted-foreground font-body">No recent activity to display.</p>
-             )}
+            ) : (
+                <p className="text-sm text-muted-foreground font-body text-center pt-4">No recent activity to display.</p>
+            )}
           </CardContent>
           <CardFooter>
             <Button asChild variant="outline" className="w-full">
