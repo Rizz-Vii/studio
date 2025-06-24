@@ -4,7 +4,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, Pin, PinOff } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -28,14 +28,16 @@ const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContext = {
-  state: "expanded" | "collapsed"
+  state: "expanded" | "collapsed" | "pinned"
   open: boolean
   setOpen: (open: boolean) => void
+  pinned: boolean
+  setPinned: (pinned: boolean) => void
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
-  isUserMenuOpen: boolean
+  isUserMenuOpen: boolean,
   setUserMenuOpen: (open: boolean) => void
 }
 
@@ -52,17 +54,10 @@ function useSidebar() {
 
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> & {
-    defaultOpen?: boolean
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
-  }
+  React.ComponentProps<"div">
 >(
   (
     {
-      defaultOpen = true,
-      open: openProp,
-      onOpenChange: setOpenProp,
       className,
       style,
       children,
@@ -72,32 +67,45 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
-    const [open, setOpen] = React.useState(defaultOpen && !isMobile)
-    const [isUserMenuOpen, setUserMenuOpen] = React.useState(false)
+    const [open, setOpen] = React.useState(false);
+    const [pinned, setPinned] = React.useState(false);
+    const [isUserMenuOpen, setUserMenuOpen] = React.useState(false);
 
-    // Sync with controlled prop
+
+    // Get pinned state from cookie
     React.useEffect(() => {
-      if (openProp !== undefined) {
-        setOpen(openProp)
-      }
-    }, [openProp])
+        const cookie = document.cookie
+            .split(";")
+            .find((c) => c.trim().startsWith(`${SIDEBAR_COOKIE_NAME}=`));
+
+        if (cookie) {
+            const value = cookie.split("=")[1];
+            if (value === "pinned") {
+                setPinned(true);
+                setOpen(true);
+            }
+        }
+    }, []);
 
     // Sync with cookie
     React.useEffect(() => {
       // Don't save state on mobile
       if (!isMobile) {
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; max-age=${SIDEBAR_COOKIE_MAX_AGE}; path=/`
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${pinned ? 'pinned' : 'collapsed'}; max-age=${SIDEBAR_COOKIE_MAX_AGE}; path=/`
       }
-    }, [open, isMobile])
+    }, [pinned, isMobile]);
 
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
-      return isMobile
-        ? setOpenMobile((open) => !open)
-        : setOpen((open) => !open)
-    }, [isMobile, setOpen, setOpenMobile])
-
+        if (isMobile) {
+            setOpenMobile((v) => !v);
+        } else {
+            setPinned((v) => !v);
+            setOpen((v) => !v);
+        }
+    }, [isMobile]);
+    
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
@@ -114,24 +122,28 @@ const SidebarProvider = React.forwardRef<
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
-    const state = open ? "expanded" : "collapsed"
+    const state = open ? 'expanded' : 'collapsed';
 
     const contextValue = React.useMemo<SidebarContext>(
       () => ({
         state,
         open,
         setOpen,
+        pinned,
+        setPinned,
         isMobile,
         openMobile,
         setOpenMobile,
         toggleSidebar,
-        isUserMenuOpen,
-        setUserMenuOpen,
+        isUserMenuOpen, 
+        setUserMenuOpen
       }),
       [
         state,
         open,
         setOpen,
+        pinned,
+        setPinned,
         isMobile,
         openMobile,
         setOpenMobile,
@@ -139,6 +151,18 @@ const SidebarProvider = React.forwardRef<
         isUserMenuOpen,
       ]
     )
+
+    const handleMouseEnter = () => {
+        if (!pinned) {
+            setOpen(true);
+        }
+    };
+    
+    const handleMouseLeave = () => {
+        if (!pinned && !isUserMenuOpen) {
+            setOpen(false);
+        }
+    };
 
     return (
       <SidebarContext.Provider value={contextValue}>
@@ -151,10 +175,9 @@ const SidebarProvider = React.forwardRef<
                 ...style,
               } as React.CSSProperties
             }
-            className={cn(
-              "group/sidebar-wrapper", // Removed flex layout from here
-              className
-            )}
+            className={cn("group/sidebar-wrapper", className)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             ref={ref}
             {...props}
           >
@@ -166,6 +189,7 @@ const SidebarProvider = React.forwardRef<
   }
 )
 SidebarProvider.displayName = "SidebarProvider"
+
 
 const Sidebar = React.forwardRef<
   HTMLDivElement,
@@ -182,7 +206,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, setOpen, openMobile, setOpenMobile, isUserMenuOpen } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 
     if (isMobile) {
       return (
@@ -208,8 +232,8 @@ const Sidebar = React.forwardRef<
         <aside
             ref={ref}
             className={cn(
-                "group sticky top-0 z-40 h-screen flex-shrink-0 bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col",
-                state === 'expanded' ? "w-[var(--sidebar-width)]" : "w-[var(--sidebar-width-icon)]",
+                "group/sidebar fixed top-0 z-50 h-full flex-shrink-0 bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col",
+                state === 'expanded' ? "w-[var(--sidebar-width)] shadow-lg" : "w-[var(--sidebar-width-icon)]",
                 className
             )}
             data-state={state}
@@ -222,11 +246,35 @@ const Sidebar = React.forwardRef<
 )
 Sidebar.displayName = "Sidebar"
 
+const SidebarInset = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
+    ({ className, style, ...props }, ref) => {
+        const { state, isMobile } = useSidebar();
+        
+        if (isMobile) {
+            return <div ref={ref} className={className} style={style} {...props} />;
+        }
+        
+        return (
+            <div
+                ref={ref}
+                data-sidebar="inset"
+                className={cn("transition-[margin] duration-300 ease-in-out", className)}
+                style={{
+                    marginLeft: state === 'expanded' ? 'var(--sidebar-width)' : 'var(--sidebar-width-icon)',
+                    ...style,
+                }}
+                {...props}
+            />
+        );
+    }
+);
+SidebarInset.displayName = "SidebarInset";
+
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, pinned } = useSidebar()
 
   return (
     <Button
@@ -241,7 +289,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeft />
+      {pinned ? <PinOff/> : <Pin />}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
@@ -704,4 +752,5 @@ export {
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
+  SidebarInset,
 }

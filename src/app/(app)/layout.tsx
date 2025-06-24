@@ -1,3 +1,4 @@
+
 // src/app/(app)/layout.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
@@ -14,6 +15,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   SidebarTrigger,
+  SidebarInset,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
@@ -38,9 +40,8 @@ import LoadingScreen from '@/components/ui/loading-screen';
 const UserNav = () => {
   const { user, profile } = useAuth();
   const router = useRouter();
-  const { open, setOpen, isMobile, setUserMenuOpen } = useSidebar();
-  const [openedByMe, setOpenedByMe] = React.useState(false);
-
+  const { setOpen, isUserMenuOpen, setUserMenuOpen } = useSidebar();
+  
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -49,7 +50,16 @@ const UserNav = () => {
       console.error("Error logging out:", error.message);
     }
   };
-  
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setUserMenuOpen(isOpen);
+    if (!isOpen && isUserMenuOpen) {
+      // Allow sidebar to auto-close if it was forced open
+    } else if (isOpen) {
+      setOpen(true); // Force sidebar open
+    }
+  };
+
   if (!user) {
     return (
         <div className="flex flex-col gap-2 w-full">
@@ -68,25 +78,6 @@ const UserNav = () => {
         </div>
     );
   }
-
-
-  const handleOpenChange = (isOpen: boolean) => {
-    setUserMenuOpen(isOpen);
-    if (isMobile) {
-        return;
-    }
-    if (isOpen) {
-      if (!open) {
-        setOpenedByMe(true);
-        setOpen(true);
-      }
-    } else {
-      if (openedByMe) {
-        setOpenedByMe(false);
-        setOpen(false);
-      }
-    }
-  };
 
   const userInitial = user ? (profile?.displayName || user.email || 'U').charAt(0).toUpperCase() : '';
 
@@ -171,7 +162,12 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false)
 
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+  
   useEffect(() => {
     if (isNavigating) {
       setIsNavigating(false);
@@ -179,9 +175,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, [pathname, isNavigating]);
   
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full">
-          <Sidebar>
+    <SidebarProvider>
+        <Sidebar>
             <SidebarHeader className="p-4">
               <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
                 <AppLogo className="h-8 w-8 text-primary shrink-0" />
@@ -196,21 +191,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarFooter className="p-2">
                 <UserNav />
             </SidebarFooter>
-          </Sidebar>
-          <div className="flex-1 flex flex-col">
-            <main className="relative flex-1 overflow-y-auto">
-              <div className="sticky top-0 p-2 z-10">
-                <SidebarTrigger />
-              </div>
-              <div className="p-4 md:p-6 lg:p-8">
-                <AnimatePresence>
-                  {isNavigating && <LoadingScreen />}
-                </AnimatePresence>
-                {children}
-              </div>
+        </Sidebar>
+        <SidebarInset>
+            <main className="relative flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto h-screen">
+              <AnimatePresence>
+                {isNavigating && <LoadingScreen />}
+              </AnimatePresence>
+              {children}
             </main>
-          </div>
-      </div>
+        </SidebarInset>
     </SidebarProvider>
   );
 }
