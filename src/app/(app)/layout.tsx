@@ -3,8 +3,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   SidebarProvider,
   Sidebar,
@@ -151,12 +150,15 @@ interface AppNavProps {
 
 const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
     const pathname = usePathname();
+    const router = useRouter();
     const { open, isMobile } = useSidebar();
     const { user, role } = useAuth();
 
-    const handleNavigation = (href: string) => {
+    const handleNavigation = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        event.preventDefault();
         if (pathname !== href) {
             setIsNavigating(true);
+            router.push(href);
         }
     };
     
@@ -176,7 +178,7 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
                   className="font-body"
                   asChild
                 >
-              <Link href={item.href} onClick={() => handleNavigation(item.href)}>
+              <Link href={item.href} onClick={(e) => handleNavigation(e, item.href)}>
                     <item.icon />
                     {showText && (
                        <span className="whitespace-nowrap">
@@ -200,7 +202,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (isNavigating) {
       setIsNavigating(false);
     }
-  }, [pathname]);
+  }, [pathname, isNavigating]);
 
   if (loading || !user) {
     return <LoadingScreen />;
