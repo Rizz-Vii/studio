@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Lightbulb, AlertTriangle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function InsightsPage() {
     const { user } = useAuth();
@@ -31,7 +32,19 @@ export default function InsightsPage() {
                 const activitiesRef = collection(db, "users", user.uid, "activities");
                 const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(10));
                 const querySnapshot = await getDocs(q);
-                const activities = querySnapshot.docs.map(doc => doc.data());
+
+                // Convert Firestore Timestamps and other complex objects to plain objects
+                // before passing to the server function.
+                const activities = querySnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    // We only need the fields defined in the ActivitySchema for the AI flow.
+                    return {
+                        type: data.type,
+                        tool: data.tool,
+                        details: data.details,
+                        resultsSummary: data.resultsSummary,
+                    };
+                });
 
                 if (activities.length === 0) {
                     setInsights([]);
