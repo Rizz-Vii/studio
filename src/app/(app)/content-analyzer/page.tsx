@@ -31,6 +31,9 @@ export default function ContentAnalyzerPage() {
             details: {
                 targetKeywords: values.targetKeywords,
                 overallScore: result.overallScore,
+                readabilityScore: result.readabilityScore,
+                keywordScore: result.keywordScore,
+                semanticScore: result.semanticScore,
             },
             resultsSummary: `Analyzed content for keywords: "${values.targetKeywords}". Overall Score: ${result.overallScore}/100.`
         });

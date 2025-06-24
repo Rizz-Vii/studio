@@ -70,6 +70,12 @@ const chartConfig = {
 
 // ----- HELPER & SUMMARY COMPONENTS -----
 
+const getProgressColor = (score: number) => {
+    if (score > 85) return "bg-success";
+    if (score > 60) return "bg-warning";
+    return "bg-destructive";
+};
+
 const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
     const auditData = activities
         .map(a => ({
@@ -115,13 +121,23 @@ const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
 };
 
 const ContentAnalyzerSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const scores = activities
-        .map(a => a.details?.overallScore)
-        .filter(score => typeof score === 'number');
+    const scores = activities.map(a => a.details).filter(Boolean);
 
-    if (scores.length === 0) return <p className="text-sm text-muted-foreground font-body">No recent content analyses.</p>;
+    if (scores.length === 0) {
+        return <p className="text-sm text-muted-foreground font-body">No recent content analyses.</p>;
+    }
+    
+    const calculateAverage = (key: string) => {
+        const relevantScores = scores.map(s => s[key]).filter(v => typeof v === 'number');
+        if (relevantScores.length === 0) return 0;
+        return Math.round(relevantScores.reduce((a, b) => a + b, 0) / relevantScores.length);
+    }
+    
+    const avgOverall = calculateAverage('overallScore');
+    const avgReadability = calculateAverage('readabilityScore');
+    const avgKeywords = calculateAverage('keywordScore');
+    const avgSemantics = calculateAverage('semanticScore');
 
-    const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     return (
          <div className="space-y-4">
             <div className="flex justify-around text-center border-b pb-3">
@@ -130,15 +146,33 @@ const ContentAnalyzerSummary: React.FC<{ activities: UserActivity[] }> = ({ acti
                     <p className="text-xs text-muted-foreground font-body">Analyses</p>
                 </div>
                 <div>
-                    <p className="text-2xl font-bold font-headline">{avgScore}</p>
+                    <p className="text-2xl font-bold font-headline">{avgOverall}</p>
                     <p className="text-xs text-muted-foreground font-body">Avg Score</p>
                 </div>
             </div>
-            <div className="flex items-center gap-4 pt-2">
-                <div className="flex-grow space-y-1">
-                    <Progress value={avgScore} indicatorClassName={avgScore > 80 ? "bg-green-500" : avgScore > 60 ? "bg-yellow-500" : "bg-red-500"} />
+            
+            <div className="space-y-3 pt-2">
+                <div>
+                    <div className="flex justify-between text-xs mb-1">
+                        <span className="font-semibold font-body text-muted-foreground">Readability</span>
+                        <span className="font-body">{avgReadability > 0 ? `${avgReadability}/100` : 'N/A'}</span>
+                    </div>
+                    <Progress value={avgReadability} indicatorClassName={getProgressColor(avgReadability)} />
                 </div>
-                <span className="font-bold text-lg text-primary flex-shrink-0">{avgScore}/100</span>
+                <div>
+                     <div className="flex justify-between text-xs mb-1">
+                        <span className="font-semibold font-body text-muted-foreground">Keywords</span>
+                        <span className="font-body">{avgKeywords > 0 ? `${avgKeywords}/100` : 'N/A'}</span>
+                    </div>
+                    <Progress value={avgKeywords} indicatorClassName={getProgressColor(avgKeywords)} />
+                </div>
+                <div>
+                    <div className="flex justify-between text-xs mb-1">
+                        <span className="font-semibold font-body text-muted-foreground">Semantics</span>
+                        <span className="font-body">{avgSemantics > 0 ? `${avgSemantics}/100` : 'N/A'}</span>
+                    </div>
+                    <Progress value={avgSemantics} indicatorClassName={getProgressColor(avgSemantics)} />
+                </div>
             </div>
         </div>
     );
