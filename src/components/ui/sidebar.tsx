@@ -211,7 +211,7 @@ const Sidebar = React.forwardRef<
       <aside
         ref={ref}
         className={cn(
-            "group md:block text-sidebar-foreground transition-all duration-300 ease-in-out flex-shrink-0 z-40",
+            "group md:block text-sidebar-foreground transition-all duration-300 ease-in-out flex-shrink-0 z-50",
             state === 'expanded' ? "w-[var(--sidebar-width)]" : "w-[var(--sidebar-width-icon)]",
             className
         )}
