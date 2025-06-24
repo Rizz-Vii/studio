@@ -365,28 +365,32 @@ SidebarContent.displayName = "SidebarContent"
 
 const SidebarMenu = React.forwardRef<
   HTMLUListElement,
-  React.ComponentProps<"ul">
->(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    data-sidebar="menu"
-    className={cn("flex w-full min-w-0 flex-col gap-1", className)}
-    {...props}
-  />
-))
+  React.ComponentProps<"ul"> & { asChild?: boolean }
+>(({ className, asChild = false, ...props }, ref) => {
+  const Comp = asChild ? Slot : "ul"
+  return (
+    <Comp
+      ref={ref}
+      data-sidebar="menu"
+      className={cn("flex w-full min-w-0 flex-col gap-1", className)}
+      {...props}
+    />
+  )
+})
 SidebarMenu.displayName = "SidebarMenu"
 
-const SidebarMenuItem = React.forwardRef<
+
+const SidebarMenuItem = motion(React.forwardRef<
   HTMLLIElement,
-  React.ComponentProps<typeof motion.li>
+  React.ComponentProps<"li">
 >(({ className, ...props }, ref) => (
-  <motion.li
+  <li
     ref={ref}
     data-sidebar="menu-item"
     className={cn("group/menu-item relative", className)}
     {...props}
   />
-))
+)));
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(

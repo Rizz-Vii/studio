@@ -174,28 +174,30 @@ const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
     const showText = open || isMobile;
 
     return (
-        <SidebarMenu as={motion.ul} variants={navVariants} initial={false} animate={showText ? "open" : "closed"}>
-          {navItems
-            .filter(item => !item.adminOnly || (user && role === 'admin'))
-            .map((item: NavItem) => (
-            <SidebarMenuItem key={item.href} variants={menuItemVariants}>
-                <SidebarMenuButton
-                    isActive={pathname === item.href}
-                    tooltip={{ children: item.title, className:"font-body" }}
-                    className="font-body"
-                    asChild
-                    >
-                <Link href={item.href} onClick={(e) => handleNavigation(e, item.href)}>
-                        <item.icon />
-                        {showText && (
-                        <span className="whitespace-nowrap">
-                                {item.title}
-                            </span>
-                        )}
-                    </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-          ))}
+        <SidebarMenu asChild>
+            <motion.ul variants={navVariants} initial="closed" animate={showText ? "open" : "closed"}>
+            {navItems
+                .filter(item => !item.adminOnly || (user && role === 'admin'))
+                .map((item: NavItem) => (
+                <SidebarMenuItem key={item.href} variants={menuItemVariants}>
+                    <SidebarMenuButton
+                        isActive={pathname === item.href}
+                        tooltip={{ children: item.title, className:"font-body" }}
+                        className="font-body"
+                        asChild
+                        >
+                    <Link href={item.href} onClick={(e) => handleNavigation(e, item.href)}>
+                            <item.icon />
+                            {showText && (
+                            <span className="whitespace-nowrap">
+                                    {item.title}
+                                </span>
+                            )}
+                        </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+            ))}
+            </motion.ul>
         </SidebarMenu>
     );
 };
