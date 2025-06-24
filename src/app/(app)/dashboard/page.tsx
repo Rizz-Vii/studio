@@ -1,505 +1,193 @@
 // src/app/(app)/dashboard/page.tsx
 'use client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  KeyRound,
-  ScanText,
-  Users,
-  ListChecks,
+  TrendingUp,
   Activity,
-  BookText,
+  KeyRound,
+  ShieldCheck,
   Link as LinkIcon,
-  ChevronLeft, 
-  ChevronRight,
-  Rocket,
-  Lightbulb,
-  ArrowRight,
-  Loader2
+  Users
 } from "lucide-react";
-import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import LoadingScreen from '@/components/ui/loading-screen';
-import { format, formatDistanceToNow } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from "@/components/ui/button";
-import { dummyContentBriefs, ContentBrief } from '@/lib/dummy-data';
-import type { GenerateInsightsOutput } from '@/ai/flows/generate-insights';
-import { generateInsights } from '@/ai/flows/generate-insights';
-import Link from 'next/link';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, RadialBarChart, RadialBar, Legend, PolarGrid, PolarAngleAxis } from "recharts";
+import { motion } from 'framer-motion';
+import { dummyDashboardData } from '@/lib/dummy-data';
 
-// ----- TYPES AND CONFIGS -----
+// ----- CHART CONFIGS -----
 
-interface UserActivity {
-  id: string;
-  type: string;
-  tool: string;
-  timestamp: any; // Firestore Timestamp
-  details?: any;
-  resultsSummary?: string;
-}
-
-type GroupedActivities = Record<string, UserActivity[]>;
-
-const toolConfig: Record<string, { icon: React.ElementType; color: string; href: string; }> = {
-  "SEO Audit": { icon: ListChecks, color: "text-blue-500", href: "/seo-audit"},
-  "Keyword Tool": { icon: KeyRound, color: "text-green-500", href: "/keyword-tool" },
-  "Content Analyzer": { icon: ScanText, color: "text-purple-500", href: "/content-analyzer" },
-  "Competitor Analysis": { icon: Users, color: "text-orange-500", href: "/competitors" },
-  "Content Brief": { icon: BookText, color: "text-indigo-500", href: "/content-brief" },
-  "Link View": { icon: LinkIcon, color: "text-teal-500", href: "/link-view" },
-  "Default": { icon: Activity, color: "text-gray-500", href: "/dashboard" },
-};
-
-const chartConfig = {
+const lineChartConfig = {
   score: { label: "Score", color: "hsl(var(--chart-1))" },
-  analyses: { label: "Analyses", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig;
 
+const barChartConfig = {
+  new: { label: "New", color: "hsl(var(--chart-1))" },
+  lost: { label: "Lost", color: "hsl(var(--chart-2))" },
+} satisfies ChartConfig
 
-// ----- HELPER & SUMMARY COMPONENTS -----
+const pieChartConfig = {
+    sources: { label: "Traffic Sources" },
+    'Organic Search': { label: 'Organic', color: "hsl(var(--chart-1))" },
+    'Direct': { label: 'Direct', color: "hsl(var(--chart-2))" },
+    'Referral': { label: 'Referral', color: "hsl(var(--chart-3))" },
+    'Social': { label: 'Social', color: "hsl(var(--chart-4))" },
+} satisfies ChartConfig
 
-const getProgressColor = (score: number) => {
-    if (score > 85) return "bg-success";
-    if (score > 60) return "bg-warning";
-    return "bg-destructive";
-};
+// ----- REUSABLE COMPONENTS -----
 
-const SeoAuditSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const auditData = activities
-        .map(a => ({
-            score: a.details?.overallScore,
-            date: a.timestamp.toDate(),
-        }))
-        .filter(a => typeof a.score === 'number')
-        .reverse();
+const DashboardMetricCard: React.FC<{ title: string, value: string, change?: number, icon: React.ElementType }> = ({ title, value, change, icon: Icon }) => (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium font-body">{title}</CardTitle>
+        <Icon className="h-4 w-4 text-muted-foreground" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold font-headline">{value}</div>
+        {change !== undefined && (
+          <p className={`text-xs ${change >= 0 ? 'text-success' : 'text-destructive'}`}>
+            {change >= 0 ? `+${change}` : change} from last month
+          </p>
+        )}
+      </CardContent>
+    </Card>
+);
 
-    if (auditData.length === 0) return <p className="text-sm text-muted-foreground font-body">No recent SEO audits.</p>;
+const SeoScoreTrendChart = () => (
+    <Card>
+        <CardHeader>
+            <CardTitle className="font-headline">Overall SEO Score</CardTitle>
+            <CardDescription>Your site's SEO score trend over the last 6 weeks.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <ChartContainer config={lineChartConfig} className="h-[200px] w-full">
+                <LineChart data={dummyDashboardData.seoScoreTrend} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="date" tickFormatter={(val) => new Date(val).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tickLine={false} axisLine={false} />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                    <Line type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={2} dot={true} />
+                </LineChart>
+            </ChartContainer>
+        </CardContent>
+    </Card>
+);
 
-    const avgScore = Math.round(auditData.reduce((sum, a) => sum + a.score, 0) / auditData.length);
-  
+const KeywordVisibilityChart = () => {
+    const data = [{ name: 'Visibility', value: dummyDashboardData.keywordVisibility.score, fill: 'hsl(var(--chart-1))' }];
     return (
-        <div className="space-y-4">
-            <div className="flex justify-around text-center border-b pb-3">
-                <div>
-                    <p className="text-2xl font-bold font-headline">{activities.length}</p>
-                    <p className="text-xs text-muted-foreground font-body">Audits</p>
-                </div>
-                <div>
-                    <p className="text-2xl font-bold font-headline">{avgScore}</p>
-                    <p className="text-xs text-muted-foreground font-body">Avg Score</p>
-                </div>
-            </div>
-            {auditData.length > 1 && (
-                <div style={{ aspectRatio: '16 / 9' }}>
-                    <ChartContainer config={chartConfig}>
-                        <ResponsiveContainer>
-                            <LineChart data={auditData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
-                                <XAxis dataKey="date" tickFormatter={(time) => format(time, 'MMM d')} className="text-xs font-body"/>
-                                <YAxis domain={[0, 100]} className="text-xs" />
-                                <ChartTooltip content={<ChartTooltipContent indicator="line" labelFormatter={(label) => format(new Date(label), 'PPp')} formatter={(value) => `${value}/100`} />} />
-                                <Line type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={2} dot={false} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </ChartContainer>
-                </div>
-            )}
-        </div>
-    );
-};
-
-const ContentAnalyzerSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const scores = activities.map(a => a.details).filter(Boolean);
-
-    if (scores.length === 0) {
-        return <p className="text-sm text-muted-foreground font-body">No recent content analyses.</p>;
-    }
-    
-    const calculateAverage = (key: string) => {
-        const relevantScores = scores.map(s => s[key]).filter(v => typeof v === 'number');
-        if (relevantScores.length === 0) return 0;
-        return Math.round(relevantScores.reduce((a, b) => a + b, 0) / relevantScores.length);
-    }
-    
-    const avgOverall = calculateAverage('overallScore');
-    const avgReadability = calculateAverage('readabilityScore');
-    const avgKeywords = calculateAverage('keywordScore');
-    const avgSemantics = calculateAverage('semanticScore');
-
-    return (
-         <div className="space-y-4">
-            <div className="flex justify-around text-center border-b pb-3">
-                <div>
-                    <p className="text-2xl font-bold font-headline">{activities.length}</p>
-                    <p className="text-xs text-muted-foreground font-body">Analyses</p>
-                </div>
-                <div>
-                    <p className="text-2xl font-bold font-headline">{avgOverall}</p>
-                    <p className="text-xs text-muted-foreground font-body">Avg Score</p>
-                </div>
-            </div>
-            
-            <motion.div 
-                className="space-y-3 pt-2"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                    visible: { transition: { staggerChildren: 0.1 } },
-                    hidden: {},
-                }}
-            >
-                <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
-                    <div className="flex justify-between text-xs mb-1">
-                        <span className="font-semibold font-body text-muted-foreground">Readability</span>
-                        <span className="font-body">{avgReadability > 0 ? `${avgReadability}/100` : 'N/A'}</span>
-                    </div>
-                    <Progress value={avgReadability} indicatorClassName={getProgressColor(avgReadability)} />
-                </motion.div>
-                <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
-                     <div className="flex justify-between text-xs mb-1">
-                        <span className="font-semibold font-body text-muted-foreground">Keywords</span>
-                        <span className="font-body">{avgKeywords > 0 ? `${avgKeywords}/100` : 'N/A'}</span>
-                    </div>
-                    <Progress value={avgKeywords} indicatorClassName={getProgressColor(avgKeywords)} />
-                </motion.div>
-                <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
-                    <div className="flex justify-between text-xs mb-1">
-                        <span className="font-semibold font-body text-muted-foreground">Semantics</span>
-                        <span className="font-body">{avgSemantics > 0 ? `${avgSemantics}/100` : 'N/A'}</span>
-                    </div>
-                    <Progress value={avgSemantics} indicatorClassName={getProgressColor(avgSemantics)} />
-                </motion.div>
-            </motion.div>
-        </div>
-    );
-};
-
-const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const topics = activities
-        .map(a => a.details?.topic)
-        .filter(Boolean);
-
-    if (topics.length === 0) return <p className="text-sm text-muted-foreground font-body">No recent keyword research.</p>;
-    
-    const topicCounts = topics.reduce((acc, topic) => {
-        acc[topic] = (acc[topic] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
-
-    const topTopics = Object.entries(topicCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5);
-
-    return (
-        <div>
-            <h4 className="font-semibold text-sm mb-2 font-body">Top Searched Topics:</h4>
-            <div className="flex flex-wrap gap-2">
-                {topTopics.map(([topic, count]) => (
-                    <Badge key={topic} variant="secondary" className="transition-transform hover:scale-105 font-body">{topic} ({count})</Badge>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const competitors = activities
-        .flatMap(a => a.details?.competitorUrls || a.details?.competitors || [])
-        .filter(Boolean)
-        .map(url => {
-            try {
-                return new URL(url).hostname;
-            } catch (e) {
-                return url.length > 30 ? url.substring(0, 27) + '...' : url;
-            }
-        });
-
-    if (competitors.length === 0) {
-        return (
-            <div>
-                <p className="text-sm text-muted-foreground font-body">No recent competitor analyses.</p>
-            </div>
-        );
-    }
-    
-    const competitorCounts = competitors.reduce((acc, competitor) => {
-        if(competitor) {
-            acc[competitor] = (acc[competitor] || 0) + 1;
-        }
-        return acc;
-    }, {} as Record<string, number>);
-
-    const topCompetitors = Object.entries(competitorCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5);
-
-    return (
-        <div>
-            <h4 className="font-semibold text-sm mb-2 font-body">Most Analyzed Competitors:</h4>
-            <div className="flex flex-wrap gap-2">
-                {topCompetitors.map(([competitor, count]) => (
-                    <Badge key={competitor} variant="secondary" className="transition-transform hover:scale-105 font-body">{competitor} ({count})</Badge>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => {
-    const profileKeywords = profile?.primaryKeywords?.split(',').map((k: string) => k.trim().toLowerCase()) || [];
-    
-    const prioritizedBriefs = [
-      ...dummyContentBriefs.filter(brief => profileKeywords.includes(brief.primaryKeyword.toLowerCase())),
-      ...dummyContentBriefs.filter(brief => !profileKeywords.includes(brief.primaryKeyword.toLowerCase()))
-    ];
-    
-    const uniqueBriefs = Array.from(new Map(prioritizedBriefs.map(item => [item.id, item])).values());
-
-    const [[index, direction], setPage] = useState([0, 0]);
-
-    const wrappedIndex = (idx: number) => {
-        return (idx % uniqueBriefs.length + uniqueBriefs.length) % uniqueBriefs.length;
-    };
-
-    const slide = useCallback((newDirection: number) => {
-        setPage(([prevIndex, prevDirection]) => [prevIndex + newDirection, newDirection]);
-    }, []);
-
-
-    useEffect(() => {
-        if (uniqueBriefs.length <= 4) return;
-
-        const interval = setInterval(() => {
-            slide(1); // Auto-slide next
-        }, 5000); // Rotate every 5 seconds
-        return () => clearInterval(interval);
-    }, [uniqueBriefs.length, slide]);
-
-    if (uniqueBriefs.length === 0) {
-        return <p className="text-sm text-muted-foreground font-body">Generate a content brief to see suggestions here.</p>;
-    }
-    
-    const getVisibleBriefs = () => {
-        const total = uniqueBriefs.length;
-        if (total <= 4) return uniqueBriefs;
-        
-        const items: ContentBrief[] = [];
-        for (let i = 0; i < 4; i++) {
-            items.push(uniqueBriefs[wrappedIndex(index + i)]);
-        }
-        return items;
-    }
-
-    const sliderVariants = {
-        enter: (direction: number) => ({
-            x: direction > 0 ? '100%' : '-100%',
-            opacity: 0,
-            scale: 1,
-        }),
-        center: {
-            zIndex: 1,
-            x: 0,
-            opacity: 1,
-            scale: 1,
-        },
-        exit: (direction: number) => ({
-            zIndex: 0,
-            x: direction < 0 ? '100%' : '-100%',
-            opacity: 0,
-            scale: 1,
-        }),
-    };
-
-    return (
-        <div>
-            <h4 className="font-semibold text-sm mb-2 font-body">Relevant Briefs For You:</h4>
-            <div className="relative h-[250px] overflow-hidden">
-                 {uniqueBriefs.length > 4 && (
-                    <Button variant="ghost" size="icon" className="absolute left-0 top-1/2 -translate-y-1/2 z-10" onClick={() => slide(-1)}>
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                 )}
-                <AnimatePresence initial={false} custom={direction}>
-                    <motion.div
-                        key={index}
-                        className="absolute inset-0 flex items-center justify-center space-x-2"
-                        custom={direction}
-                        variants={sliderVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{
-                            x: { type: "spring", stiffness: 240, damping: 30 },
-                            opacity: { duration: 0.2 }
-                        }}
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline">Keyword Visibility</CardTitle>
+                <CardDescription>Your share of clicks for tracked keywords.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center">
+                 <ChartContainer config={lineChartConfig} className="h-[200px] w-full">
+                    <RadialBarChart 
+                        data={data} 
+                        startAngle={-270}
+                        endAngle={90}
+                        innerRadius="70%" 
+                        outerRadius="110%"
+                        barSize={30}
                     >
-                    {getVisibleBriefs().map((brief) => (
-                        <Link href="/content-brief" key={brief.id} className="block hover:no-underline">
-                            <Card className="h-full w-[160px] flex flex-col bg-muted/50 overflow-hidden cursor-pointer">
-                                <CardHeader className="p-3 pb-2">
-                                    <CardTitle className="text-sm font-bold font-headline truncate" title={brief.title}>{brief.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-3 pt-0 flex-grow space-y-2 text-left">
-                                    <Badge variant="secondary" className="font-body">{brief.primaryKeyword}</Badge>
-                                    <div className="text-xs">
-                                        <span className="font-semibold font-body">Intent:</span> <span className="font-body">{brief.searchIntent}</span>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="p-3 pt-0">
-                                    <div className="w-full">
-                                        <span className="text-xs text-muted-foreground font-body">SEO Score: {brief.seoScore}</span>
-                                        <Progress value={parseInt(brief.seoScore.split('/')[0])} className="h-2 mt-1" indicatorClassName={parseInt(brief.seoScore.split('/')[0]) > 80 ? "bg-green-500" : parseInt(brief.seoScore.split('/')[0]) > 60 ? "bg-yellow-500" : "bg-red-500"} />
-                                    </div>
-                                </CardFooter>
-                            </Card>
-                        </Link>
-                    ))}
-                    </motion.div>
-                </AnimatePresence>
-                 {uniqueBriefs.length > 4 && (
-                    <Button variant="ghost" size="icon" className="absolute right-0 top-1/2 -translate-y-1/2 z-10" onClick={() => slide(1)}>
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
-                )}
-            </div>
-        </div>
+                        <PolarGrid gridType="circle" radialLines={false} stroke="none" />
+                        <RadialBar background dataKey="value" cornerRadius={10} />
+                        <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+                         <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-4xl font-headline fill-foreground">
+                            {`${dummyDashboardData.keywordVisibility.score}%`}
+                        </text>
+                    </RadialBarChart>
+                 </ChartContainer>
+            </CardContent>
+        </Card>
     );
 };
 
-const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
-    const domains = activities
-        .map(a => a.details?.url)
-        .filter(Boolean)
-        .map(url => {
-            try {
-                return new URL(url).hostname;
-            } catch (e) {
-                return null;
-            }
-        })
-        .filter(Boolean);
+const DomainAuthorityChart = () => (
+    <Card>
+        <CardHeader>
+            <CardTitle className="font-headline">Domain Authority</CardTitle>
+            <CardDescription>Your domain's authority score over the last 6 months.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <ChartContainer config={lineChartConfig} className="h-[200px] w-full">
+                <LineChart data={dummyDashboardData.domainAuthority.history} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="date" tickFormatter={(val) => new Date(val).toLocaleDateString('en-US', { month: 'short' })} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} tickLine={false} axisLine={false} />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                    <Line type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={2} dot={true} />
+                </LineChart>
+            </ChartContainer>
+        </CardContent>
+    </Card>
+);
 
-    if (domains.length === 0) return <p className="text-sm text-muted-foreground font-body">No recent link analyses.</p>;
-    
-    const domainCounts = domains.reduce((acc, domain) => {
-        if(domain) {
-            acc[domain] = (acc[domain] || 0) + 1;
-        }
-        return acc;
-    }, {} as Record<string, number>);
+const BacklinksChart = () => (
+    <Card>
+        <CardHeader>
+            <CardTitle className="font-headline">Backlink Growth</CardTitle>
+            <CardDescription>New vs. Lost backlinks over the last 6 months.</CardDescription>
+        </CardHeader>
+        <CardContent>
+             <ChartContainer config={barChartConfig} className="h-[200px] w-full">
+                <BarChart data={dummyDashboardData.backlinks.history} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                    <YAxis tickLine={false} axisLine={false} />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                    <Bar dataKey="new" fill="var(--color-new)" radius={4} />
+                    <Bar dataKey="lost" fill="var(--color-lost)" radius={4} />
+                </BarChart>
+            </ChartContainer>
+        </CardContent>
+    </Card>
+);
 
-    const topDomains = Object.entries(domainCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5);
-
-    return (
-        <div>
-            <h4 className="font-semibold text-sm mb-2 font-body">Most Analyzed Domains:</h4>
-            <div className="flex flex-wrap gap-2">
-                {topDomains.map(([domain, count]) => (
-                    <Badge key={domain} variant="secondary" className="transition-transform hover:scale-105 font-body">{domain} ({count})</Badge>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-const ActionableInsights: React.FC<{ user: any; activities: UserActivity[]; }> = ({ user, activities }) => {
-    const [insights, setInsights] = useState<GenerateInsightsOutput['insights']>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchInsights = async () => {
-            if (!user) {
-                setLoading(false);
-                return;
-            };
-
-            const simplifiedActivities = activities.map(activity => ({
-                type: activity.type,
-                tool: activity.tool,
-                details: activity.details,
-                resultsSummary: activity.resultsSummary,
-            }));
-            
-            if (simplifiedActivities.length > 0) {
-                try {
-                    const result = await generateInsights({ activities: simplifiedActivities });
-                    setInsights(result.insights);
-                } catch (error) {
-                    console.error("Failed to generate insights:", error);
-                }
-            }
-            setLoading(false);
-        };
-        fetchInsights();
-    }, [user, activities]);
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-        );
-    }
-    
-    if (insights.length === 0) {
-        return (
-            <div className="text-center py-8">
-                <Lightbulb className="h-10 w-10 mx-auto text-muted-foreground mb-2"/>
-                <p className="font-body text-muted-foreground">No new insights. Use the tools to get started!</p>
-            </div>
-        );
-    }
-
-    return (
-        <ul className="space-y-3">
-            {insights.slice(0, 4).map(insight => (
-                <li key={insight.id}>
-                     <Link href={insight.actionLink || '/insights'} className="block p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center justify-between">
-                            <p className="font-semibold font-body">{insight.title}</p>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+const TrafficSourcesChart = () => (
+    <Card>
+        <CardHeader>
+            <CardTitle className="font-headline">Traffic Sources</CardTitle>
+            <CardDescription>Breakdown of your website traffic sources.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center">
+            <ChartContainer config={pieChartConfig} className="h-[200px] w-full">
+                <PieChart>
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                    <Pie
+                        data={dummyDashboardData.trafficSources}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={50}
+                        strokeWidth={5}
+                    >
+                         {dummyDashboardData.trafficSources.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                    </Pie>
+                    <Legend content={({ payload }) => (
+                         <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4">
+                            {payload?.map((entry, index) => (
+                                <div key={`item-${index}`} className="flex items-center gap-1.5 text-xs">
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                                    <span>{entry.value}</span>
+                                </div>
+                            ))}
                         </div>
-                        <p className="text-sm text-muted-foreground font-body">{insight.description}</p>
-                        <div className="mt-2">
-                             <Badge variant={insight.priority === 'High' ? 'destructive' : insight.priority === 'Medium' ? 'warning' : 'success'} className="text-xs">{insight.priority}</Badge>
-                        </div>
-                    </Link>
-                </li>
-            ))}
-        </ul>
-    );
-};
-
-const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[]; profile?: any }>> = {
-    'SEO Audit': SeoAuditSummary,
-    'Content Analyzer': ContentAnalyzerSummary,
-    'Keyword Tool': KeywordToolSummary,
-    'Competitor Analysis': CompetitorAnalysisSummary,
-    'Content Brief': ContentBriefSummary,
-    'Link View': LinkViewSummary,
-};
+                    )} />
+                </PieChart>
+            </ChartContainer>
+        </CardContent>
+    </Card>
+);
 
 
 // ----- MAIN COMPONENT -----
 
 export default function DashboardPage() {
-  const { user: currentUser, profile, activities, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   
   const containerVariants = {
     hidden: { opacity: 1 },
@@ -527,157 +215,62 @@ export default function DashboardPage() {
       return <LoadingScreen fullScreen text="Loading dashboard data..." />
   }
 
-  const groupedActivities = activities.reduce((acc, activity) => {
-    const tool = activity.tool || "Other";
-    if (!acc[tool]) {
-        acc[tool] = [];
-    }
-    acc[tool].push(activity);
-    return acc;
-  }, {} as GroupedActivities);
-
-  const toolSummaries = Object.entries(groupedActivities).map(([tool, activities]) => {
-    const ToolSummary = toolSummaryComponents[tool as keyof typeof toolSummaryComponents];
-    const config = toolConfig[tool] || toolConfig["Default"];
-    const Icon = config.icon;
-
-    if (!ToolSummary) return null;
-
-    return (
-        <motion.div key={tool} variants={itemVariants}>
-            <Card className="flex flex-col h-full">
-                <CardHeader>
-                    <div className="flex justify-between items-start">
-                        <CardTitle className="font-headline flex items-center gap-2">
-                            <Icon className={`h-6 w-6 ${config.color}`} />
-                            <Link href={config.href} className="hover:underline">{tool}</Link>
-                        </CardTitle>
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                 <Badge variant="outline" className="text-xs font-body cursor-pointer">{activities.length} {activities.length === 1 ? 'Activity' : 'Activities'}</Badge>
-                            </DialogTrigger>
-                             <DialogContent className="max-w-4xl">
-                            <DialogHeader>
-                                <DialogTitle className="font-headline flex items-center gap-2 text-2xl">
-                                    <Icon className={`h-6 w-6 ${config.color}`} />
-                                    {tool} Activity Log
-                                </DialogTitle>
-                                <DialogDescription className="font-body">A detailed log of your recent activity using this tool.</DialogDescription>
-                            </DialogHeader>
-                            <div className="max-h-[60vh] overflow-y-auto pr-4">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="hover:bg-transparent">
-                                            <TableHead>Details</TableHead>
-                                            <TableHead className="w-[180px] text-right">Date</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {activities.map((activity) => (
-                                            <TableRow key={activity.id}>
-                                                <TableCell className="font-medium font-body">{activity.resultsSummary || activity.type}</TableCell>
-                                                <TableCell className="text-right text-muted-foreground font-body">
-                                                    <TooltipProvider>
-                                                        <Tooltip>
-                                                            <TooltipTrigger>
-                                                                {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                {format(activity.timestamp.toDate(), 'PPp')}
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                        </DialogContent>
-                        </Dialog>
-                    </div>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                    <ToolSummary activities={activities} profile={profile} />
-                </CardContent>
-            </Card>
-        </motion.div>
-    );
-  }).filter(Boolean);
-
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      <h1 className="text-3xl font-headline font-semibold text-foreground">
-        Welcome, {profile?.displayName || currentUser?.email}!
-      </h1>
-      <p className="text-muted-foreground font-body">Here's your SEO command center. Monitor key metrics and review your activity across all tools.</p>
+      <motion.div initial="hidden" animate="visible" variants={itemVariants}>
+        <h1 className="text-3xl font-headline font-semibold text-foreground">
+            Welcome, {profile?.displayName || user?.email}!
+        </h1>
+        <p className="text-muted-foreground font-body">Here's your SEO command center at a glance.</p>
+      </motion.div>
       
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <motion.div className="lg:col-span-2" variants={itemVariants}>
-                <Card className="h-full">
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2">
-                           <Lightbulb className="h-6 w-6 text-primary" /> Actionable Insights
-                        </CardTitle>
-                        <CardDescription>AI-generated recommendations based on your recent activity.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <ActionableInsights user={currentUser} activities={activities} />
-                    </CardContent>
-                    <CardFooter>
-                        <Button variant="outline" asChild>
-                            <Link href="/insights">View All Insights <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </motion.div>
-            
-            <motion.div variants={itemVariants}>
-                 <Card className="h-full">
-                    <CardHeader>
-                        <CardTitle className="font-headline flex items-center gap-2">
-                            <Activity className="h-6 w-6 text-primary" /> Key Metrics
-                        </CardTitle>
-                        <CardDescription>A quick overview of your site's performance.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="text-center">
-                            <h3 className="font-bold font-headline text-4xl text-success">78</h3>
-                            <p className="text-sm text-muted-foreground">Overall SEO Score</p>
-                        </div>
-                        <div className="flex justify-around text-center">
-                             <div>
-                                <p className="font-bold font-headline text-2xl">1,204</p>
-                                <p className="text-xs text-muted-foreground">Tracked Keywords</p>
-                            </div>
-                             <div>
-                                <p className="font-bold font-headline text-2xl">5</p>
-                                <p className="text-xs text-muted-foreground">Active Projects</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </motion.div>
-        </div>
-
-
-      {toolSummaries.length > 0 ? (
         <motion.div 
+            className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div variants={itemVariants}>
+                <DashboardMetricCard title="Overall SEO Score" value={String(dummyDashboardData.seoScore.current)} change={dummyDashboardData.seoScore.change} icon={Activity} />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+                <DashboardMetricCard title="Tracked Keywords" value={dummyDashboardData.trackedKeywords.current.toLocaleString()} change={dummyDashboardData.trackedKeywords.change} icon={KeyRound} />
+            </motion.div>
+             <motion.div variants={itemVariants}>
+                <DashboardMetricCard title="Domain Authority" value={String(dummyDashboardData.domainAuthority.score)} change={dummyDashboardData.domainAuthority.score - 52} icon={ShieldCheck} />
+            </motion.div>
+             <motion.div variants={itemVariants}>
+                <DashboardMetricCard title="Total Backlinks" value={dummyDashboardData.backlinks.total.toLocaleString()} change={dummyDashboardData.backlinks.newLast30Days} icon={LinkIcon} />
+            </motion.div>
+        </motion.div>
+
+        <motion.div 
+            className="grid gap-6 md:grid-cols-1 lg:grid-cols-5"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div className="lg:col-span-3" variants={itemVariants}>
+                <SeoScoreTrendChart />
+            </motion.div>
+            <motion.div className="lg:col-span-2" variants={itemVariants}>
+                <TrafficSourcesChart />
+            </motion.div>
+        </motion.div>
+        
+         <motion.div 
             className="grid gap-6 md:grid-cols-1 lg:grid-cols-2"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-          {toolSummaries}
+            <motion.div variants={itemVariants}>
+                <KeywordVisibilityChart />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+                <BacklinksChart />
+            </motion.div>
         </motion.div>
-      ) : (
-        <Card>
-          <CardContent className="p-10 text-center">
-            <h3 className="text-xl font-headline mb-2">No Activity Yet</h3>
-            <p className="font-body text-muted-foreground">Start using the tools to perform some SEO tasks. We'll analyze your activity and provide personalized recommendations here.</p>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

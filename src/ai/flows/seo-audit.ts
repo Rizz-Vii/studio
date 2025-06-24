@@ -8,7 +8,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 
 // Define the input schema for the SEO audit flow
@@ -56,7 +56,7 @@ const auditUrlPrompt = ai.definePrompt({
       *   **Details:** Provide a brief assessment of readability and suggest simplifying complex sentences or jargon.
   5.  **Image Alt Text (\`image-alts\`)**:
       *   **Score:** Based on the percentage of images with non-empty alt text.
-      *   **Details:** Note the number of images found and how many are missing alt text. Provide examples if possible.
+      *   **Details:** Note the number of images found and how many are missing alt text. For example: "Found 10 images, 3 are missing alt text."
   6.  **Site Speed (Simulated) (\`site-speed\`)**:
       *   **Score:** Based on content structure (e.g., number of images, scripts). A high number of render-blocking resources should lower the score.
       *   **Details:** Provide a qualitative assessment (e.g., "Appears fast," "May be slow due to numerous large images"). Suggest general performance improvements like image compression.

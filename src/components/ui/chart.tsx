@@ -135,37 +135,44 @@ const ChartTooltipContent = React.forwardRef<
     const { config } = useChart()
 
     const tooltipLabel = React.useMemo(() => {
-      if (hideLabel || !payload?.length) {
+        if (hideLabel || !payload?.length) {
+            return null
+        }
+
+        const initialLabel = label;
+        
+        if (labelFormatter) {
+            return (
+              <div className={cn("font-medium", labelClassName)}>
+                {labelFormatter(initialLabel, payload)}
+              </div>
+            )
+        }
+
+        if (labelKey && payload?.[0]?.payload?.[labelKey]) {
+            return (
+                <div className={cn("font-medium", labelClassName)}>
+                  {payload[0].payload[labelKey]}
+                </div>
+            )
+        }
+        
+        if (initialLabel) {
+            return (
+                <div className={cn("font-medium", labelClassName)}>
+                    {initialLabel}
+                </div>
+            )
+        }
+      
         return null
-      }
 
-      if (labelFormatter) {
-        return (
-          <div className={cn("font-medium", labelClassName)}>
-            {labelFormatter(label, payload)}
-          </div>
-        )
-      }
-
-      const [item] = payload
-      const key = `${labelKey || item.dataKey || item.name || "value"}`
-      const itemConfig = getPayloadConfigFromPayload(config, item, key)
-      const value = !labelKey && typeof label === "string"
-          ? config[label as keyof typeof config]?.label || label
-          : itemConfig?.label
-
-      if (!value) {
-        return null
-      }
-
-      return <div className={cn("font-medium", labelClassName)}>{value}</div>
     }, [
       label,
       labelFormatter,
       payload,
       hideLabel,
       labelClassName,
-      config,
       labelKey,
     ])
 
@@ -363,5 +370,3 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
-
-    

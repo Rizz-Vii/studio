@@ -94,7 +94,7 @@ export default function HomePage() {
        <section className="mt-24 w-full max-w-6xl text-center">
         <h2 className="text-3xl md:text-4xl font-semibold mb-4">Your SEO Command Center</h2>
         <p className="text-muted-foreground mb-6">All your SEO tools — crawler, analyzer, optimizer — in one clean, intuitive dashboard designed to turn data into action.</p>
-        <div className="rounded-xl shadow-xl hover:shadow-2xl overflow-hidden border border-gray-200 transition-shadow duration-300">
+        <Card className="rounded-xl overflow-hidden">
           <Image
             src="https://placehold.co/1200x700.png"
             alt="SEO Dashboard Screenshot"
@@ -104,7 +104,7 @@ export default function HomePage() {
             className="w-full h-auto"
             priority
           />
-        </div>
+        </Card>
       </section>
 
       {/* About Us */}
@@ -184,7 +184,7 @@ export default function HomePage() {
 
 function Feature({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
     return (
-        <Card className="h-full rounded-2xl">
+        <Card className="h-full">
           <CardHeader>
             <div className="text-primary mb-4">{React.cloneElement(icon as React.ReactElement, { className: 'h-6 w-6' })}</div>
             <CardTitle className="text-xl">{title}</CardTitle>
