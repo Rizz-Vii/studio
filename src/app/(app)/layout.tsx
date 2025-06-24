@@ -32,14 +32,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import LoadingScreen from '@/components/ui/loading-screen';
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+
 
 const AppHeader = () => {
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
       <SidebarTrigger className="md:hidden" />
       <div className="flex items-center gap-2 md:hidden">
         <h1 className="text-xl font-headline font-semibold">{AppName}</h1>
@@ -83,7 +84,28 @@ const UserNav = () => {
 
 
   if (!user) {
-    return null; // Or a login button if preferred
+    return (
+       <>
+        <div className="flex w-full flex-col items-center gap-2 group-data-[state=collapsed]:hidden px-2">
+            <Button asChild className="w-full font-body">
+                <Link href="/login">Login</Link>
+            </Button>
+            <Button asChild variant="secondary" className="w-full font-body">
+                <Link href="/register">Sign Up</Link>
+            </Button>
+        </div>
+        <div className="hidden w-full flex-col items-center gap-2 group-data-[state=collapsed]:flex">
+             <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button asChild variant="outline" size="icon">
+                        <Link href="/login"><LogIn /></Link>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Login</TooltipContent>
+            </Tooltip>
+        </div>
+      </>
+    );
   }
 
   const userInitial = (profile?.displayName || user.email || 'U').charAt(0).toUpperCase();
@@ -129,7 +151,7 @@ interface AppNavProps {
 
 const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
     const pathname = usePathname();
-    const { state } = useSidebar();
+    const { open } = useSidebar();
     const { role } = useAuth();
 
     const handleNavigation = (href: string) => {
@@ -152,19 +174,11 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
                 >
               <Link href={item.href} onClick={() => handleNavigation(item.href)}>
                     <item.icon />
-                    <AnimatePresence>
-                    {state === 'expanded' && (
-                        <motion.span
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: 'auto' }}
-                            exit={{ opacity: 0, width: 0 }}
-                            transition={{ duration: 0.2, ease: "easeInOut" }}
-                            className="whitespace-nowrap overflow-hidden"
-                        >
+                    {open && (
+                       <span className="whitespace-nowrap overflow-hidden">
                             {item.title}
-                        </motion.span>
+                        </span>
                     )}
-                    </AnimatePresence>
                   </Link>
                 </SidebarMenuButton>
 
@@ -177,6 +191,11 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Listen for route changes to stop the loader.
   useEffect(() => {
@@ -186,33 +205,39 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  if (!isClient) {
+    return null;
+  }
+
   return (
-    <SidebarProvider defaultOpen={false}>
-      <Sidebar collapsible="icon">
-        <SidebarHeader className="p-4">
-          <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
-            <AppLogo className="h-8 w-8 text-primary shrink-0" />
-            <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
-          </Link>
-        </SidebarHeader>
-        <SidebarContent>
-          <ScrollArea className="h-full">
-            <AppNav setIsNavigating={setIsNavigating} />
-          </ScrollArea>
-        </SidebarContent>
-        <SidebarFooter className="p-2">
-            <UserNav />
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>
-        <AppHeader />
-        <main className="relative flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-          <AnimatePresence>
-            {isNavigating && <LoadingScreen />}
-          </AnimatePresence>
-          {children}
-        </main>
-      </SidebarInset>
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex min-h-screen">
+          <Sidebar>
+            <SidebarHeader className="p-4">
+              <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
+                <AppLogo className="h-8 w-8 text-primary shrink-0" />
+                <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
+              </Link>
+            </SidebarHeader>
+            <SidebarContent>
+              <ScrollArea className="h-full">
+                <AppNav setIsNavigating={setIsNavigating} />
+              </ScrollArea>
+            </SidebarContent>
+            <SidebarFooter className="p-2">
+                <UserNav />
+            </SidebarFooter>
+          </Sidebar>
+          <div className="flex-1 flex flex-col">
+            <AppHeader />
+            <main className="relative flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
+              <AnimatePresence>
+                {isNavigating && <LoadingScreen />}
+              </AnimatePresence>
+              {children}
+            </main>
+          </div>
+      </div>
     </SidebarProvider>
   );
 }
