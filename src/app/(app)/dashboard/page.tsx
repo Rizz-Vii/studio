@@ -151,29 +151,37 @@ const ContentAnalyzerSummary: React.FC<{ activities: UserActivity[] }> = ({ acti
                 </div>
             </div>
             
-            <div className="space-y-3 pt-2">
-                <div>
+            <motion.div 
+                className="space-y-3 pt-2"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    visible: { transition: { staggerChildren: 0.1 } },
+                    hidden: {},
+                }}
+            >
+                <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
                     <div className="flex justify-between text-xs mb-1">
                         <span className="font-semibold font-body text-muted-foreground">Readability</span>
                         <span className="font-body">{avgReadability > 0 ? `${avgReadability}/100` : 'N/A'}</span>
                     </div>
                     <Progress value={avgReadability} indicatorClassName={getProgressColor(avgReadability)} />
-                </div>
-                <div>
+                </motion.div>
+                <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
                      <div className="flex justify-between text-xs mb-1">
                         <span className="font-semibold font-body text-muted-foreground">Keywords</span>
                         <span className="font-body">{avgKeywords > 0 ? `${avgKeywords}/100` : 'N/A'}</span>
                     </div>
                     <Progress value={avgKeywords} indicatorClassName={getProgressColor(avgKeywords)} />
-                </div>
-                <div>
+                </motion.div>
+                <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
                     <div className="flex justify-between text-xs mb-1">
                         <span className="font-semibold font-body text-muted-foreground">Semantics</span>
                         <span className="font-body">{avgSemantics > 0 ? `${avgSemantics}/100` : 'N/A'}</span>
                     </div>
                     <Progress value={avgSemantics} indicatorClassName={getProgressColor(avgSemantics)} />
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </div>
     );
 };
@@ -208,7 +216,7 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
 
 const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
     const competitors = activities
-        .flatMap(a => a.details?.competitorUrls || [])
+        .flatMap(a => a.details?.competitorUrls || a.details?.competitors || [])
         .filter(Boolean)
         .map(url => {
             try {
@@ -427,6 +435,28 @@ export default function DashboardPage() {
   const [groupedActivities, setGroupedActivities] = useState<GroupedActivities>({});
   const [loadingData, setLoadingData] = useState(true);
 
+  const containerVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+      },
+    },
+  };
+
   useEffect(() => {
     const fetchActivities = async () => {
       if (currentUser) {
@@ -476,74 +506,81 @@ export default function DashboardPage() {
       <p className="text-muted-foreground font-body">Here's your SEO command center. Monitor key metrics and review your activity across all tools.</p>
       
       {Object.keys(groupedActivities).length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+        <motion.div 
+            className="grid gap-6 md:grid-cols-1 lg:grid-cols-2"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
           {Object.entries(groupedActivities).map(([tool, activities]) => {
             const ToolSummary = toolSummaryComponents[tool];
             const config = toolConfig[tool] || toolConfig["Default"];
             const Icon = config.icon;
 
             return (
-                <Dialog key={tool}>
-                    <DialogTrigger asChild>
-                        <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col cursor-pointer">
-                            <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <CardTitle className="font-headline flex items-center gap-2">
-                                        <Icon className={`h-6 w-6 ${config.color}`} />
-                                        {tool}
-                                    </CardTitle>
-                                    <Badge variant="outline" className="text-xs font-body">{activities.length} {activities.length === 1 ? 'Activity' : 'Activities'}</Badge>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="flex-grow space-y-4 pt-4">
-                                {ToolSummary && <ToolSummary activities={activities} profile={profile} />}
-                            </CardContent>
-                        </Card>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-4xl">
-                        <DialogHeader>
-                            <DialogTitle className="font-headline flex items-center gap-2 text-2xl">
-                                <Icon className={`h-6 w-6 ${config.color}`} />
-                                {tool} Activity Log
-                            </DialogTitle>
-                            <DialogDescription className="font-body">A detailed log of your recent activity using this tool.</DialogDescription>
-                        </DialogHeader>
-                        <div className="max-h-[60vh] overflow-y-auto pr-4">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="hover:bg-transparent">
-                                        <TableHead>Details</TableHead>
-                                        <TableHead className="w-[180px] text-right">Date</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {activities.map((activity) => (
-                                        <TableRow key={activity.id}>
-                                            <TableCell className="font-medium font-body">{activity.resultsSummary || activity.type}</TableCell>
-                                            <TableCell className="text-right text-muted-foreground font-body">
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger>
-                                                            {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            {format(activity.timestamp.toDate(), 'PPp')}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            </TableCell>
+                <motion.div key={tool} variants={itemVariants}>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Card className="shadow-lg flex flex-col cursor-pointer h-full">
+                                <CardHeader>
+                                    <div className="flex justify-between items-start">
+                                        <CardTitle className="font-headline flex items-center gap-2">
+                                            <Icon className={`h-6 w-6 ${config.color}`} />
+                                            {tool}
+                                        </CardTitle>
+                                        <Badge variant="outline" className="text-xs font-body">{activities.length} {activities.length === 1 ? 'Activity' : 'Activities'}</Badge>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="flex-grow space-y-4 pt-4">
+                                    {ToolSummary && <ToolSummary activities={activities} profile={profile} />}
+                                </CardContent>
+                            </Card>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">
+                            <DialogHeader>
+                                <DialogTitle className="font-headline flex items-center gap-2 text-2xl">
+                                    <Icon className={`h-6 w-6 ${config.color}`} />
+                                    {tool} Activity Log
+                                </DialogTitle>
+                                <DialogDescription className="font-body">A detailed log of your recent activity using this tool.</DialogDescription>
+                            </DialogHeader>
+                            <div className="max-h-[60vh] overflow-y-auto pr-4">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="hover:bg-transparent">
+                                            <TableHead>Details</TableHead>
+                                            <TableHead className="w-[180px] text-right">Date</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {activities.map((activity) => (
+                                            <TableRow key={activity.id}>
+                                                <TableCell className="font-medium font-body">{activity.resultsSummary || activity.type}</TableCell>
+                                                <TableCell className="text-right text-muted-foreground font-body">
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger>
+                                                                {formatDistanceToNow(activity.timestamp.toDate(), { addSuffix: true })}
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                {format(activity.timestamp.toDate(), 'PPp')}
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       ) : (
-        <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
+        <Card className="shadow-lg">
           <CardContent className="p-10 text-center">
             <h3 className="text-xl font-headline mb-2">No Activity Yet</h3>
             <p className="font-body text-muted-foreground">Start using the tools to see your activity summary here.</p>

@@ -20,7 +20,6 @@ import { navItems, AppLogo, AppName } from '@/constants/nav';
 import type { NavItem } from '@/constants/nav';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/context/AuthContext';
-import { auth } from '@/lib/firebase';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -76,7 +75,6 @@ const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEven
 
 const UserNav = () => {
     const { user, profile } = useAuth();
-    const router = useRouter();
     const { open, setOpen, isMobile, setUserMenuOpen, pinned } = useSidebar();
     const { handleNavigation } = useAppNavigation();
     const [openedByMe, setOpenedByMe] = React.useState(false);
@@ -138,6 +136,33 @@ interface AppNavProps {
     handleNavigation: (event: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
 }
 
+const navVariants = {
+  open: {
+    transition: { staggerChildren: 0.07, delayChildren: 0.2 }
+  },
+  closed: {
+    transition: { staggerChildren: 0.05, staggerDirection: -1 }
+  }
+};
+
+const menuItemVariants = {
+  open: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      y: { stiffness: 1000, velocity: -100 }
+    }
+  },
+  closed: {
+    y: 20,
+    opacity: 0,
+    transition: {
+      y: { stiffness: 1000 }
+    }
+  }
+};
+
+
 const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
     const pathname = usePathname();
     const { open, isMobile } = useSidebar();
@@ -148,27 +173,29 @@ const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
     const showText = open || isMobile;
 
     return (
-        <SidebarMenu>
+        <SidebarMenu as={motion.ul} variants={navVariants} initial={false} animate={showText ? "open" : "closed"}>
           {navItems
             .filter(item => !item.adminOnly || (user && role === 'admin'))
             .map((item: NavItem) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                  isActive={pathname === item.href}
-                  tooltip={{ children: item.title, className:"font-body" }}
-                  className="font-body"
-                  asChild
-                >
-              <Link href={item.href} onClick={(e) => handleNavigation(e, item.href)}>
-                    <item.icon />
-                    {showText && (
-                       <span className="whitespace-nowrap">
-                            {item.title}
-                        </span>
-                    )}
-                  </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
+            <motion.li key={item.href} variants={menuItemVariants}>
+                <SidebarMenuItem>
+                <SidebarMenuButton
+                    isActive={pathname === item.href}
+                    tooltip={{ children: item.title, className:"font-body" }}
+                    className="font-body"
+                    asChild
+                    >
+                <Link href={item.href} onClick={(e) => handleNavigation(e, item.href)}>
+                        <item.icon />
+                        {showText && (
+                        <span className="whitespace-nowrap">
+                                {item.title}
+                            </span>
+                        )}
+                    </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            </motion.li>
           ))}
         </SidebarMenu>
     );
@@ -220,10 +247,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
                 <AppHeader handleNavigation={handleNavigation} />
                 <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-                    <AnimatePresence>
-                    {isNavigating && <LoadingScreen />}
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={pathname}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {isNavigating ? <LoadingScreen /> : children}
+                        </motion.div>
                     </AnimatePresence>
-                    {!isNavigating && children}
                 </main>
             </div>
         </div>

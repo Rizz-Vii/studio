@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { Loader2, AlertTriangle, CheckCircle, AlertCircle, XCircle } from 'lucide-react';
 import type { AuditUrlInput, AuditUrlOutput } from '@/ai/flows/seo-audit';
 import { useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
@@ -36,6 +37,21 @@ const statusColors: { [key: string]: string } = {
     good: 'text-success',
     warning: 'text-warning',
     error: 'text-destructive',
+};
+
+const containerVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0 }
 };
 
 export default function SeoAuditForm({ onSubmit, isLoading, results, error }: SeoAuditFormProps) {
@@ -94,49 +110,55 @@ export default function SeoAuditForm({ onSubmit, isLoading, results, error }: Se
                         </CardContent>
                     </Card>
                 )}
+                <AnimatePresence>
                 {error && (
-                    <Card className="mt-8 border-destructive">
-                        <CardHeader>
-                             <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Audit Failed</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p>{error}</p>
-                        </CardContent>
-                    </Card>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                        <Card className="mt-8 border-destructive">
+                            <CardHeader>
+                                <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Audit Failed</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p>{error}</p>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
                 )}
                 {results && (
-                    <Card className="mt-8">
-                        <CardHeader>
-                            <CardTitle className="font-headline">Audit Results</CardTitle>
-                            <div className="flex items-center gap-4 pt-2">
-                                <span className="text-4xl font-bold text-primary">{results.overallScore}</span>
-                                <div className="w-full">
-                                    <p className="font-semibold">Overall Score</p>
-                                    <Progress value={results.overallScore} className="mt-1" />
+                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                        <Card className="mt-8">
+                            <CardHeader>
+                                <CardTitle className="font-headline">Audit Results</CardTitle>
+                                <div className="flex items-center gap-4 pt-2">
+                                    <span className="text-4xl font-bold text-primary">{results.overallScore}</span>
+                                    <div className="w-full">
+                                        <p className="font-semibold">Overall Score</p>
+                                        <Progress value={results.overallScore} className="mt-1" />
+                                    </div>
                                 </div>
-                            </div>
-                             <CardDescription className="pt-2">{results.summary}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {results.items.map((item) => {
-                                    const Icon = statusIcons[item.status] || AlertCircle;
-                                    const color = statusColors[item.status] || 'text-muted-foreground';
-                                    return (
-                                        <div key={item.id} className="flex items-start gap-4">
-                                            <Icon className={`mt-1 h-5 w-5 flex-shrink-0 ${color}`} />
-                                            <div className="flex-1">
-                                                <p className="font-semibold">{item.name}</p>
-                                                <p className="text-sm text-muted-foreground">{item.details}</p>
-                                            </div>
-                                            <span className={`font-semibold text-sm ${color}`}>{item.score}/100</span>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </CardContent>
-                    </Card>
+                                <CardDescription className="pt-2">{results.summary}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <motion.div className="space-y-4" variants={containerVariants} initial="hidden" animate="visible">
+                                    {results.items.map((item) => {
+                                        const Icon = statusIcons[item.status] || AlertCircle;
+                                        const color = statusColors[item.status] || 'text-muted-foreground';
+                                        return (
+                                            <motion.div key={item.id} className="flex items-start gap-4" variants={itemVariants}>
+                                                <Icon className={`mt-1 h-5 w-5 flex-shrink-0 ${color}`} />
+                                                <div className="flex-1">
+                                                    <p className="font-semibold">{item.name}</p>
+                                                    <p className="text-sm text-muted-foreground">{item.details}</p>
+                                                </div>
+                                                <span className={`font-semibold text-sm ${color}`}>{item.score}/100</span>
+                                            </motion.div>
+                                        )
+                                    })}
+                                </motion.div>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
                 )}
+                </AnimatePresence>
             </div>
         </div>
     );

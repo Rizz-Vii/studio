@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Loader2, Users, AlertTriangle } from 'lucide-react';
 import type { CompetitorAnalysisInput, CompetitorAnalysisOutput } from '@/ai/flows/competitor-analysis';
 import { useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const formSchema = z.object({
   yourUrl: z.string().url({ message: 'Please enter a valid URL for your website.' }),
@@ -129,69 +130,78 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
                         </CardContent>
                     </Card>
                 )}
-                {error && (
-                    <Card className="mt-8 border-destructive">
-                        <CardHeader>
-                            <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p>{error}</p>
-                        </CardContent>
-                    </Card>
-                )}
-                {results && (
-                    <div className="space-y-6 mt-8">
-                         <Card>
-                            <CardHeader>
-                                <CardTitle className="font-headline flex items-center gap-2"><Users /> Keyword Rankings</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Keyword</TableHead>
-                                            <TableHead className="text-center">Your Rank</TableHead>
-                                            {competitorHeaders.map(url => (
-                                                <TableHead key={url} className="text-center truncate" title={url}>{new URL(url).hostname}</TableHead>
-                                            ))}
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {results.rankings.map((item) => (
-                                            <TableRow key={item.keyword}>
-                                                <TableCell className="font-medium">{item.keyword}</TableCell>
-                                                <TableCell className="text-center">{item.yourRank?.rank ?? 'N/A'}</TableCell>
+                <AnimatePresence>
+                    {error && (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                            <Card className="mt-8 border-destructive">
+                                <CardHeader>
+                                    <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p>{error}</p>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+                    )}
+                    {results && (
+                        <motion.div 
+                            className="space-y-6 mt-8"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="font-headline flex items-center gap-2"><Users /> Keyword Rankings</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Keyword</TableHead>
+                                                <TableHead className="text-center">Your Rank</TableHead>
                                                 {competitorHeaders.map(url => (
-                                                    <TableCell key={url} className="text-center">
-                                                        {(item as any)[url]?.rank ?? 'N/A'}
-                                                    </TableCell>
+                                                    <TableHead key={url} className="text-center truncate" title={url}>{new URL(url).hostname}</TableHead>
                                                 ))}
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                        </Card>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {results.rankings.map((item) => (
+                                                <TableRow key={item.keyword}>
+                                                    <TableCell className="font-medium">{item.keyword}</TableCell>
+                                                    <TableCell className="text-center">{item.yourRank?.rank ?? 'N/A'}</TableCell>
+                                                    {competitorHeaders.map(url => (
+                                                        <TableCell key={url} className="text-center">
+                                                            {(item as any)[url]?.rank ?? 'N/A'}
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </CardContent>
+                            </Card>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
-                                <CardDescription>Keywords where competitors rank well but you don't.</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {results.contentGaps.length > 0 ? (
-                                <ul className="list-disc pl-5 space-y-2">
-                                    {results.contentGaps.map((gap, index) => (
-                                        <li key={index}>{gap}</li>
-                                    ))}
-                                </ul>
-                                ) : (
-                                    <p className="text-muted-foreground">No significant content gaps found. Great job!</p>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-                )}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
+                                    <CardDescription>Keywords where competitors rank well but you don't.</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    {results.contentGaps.length > 0 ? (
+                                    <ul className="list-disc pl-5 space-y-2">
+                                        {results.contentGaps.map((gap, index) => (
+                                            <li key={index}>{gap}</li>
+                                        ))}
+                                    </ul>
+                                    ) : (
+                                        <p className="text-muted-foreground">No significant content gaps found. Great job!</p>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );
