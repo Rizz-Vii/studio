@@ -28,6 +28,8 @@ type SidebarContext = {
   state: "expanded" | "collapsed"
   open: boolean
   setOpen: (open: boolean) => void
+  pinned: boolean;
+  setPinned: (pinned: boolean) => void;
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
@@ -71,6 +73,7 @@ const SidebarProvider = React.forwardRef<
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
     const [open, setOpen] = React.useState(defaultOpen && !isMobile)
+    const [pinned, setPinned] = React.useState(defaultOpen && !isMobile);
     const [isUserMenuOpen, setUserMenuOpen] = React.useState(false)
     const [hydrated, setHydrated] = React.useState(false)
     
@@ -82,14 +85,18 @@ const SidebarProvider = React.forwardRef<
     
           if (cookie) {
             const value = cookie.split("=")[1];
-            setOpen(value === "expanded");
+            const newPinned = value === 'pinned';
+            setPinned(newPinned);
+            setOpen(newPinned); // A pinned sidebar should always be open initially
           } else {
-             // Set initial state from defaultOpen if no cookie is found
-             setOpen(defaultOpen && !isMobile);
+             const initialPinned = defaultOpen && !isMobile;
+             setPinned(initialPinned);
+             setOpen(initialPinned);
           }
         } catch (error) {
-          // Can fail in some environments, fallback to default
-           setOpen(defaultOpen && !isMobile);
+           const initialPinned = defaultOpen && !isMobile;
+           setPinned(initialPinned);
+           setOpen(initialPinned);
         } finally {
             setHydrated(true);
         }
@@ -105,19 +112,21 @@ const SidebarProvider = React.forwardRef<
     // Sync with cookie
     React.useEffect(() => {
       if (hydrated && !isMobile) {
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${open ? 'expanded' : 'collapsed'}; max-age=${SIDEBAR_COOKIE_MAX_AGE}; path=/`
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${pinned ? 'pinned' : 'collapsed'}; max-age=${SIDEBAR_COOKIE_MAX_AGE}; path=/`
       }
-    }, [open, isMobile, hydrated])
+    }, [pinned, isMobile, hydrated])
 
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
-        const newOpenState = !open
-        setOpen(newOpenState)
-        if (setOpenProp) {
-            setOpenProp(newOpenState)
+        if (isMobile) {
+            setOpenMobile((current) => !current);
+        } else {
+            const newPinned = !pinned;
+            setPinned(newPinned);
+            setOpen(newPinned); // Pinning opens it, unpinning collapses it immediately.
         }
-    }, [open, setOpen, setOpenProp]);
+    }, [isMobile, setOpen, setOpenMobile, pinned, setPinned]);
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -142,6 +151,8 @@ const SidebarProvider = React.forwardRef<
         state,
         open,
         setOpen,
+        pinned,
+        setPinned,
         isMobile,
         openMobile,
         setOpenMobile,
@@ -154,6 +165,8 @@ const SidebarProvider = React.forwardRef<
         state,
         open,
         setOpen,
+        pinned,
+        setPinned,
         isMobile,
         openMobile,
         setOpenMobile,
@@ -205,16 +218,16 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, setOpen, openMobile, setOpenMobile, isUserMenuOpen } = useSidebar()
+    const { isMobile, state, setOpen, openMobile, setOpenMobile, pinned, isUserMenuOpen } = useSidebar()
     
     const handleMouseEnter = () => {
-        if (state === 'collapsed') {
+        if (!pinned) {
             setOpen(true);
         }
     };
     
     const handleMouseLeave = () => {
-        if (!isUserMenuOpen) {
+        if (!pinned && !isUserMenuOpen) {
             setOpen(false);
         }
     };

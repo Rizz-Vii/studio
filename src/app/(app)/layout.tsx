@@ -36,6 +36,19 @@ import { AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 
+const AppHeader = () => {
+    return (
+      <header className="flex h-16 flex-shrink-0 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
+        {/* Mobile-only trigger */}
+        <SidebarTrigger className="md:hidden" />
+        {/* Mobile-only title */}
+        <div className="flex items-center gap-2 md:hidden">
+          <h1 className="text-xl font-headline font-semibold">{AppName}</h1>
+        </div>
+      </header>
+    );
+  };
+
 const UserNav = () => {
   const { user, profile } = useAuth();
   const router = useRouter();
@@ -168,15 +181,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
   
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex h-screen w-full bg-background">
           <Sidebar>
             <SidebarHeader className="p-4 flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:hidden">
                 <AppLogo className="h-8 w-8 text-primary shrink-0" />
                 <span className="text-2xl font-headline font-bold text-primary">{AppName}</span>
               </Link>
-               <SidebarTrigger />
+               <SidebarTrigger className="hidden md:flex" />
             </SidebarHeader>
             <SidebarContent>
               <ScrollArea className="h-full">
@@ -187,12 +200,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <UserNav />
             </SidebarFooter>
           </Sidebar>
-          <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto h-screen">
-            <AnimatePresence>
-              {isNavigating && <LoadingScreen />}
-            </AnimatePresence>
-            {children}
-          </main>
+          <div className="flex-1 flex flex-col h-screen overflow-hidden">
+            <AppHeader />
+            <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+                <AnimatePresence>
+                {isNavigating && <LoadingScreen />}
+                </AnimatePresence>
+                {children}
+            </main>
+          </div>
       </div>
     </SidebarProvider>
   );
