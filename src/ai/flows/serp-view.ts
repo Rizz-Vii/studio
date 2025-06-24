@@ -25,11 +25,21 @@ const OrganicResultSchema = z.object({
 
 const PeopleAlsoAskSchema = z.object({
     question: z.string().describe("A question that people also ask."),
+    answer: z.string().describe("A concise answer to the question."),
 });
+
+const SerpFeaturesSchema = z.object({
+    hasFeaturedSnippet: z.boolean().describe("Whether the SERP contains a featured snippet at the top."),
+    hasImagePack: z.boolean().describe("Whether the SERP contains a pack of image results."),
+    hasVideoCarousel: z.boolean().describe("Whether the SERP contains a carousel of video results."),
+    topStories: z.boolean().describe("Whether the SERP contains a 'Top Stories' news section."),
+});
+
 
 const SerpViewOutputSchema = z.object({
   organicResults: z.array(OrganicResultSchema).describe('The top 10 organic search results.'),
-  peopleAlsoAsk: z.array(PeopleAlsoAskSchema).describe('A list of related questions people also ask.'),
+  peopleAlsoAsk: z.array(PeopleAlsoAskSchema).describe('A list of related questions people also ask, including answers.'),
+  serpFeatures: SerpFeaturesSchema.describe("An analysis of common SERP features present for this keyword."),
 });
 export type SerpViewOutput = z.infer<typeof SerpViewOutputSchema>;
 
@@ -47,10 +57,11 @@ const serpPrompt = ai.definePrompt({
 **Keyword:** {{{keyword}}}
 
 **Instructions:**
-1.  **Generate Organic Results:** Create a list of exactly 10 organic search results. Each result must include a realistic position, title, URL, and a descriptive snippet.
-2.  **Generate "People Also Ask":** Create a list of 4 relevant questions that users might also ask related to the keyword.
-3.  **Realism:** The titles, URLs, and snippets should be plausible and relevant to the keyword.
-4.  **Strictly Adhere to Output Format:** Your entire output MUST be a single, valid JSON object that conforms to the provided output schema.
+1.  **Generate Organic Results:** Create a list of exactly 10 organic search results. Each result must include a realistic position, title, URL, and a descriptive snippet. The URLs should be varied and look like real websites (e.g., blog posts, documentation, news articles, commercial sites), not just placeholders like 'example.com'.
+2.  **Generate "People Also Ask":** Create a list of 4 relevant questions that users might also ask related to the keyword. For each question, provide a concise, helpful answer.
+3.  **Analyze SERP Features:** Based on the results you are generating, determine which common SERP features are present. For example, if your top result is a direct answer, set \`hasFeaturedSnippet\` to true. If you include image or video results, set the corresponding flags.
+4.  **Realism:** The titles, URLs, and snippets should be plausible and highly relevant to the keyword.
+5.  **Strictly Adhere to Output Format:** Your entire output MUST be a single, valid JSON object that conforms to the provided output schema.
 `,
 });
 
