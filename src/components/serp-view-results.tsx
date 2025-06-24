@@ -58,10 +58,10 @@ export default function SerpViewResults({ results }: SerpViewResultsProps) {
             A simulation of the top 10 organic search results.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-2">
           {results.organicResults.map((result) => (
-            <div key={result.position} className="flex gap-4">
-              <div className="text-lg font-bold text-muted-foreground">{result.position}.</div>
+            <div key={result.position} className="flex gap-4 p-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-muted/50 hover:shadow-lg hover:scale-[1.02]">
+              <div className="text-lg font-bold text-muted-foreground pt-1">{result.position}.</div>
               <div>
                 <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-lg">
                   <h3 className="font-headline">{result.title}</h3>
