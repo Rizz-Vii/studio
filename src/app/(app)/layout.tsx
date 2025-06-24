@@ -31,12 +31,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, LogIn } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
-
 
 const AppHeader = () => {
   return (
@@ -166,6 +164,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
   const { user, loading } = useProtectedRoute();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+      setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (isNavigating) {
@@ -173,13 +176,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [pathname, isNavigating]);
 
-  if (loading || !user) {
+  if (!isClient || loading || !user) {
     return <LoadingScreen />;
   }
   
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen w-full">
           <Sidebar>
             <SidebarHeader className="p-4">
               <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
@@ -196,7 +199,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <UserNav />
             </SidebarFooter>
           </Sidebar>
-          <div className="flex-1 flex flex-col hidden">
+          <div className="flex-1 flex flex-col">
             <AppHeader />
             <main className="relative flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
               <AnimatePresence>
