@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAppNavigation } from '@/context/AppNavigationContext';
 import { Input } from '@/components/ui/input';
 import { Search, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,7 +24,6 @@ export default function GlobalSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const debouncedQuery = useDebounce(query, 300);
-  const { handleNavigation } = useAppNavigation();
   const searchContainerRef = useRef<HTMLDivElement>(null);
   
   const [placeholder, setPlaceholder] = useState(placeholderQueries[0]);
@@ -126,8 +124,7 @@ export default function GlobalSearch() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      onClick={(e) => {
-                        handleNavigation(e, item.href);
+                      onClick={() => {
                         setIsFocused(false);
                         setQuery('');
                       }}
