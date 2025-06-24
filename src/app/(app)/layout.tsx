@@ -31,101 +31,118 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Search } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
+import { User, LogOut, Search, Rocket } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { Input } from '@/components/ui/input';
 
 const AppHeader = () => {
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b bg-card/95 px-4 backdrop-blur-sm md:px-6">
       <div className="flex h-full w-full items-center justify-between">
         {/* Left side: Mobile trigger and a search bar */}
         <div className="flex items-center gap-4">
           <SidebarTrigger className="md:hidden" />
-          <div className="relative hidden md:block">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="relative hidden md:block"
+          >
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search features..."
-              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background"
+              className="pl-8 sm:w-[200px] lg:w-[300px] bg-background transition-all duration-300 ease-in-out focus:w-[300px] lg:focus:w-[400px]"
             />
-          </div>
+          </motion.div>
         </div>
         {/* Right side: User navigation */}
-        <div className="flex items-center gap-4">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex items-center gap-4"
+        >
+            <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
+                <Link href="/seo-audit">
+                    <Rocket className="mr-2 h-4 w-4" />
+                    New Audit
+                </Link>
+            </Button>
           <UserNav />
-        </div>
+        </motion.div>
       </div>
     </header>
   );
 };
 
 const UserNav = () => {
-  const { user, profile } = useAuth();
-  const router = useRouter();
-  const { open, setOpen, isMobile, setUserMenuOpen, pinned } = useSidebar();
-  const [openedByMe, setOpenedByMe] = React.useState(false);
-
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      router.push('/login');
-    } catch (error: any) {
-      console.error("Error logging out:", error.message);
-    }
-  };
-
-  const handleOpenChange = (isOpen: boolean) => {
-    setUserMenuOpen(isOpen);
-    if (isMobile || pinned) {
-        return;
-    }
-    if (isOpen) {
-      if (!open) {
-        setOpenedByMe(true);
-        setOpen(true);
+    const { user, profile } = useAuth();
+    const router = useRouter();
+    const { open, setOpen, isMobile, setUserMenuOpen, pinned } = useSidebar();
+    const [openedByMe, setOpenedByMe] = React.useState(false);
+  
+    const handleLogout = async () => {
+      try {
+        await auth.signOut();
+        router.push('/login');
+      } catch (error: any) {
+        console.error("Error logging out:", error.message);
       }
-    } else {
-      if (openedByMe) {
-        setOpenedByMe(false);
-        setOpen(false);
+    };
+  
+    const handleOpenChange = (isOpen: boolean) => {
+      setUserMenuOpen(isOpen);
+      if (isMobile || pinned) {
+          return;
       }
-    }
+      if (isOpen) {
+        if (!open) {
+          setOpenedByMe(true);
+          setOpen(true);
+        }
+      } else {
+        if (openedByMe) {
+          setOpenedByMe(false);
+          setOpen(false);
+        }
+      }
+    };
+  
+    const userInitial = user ? (profile?.displayName || user.email || 'U').charAt(0).toUpperCase() : '';
+  
+    return (
+      <DropdownMenu onOpenChange={handleOpenChange}>
+        <DropdownMenuTrigger asChild>
+            <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative h-9 w-9 rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+            <Avatar className="h-9 w-9 border-2 border-primary/50">
+                <AvatarFallback>{userInitial}</AvatarFallback>
+            </Avatar>
+            </motion.button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="end" sideOffset={12}>
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+             <Link href="/profile">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+             </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   };
-
-  const userInitial = user ? (profile?.displayName || user.email || 'U').charAt(0).toUpperCase() : '';
-
-  return (
-    <DropdownMenu onOpenChange={handleOpenChange}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="relative h-8 w-8 rounded-full"
-        >
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>{userInitial}</AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" sideOffset={12}>
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-           <Link href="/profile">
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-           </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
 
 interface AppNavProps {
   setIsNavigating: (isNavigating: boolean) => void;
