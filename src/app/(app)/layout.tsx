@@ -82,7 +82,7 @@ const UserNav = () => {
     const handleLogout = async () => {
       try {
         await auth.signOut();
-        router.push('/login');
+        router.push('/');
       } catch (error: any) {
         console.error("Error logging out:", error.message);
       }

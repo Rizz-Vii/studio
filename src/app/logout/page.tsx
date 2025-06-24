@@ -16,7 +16,7 @@ export default function LogoutPage() {
         console.error("Error during logout:", error);
       } finally {
         // Ensure redirection happens even if signOut fails for some reason
-        router.push('/login');
+        router.push('/');
       }
     };
 
