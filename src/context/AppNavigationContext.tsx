@@ -1,20 +1,4 @@
-// src/context/AppNavigationContext.tsx
-'use client';
-
-import React, { createContext, useContext, MouseEvent } from 'react';
-
-interface AppNavigationContextType {
-  handleNavigation: (event: MouseEvent<HTMLAnchorElement>, href: string) => void;
-}
-
-const AppNavigationContext = createContext<AppNavigationContextType | undefined>(undefined);
-
-export function useAppNavigation() {
-    const context = useContext(AppNavigationContext);
-    if (!context) {
-        throw new Error('useAppNavigation must be used within an AppLayout that provides AppNavigationContext');
-    }
-    return context;
-}
-
-export default AppNavigationContext;
+// This file is no longer needed and can be removed.
+// The new TopLoader component handles navigation state automatically.
+// For simplicity, we are leaving the file here but emptying its contents.
+// In a real project, you would delete this file.

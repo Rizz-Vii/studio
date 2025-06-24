@@ -1,8 +1,8 @@
 // src/app/(app)/layout.tsx
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   SidebarProvider,
   Sidebar,
@@ -29,15 +29,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Search, Rocket, ChevronLeft, ChevronRight } from 'lucide-react';
+import { User, LogOut, Search, Rocket } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import GlobalSearch from '@/components/global-search';
-import AppNavigationContext from '@/context/AppNavigationContext';
-import { useAppNavigation } from '@/context/AppNavigationContext';
+import TopLoader from '@/components/ui/top-loader';
 
-const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void; }) => {
+const AppHeader = () => {
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b bg-card/95 px-4 backdrop-blur-sm md:px-6">
       <div className="flex h-full w-full items-center justify-between">
@@ -61,7 +60,7 @@ const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEven
           className="flex items-center gap-4"
         >
             <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
-                <Link href="/seo-audit" onClick={(e) => handleNavigation(e, '/seo-audit')}>
+                <Link href="/seo-audit">
                     <Rocket className="mr-2 h-4 w-4" />
                     New Audit
                 </Link>
@@ -76,7 +75,6 @@ const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEven
 const UserNav = () => {
     const { user, profile } = useAuth();
     const { open, setOpen, isMobile, setUserMenuOpen, pinned } = useSidebar();
-    const { handleNavigation } = useAppNavigation();
     const [openedByMe, setOpenedByMe] = React.useState(false);
   
     const handleOpenChange = (isOpen: boolean) => {
@@ -116,13 +114,13 @@ const UserNav = () => {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-             <Link href="/profile" onClick={(e) => handleNavigation(e, '/profile')}>
+             <Link href="/profile">
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
              </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-             <Link href="/logout" onClick={(e) => handleNavigation(e, '/logout')}>
+             <Link href="/logout">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
             </Link>
@@ -132,9 +130,7 @@ const UserNav = () => {
     );
   };
 
-interface AppNavProps {
-    handleNavigation: (event: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
-}
+interface AppNavProps {}
 
 const navVariants = {
   open: {
@@ -167,7 +163,7 @@ const textSpanVariants = {
     closed: { opacity: 0, x: -10, transition: { duration: 0.15 } }
 }
 
-const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
+const AppNav: React.FC<AppNavProps> = () => {
     const pathname = usePathname();
     const { open, isMobile } = useSidebar();
     const { user, role } = useAuth();
@@ -187,7 +183,7 @@ const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
                         className="font-body"
                         asChild
                         >
-                    <Link href={item.href} onClick={(e) => handleNavigation(e, item.href)}>
+                    <Link href={item.href}>
                             <item.icon />
                             <AnimatePresence>
                                 {showText && (
@@ -224,8 +220,7 @@ const SidebarPinControl = () => {
     );
 };
 
-const MainPanel = ({ children, isNavigating }: { children: React.ReactNode, isNavigating: boolean }) => {
-    const { handleNavigation } = useAppNavigation();
+const MainPanel = ({ children }: { children: React.ReactNode }) => {
     const { open, setOpen, pinned, isMobile } = useSidebar();
     const pathname = usePathname();
 
@@ -237,7 +232,8 @@ const MainPanel = ({ children, isNavigating }: { children: React.ReactNode, isNa
 
     return (
         <div className="flex-1 flex flex-col h-screen overflow-hidden" onClick={handleClickOutside}>
-            <AppHeader handleNavigation={handleNavigation} />
+            <AppHeader />
+            <TopLoader />
             <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -247,7 +243,7 @@ const MainPanel = ({ children, isNavigating }: { children: React.ReactNode, isNa
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                     >
-                        {isNavigating ? <LoadingScreen /> : children}
+                        {children}
                     </motion.div>
                 </AnimatePresence>
             </main>
@@ -257,51 +253,34 @@ const MainPanel = ({ children, isNavigating }: { children: React.ReactNode, isNa
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useProtectedRoute();
-  const [isNavigating, setIsNavigating] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
-
-  const handleNavigation = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    event.preventDefault();
-    if (pathname !== href) {
-        setIsNavigating(true);
-        router.push(href);
-    }
-  };
-
-  useEffect(() => {
-    setIsNavigating(false);
-  }, [pathname]);
 
   if (loading || !user) {
     return <LoadingScreen />;
   }
   
   return (
-    <AppNavigationContext.Provider value={{ handleNavigation }}>
-        <SidebarProvider defaultOpen={true}>
-        <div className="flex h-screen w-full bg-background">
-            <Sidebar>
-                <SidebarHeader className="p-4 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
-                    <AppLogo className="h-8 w-8 text-primary shrink-0" />
-                    <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
-                </Link>
-                </SidebarHeader>
-                <SidebarContent>
-                <ScrollArea className="h-full">
-                    <AppNav handleNavigation={handleNavigation} />
-                </ScrollArea>
-                </SidebarContent>
-                <SidebarFooter>
-                    <SidebarPinControl />
-                </SidebarFooter>
-            </Sidebar>
-            <MainPanel isNavigating={isNavigating}>
-                {children}
-            </MainPanel>
-        </div>
-        </SidebarProvider>
-    </AppNavigationContext.Provider>
+    <SidebarProvider defaultOpen={true}>
+    <div className="flex h-screen w-full bg-background">
+        <Sidebar>
+            <SidebarHeader className="p-4 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
+                <AppLogo className="h-8 w-8 text-primary shrink-0" />
+                <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
+            </Link>
+            </SidebarHeader>
+            <SidebarContent>
+            <ScrollArea className="h-full">
+                <AppNav />
+            </ScrollArea>
+            </SidebarContent>
+            <SidebarFooter>
+                <SidebarPinControl />
+            </SidebarFooter>
+        </Sidebar>
+        <MainPanel>
+            {children}
+        </MainPanel>
+    </div>
+    </SidebarProvider>
   );
 }

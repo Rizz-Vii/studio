@@ -13,14 +13,12 @@ import { Loader2, Lightbulb, AlertTriangle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useAppNavigation } from '@/context/AppNavigationContext';
 
 export default function InsightsPage() {
     const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [insights, setInsights] = useState<GenerateInsightsOutput['insights']>([]);
     const [error, setError] = useState<string | null>(null);
-    const { handleNavigation } = useAppNavigation();
 
     useEffect(() => {
         const fetchInsights = async () => {
@@ -141,7 +139,7 @@ export default function InsightsPage() {
                             {insight.actionLink && insight.actionText && (
                                 <CardFooter>
                                     <Button asChild>
-                                        <Link href={insight.actionLink} onClick={(e) => handleNavigation(e, insight.actionLink!)}>
+                                        <Link href={insight.actionLink}>
                                             {insight.actionText} <ArrowRight className="ml-2 h-4 w-4" />
                                         </Link>
                                     </Button>
