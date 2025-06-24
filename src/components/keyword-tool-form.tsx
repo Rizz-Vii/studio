@@ -3,7 +3,7 @@
 
 import type { SuggestKeywordsInput, SuggestKeywordsOutput } from '@/ai/flows/keyword-suggestions';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState, useTransition, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Progress } from '@/components/ui/progress';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: 'Topic must be at least 3 characters long.' }),
@@ -28,6 +30,13 @@ interface KeywordToolFormProps {
   isLoading: boolean;
   results: SuggestKeywordsOutput | null;
 }
+
+const getProgressColor = (score: number) => {
+    if (score > 70) return "bg-destructive";
+    if (score > 40) return "bg-warning";
+    return "bg-success";
+};
+
 
 export default function KeywordToolForm({ onSubmit, isLoading, results }: KeywordToolFormProps) {
   const { toast } = useToast();
@@ -58,24 +67,6 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
     }).catch(err => {
       toast({ variant: "destructive", title: "Copy Failed", description: "Could not copy to clipboard." });
     });
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 1 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-    },
   };
 
   return (
@@ -157,29 +148,38 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
                     <CardHeader>
                     <div className="flex justify-between items-center">
                         <CardTitle className="font-headline">Suggested Keywords</CardTitle>
-                        <Button variant="ghost" size="sm" onClick={() => copyToClipboard(results.keywords.join(', '))} className="font-body">
-                        <Copy className="mr-2 h-4 w-4" /> Copy All
+                        <Button variant="ghost" size="sm" onClick={() => copyToClipboard(results.keywords.map(k => k.keyword).join(', '))} className="font-body">
+                        <Copy className="mr-2 h-4 w-4" /> Copy Keywords
                         </Button>
                     </div>
                     <CardDescription className="font-body">
-                        Use these keywords to brainstorm content ideas, optimize existing pages, or inform your PPC campaigns. Long-tail keywords often have lower competition and higher conversion rates.
+                        Here are keywords related to your topic, with estimated volume and ranking difficulty.
                     </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <motion.div 
-                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                            variants={containerVariants}
-                            initial="hidden"
-                            animate="visible"
-                        >
-                        {results.keywords.map((keyword, index) => (
-                            <motion.div key={index} variants={itemVariants}>
-                                <Card className="p-4 flex items-center justify-center text-center h-24">
-                                    <p className="font-medium font-body">{keyword}</p>
-                                </Card>
-                            </motion.div>
-                        ))}
-                        </motion.div>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Keyword</TableHead>
+                                    <TableHead className="text-right">Search Volume</TableHead>
+                                    <TableHead className="w-[150px]">Difficulty</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {results.keywords.map((item, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell className="font-medium">{item.keyword}</TableCell>
+                                        <TableCell className="text-right">{item.searchVolume.toLocaleString()}</TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <Progress value={item.difficulty} className="w-full" indicatorClassName={getProgressColor(item.difficulty)} />
+                                                <span className="text-sm font-semibold">{item.difficulty}</span>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </CardContent>
                 </Card>
             </motion.div>

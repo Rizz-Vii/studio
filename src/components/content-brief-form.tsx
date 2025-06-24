@@ -12,6 +12,7 @@ import { Loader2, FileText, Compass, BarChart2, Star, Users, BrainCircuit } from
 import type { ContentBriefInput, ContentBriefOutput } from '@/ai/flows/content-brief';
 import { useRef, useEffect } from 'react';
 import LoadingScreen from '@/components/ui/loading-screen';
+import { ResponsiveContainer, RadialBarChart, RadialBar, PolarGrid, PolarAngleAxis } from 'recharts';
 
 const formSchema = z.object({
   keyword: z.string().min(3, { message: 'Keyword must be at least 3 characters long.' }),
@@ -40,6 +41,44 @@ const ResultCard = ({ title, icon: Icon, children, description }: { title: strin
         </CardContent>
     </Card>
 );
+
+
+const SeoScoreGauge = ({ score }: { score: number }) => {
+    const data = [{ name: 'SEO Score', value: score, fill: 'hsl(var(--primary))' }];
+    return (
+      <ResponsiveContainer width="100%" height={150}>
+        <RadialBarChart
+          data={data}
+          startAngle={180}
+          endAngle={0}
+          innerRadius="70%"
+          outerRadius="110%"
+          barSize={20}
+        >
+          <PolarGrid gridType="circle" radialLines={false} stroke="none" />
+          <RadialBar background dataKey="value" cornerRadius={10} />
+          <text
+            x="50%"
+            y="75%"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="text-4xl font-headline fill-foreground"
+          >
+            {score}
+          </text>
+          <text
+            x="50%"
+            y="95%"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="text-sm font-body fill-muted-foreground"
+          >
+            / 100
+          </text>
+        </RadialBarChart>
+      </ResponsiveContainer>
+    );
+};
 
 export default function ContentBriefForm({ onSubmit, isLoading, briefResult, error }: ContentBriefFormProps) {
   const form = useForm<ContentBriefFormValues>({
@@ -117,18 +156,18 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
               <ResultCard title="Executive Summary" icon={BrainCircuit} description="Core strategy and targets for this content piece.">
                  <div className="space-y-3">
                     <p className="text-muted-foreground font-body">{briefResult.briefSummary}</p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center pt-2">
-                        <div>
-                            <p className="font-bold text-lg text-primary font-headline">{briefResult.primaryKeyword}</p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 items-center pt-2">
+                        <div className="text-center">
+                            <p className="font-bold text-lg text-primary font-headline truncate">{briefResult.primaryKeyword}</p>
                             <p className="text-xs text-muted-foreground font-body">Primary Keyword</p>
                         </div>
-                        <div>
+                        <div className="text-center">
                             <p className="font-bold text-lg text-primary font-headline">{briefResult.searchIntent}</p>
                             <p className="text-xs text-muted-foreground font-body">Search Intent</p>
                         </div>
-                        <div>
-                            <p className="font-bold text-lg text-primary font-headline">{briefResult.seoScore}</p>
-                            <p className="text-xs text-muted-foreground font-body">SEO Potential</p>
+                        <div className="flex flex-col items-center justify-center">
+                            <SeoScoreGauge score={briefResult.seoScore} />
+                            <p className="text-xs text-muted-foreground font-body -mt-4">SEO Potential</p>
                         </div>
                     </div>
                   </div>

@@ -9,11 +9,13 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Link as LinkIcon, AlertTriangle } from 'lucide-react';
+import { Loader2, Link as LinkIcon, AlertTriangle, BarChart3 } from 'lucide-react';
 import type { LinkAnalysisInput, LinkAnalysisOutput } from '@/ai/flows/link-analysis';
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+import { ChartContainer, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
@@ -27,6 +29,52 @@ interface LinkAnalysisFormProps {
   results: LinkAnalysisOutput | null;
   error: string | null;
 }
+
+
+const DomainAuthorityChart = ({ backlinks }: { backlinks: LinkAnalysisOutput['backlinks'] }) => {
+    const daRanges = [
+        { range: '0-10', count: 0 }, { range: '11-20', count: 0 },
+        { range: '21-30', count: 0 }, { range: '31-40', count: 0 },
+        { range: '41-50', count: 0 }, { range: '51-60', count: 0 },
+        { range: '61-70', count: 0 }, { range: '71-80', count: 0 },
+        { range: '81-90', count: 0 }, { range: '91-100', count: 0 }
+    ];
+
+    backlinks.forEach(link => {
+        const index = Math.floor(link.domainAuthority / 10.01);
+        if (daRanges[index]) {
+            daRanges[index].count++;
+        }
+    });
+
+    const chartConfig: ChartConfig = {
+        count: { label: "Backlinks" },
+        range: { label: "DA Range" }
+    };
+    chartConfig['count'].color = 'hsl(var(--chart-1))';
+
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2"><BarChart3 />Domain Authority Distribution</CardTitle>
+                <CardDescription>Number of backlinks from domains in each DA range.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                    <BarChart data={daRanges} margin={{ left: -10, right: 10 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="range" tickLine={false} axisLine={false} />
+                        <YAxis tickLine={false} axisLine={false} />
+                        <RechartsTooltip cursor={false} content={<ChartTooltipContent />} />
+                        <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+    );
+};
+
 
 export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }: LinkAnalysisFormProps) {
     const form = useForm<FormValues>({
@@ -91,8 +139,9 @@ export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }
                         </motion.div>
                     )}
                     {results && (
-                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                            <Card className="mt-8">
+                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="mt-8 space-y-6">
+                            <DomainAuthorityChart backlinks={results.backlinks} />
+                            <Card>
                                 <CardHeader>
                                     <CardTitle className="font-headline">Backlink Profile</CardTitle>
                                     <CardDescription>

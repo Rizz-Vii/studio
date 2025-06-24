@@ -20,7 +20,7 @@ const ContentBriefOutputSchema = z.object({
   title: z.string().describe('A compelling, SEO-optimized title for the article.'),
   primaryKeyword: z.string().describe('The primary keyword the brief is targeting.'),
   searchIntent: z.string().describe('The user\'s likely intent (e.g., "Informational", "Commercial", "Transactional").'),
-  seoScore: z.string().describe('A simulated SEO potential score for this brief (e.g., "82/100").'),
+  seoScore: z.number().min(0).max(100).describe('A simulated SEO potential score from 0 to 100.'),
   llmGeneratedOutline: z.array(z.string()).describe('An ordered list of suggested headings to structure the content.'),
   recommendedMeta: z.object({
     title: z.string().describe('The suggested meta title.'),
@@ -49,7 +49,7 @@ Based on the target keyword, generate the following components for the content b
 1.  **title:** The main headline for the article. Make it compelling and include the keyword.
 2.  **primaryKeyword:** The main keyword to target. This should be the same as the input keyword.
 3.  **searchIntent:** Classify the search intent. Is it "Informational", "Commercial", "Transactional", or "Navigational"?
-4.  **seoScore:** Provide a simulated SEO potential score out of 100 (e.g., "85/100"). This score should reflect how likely content based on this brief is to succeed, considering competition and opportunity.
+4.  **seoScore:** Provide a simulated SEO potential score as a number between 0 and 100. This score should reflect how likely content based on this brief is to succeed, considering competition and opportunity.
 5.  **llmGeneratedOutline:** Create a logical content structure with an array of H2 and H3 headings.
 6.  **recommendedMeta:**
     *   **title:** An SEO-optimized meta title (50-60 characters).

@@ -10,11 +10,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Users, AlertTriangle } from 'lucide-react';
+import { Loader2, Users, AlertTriangle, BarChart3 } from 'lucide-react';
 import type { CompetitorAnalysisInput, CompetitorAnalysisOutput } from '@/ai/flows/competitor-analysis';
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+import { ChartContainer, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 
 const formSchema = z.object({
   yourUrl: z.string().url({ message: 'Please enter a valid URL for your website.' }),
@@ -30,6 +32,52 @@ interface CompetitorAnalysisFormProps {
   results: CompetitorAnalysisOutput | null;
   error: string | null;
 }
+
+
+const RankingsChart = ({ rankings }: { rankings: CompetitorAnalysisOutput['rankings']}) => {
+    if (!rankings || rankings.length === 0) return null;
+
+    const firstKeywordData = rankings[0];
+    const competitorUrls = Object.keys(firstKeywordData).filter(k => k !== 'keyword' && k !== 'yourRank');
+    
+    const chartData = [
+        { name: 'Your Site', rank: typeof firstKeywordData.yourRank?.rank === 'number' ? firstKeywordData.yourRank.rank : 101, fill: 'hsl(var(--chart-1))' },
+        ...competitorUrls.map((url, index) => {
+            const competitorData = (firstKeywordData as any)[url];
+            return {
+                name: new URL(url).hostname,
+                rank: typeof competitorData?.rank === 'number' ? competitorData.rank : 101,
+                fill: `hsl(var(--chart-${(index % 5) + 2}))`
+            };
+        })
+    ];
+    
+    const chartConfig: ChartConfig = chartData.reduce((acc, item) => {
+        acc[item.name] = { label: item.name, color: item.fill };
+        return acc;
+    }, {} as ChartConfig);
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2"><BarChart3/>Ranking Comparison for "{firstKeywordData.keyword}"</CardTitle>
+                <CardDescription>Lower bars are better. Ranks of 101 indicate "N/A" or rank > 100.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                    <BarChart data={chartData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                        <CartesianGrid horizontal={false} />
+                        <YAxis dataKey="name" type="category" width={120} tickLine={false} axisLine={false} stroke="hsl(var(--foreground))" className="text-xs" />
+                        <XAxis dataKey="rank" type="number" domain={[0, 101]} reversed={true} />
+                        <RechartsTooltip cursor={false} content={<ChartTooltipContent />} />
+                        <Bar dataKey="rank" layout="vertical" radius={5} />
+                    </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+    );
+};
+
 
 export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, error }: CompetitorAnalysisFormProps) {
     const form = useForm<FormValues>({
@@ -57,7 +105,6 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
         onSubmit(submissionValues);
     }
     
-    // Dynamically generate table headers
     const competitorHeaders = results ? Array.from(new Set(results.rankings.flatMap(r => Object.keys(r).filter(k => k !== 'keyword' && k !== 'yourRank')))) : [];
 
     return (
@@ -144,9 +191,11 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
                         >
+                            <RankingsChart rankings={results.rankings} />
+
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="font-headline flex items-center gap-2"><Users /> Keyword Rankings</CardTitle>
+                                    <CardTitle className="font-headline flex items-center gap-2"><Users /> Keyword Rankings Data</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <Table>
