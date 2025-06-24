@@ -5,17 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Link as LinkIcon, AlertTriangle, BarChart3 } from 'lucide-react';
-import type { LinkAnalysisInput, LinkAnalysisOutput } from '@/ai/flows/link-analysis';
-import { useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import LoadingScreen from '@/components/ui/loading-screen';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
-import { ChartContainer, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
+import { Loader2 } from 'lucide-react';
+import type { LinkAnalysisInput } from '@/ai/flows/link-analysis';
 
 const formSchema = z.object({
   url: z.string().min(1, { message: 'Please enter a valid URL.' }),
@@ -26,68 +20,13 @@ type FormValues = z.infer<typeof formSchema>;
 interface LinkAnalysisFormProps {
   onSubmit: (values: LinkAnalysisInput) => Promise<void>;
   isLoading: boolean;
-  results: LinkAnalysisOutput | null;
-  error: string | null;
 }
 
-
-const DomainAuthorityChart = ({ backlinks }: { backlinks: LinkAnalysisOutput['backlinks'] }) => {
-    const daRanges = [
-        { range: '0-10', count: 0 }, { range: '11-20', count: 0 },
-        { range: '21-30', count: 0 }, { range: '31-40', count: 0 },
-        { range: '41-50', count: 0 }, { range: '51-60', count: 0 },
-        { range: '61-70', count: 0 }, { range: '71-80', count: 0 },
-        { range: '81-90', count: 0 }, { range: '91-100', count: 0 }
-    ];
-
-    backlinks.forEach(link => {
-        const index = Math.floor(link.domainAuthority / 10.01);
-        if (daRanges[index]) {
-            daRanges[index].count++;
-        }
-    });
-
-    const chartConfig: ChartConfig = {
-        count: { label: "Backlinks" },
-        range: { label: "DA Range" }
-    };
-    chartConfig['count'].color = 'hsl(var(--chart-1))';
-
-
-    return (
-        <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
-            <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2"><BarChart3 />Domain Authority Distribution</CardTitle>
-                <CardDescription>Number of backlinks from domains in each DA range.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                    <BarChart data={daRanges} margin={{ left: -10, right: 10 }}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis dataKey="range" tickLine={false} axisLine={false} />
-                        <YAxis tickLine={false} axisLine={false} />
-                        <RechartsTooltip cursor={false} content={<ChartTooltipContent />} />
-                        <Bar dataKey="count" fill="var(--color-count)" radius={4} />
-                    </BarChart>
-                </ChartContainer>
-            </CardContent>
-        </Card>
-    );
-};
-
-
-export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }: LinkAnalysisFormProps) {
+export default function LinkAnalysisForm({ onSubmit, isLoading }: LinkAnalysisFormProps) {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: { url: '' },
     });
-
-    const resultsRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        if (results || error) {
-            resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }, [results, error]);
     
     function handleFormSubmit(values: FormValues) {
         const normalizeUrl = (url: string): string => {
@@ -108,91 +47,36 @@ export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }
     }
 
     return (
-        <div className="space-y-6">
-            <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                <CardHeader>
-                    <CardTitle className="font-headline">Backlink Analyzer</CardTitle>
-                    <CardDescription className="font-body">Enter a URL to discover its backlink profile.</CardDescription>
-                </CardHeader>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
-                        <CardContent>
-                            <FormField
-                                control={form.control}
-                                name="url"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>URL to Analyze</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="example.com" {...field} disabled={isLoading} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </CardContent>
-                        <CardFooter>
-                            <Button type="submit" disabled={isLoading}>
-                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Analyze Backlinks
-                            </Button>
-                        </CardFooter>
-                    </form>
-                </Form>
-            </Card>
-
-            <div ref={resultsRef}>
-                {isLoading && <LoadingScreen text="Discovering backlinks..." />}
-                <AnimatePresence>
-                    {error && (
-                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                            <Card className="mt-8 border-destructive shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                                <CardHeader>
-                                    <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p>{error}</p>
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-                    )}
-                    {results && (
-                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="mt-8 space-y-6">
-                            <DomainAuthorityChart backlinks={results.backlinks} />
-                            <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                                <CardHeader>
-                                    <CardTitle className="font-headline">Backlink Profile</CardTitle>
-                                    <CardDescription>
-                                        Found {results.summary.totalBacklinks} backlinks from {results.summary.referringDomains} unique domains.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Referring Domain</TableHead>
-                                                <TableHead>Anchor Text</TableHead>
-                                                <TableHead className="text-right">Domain Authority</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {results.backlinks.map((link, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell className="font-medium truncate" style={{maxWidth: '200px'}}>
-                                                        <a href={link.backlinkUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">{link.referringDomain}</a>
-                                                    </TableCell>
-                                                    <TableCell className="italic">"{link.anchorText}"</TableCell>
-                                                    <TableCell className="text-right">{link.domainAuthority}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-        </div>
+        <Card className="h-full">
+            <CardHeader>
+                <CardTitle className="font-headline">Backlink Analyzer</CardTitle>
+                <CardDescription className="font-body">Enter a URL to discover its backlink profile.</CardDescription>
+            </CardHeader>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+                    <CardContent>
+                        <FormField
+                            control={form.control}
+                            name="url"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>URL to Analyze</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="example.com" {...field} disabled={isLoading} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </CardContent>
+                    <CardFooter>
+                        <Button type="submit" disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Analyze Backlinks
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Form>
+        </Card>
     );
 }

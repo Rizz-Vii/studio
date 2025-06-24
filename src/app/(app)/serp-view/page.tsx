@@ -1,22 +1,37 @@
 // src/app/(app)/serp-view/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import SerpViewForm from '@/components/serp-view-form';
 import type { SerpViewInput, SerpViewOutput } from '@/ai/flows/serp-view';
 import { getSerpData } from '@/ai/flows/serp-view';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import SerpViewResults from '@/components/serp-view-results';
+import LoadingScreen from '@/components/ui/loading-screen';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { AlertTriangle } from 'lucide-react';
 
 export default function SerpViewPage() {
     const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [results, setResults] = useState<SerpViewOutput | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [submitted, setSubmitted] = useState(false);
+
+    const resultsRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (results || error) {
+            resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [results, error]);
 
     const handleSubmit = async (values: SerpViewInput) => {
         setIsLoading(true);
+        setSubmitted(true);
         setResults(null);
         setError(null);
         try {
@@ -41,13 +56,39 @@ export default function SerpViewPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <SerpViewForm
-                onSubmit={handleSubmit}
-                isLoading={isLoading}
-                results={results}
-                error={error}
-            />
+        <div className={cn(
+            "mx-auto transition-all duration-500",
+            submitted ? "max-w-7xl" : "max-w-xl"
+        )}>
+            <div className={cn(
+                "grid gap-8 transition-all duration-500",
+                submitted ? "lg:grid-cols-3" : "lg:grid-cols-1"
+            )}>
+                <motion.div layout className="lg:col-span-1">
+                     <SerpViewForm
+                        onSubmit={handleSubmit}
+                        isLoading={isLoading}
+                    />
+                </motion.div>
+                <div className="lg:col-span-2" ref={resultsRef}>
+                    <AnimatePresence>
+                        {isLoading && <LoadingScreen text="Fetching search results..." />}
+                        {error && (
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                                <Card className="border-destructive">
+                                    <CardHeader>
+                                        <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p>{error}</p>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        )}
+                        {results && <SerpViewResults results={results} />}
+                    </AnimatePresence>
+                </div>
+            </div>
         </div>
     );
 }

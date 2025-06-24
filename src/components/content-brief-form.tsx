@@ -1,4 +1,4 @@
-
+// src/components/content-brief-form.tsx
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,11 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, FileText, Compass, BarChart2, Star, Users, BrainCircuit } from 'lucide-react';
-import type { ContentBriefInput, ContentBriefOutput } from '@/ai/flows/content-brief';
-import { useRef, useEffect } from 'react';
-import LoadingScreen from '@/components/ui/loading-screen';
-import { ResponsiveContainer, RadialBarChart, RadialBar, PolarGrid, PolarAngleAxis } from 'recharts';
+import { Loader2 } from 'lucide-react';
+import type { ContentBriefInput } from '@/ai/flows/content-brief';
 
 const formSchema = z.object({
   keyword: z.string().min(3, { message: 'Keyword must be at least 3 characters long.' }),
@@ -23,191 +20,55 @@ type ContentBriefFormValues = z.infer<typeof formSchema>;
 interface ContentBriefFormProps {
   onSubmit: (values: ContentBriefInput) => Promise<void>;
   isLoading: boolean;
-  briefResult: ContentBriefOutput | null;
-  error: string | null;
 }
 
-const ResultCard = ({ title, icon: Icon, children, description }: { title: string; icon: React.ElementType; children: React.ReactNode, description?: string }) => (
-    <Card className="flex flex-col">
-        <CardHeader className="pb-4">
-            <CardTitle className="font-headline text-lg flex items-center gap-2">
-                <Icon className="h-6 w-6 text-primary" />
-                {title}
-            </CardTitle>
-            {description && <CardDescription>{description}</CardDescription>}
-        </CardHeader>
-        <CardContent className="flex-grow">
-            {children}
-        </CardContent>
-    </Card>
-);
-
-
-const SeoScoreGauge = ({ score }: { score: number }) => {
-    const data = [{ name: 'SEO Score', value: score, fill: 'hsl(var(--primary))' }];
-    return (
-      <ResponsiveContainer width="100%" height={150}>
-        <RadialBarChart
-          data={data}
-          startAngle={180}
-          endAngle={0}
-          innerRadius="70%"
-          outerRadius="110%"
-          barSize={20}
-        >
-          <PolarGrid gridType="circle" radialLines={false} stroke="none" />
-          <RadialBar background dataKey="value" cornerRadius={10} />
-          <text
-            x="50%"
-            y="75%"
-            textAnchor="middle"
-            dominantBaseline="middle"
-            className="text-4xl font-headline fill-foreground"
-          >
-            {score}
-          </text>
-          <text
-            x="50%"
-            y="95%"
-            textAnchor="middle"
-            dominantBaseline="middle"
-            className="text-sm font-body fill-muted-foreground"
-          >
-            / 100
-          </text>
-        </RadialBarChart>
-      </ResponsiveContainer>
-    );
-};
-
-export default function ContentBriefForm({ onSubmit, isLoading, briefResult, error }: ContentBriefFormProps) {
+export default function ContentBriefForm({ onSubmit, isLoading }: ContentBriefFormProps) {
   const form = useForm<ContentBriefFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { keyword: '' },
   });
 
-  const resultsRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (briefResult || error) {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [briefResult, error]);
-
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Generate a Content Brief</CardTitle>
-          <CardDescription className="font-body">
-            Enter a target keyword to generate a comprehensive SEO content brief.
-          </CardDescription>
-        </CardHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <CardContent>
-              <FormField
-                control={form.control}
-                name="keyword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-body">Target Keyword</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g., how to start a podcast"
-                        {...field}
-                        className="font-body"
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormDescription className="font-body">
-                      The primary keyword you want to rank for.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" disabled={isLoading} className="font-body w-full sm:w-auto">
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Generate Brief
-              </Button>
-            </CardFooter>
-          </form>
-        </Form>
-      </Card>
-
-      <div ref={resultsRef}>
-        {isLoading && <LoadingScreen text="Generating your content brief..." />}
-
-        {error && (
-          <Card className="border-destructive mt-8">
-            <CardHeader>
-              <CardTitle className="text-destructive font-headline">Generation Failed</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="font-body text-destructive-foreground">{error}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {briefResult && (
-          <div className="space-y-6 mt-8">
-              <ResultCard title="Executive Summary" icon={BrainCircuit} description="Core strategy and targets for this content piece.">
-                 <div className="space-y-3">
-                    <p className="text-muted-foreground font-body">{briefResult.briefSummary}</p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 items-center pt-2">
-                        <div className="text-center">
-                            <p className="font-bold text-lg text-primary font-headline truncate">{briefResult.primaryKeyword}</p>
-                            <p className="text-xs text-muted-foreground font-body">Primary Keyword</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="font-bold text-lg text-primary font-headline">{briefResult.searchIntent}</p>
-                            <p className="text-xs text-muted-foreground font-body">Search Intent</p>
-                        </div>
-                        <div className="flex flex-col items-center justify-center">
-                            <SeoScoreGauge score={briefResult.seoScore} />
-                            <p className="text-xs text-muted-foreground font-body -mt-4">SEO Potential</p>
-                        </div>
-                    </div>
-                  </div>
-              </ResultCard>
-
-              <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-6">
-                    <ResultCard title="Title and Meta" icon={FileText}>
-                      <div className="space-y-4">
-                          <div>
-                              <h4 className="font-semibold font-body">Suggested Title</h4>
-                              <p className="text-muted-foreground font-body">{briefResult.recommendedMeta.title}</p>
-                          </div>
-                          <div>
-                              <h4 className="font-semibold font-body">Meta Description</h4>
-                              <p className="text-muted-foreground font-body">{briefResult.recommendedMeta.description}</p>
-                          </div>
-                      </div>
-                    </ResultCard>
-                    <ResultCard title="Competitor Insights" icon={Users} description="What top-ranking pages are doing right.">
-                        <ul className="space-y-2 list-disc pl-5 font-body">
-                            {briefResult.competitorInsights.map((insight, i) => (
-                                <li key={i} className="p-1 rounded transition-colors hover:bg-muted/50">{insight}</li>
-                            ))}
-                        </ul>
-                    </ResultCard>
-                </div>
-                <ResultCard title="Content Outline" icon={BarChart2} description="A logical structure for the article.">
-                    <ul className="space-y-2 list-disc pl-5">
-                        {briefResult.llmGeneratedOutline.map((heading, i) => (
-                            <li key={i} className="font-body p-1 -ml-1 rounded transition-colors hover:bg-muted/50">
-                                {heading}
-                            </li>
-                        ))}
-                    </ul>
-                </ResultCard>
-              </div>
-          </div>
-        )}
-      </div>
-    </div>
+    <Card className="h-full">
+      <CardHeader>
+        <CardTitle className="font-headline">Generate a Content Brief</CardTitle>
+        <CardDescription className="font-body">
+          Enter a target keyword to generate a comprehensive SEO content brief.
+        </CardDescription>
+      </CardHeader>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <CardContent>
+            <FormField
+              control={form.control}
+              name="keyword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-body">Target Keyword</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., how to start a podcast"
+                      {...field}
+                      className="font-body"
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormDescription className="font-body">
+                    The primary keyword you want to rank for.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" disabled={isLoading} className="font-body w-full sm:w-auto">
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Generate Brief
+            </Button>
+          </CardFooter>
+        </form>
+      </Form>
+    </Card>
   );
 }

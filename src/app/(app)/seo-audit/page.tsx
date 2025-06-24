@@ -20,6 +20,7 @@ import {
   ChartConfig,
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell } from "recharts";
+import { cn } from '@/lib/utils';
 
 const statusIcons: { [key: string]: React.ElementType } = {
     good: CheckCircle,
@@ -126,7 +127,7 @@ const AuditCharts = ({ items }: { items: AuditUrlOutput['items']}) => {
 
 const AuditResults = ({ results }: { results: AuditUrlOutput }) => (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <Card className="mt-8">
+        <Card>
             <CardHeader>
                 <CardTitle className="font-headline">Audit Results</CardTitle>
                 <div className="flex items-center gap-4 pt-2">
@@ -171,6 +172,7 @@ export default function SeoAuditPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [results, setResults] = useState<AuditUrlOutput | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [submitted, setSubmitted] = useState(false);
     
     const resultsRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -182,6 +184,7 @@ export default function SeoAuditPage() {
 
     const handleSubmit = async (values: AuditUrlInput) => {
         setIsLoading(true);
+        setSubmitted(true);
         setResults(null);
         setError(null);
         try {
@@ -209,31 +212,39 @@ export default function SeoAuditPage() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto">
-            <SeoAuditForm
-                onSubmit={handleSubmit}
-                isLoading={isLoading}
-            />
-
-            <div ref={resultsRef}>
-                {isLoading && <LoadingScreen text="Auditing page..." />}
-                <AnimatePresence>
-                {error && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                        <Card className="mt-8 border-destructive">
-                            <CardHeader>
-                                <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Audit Failed</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p>{error}</p>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-                )}
-                {results && (
-                     <AuditResults results={results} />
-                )}
-                </AnimatePresence>
+        <div className={cn(
+            "mx-auto transition-all duration-500",
+            submitted ? "max-w-7xl" : "max-w-xl"
+        )}>
+            <div className={cn(
+                "grid gap-8 transition-all duration-500",
+                submitted ? "lg:grid-cols-3" : "lg:grid-cols-1"
+            )}>
+                <motion.div layout className="lg:col-span-1">
+                    <SeoAuditForm
+                        onSubmit={handleSubmit}
+                        isLoading={isLoading}
+                    />
+                </motion.div>
+                
+                <div className="lg:col-span-2" ref={resultsRef}>
+                    <AnimatePresence>
+                        {isLoading && <LoadingScreen text="Auditing page..." />}
+                        {error && (
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                                <Card className="border-destructive">
+                                    <CardHeader>
+                                        <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Audit Failed</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p>{error}</p>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        )}
+                        {results && <AuditResults results={results} />}
+                    </AnimatePresence>
+                </div>
             </div>
         </div>
     );

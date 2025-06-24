@@ -8,11 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, AlertTriangle } from 'lucide-react';
-import { useRef, useEffect } from 'react';
-import type { SerpViewOutput } from '@/ai/flows/serp-view';
-import SerpViewResults from './serp-view-results';
-import LoadingScreen from '@/components/ui/loading-screen';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   keyword: z.string().min(2, { message: 'Please enter a keyword.' }),
@@ -23,71 +19,45 @@ type FormValues = z.infer<typeof formSchema>;
 interface SerpViewFormProps {
   onSubmit: (values: FormValues) => Promise<void>;
   isLoading: boolean;
-  results: SerpViewOutput | null;
-  error: string | null;
 }
 
-export default function SerpViewForm({ onSubmit, isLoading, results, error }: SerpViewFormProps) {
+export default function SerpViewForm({ onSubmit, isLoading }: SerpViewFormProps) {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: { keyword: '' },
     });
 
-    const resultsRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        if (results || error) {
-            resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }, [results, error]);
-
     return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline">SERP Visualizer</CardTitle>
-                    <CardDescription className="font-body">Enter a keyword to see a simulated Search Engine Results Page.</CardDescription>
-                </CardHeader>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                        <CardContent>
-                            <FormField
-                                control={form.control}
-                                name="keyword"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Keyword</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="e.g., best seo tools 2025" {...field} disabled={isLoading} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </CardContent>
-                        <CardFooter>
-                            <Button type="submit" disabled={isLoading}>
-                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Visualize SERP
-                            </Button>
-                        </CardFooter>
-                    </form>
-                </Form>
-            </Card>
-
-            <div ref={resultsRef}>
-                {isLoading && <LoadingScreen text="Fetching search results..." />}
-                {error && (
-                     <Card className="mt-8 border-destructive">
-                        <CardHeader>
-                            <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p>{error}</p>
-                        </CardContent>
-                    </Card>
-                )}
-                {results && <SerpViewResults results={results} />}
-            </div>
-        </div>
+        <Card className="h-full">
+            <CardHeader>
+                <CardTitle className="font-headline">SERP Visualizer</CardTitle>
+                <CardDescription className="font-body">Enter a keyword to see a simulated Search Engine Results Page.</CardDescription>
+            </CardHeader>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <CardContent>
+                        <FormField
+                            control={form.control}
+                            name="keyword"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Keyword</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g., best seo tools 2025" {...field} disabled={isLoading} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </CardContent>
+                    <CardFooter>
+                        <Button type="submit" disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Visualize SERP
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Form>
+        </Card>
     );
 }
