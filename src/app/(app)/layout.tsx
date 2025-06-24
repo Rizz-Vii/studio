@@ -31,23 +31,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Search } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
+import { Input } from '@/components/ui/input';
 
 const AppHeader = () => {
-    return (
-      <header className="flex h-16 flex-shrink-0 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
-        {/* Mobile-only trigger */}
-        <SidebarTrigger className="md:hidden" />
-        {/* Mobile-only title */}
-        <div className="flex items-center gap-2 md:hidden">
-          <h1 className="text-xl font-headline font-semibold">{AppName}</h1>
+  return (
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm md:px-6">
+      <div className="flex h-full w-full items-center justify-between">
+        {/* Left side: Mobile trigger and a search bar */}
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="md:hidden" />
+          <div className="relative hidden md:block">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search features..."
+              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background"
+            />
+          </div>
         </div>
-      </header>
-    );
-  };
+        {/* Right side: User navigation */}
+        <div className="flex items-center gap-4">
+          <UserNav />
+        </div>
+      </div>
+    </header>
+  );
+};
 
 const UserNav = () => {
   const { user, profile } = useAuth();
@@ -89,19 +102,14 @@ const UserNav = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-lg p-2 text-left text-sm group-data-[state=collapsed]:h-12 group-data-[state=collapsed]:w-12 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:p-0"
+          className="relative h-8 w-8 rounded-full"
         >
           <Avatar className="h-8 w-8">
             <AvatarFallback>{userInitial}</AvatarFallback>
           </Avatar>
-          <div className="group-data-[state=collapsed]:hidden">
-            <p className="max-w-[7rem] truncate font-medium">
-              {profile?.displayName || user?.email}
-            </p>
-          </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="right" align="start" sideOffset={12}>
+      <DropdownMenuContent side="bottom" align="end" sideOffset={12}>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
@@ -185,11 +193,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex h-screen w-full bg-background">
           <Sidebar>
             <SidebarHeader className="p-4 flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:hidden">
+              <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
                 <AppLogo className="h-8 w-8 text-primary shrink-0" />
-                <span className="text-2xl font-headline font-bold text-primary">{AppName}</span>
+                <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
               </Link>
-               <SidebarTrigger className="hidden md:flex" />
             </SidebarHeader>
             <SidebarContent>
               <ScrollArea className="h-full">
@@ -197,7 +204,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </ScrollArea>
             </SidebarContent>
             <SidebarFooter className="p-2">
-                <UserNav />
+                <SidebarTrigger className="hidden md:flex" />
             </SidebarFooter>
           </Sidebar>
           <div className="flex-1 flex flex-col h-screen overflow-hidden">
