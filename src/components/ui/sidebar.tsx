@@ -5,6 +5,7 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
+import { motion } from "framer-motion"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -377,9 +378,9 @@ SidebarMenu.displayName = "SidebarMenu"
 
 const SidebarMenuItem = React.forwardRef<
   HTMLLIElement,
-  React.ComponentProps<"li">
+  React.ComponentProps<typeof motion.li>
 >(({ className, ...props }, ref) => (
-  <li
+  <motion.li
     ref={ref}
     data-sidebar="menu-item"
     className={cn("group/menu-item relative", className)}

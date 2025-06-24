@@ -1,3 +1,4 @@
+
 // src/app/(app)/layout.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
@@ -177,8 +178,7 @@ const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
           {navItems
             .filter(item => !item.adminOnly || (user && role === 'admin'))
             .map((item: NavItem) => (
-            <motion.li key={item.href} variants={menuItemVariants}>
-                <SidebarMenuItem>
+            <SidebarMenuItem key={item.href} variants={menuItemVariants}>
                 <SidebarMenuButton
                     isActive={pathname === item.href}
                     tooltip={{ children: item.title, className:"font-body" }}
@@ -195,7 +195,6 @@ const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
                     </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
-            </motion.li>
           ))}
         </SidebarMenu>
     );
