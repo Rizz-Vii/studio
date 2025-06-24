@@ -79,13 +79,8 @@ const UserNav = () => {
     const { open, setOpen, isMobile, setUserMenuOpen, pinned } = useSidebar();
     const [openedByMe, setOpenedByMe] = React.useState(false);
   
-    const handleLogout = async () => {
-      try {
-        await auth.signOut();
-        router.push('/');
-      } catch (error: any) {
-        console.error("Error logging out:", error.message);
-      }
+    const handleLogout = () => {
+        router.push('/logout');
     };
   
     const handleOpenChange = (isOpen: boolean) => {
