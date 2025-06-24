@@ -289,7 +289,7 @@ const SidebarTrigger = React.forwardRef<
         onClick={() => setOpenMobile(!openMobile)}
         {...props}
       >
-        <PanelLeft />
+        <PanelLeft className="h-5 w-5" />
         <span className="sr-only">Toggle Sidebar</span>
       </Button>
     )
@@ -307,7 +307,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeft />
+      <PanelLeft className="h-5 w-5" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
@@ -367,7 +367,7 @@ const SidebarMenu = React.forwardRef<
   HTMLUListElement,
   React.ComponentProps<"ul"> & { asChild?: boolean }
 >(({ className, asChild = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : "ul"
+  const Comp = asChild ? motion.ul : "ul"
   return (
     <Comp
       ref={ref}
@@ -444,7 +444,7 @@ const SidebarMenuButton = React.forwardRef<
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+        className={cn(sidebarMenuButtonVariants({ variant, size }), "[&_svg]:size-5", className)}
         {...props}
       />
     )

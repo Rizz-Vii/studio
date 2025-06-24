@@ -1,4 +1,3 @@
-
 // src/app/(app)/layout.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
@@ -166,19 +165,23 @@ const menuItemVariants = {
 
 const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
     const pathname = usePathname();
-    const { open, isMobile } = useSidebar();
+    const { open, isMobile, state } = useSidebar();
     const { user, role } = useAuth();
     
     // On mobile, the sidebar is a sheet, so when it's visible, the text should be too.
     // On desktop, the `open` state controls text visibility.
     const showText = open || isMobile;
 
+    const baseNavItems = navItems.filter(item => !item.adminOnly || (user && role === 'admin'));
+    const itemsToRender = (state === 'collapsed' && !isMobile)
+        ? baseNavItems.filter(item => pathname === item.href)
+        : baseNavItems;
+
+
     return (
         <SidebarMenu asChild>
             <motion.ul variants={navVariants} initial="closed" animate={showText ? "open" : "closed"}>
-            {navItems
-                .filter(item => !item.adminOnly || (user && role === 'admin'))
-                .map((item: NavItem) => (
+            {itemsToRender.map((item: NavItem) => (
                 <SidebarMenuItem key={item.href} variants={menuItemVariants}>
                     <SidebarMenuButton
                         isActive={pathname === item.href}
@@ -202,6 +205,19 @@ const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
     );
 };
 
+const SidebarPinControl = () => {
+    const { pinned } = useSidebar();
+    return (
+        <div className="flex w-full items-center justify-center gap-2 p-2">
+            <SidebarTrigger />
+            <div className="group-data-[state=expanded]:inline-block hidden whitespace-nowrap">
+                <span className="text-sm text-sidebar-foreground/70">{pinned ? 'Unpin' : 'Pin'} sidebar</span>
+                <span className="ml-2 text-xs text-sidebar-foreground/50">(⌘B)</span>
+            </div>
+        </div>
+    );
+};
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useProtectedRoute();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -217,9 +233,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // This effect runs when the page navigation completes and the path changes.
     setIsNavigating(false);
-  }, [pathname]); // Only depend on the pathname
+  }, [pathname]);
 
   if (loading || !user) {
     return <LoadingScreen />;
@@ -232,7 +247,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Sidebar>
                 <SidebarHeader className="p-4 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
-                    <AppLogo className="h-8 w-8 text-primary shrink-0" />
+                    <AppLogo className="h-6 w-6 text-primary shrink-0" />
                     <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
                 </Link>
                 </SidebarHeader>
@@ -241,8 +256,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <AppNav handleNavigation={handleNavigation} />
                 </ScrollArea>
                 </SidebarContent>
-                <SidebarFooter className="p-2">
-                    <SidebarTrigger className="hidden md:flex" />
+                <SidebarFooter>
+                    <SidebarPinControl />
                 </SidebarFooter>
             </Sidebar>
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
