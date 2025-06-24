@@ -19,7 +19,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Toolti
 import { ChartContainer, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 
 const formSchema = z.object({
-  yourUrl: z.string().url({ message: 'Please enter a valid URL for your website.' }),
+  yourUrl: z.string().min(1, { message: 'Please enter your website URL.' }),
   competitorUrls: z.string().min(1, { message: 'Please enter at least one competitor URL.' }),
   keywords: z.string().min(1, { message: 'Please enter at least one keyword.' }),
 });
@@ -58,7 +58,7 @@ const RankingsChart = ({ rankings }: { rankings: CompetitorAnalysisOutput['ranki
     }, {} as ChartConfig);
 
     return (
-        <Card>
+        <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
             <CardHeader>
                 <CardTitle className="font-headline flex items-center gap-2"><BarChart3/>Ranking Comparison for "{firstKeywordData.keyword}"</CardTitle>
                 <CardDescription>Lower bars are better. Ranks of 101 indicate "N/A" or rank > 100.</CardDescription>
@@ -97,9 +97,20 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
     }, [results, error]);
 
     function handleFormSubmit(values: FormValues) {
+        const normalizeUrl = (url: string): string => {
+            const trimmed = url.trim();
+            if (!trimmed) {
+                return "";
+            }
+            if (!/^(https?:\/\/)/i.test(trimmed)) {
+                return `https://${trimmed}`;
+            }
+            return trimmed;
+        };
+
         const submissionValues: CompetitorAnalysisInput = {
-            yourUrl: values.yourUrl,
-            competitorUrls: values.competitorUrls.split(',').map(url => url.trim()).filter(url => url),
+            yourUrl: normalizeUrl(values.yourUrl),
+            competitorUrls: values.competitorUrls.split(',').map(normalizeUrl).filter(url => url),
             keywords: values.keywords.split(',').map(kw => kw.trim()).filter(kw => kw),
         };
         onSubmit(submissionValues);
@@ -109,7 +120,7 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
 
     return (
         <div className="space-y-6">
-            <Card>
+            <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
                 <CardHeader>
                     <CardTitle className="font-headline">Competitor Analysis</CardTitle>
                     <CardDescription className="font-body">Compare your keyword rankings against your competitors.</CardDescription>
@@ -124,7 +135,7 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
                                     <FormItem>
                                         <FormLabel>Your URL</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="https://yourwebsite.com" {...field} disabled={isLoading} />
+                                            <Input placeholder="yourwebsite.com" {...field} disabled={isLoading} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -137,7 +148,7 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
                                     <FormItem>
                                         <FormLabel>Competitor URLs</FormLabel>
                                         <FormControl>
-                                            <Textarea placeholder="https://competitor1.com, https://competitor2.com" {...field} disabled={isLoading} />
+                                            <Textarea placeholder="competitor1.com, competitor2.com" {...field} disabled={isLoading} />
                                         </FormControl>
                                         <FormDescription>Comma-separated list of competitor URLs.</FormDescription>
                                         <FormMessage />
@@ -174,7 +185,7 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
                 <AnimatePresence>
                     {error && (
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                            <Card className="mt-8 border-destructive">
+                            <Card className="mt-8 border-destructive shadow-xl hover:shadow-2xl transition-shadow duration-300">
                                 <CardHeader>
                                     <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
                                 </CardHeader>
@@ -193,7 +204,7 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
                         >
                             <RankingsChart rankings={results.rankings} />
 
-                            <Card>
+                            <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
                                 <CardHeader>
                                     <CardTitle className="font-headline flex items-center gap-2"><Users /> Keyword Rankings Data</CardTitle>
                                 </CardHeader>
@@ -225,7 +236,7 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
                                 </CardContent>
                             </Card>
 
-                            <Card>
+                            <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
                                 <CardHeader>
                                     <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
                                     <CardDescription>Keywords where competitors rank well but you don't.</CardDescription>

@@ -12,7 +12,7 @@ import { Loader2 } from 'lucide-react';
 import type { AuditUrlInput } from '@/ai/flows/seo-audit';
 
 const formSchema = z.object({
-  url: z.string().url({ message: 'Please enter a valid URL.' }),
+  url: z.string().min(1, { message: 'Please enter a valid URL.' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -28,14 +28,32 @@ export default function SeoAuditForm({ onSubmit, isLoading }: SeoAuditFormProps)
         defaultValues: { url: '' },
     });
 
+    function handleFormSubmit(values: FormValues) {
+        const normalizeUrl = (url: string): string => {
+            const trimmed = url.trim();
+            if (!trimmed) {
+                return "";
+            }
+            if (!/^(https?:\/\/)/i.test(trimmed)) {
+                return `https://${trimmed}`;
+            }
+            return trimmed;
+        };
+
+        const submissionValues: AuditUrlInput = {
+            url: normalizeUrl(values.url),
+        };
+        onSubmit(submissionValues);
+    }
+
     return (
-        <Card>
+        <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
             <CardHeader>
                 <CardTitle className="font-headline">Technical SEO Audit</CardTitle>
                 <CardDescription className="font-body">Enter a URL to run a quick technical and content SEO audit.</CardDescription>
             </CardHeader>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
                     <CardContent>
                         <FormField
                             control={form.control}
@@ -44,7 +62,7 @@ export default function SeoAuditForm({ onSubmit, isLoading }: SeoAuditFormProps)
                                 <FormItem>
                                     <FormLabel>URL to Audit</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="https://example.com" {...field} disabled={isLoading} />
+                                        <Input placeholder="example.com" {...field} disabled={isLoading} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

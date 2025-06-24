@@ -18,7 +18,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Toolti
 import { ChartContainer, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 
 const formSchema = z.object({
-  url: z.string().url({ message: 'Please enter a valid URL.' }),
+  url: z.string().min(1, { message: 'Please enter a valid URL.' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -55,7 +55,7 @@ const DomainAuthorityChart = ({ backlinks }: { backlinks: LinkAnalysisOutput['ba
 
 
     return (
-        <Card>
+        <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
             <CardHeader>
                 <CardTitle className="font-headline flex items-center gap-2"><BarChart3 />Domain Authority Distribution</CardTitle>
                 <CardDescription>Number of backlinks from domains in each DA range.</CardDescription>
@@ -88,16 +88,34 @@ export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }
             resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }, [results, error]);
+    
+    function handleFormSubmit(values: FormValues) {
+        const normalizeUrl = (url: string): string => {
+            const trimmed = url.trim();
+            if (!trimmed) {
+                return "";
+            }
+            if (!/^(https?:\/\/)/i.test(trimmed)) {
+                return `https://${trimmed}`;
+            }
+            return trimmed;
+        };
+
+        const submissionValues: LinkAnalysisInput = {
+            url: normalizeUrl(values.url),
+        };
+        onSubmit(submissionValues);
+    }
 
     return (
         <div className="space-y-6">
-            <Card>
+            <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
                 <CardHeader>
                     <CardTitle className="font-headline">Backlink Analyzer</CardTitle>
                     <CardDescription className="font-body">Enter a URL to discover its backlink profile.</CardDescription>
                 </CardHeader>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
                         <CardContent>
                             <FormField
                                 control={form.control}
@@ -106,7 +124,7 @@ export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }
                                     <FormItem>
                                         <FormLabel>URL to Analyze</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="https://example.com" {...field} disabled={isLoading} />
+                                            <Input placeholder="example.com" {...field} disabled={isLoading} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -128,7 +146,7 @@ export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }
                 <AnimatePresence>
                     {error && (
                          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                            <Card className="mt-8 border-destructive">
+                            <Card className="mt-8 border-destructive shadow-xl hover:shadow-2xl transition-shadow duration-300">
                                 <CardHeader>
                                     <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
                                 </CardHeader>
@@ -141,7 +159,7 @@ export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }
                     {results && (
                          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="mt-8 space-y-6">
                             <DomainAuthorityChart backlinks={results.backlinks} />
-                            <Card>
+                            <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
                                 <CardHeader>
                                     <CardTitle className="font-headline">Backlink Profile</CardTitle>
                                     <CardDescription>
