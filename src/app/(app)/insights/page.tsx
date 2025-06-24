@@ -167,4 +167,8 @@ export default function InsightsPage() {
                             </Card>
                         </motion.div>
                     ))}
-                </motion.div
+                </motion.div>
+            )}
+        </div>
+    );
+}
