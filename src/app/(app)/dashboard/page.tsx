@@ -22,12 +22,10 @@ import {
   Rocket,
   Lightbulb,
   ArrowRight,
-  Loader2 // Added this
+  Loader2
 } from "lucide-react";
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import LoadingScreen from '@/components/ui/loading-screen';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
@@ -420,31 +418,27 @@ const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
     );
 };
 
-const ActionableInsights: React.FC<{ user: any }> = ({ user }) => {
+const ActionableInsights: React.FC<{ user: any; activities: UserActivity[]; }> = ({ user, activities }) => {
     const [insights, setInsights] = useState<GenerateInsightsOutput['insights']>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchInsights = async () => {
-            if (!user) return;
+            if (!user) {
+                setLoading(false);
+                return;
+            };
+
+            const simplifiedActivities = activities.map(activity => ({
+                type: activity.type,
+                tool: activity.tool,
+                details: activity.details,
+                resultsSummary: activity.resultsSummary,
+            }));
             
-            const activitiesRef = collection(db, "users", user.uid, "activities");
-            const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(10));
-            const querySnapshot = await getDocs(q);
-
-            const activities = querySnapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    type: data.type,
-                    tool: data.tool,
-                    details: data.details,
-                    resultsSummary: data.resultsSummary,
-                };
-            });
-
-            if (activities.length > 0) {
+            if (simplifiedActivities.length > 0) {
                 try {
-                    const result = await generateInsights({ activities });
+                    const result = await generateInsights({ activities: simplifiedActivities });
                     setInsights(result.insights);
                 } catch (error) {
                     console.error("Failed to generate insights:", error);
@@ -453,7 +447,7 @@ const ActionableInsights: React.FC<{ user: any }> = ({ user }) => {
             setLoading(false);
         };
         fetchInsights();
-    }, [user]);
+    }, [user, activities]);
 
     if (loading) {
         return (
@@ -505,11 +499,8 @@ const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[
 // ----- MAIN COMPONENT -----
 
 export default function DashboardPage() {
-  const { user: currentUser, profile } = useAuth();
+  const { user: currentUser, profile, activities, loading: authLoading } = useAuth();
   
-  const [groupedActivities, setGroupedActivities] = useState<GroupedActivities>({});
-  const [loadingData, setLoadingData] = useState(true);
-
   const containerVariants = {
     hidden: { opacity: 1 },
     visible: {
@@ -532,46 +523,18 @@ export default function DashboardPage() {
     },
   };
 
-  useEffect(() => {
-    const fetchActivities = async () => {
-      if (currentUser) {
-        setLoadingData(true);
-        const activitiesRef = collection(db, "users", currentUser.uid, "activities");
-        const q = query(activitiesRef, orderBy("timestamp", "desc"));
-        try {
-            const querySnapshot = await getDocs(q);
-
-            const fetchedActivities = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-            } as UserActivity));
-
-            const grouped = fetchedActivities.reduce((acc, activity) => {
-            const tool = activity.tool || "Other";
-            if (!acc[tool]) {
-                acc[tool] = [];
-            }
-            acc[tool].push(activity);
-            return acc;
-            }, {} as GroupedActivities);
-
-            setGroupedActivities(grouped);
-        } catch (error) {
-            console.error("Error fetching activities:", error);
-        } finally {
-            setLoadingData(false);
-        }
-      } else {
-          setGroupedActivities({});
-          setLoadingData(false);
-      }
-    };
-    fetchActivities();
-  }, [currentUser]);
-
-  if (loadingData) {
+  if (authLoading) {
       return <LoadingScreen fullScreen text="Loading dashboard data..." />
   }
+
+  const groupedActivities = activities.reduce((acc, activity) => {
+    const tool = activity.tool || "Other";
+    if (!acc[tool]) {
+        acc[tool] = [];
+    }
+    acc[tool].push(activity);
+    return acc;
+  }, {} as GroupedActivities);
 
   const toolSummaries = Object.entries(groupedActivities).map(([tool, activities]) => {
     const ToolSummary = toolSummaryComponents[tool as keyof typeof toolSummaryComponents];
@@ -659,7 +622,7 @@ export default function DashboardPage() {
                         <CardDescription>AI-generated recommendations based on your recent activity.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <ActionableInsights user={currentUser} />
+                        <ActionableInsights user={currentUser} activities={activities} />
                     </CardContent>
                     <CardFooter>
                         <Button variant="outline" asChild>

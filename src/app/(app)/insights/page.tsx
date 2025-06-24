@@ -5,8 +5,6 @@ import { useState, useEffect } from 'react';
 import { generateInsights } from '@/ai/flows/generate-insights';
 import type { GenerateInsightsOutput } from '@/ai/flows/generate-insights';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Lightbulb, AlertTriangle, ArrowRight } from 'lucide-react';
@@ -17,42 +15,36 @@ import LoadingScreen from '@/components/ui/loading-screen';
 import { motion } from 'framer-motion';
 
 export default function InsightsPage() {
-    const { user } = useAuth();
+    const { user, activities, loading: authLoading } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [insights, setInsights] = useState<GenerateInsightsOutput['insights']>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchInsights = async () => {
+            if (authLoading) {
+                return;
+            }
             if (!user) {
                 setIsLoading(false);
                 return;
             }
 
+            setIsLoading(true);
             try {
-                // 1. Fetch last 10 activities
-                const activitiesRef = collection(db, "users", user.uid, "activities");
-                const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(10));
-                const querySnapshot = await getDocs(q);
-
-                const activities = querySnapshot.docs.map(doc => {
-                    const data = doc.data();
-                    return {
-                        type: data.type,
-                        tool: data.tool,
-                        details: data.details,
-                        resultsSummary: data.resultsSummary,
-                    };
-                });
-
                 if (activities.length === 0) {
                     setInsights([]);
-                    setIsLoading(false);
                     return;
                 }
 
-                // 2. Generate insights
-                const result = await generateInsights({ activities });
+                const simplifiedActivities = activities.map(activity => ({
+                    type: activity.type,
+                    tool: activity.tool,
+                    details: activity.details,
+                    resultsSummary: activity.resultsSummary,
+                }));
+
+                const result = await generateInsights({ activities: simplifiedActivities });
                 setInsights(result.insights);
 
             } catch (e: any) {
@@ -63,7 +55,7 @@ export default function InsightsPage() {
         };
 
         fetchInsights();
-    }, [user]);
+    }, [user, activities, authLoading]);
 
     const priorityColors: { [key: string]: string } = {
         'High': 'bg-destructive',
