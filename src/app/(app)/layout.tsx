@@ -29,7 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Search, Rocket } from 'lucide-react';
+import { User, LogOut, Search, Rocket, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
@@ -224,6 +224,37 @@ const SidebarPinControl = () => {
     );
 };
 
+const MainPanel = ({ children, isNavigating }: { children: React.ReactNode, isNavigating: boolean }) => {
+    const { handleNavigation } = useAppNavigation();
+    const { open, setOpen, pinned, isMobile } = useSidebar();
+    const pathname = usePathname();
+
+    const handleClickOutside = () => {
+        if (!isMobile && open && !pinned) {
+            setOpen(false);
+        }
+    };
+
+    return (
+        <div className="flex-1 flex flex-col h-screen overflow-hidden" onClick={handleClickOutside}>
+            <AppHeader handleNavigation={handleNavigation} />
+            <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={pathname}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {isNavigating ? <LoadingScreen /> : children}
+                    </motion.div>
+                </AnimatePresence>
+            </main>
+        </div>
+    );
+};
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useProtectedRoute();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -266,22 +297,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <SidebarPinControl />
                 </SidebarFooter>
             </Sidebar>
-            <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                <AppHeader handleNavigation={handleNavigation} />
-                <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={pathname}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            {isNavigating ? <LoadingScreen /> : children}
-                        </motion.div>
-                    </AnimatePresence>
-                </main>
-            </div>
+            <MainPanel isNavigating={isNavigating}>
+                {children}
+            </MainPanel>
         </div>
         </SidebarProvider>
     </AppNavigationContext.Provider>
