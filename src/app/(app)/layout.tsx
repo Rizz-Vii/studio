@@ -162,26 +162,24 @@ const menuItemVariants = {
   }
 };
 
+const textSpanVariants = {
+    open: { opacity: 1, x: 0, transition: { duration: 0.2, delay: 0.1 } },
+    closed: { opacity: 0, x: -10, transition: { duration: 0.15 } }
+}
 
 const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
     const pathname = usePathname();
-    const { open, isMobile, state } = useSidebar();
+    const { open, isMobile } = useSidebar();
     const { user, role } = useAuth();
     
-    // On mobile, the sidebar is a sheet, so when it's visible, the text should be too.
-    // On desktop, the `open` state controls text visibility.
     const showText = open || isMobile;
 
     const baseNavItems = navItems.filter(item => !item.adminOnly || (user && role === 'admin'));
-    const itemsToRender = (state === 'collapsed' && !isMobile)
-        ? baseNavItems.filter(item => pathname === item.href)
-        : baseNavItems;
-
 
     return (
         <SidebarMenu asChild>
-            <motion.ul variants={navVariants} initial="closed" animate={showText ? "open" : "closed"}>
-            {itemsToRender.map((item: NavItem) => (
+            <motion.ul variants={navVariants} initial="closed" animate="open">
+            {baseNavItems.map((item: NavItem) => (
                 <SidebarMenuItem key={item.href} variants={menuItemVariants}>
                     <SidebarMenuButton
                         isActive={pathname === item.href}
@@ -191,11 +189,19 @@ const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
                         >
                     <Link href={item.href} onClick={(e) => handleNavigation(e, item.href)}>
                             <item.icon />
-                            {showText && (
-                            <span className="whitespace-nowrap">
+                            <AnimatePresence>
+                                {showText && (
+                                <motion.span
+                                    className="whitespace-nowrap"
+                                    variants={textSpanVariants}
+                                    initial="closed"
+                                    animate="open"
+                                    exit="closed"
+                                >
                                     {item.title}
-                                </span>
-                            )}
+                                </motion.span>
+                                )}
+                            </AnimatePresence>
                         </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -247,7 +253,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Sidebar>
                 <SidebarHeader className="p-4 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
-                    <AppLogo className="h-6 w-6 text-primary shrink-0" />
+                    <AppLogo className="h-8 w-8 text-primary shrink-0" />
                     <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
                 </Link>
                 </SidebarHeader>
