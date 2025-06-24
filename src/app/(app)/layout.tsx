@@ -37,7 +37,7 @@ import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { Input } from '@/components/ui/input';
 
-const AppHeader = () => {
+const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void; }) => {
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b bg-card/95 px-4 backdrop-blur-sm md:px-6">
       <div className="flex h-full w-full items-center justify-between">
@@ -66,7 +66,7 @@ const AppHeader = () => {
           className="flex items-center gap-4"
         >
             <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
-                <Link href="/seo-audit">
+                <Link href="/seo-audit" onClick={(e) => handleNavigation(e, '/seo-audit')}>
                     <Rocket className="mr-2 h-4 w-4" />
                     New Audit
                 </Link>
@@ -145,22 +145,13 @@ const UserNav = () => {
   };
 
 interface AppNavProps {
-  setIsNavigating: (isNavigating: boolean) => void;
+    handleNavigation: (event: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
 }
 
-const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
+const AppNav: React.FC<AppNavProps> = ({ handleNavigation }) => {
     const pathname = usePathname();
-    const router = useRouter();
     const { open, isMobile } = useSidebar();
     const { user, role } = useAuth();
-
-    const handleNavigation = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        event.preventDefault();
-        if (pathname !== href) {
-            setIsNavigating(true);
-            router.push(href);
-        }
-    };
     
     // On mobile, the sidebar is a sheet, so when it's visible, the text should be too.
     // On desktop, the `open` state controls text visibility.
@@ -197,6 +188,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useProtectedRoute();
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleNavigation = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    if (pathname !== href) {
+        setIsNavigating(true);
+        router.push(href);
+    }
+  };
 
   useEffect(() => {
     if (isNavigating) {
@@ -220,7 +220,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarHeader>
             <SidebarContent>
               <ScrollArea className="h-full">
-                <AppNav setIsNavigating={setIsNavigating} />
+                <AppNav handleNavigation={handleNavigation} />
               </ScrollArea>
             </SidebarContent>
             <SidebarFooter className="p-2">
@@ -228,7 +228,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarFooter>
           </Sidebar>
           <div className="flex-1 flex flex-col h-screen overflow-hidden">
-            <AppHeader />
+            <AppHeader handleNavigation={handleNavigation} />
             <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
                 <AnimatePresence>
                 {isNavigating && <LoadingScreen />}
