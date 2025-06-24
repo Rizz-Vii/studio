@@ -1,3 +1,4 @@
+
 // src/app/(app)/layout.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
@@ -32,7 +33,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut, Search, Rocket } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { Input } from '@/components/ui/input';
@@ -199,7 +200,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (isNavigating) {
       setIsNavigating(false);
     }
-  }, [pathname, isNavigating]);
+  }, [pathname]);
 
   if (loading || !user) {
     return <LoadingScreen />;
