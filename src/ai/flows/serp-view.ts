@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview SERP analysis flow that simulates search engine results for a given keyword.
@@ -18,7 +19,7 @@ export type SerpViewInput = z.infer<typeof SerpViewInputSchema>;
 const OrganicResultSchema = z.object({
   position: z.number().describe('The ranking position.'),
   title: z.string().describe('The title of the search result.'),
-  url: z.string().url().describe('The URL of the search result.'),
+  url: z.string().describe('The URL of the search result.'),
   snippet: z.string().describe('A short descriptive snippet from the page.'),
 });
 
