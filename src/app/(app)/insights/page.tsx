@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import LoadingScreen from '@/components/ui/loading-screen';
+import { motion } from 'framer-motion';
 
 export default function InsightsPage() {
     const { user } = useAuth();
@@ -34,11 +35,8 @@ export default function InsightsPage() {
                 const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(10));
                 const querySnapshot = await getDocs(q);
 
-                // Convert Firestore Timestamps and other complex objects to plain objects
-                // before passing to the server function.
                 const activities = querySnapshot.docs.map(doc => {
                     const data = doc.data();
-                    // We only need the fields defined in the ActivitySchema for the AI flow.
                     return {
                         type: data.type,
                         tool: data.tool,
@@ -68,15 +66,33 @@ export default function InsightsPage() {
     }, [user]);
 
     const priorityColors: { [key: string]: string } = {
-        'High': 'bg-red-500',
-        'Medium': 'bg-yellow-500',
-        'Low': 'bg-green-500',
+        'High': 'bg-destructive',
+        'Medium': 'bg-warning',
+        'Low': 'bg-success',
     };
 
     if (isLoading) {
         return <LoadingScreen text="Generating personalized insights..." />;
     }
     
+    const containerVariants = {
+        hidden: { opacity: 1 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.1,
+          },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+          y: 0,
+          opacity: 1,
+        },
+    };
+
     return (
         <div className="max-w-4xl mx-auto">
             <div className="mb-8">
@@ -108,44 +124,47 @@ export default function InsightsPage() {
             )}
 
             {!error && insights.length > 0 && (
-                <div className="space-y-4">
+                <motion.div 
+                    className="space-y-4"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
                     {insights.map(insight => (
-                        <Card key={insight.id}>
-                            <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <CardTitle className="font-headline">{insight.title}</CardTitle>
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <div className={`h-3 w-3 rounded-full ${priorityColors[insight.priority]}`}></div>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{insight.priority} Priority</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </div>
-                                <CardDescription>
-                                    <Badge variant="outline" className="mr-2">{insight.category}</Badge>
-                                    Impact: <Badge variant="secondary">{insight.estimatedImpact}</Badge>
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="font-body text-muted-foreground">{insight.description}</p>
-                            </CardContent>
-                            {insight.actionLink && insight.actionText && (
-                                <CardFooter>
-                                    <Button asChild>
-                                        <Link href={insight.actionLink}>
-                                            {insight.actionText} <ArrowRight className="ml-2 h-4 w-4" />
-                                        </Link>
-                                    </Button>
-                                </CardFooter>
-                            )}
-                        </Card>
+                        <motion.div key={insight.id} variants={itemVariants}>
+                            <Card>
+                                <CardHeader>
+                                    <div className="flex justify-between items-start">
+                                        <CardTitle className="font-headline">{insight.title}</CardTitle>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <div className={`h-3 w-3 rounded-full ${priorityColors[insight.priority]}`}></div>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{insight.priority} Priority</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                    <CardDescription>
+                                        <Badge variant="outline" className="mr-2">{insight.category}</Badge>
+                                        Impact: <Badge variant="secondary">{insight.estimatedImpact}</Badge>
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="font-body text-muted-foreground">{insight.description}</p>
+                                </CardContent>
+                                {insight.actionLink && insight.actionText && (
+                                    <CardFooter>
+                                        <Button asChild>
+                                            <Link href={insight.actionLink}>
+                                                {insight.actionText} <ArrowRight className="ml-2 h-4 w-4" />
+                                            </Link>
+                                        </Button>
+                                    </CardFooter>
+                                )}
+                            </Card>
+                        </motion.div>
                     ))}
-                </div>
-            )}
-        </div>
-    );
-}
+                </motion.div

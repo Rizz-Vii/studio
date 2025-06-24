@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, KeyRound, ScanText, Users, Search, ListChecks, Link, TrendingUp, Rocket, User, Activity, BookText, Shield } from 'lucide-react';
+import { LayoutDashboard, KeyRound, ScanText, Users, Search, ListChecks, Link, TrendingUp, Rocket, User, Activity, BookText, Shield, Lightbulb } from 'lucide-react';
 
 export interface NavItem {
   title: string;
@@ -19,7 +19,7 @@ export const navItems: NavItem[] = [
   {
     title: 'Insights',
     href: '/insights',
-    icon: TrendingUp,
+    icon: Lightbulb,
   },
   {
     title: 'Content Brief',

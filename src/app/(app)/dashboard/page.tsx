@@ -19,12 +19,14 @@ import {
   Link as LinkIcon,
   ChevronLeft, 
   ChevronRight,
-  Rocket
+  Rocket,
+  Lightbulb,
+  ArrowRight
 } from "lucide-react";
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import LoadingScreen from '@/components/ui/loading-screen';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
@@ -36,6 +38,8 @@ import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/comp
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { dummyContentBriefs, ContentBrief } from '@/lib/dummy-data';
+import type { GenerateInsightsOutput } from '@/ai/flows/generate-insights';
+import { generateInsights } from '@/ai/flows/generate-insights';
 import Link from 'next/link';
 
 // ----- TYPES AND CONFIGS -----
@@ -51,14 +55,14 @@ interface UserActivity {
 
 type GroupedActivities = Record<string, UserActivity[]>;
 
-const toolConfig: Record<string, { icon: React.ElementType; color: string }> = {
-  "SEO Audit": { icon: ListChecks, color: "text-blue-500" },
-  "Keyword Tool": { icon: KeyRound, color: "text-green-500" },
-  "Content Analyzer": { icon: ScanText, color: "text-purple-500" },
-  "Competitor Analysis": { icon: Users, color: "text-orange-500" },
-  "Content Brief": { icon: BookText, color: "text-indigo-500" },
-  "Link View": { icon: LinkIcon, color: "text-teal-500" },
-  "Default": { icon: Activity, color: "text-gray-500" },
+const toolConfig: Record<string, { icon: React.ElementType; color: string; href: string; }> = {
+  "SEO Audit": { icon: ListChecks, color: "text-blue-500", href: "/seo-audit"},
+  "Keyword Tool": { icon: KeyRound, color: "text-green-500", href: "/keyword-tool" },
+  "Content Analyzer": { icon: ScanText, color: "text-purple-500", href: "/content-analyzer" },
+  "Competitor Analysis": { icon: Users, color: "text-orange-500", href: "/competitors" },
+  "Content Brief": { icon: BookText, color: "text-indigo-500", href: "/content-brief" },
+  "Link View": { icon: LinkIcon, color: "text-teal-500", href: "/link-view" },
+  "Default": { icon: Activity, color: "text-gray-500", href: "/dashboard" },
 };
 
 const chartConfig = {
@@ -346,7 +350,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                     >
                     {getVisibleBriefs().map((brief) => (
                         <Link href="/content-brief" key={brief.id} className="block hover:no-underline">
-                            <Card className="h-full w-[160px] flex flex-col bg-muted/50 hover:bg-muted transition-colors overflow-hidden cursor-pointer">
+                            <Card className="h-full w-[160px] flex flex-col bg-muted/50 overflow-hidden cursor-pointer">
                                 <CardHeader className="p-3 pb-2">
                                     <CardTitle className="text-sm font-bold font-headline truncate" title={brief.title}>{brief.title}</CardTitle>
                                 </CardHeader>
@@ -415,15 +419,77 @@ const LinkViewSummary: React.FC<{ activities: UserActivity[] }> = ({ activities 
     );
 };
 
-const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[]; profile?: any | null }>> = {
-  "SEO Audit": SeoAuditSummary,
-  "Content Analyzer": ContentAnalyzerSummary,
-  "Keyword Tool": KeywordToolSummary,
-  "Competitor Analysis": CompetitorAnalysisSummary,
-  "Content Brief": ContentBriefSummary,
-  "Link View": LinkViewSummary,
-};
+const ActionableInsights: React.FC<{ user: any }> = ({ user }) => {
+    const [insights, setInsights] = useState<GenerateInsightsOutput['insights']>([]);
+    const [loading, setLoading] = useState(true);
 
+    useEffect(() => {
+        const fetchInsights = async () => {
+            if (!user) return;
+            
+            const activitiesRef = collection(db, "users", user.uid, "activities");
+            const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(10));
+            const querySnapshot = await getDocs(q);
+
+            const activities = querySnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    type: data.type,
+                    tool: data.tool,
+                    details: data.details,
+                    resultsSummary: data.resultsSummary,
+                };
+            });
+
+            if (activities.length > 0) {
+                try {
+                    const result = await generateInsights({ activities });
+                    setInsights(result.insights);
+                } catch (error) {
+                    console.error("Failed to generate insights:", error);
+                }
+            }
+            setLoading(false);
+        };
+        fetchInsights();
+    }, [user]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
+    
+    if (insights.length === 0) {
+        return (
+            <div className="text-center py-8">
+                <Lightbulb className="h-10 w-10 mx-auto text-muted-foreground mb-2"/>
+                <p className="font-body text-muted-foreground">No new insights. Use the tools to get started!</p>
+            </div>
+        );
+    }
+
+    return (
+        <ul className="space-y-3">
+            {insights.slice(0, 4).map(insight => (
+                <li key={insight.id}>
+                     <Link href={insight.actionLink || '/insights'} className="block p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center justify-between">
+                            <p className="font-semibold font-body">{insight.title}</p>
+                            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <p className="text-sm text-muted-foreground font-body">{insight.description}</p>
+                        <div className="mt-2">
+                             <Badge variant={insight.priority === 'High' ? 'destructive' : insight.priority === 'Medium' ? 'warning' : 'success'} className="text-xs">{insight.priority}</Badge>
+                        </div>
+                    </Link>
+                </li>
+            ))}
+        </ul>
+    );
+};
 
 // ----- MAIN COMPONENT -----
 
@@ -493,48 +559,30 @@ export default function DashboardPage() {
   }, [currentUser]);
 
   if (loadingData) {
-      return <LoadingScreen text="Loading dashboard data..." />
+      return <LoadingScreen fullScreen text="Loading dashboard data..." />
   }
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <h1 className="text-3xl font-headline font-semibold text-foreground">
-        Welcome, {profile?.displayName || currentUser?.email}!
-      </h1>
-      <p className="text-muted-foreground font-body">Here's your SEO command center. Monitor key metrics and review your activity across all tools.</p>
-      
-      {Object.keys(groupedActivities).length > 0 ? (
-        <motion.div 
-            className="grid gap-6 md:grid-cols-1 lg:grid-cols-2"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-        >
-          {Object.entries(groupedActivities).map(([tool, activities]) => {
-            const ToolSummary = toolSummaryComponents[tool];
-            const config = toolConfig[tool] || toolConfig["Default"];
-            const Icon = config.icon;
+  const toolSummaries = Object.entries(groupedActivities).map(([tool, activities]) => {
+    const ToolSummary = toolSummaryComponents[tool as keyof typeof toolSummaryComponents];
+    const config = toolConfig[tool] || toolConfig["Default"];
+    const Icon = config.icon;
 
-            return (
-                <motion.div key={tool} variants={itemVariants}>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Card className="flex flex-col cursor-pointer h-full">
-                                <CardHeader>
-                                    <div className="flex justify-between items-start">
-                                        <CardTitle className="font-headline flex items-center gap-2">
-                                            <Icon className={`h-6 w-6 ${config.color}`} />
-                                            {tool}
-                                        </CardTitle>
-                                        <Badge variant="outline" className="text-xs font-body">{activities.length} {activities.length === 1 ? 'Activity' : 'Activities'}</Badge>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="flex-grow space-y-4 pt-4">
-                                    {ToolSummary && <ToolSummary activities={activities} profile={profile} />}
-                                </CardContent>
-                            </Card>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl">
+    if (!ToolSummary) return null;
+
+    return (
+        <motion.div key={tool} variants={itemVariants}>
+            <Card className="flex flex-col h-full">
+                <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <CardTitle className="font-headline flex items-center gap-2">
+                            <Icon className={`h-6 w-6 ${config.color}`} />
+                            <Link href={config.href} className="hover:underline">{tool}</Link>
+                        </CardTitle>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                 <Badge variant="outline" className="text-xs font-body cursor-pointer">{activities.length} {activities.length === 1 ? 'Activity' : 'Activities'}</Badge>
+                            </DialogTrigger>
+                             <DialogContent className="max-w-4xl">
                             <DialogHeader>
                                 <DialogTitle className="font-headline flex items-center gap-2 text-2xl">
                                     <Icon className={`h-6 w-6 ${config.color}`} />
@@ -572,10 +620,81 @@ export default function DashboardPage() {
                                 </Table>
                             </div>
                         </DialogContent>
-                    </Dialog>
-                </motion.div>
-            );
-          })}
+                        </Dialog>
+                    </div>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                    <ToolSummary activities={activities} profile={profile} />
+                </CardContent>
+            </Card>
+        </motion.div>
+    );
+  }).filter(Boolean);
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-8">
+      <h1 className="text-3xl font-headline font-semibold text-foreground">
+        Welcome, {profile?.displayName || currentUser?.email}!
+      </h1>
+      <p className="text-muted-foreground font-body">Here's your SEO command center. Monitor key metrics and review your activity across all tools.</p>
+      
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <motion.div className="lg:col-span-2" variants={itemVariants}>
+                <Card className="h-full">
+                    <CardHeader>
+                        <CardTitle className="font-headline flex items-center gap-2">
+                           <Lightbulb className="h-6 w-6 text-primary" /> Actionable Insights
+                        </CardTitle>
+                        <CardDescription>AI-generated recommendations based on your recent activity.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ActionableInsights user={currentUser} />
+                    </CardContent>
+                    <CardFooter>
+                        <Button variant="outline" asChild>
+                            <Link href="/insights">View All Insights <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </motion.div>
+            
+            <motion.div variants={itemVariants}>
+                 <Card className="h-full">
+                    <CardHeader>
+                        <CardTitle className="font-headline flex items-center gap-2">
+                            <Activity className="h-6 w-6 text-primary" /> Key Metrics
+                        </CardTitle>
+                        <CardDescription>A quick overview of your site's performance.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="text-center">
+                            <h3 className="font-bold font-headline text-4xl text-success">78</h3>
+                            <p className="text-sm text-muted-foreground">Overall SEO Score</p>
+                        </div>
+                        <div className="flex justify-around text-center">
+                             <div>
+                                <p className="font-bold font-headline text-2xl">1,204</p>
+                                <p className="text-xs text-muted-foreground">Tracked Keywords</p>
+                            </div>
+                             <div>
+                                <p className="font-bold font-headline text-2xl">5</p>
+                                <p className="text-xs text-muted-foreground">Active Projects</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </motion.div>
+        </div>
+
+
+      {toolSummaries.length > 0 ? (
+        <motion.div 
+            className="grid gap-6 md:grid-cols-1 lg:grid-cols-2"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
+          {toolSummaries}
         </motion.div>
       ) : (
         <Card>
@@ -588,3 +707,221 @@ export default function DashboardPage() {
     </div>
   );
 }
+```,
+    <file>src/app/(app)/insights/page.tsx</file>
+    <content><![CDATA[// src/app/(app)/insights/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { generateInsights } from '@/ai/flows/generate-insights';
+import type { GenerateInsightsOutput } from '@/ai/flows/generate-insights';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Lightbulb, AlertTriangle, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import LoadingScreen from '@/components/ui/loading-screen';
+import { motion } from 'framer-motion';
+
+export default function InsightsPage() {
+    const { user } = useAuth();
+    const [isLoading, setIsLoading] = useState(true);
+    const [insights, setInsights] = useState<GenerateInsightsOutput['insights']>([]);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchInsights = async () => {
+            if (!user) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                // 1. Fetch last 10 activities
+                const activitiesRef = collection(db, "users", user.uid, "activities");
+                const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
+
+                const activities = querySnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        type: data.type,
+                        tool: data.tool,
+                        details: data.details,
+                        resultsSummary: data.resultsSummary,
+                    };
+                });
+
+                if (activities.length === 0) {
+                    setInsights([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                // 2. Generate insights
+                const result = await generateInsights({ activities });
+                setInsights(result.insights);
+
+            } catch (e: any) {
+                setError(e.message || 'An unexpected error occurred.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchInsights();
+    }, [user]);
+
+    const priorityColors: { [key: string]: string } = {
+        'High': 'bg-destructive',
+        'Medium': 'bg-warning',
+        'Low': 'bg-success',
+    };
+
+    if (isLoading) {
+        return <LoadingScreen text="Generating personalized insights..." />;
+    }
+    
+    const containerVariants = {
+        hidden: { opacity: 1 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.1,
+          },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+          y: 0,
+          opacity: 1,
+        },
+    };
+
+    return (
+        <div className="max-w-4xl mx-auto">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold font-headline">Actionable Insights</h1>
+                <p className="text-muted-foreground font-body">AI-generated recommendations based on your recent activity.</p>
+            </div>
+
+            {error && (
+                <Card className="border-destructive">
+                    <CardHeader>
+                        <CardTitle className="text-destructive font-headline flex items-center gap-2">
+                           <AlertTriangle /> Error Generating Insights
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="font-body text-destructive-foreground">{error}</p>
+                    </CardContent>
+                </Card>
+            )}
+
+            {!error && insights.length === 0 && (
+                <Card>
+                    <CardContent className="p-10 text-center">
+                        <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="text-xl font-headline mb-2">No Insights Yet</h3>
+                        <p className="font-body text-muted-foreground">Use the tools in the sidebar to perform some SEO tasks. We'll analyze your activity and provide personalized recommendations here.</p>
+                    </CardContent>
+                </Card>
+            )}
+
+            {!error && insights.length > 0 && (
+                <motion.div 
+                    className="space-y-4"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    {insights.map(insight => (
+                        <motion.div key={insight.id} variants={itemVariants}>
+                            <Card>
+                                <CardHeader>
+                                    <div className="flex justify-between items-start">
+                                        <CardTitle className="font-headline">{insight.title}</CardTitle>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger>
+                                                    <div className={`h-3 w-3 rounded-full ${priorityColors[insight.priority]}`}></div>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{insight.priority} Priority</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                    <CardDescription>
+                                        <Badge variant="outline" className="mr-2">{insight.category}</Badge>
+                                        Impact: <Badge variant="secondary">{insight.estimatedImpact}</Badge>
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="font-body text-muted-foreground">{insight.description}</p>
+                                </CardContent>
+                                {insight.actionLink && insight.actionText && (
+                                    <CardFooter>
+                                        <Button asChild>
+                                            <Link href={insight.actionLink}>
+                                                {insight.actionText} <ArrowRight className="ml-2 h-4 w-4" />
+                                            </Link>
+                                        </Button>
+                                    </CardFooter>
+                                )}
+                            </Card>
+                        </motion.div>
+                    ))}
+                </motion.div>
+            )}
+        </div>
+    );
+}
+```,
+    <file>src/components/ui/badge.tsx</file>
+    <content><![CDATA[import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground hover:bg-accent",
+        success:
+          "border-transparent bg-success text-success-foreground",
+        warning:
+          "border-transparent bg-warning text-warning-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  )
+}
+
+export { Badge, badgeVariants }
