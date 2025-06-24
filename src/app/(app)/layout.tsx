@@ -255,7 +255,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useProtectedRoute();
 
   if (loading || !user) {
-    return <LoadingScreen />;
+    return <LoadingScreen fullScreen />;
   }
   
   return (

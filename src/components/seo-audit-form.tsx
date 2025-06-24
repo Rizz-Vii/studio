@@ -13,6 +13,7 @@ import { Loader2, AlertTriangle, CheckCircle, AlertCircle, XCircle } from 'lucid
 import type { AuditUrlInput, AuditUrlOutput } from '@/ai/flows/seo-audit';
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
@@ -102,14 +103,7 @@ export default function SeoAuditForm({ onSubmit, isLoading, results, error }: Se
             </Card>
 
             <div ref={resultsRef}>
-                {isLoading && (
-                    <Card className="mt-8">
-                        <CardContent className="p-6 text-center">
-                            <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-                            <p className="mt-2 text-muted-foreground">Auditing page...</p>
-                        </CardContent>
-                    </Card>
-                )}
+                {isLoading && <LoadingScreen text="Auditing page..." />}
                 <AnimatePresence>
                 {error && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>

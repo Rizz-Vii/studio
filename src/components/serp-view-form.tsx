@@ -12,6 +12,7 @@ import { Loader2, AlertTriangle } from 'lucide-react';
 import { useRef, useEffect } from 'react';
 import type { SerpViewOutput } from '@/ai/flows/serp-view';
 import SerpViewResults from './serp-view-results';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 const formSchema = z.object({
   keyword: z.string().min(2, { message: 'Please enter a keyword.' }),
@@ -74,14 +75,7 @@ export default function SerpViewForm({ onSubmit, isLoading, results, error }: Se
             </Card>
 
             <div ref={resultsRef}>
-                {isLoading && (
-                    <Card className="mt-8">
-                        <CardContent className="p-6 text-center">
-                            <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-                            <p className="mt-2 text-muted-foreground">Fetching search results...</p>
-                        </CardContent>
-                    </Card>
-                )}
+                {isLoading && <LoadingScreen text="Fetching search results..." />}
                 {error && (
                      <Card className="mt-8 border-destructive">
                         <CardHeader>

@@ -11,7 +11,7 @@ export default function AdminOnlyPage() {
     const { user, loading, role } = useAdminRoute();
 
     if (loading || !user || role !== 'admin') {
-        return <LoadingScreen />;
+        return <LoadingScreen fullScreen text="Verifying permissions..." />;
     }
 
     return (

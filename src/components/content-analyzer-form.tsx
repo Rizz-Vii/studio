@@ -15,6 +15,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Loader2, BookOpen, CheckCircle, BarChart2, Target } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, PolarRadiusAxis } from 'recharts';
 import { Progress } from "@/components/ui/progress";
+import LoadingScreen from '@/components/ui/loading-screen';
 
 const formSchema = z.object({
   content: z.string().min(50, { message: 'Content must be at least 50 characters long.' }),
@@ -129,15 +130,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
       </Card>
 
       <div ref={resultsRef}>
-        {isLoading && (
-          <Card className="shadow-lg mt-8">
-           <CardContent className="p-6 flex items-center justify-center">
-              <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
-              <p className="font-body text-muted-foreground">Analyzing content...</p>
-            </CardContent>
-          </Card>
-       )}
-
+        {isLoading && <LoadingScreen text="Analyzing content..." />}
         {error && (
           <Card className="shadow-lg border-destructive mt-8">
             <CardHeader>

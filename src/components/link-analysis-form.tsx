@@ -13,6 +13,7 @@ import { Loader2, Link as LinkIcon, AlertTriangle } from 'lucide-react';
 import type { LinkAnalysisInput, LinkAnalysisOutput } from '@/ai/flows/link-analysis';
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
@@ -75,14 +76,7 @@ export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }
             </Card>
 
             <div ref={resultsRef}>
-                {isLoading && (
-                    <Card className="mt-8">
-                        <CardContent className="p-6 text-center">
-                            <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-                            <p className="mt-2 text-muted-foreground">Discovering backlinks...</p>
-                        </CardContent>
-                    </Card>
-                )}
+                {isLoading && <LoadingScreen text="Discovering backlinks..." />}
                 <AnimatePresence>
                     {error && (
                          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>

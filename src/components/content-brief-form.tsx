@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Loader2, FileText, Compass, BarChart2, Star, Users, BrainCircuit } from 'lucide-react';
 import type { ContentBriefInput, ContentBriefOutput } from '@/ai/flows/content-brief';
 import { useRef, useEffect } from 'react';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 const formSchema = z.object({
   keyword: z.string().min(3, { message: 'Keyword must be at least 3 characters long.' }),
@@ -98,14 +99,7 @@ export default function ContentBriefForm({ onSubmit, isLoading, briefResult, err
       </Card>
 
       <div ref={resultsRef}>
-        {isLoading && (
-          <Card className="shadow-lg mt-8">
-            <CardContent className="p-6 flex items-center justify-center">
-              <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
-              <p className="font-body text-muted-foreground">Generating your content brief...</p>
-            </CardContent>
-          </Card>
-        )}
+        {isLoading && <LoadingScreen text="Generating your content brief..." />}
 
         {error && (
           <Card className="shadow-lg border-destructive mt-8">

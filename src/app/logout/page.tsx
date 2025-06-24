@@ -23,5 +23,5 @@ export default function LogoutPage() {
     performLogout();
   }, [router]);
 
-  return <LoadingScreen />;
+  return <LoadingScreen fullScreen text="Logging out..." />;
 }

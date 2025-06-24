@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: 'Topic must be at least 3 characters long.' }),
@@ -143,14 +144,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
       </Card>
 
       <div ref={resultsRef}>
-        {isLoading && (
-          <Card className="mt-8">
-            <CardContent className="p-6 flex items-center justify-center">
-              <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
-              <p className="font-body text-muted-foreground">Generating suggestions...</p>
-            </CardContent>
-          </Card>
-        )}
+        {isLoading && <LoadingScreen text="Generating suggestions..." />}
         <AnimatePresence>
             {results && results.keywords.length > 0 && (
             <motion.div
