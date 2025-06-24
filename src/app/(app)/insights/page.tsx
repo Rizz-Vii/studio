@@ -9,10 +9,11 @@ import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Lightbulb, AlertTriangle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import LoadingScreen from '@/components/ui/loading-screen';
 
 export default function InsightsPage() {
     const { user } = useAuth();
@@ -73,11 +74,7 @@ export default function InsightsPage() {
     };
 
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
+        return <LoadingScreen text="Generating personalized insights..." />;
     }
     
     return (

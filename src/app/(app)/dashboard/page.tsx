@@ -493,7 +493,7 @@ export default function DashboardPage() {
   }, [currentUser]);
 
   if (loadingData) {
-      return <LoadingScreen />
+      return <LoadingScreen text="Loading dashboard data..." />
   }
 
   return (
