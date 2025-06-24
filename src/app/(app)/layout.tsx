@@ -34,7 +34,7 @@ import { User, LogOut, Search, Rocket } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
-import { Input } from '@/components/ui/input';
+import GlobalSearch from '@/components/global-search';
 import AppNavigationContext from '@/context/AppNavigationContext';
 
 const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void; }) => {
@@ -50,12 +50,7 @@ const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEven
             transition={{ duration: 0.5, delay: 0.2 }}
             className="relative hidden md:block"
           >
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search features..."
-              className="pl-8 sm:w-[200px] lg:w-[300px] bg-background transition-all duration-300 ease-in-out focus:w-[300px] lg:focus:w-[400px]"
-            />
+            <GlobalSearch />
           </motion.div>
         </div>
         {/* Right side: User navigation */}
