@@ -31,10 +31,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, LogIn, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
-import useProtectedRoute from '@/hooks/useProtectedRoute';
 
 const AppHeader = () => {
   return (
@@ -61,6 +60,26 @@ const UserNav = () => {
       console.error("Error logging out:", error.message);
     }
   };
+  
+  if (!user) {
+    return (
+        <div className="flex flex-col gap-2 w-full">
+            <Button asChild className="w-full">
+                <Link href="/login">
+                    <LogIn />
+                    <span className="group-data-[state=collapsed]:hidden ml-2">Login</span>
+                </Link>
+            </Button>
+            <Button asChild variant="secondary" className="w-full">
+                <Link href="/register">
+                    <UserPlus />
+                    <span className="group-data-[state=collapsed]:hidden ml-2">Sign Up</span>
+                </Link>
+            </Button>
+        </div>
+    );
+  }
+
 
   const handleOpenChange = (isOpen: boolean) => {
     setUserMenuOpen(isOpen);
@@ -124,7 +143,7 @@ interface AppNavProps {
 const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
     const pathname = usePathname();
     const { open } = useSidebar();
-    const { role } = useAuth();
+    const { user, role } = useAuth(); 
 
     const handleNavigation = (href: string) => {
         if (pathname !== href) {
@@ -135,7 +154,7 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
     return (
         <SidebarMenu>
           {navItems
-            .filter(item => !item.adminOnly || role === 'admin')
+            .filter(item => !item.adminOnly || (user && role === 'admin'))
             .map((item: NavItem) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
@@ -163,22 +182,12 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
-  const { user, loading } = useProtectedRoute();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-      setIsClient(true);
-  }, []);
 
   useEffect(() => {
     if (isNavigating) {
       setIsNavigating(false);
     }
   }, [pathname, isNavigating]);
-
-  if (!isClient || loading || !user) {
-    return <LoadingScreen />;
-  }
   
   return (
     <SidebarProvider defaultOpen={true}>
