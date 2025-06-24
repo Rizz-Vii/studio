@@ -1,4 +1,3 @@
-
 // src/app/(app)/layout.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
@@ -36,6 +35,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import { Input } from '@/components/ui/input';
+import AppNavigationContext from '@/context/AppNavigationContext';
 
 const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void; }) => {
   return (
@@ -209,34 +209,36 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
   
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex h-screen w-full bg-background">
-          <Sidebar>
-            <SidebarHeader className="p-4 flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
-                <AppLogo className="h-8 w-8 text-primary shrink-0" />
-                <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
-              </Link>
-            </SidebarHeader>
-            <SidebarContent>
-              <ScrollArea className="h-full">
-                <AppNav handleNavigation={handleNavigation} />
-              </ScrollArea>
-            </SidebarContent>
-            <SidebarFooter className="p-2">
-                <SidebarTrigger className="hidden md:flex" />
-            </SidebarFooter>
-          </Sidebar>
-          <div className="flex-1 flex flex-col h-screen overflow-hidden">
-            <AppHeader handleNavigation={handleNavigation} />
-            <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-                <AnimatePresence>
-                {isNavigating && <LoadingScreen />}
-                </AnimatePresence>
-                {children}
-            </main>
-          </div>
-      </div>
-    </SidebarProvider>
+    <AppNavigationContext.Provider value={{ handleNavigation }}>
+        <SidebarProvider defaultOpen={true}>
+        <div className="flex h-screen w-full bg-background">
+            <Sidebar>
+                <SidebarHeader className="p-4 flex items-center justify-between">
+                <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
+                    <AppLogo className="h-8 w-8 text-primary shrink-0" />
+                    <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
+                </Link>
+                </SidebarHeader>
+                <SidebarContent>
+                <ScrollArea className="h-full">
+                    <AppNav handleNavigation={handleNavigation} />
+                </ScrollArea>
+                </SidebarContent>
+                <SidebarFooter className="p-2">
+                    <SidebarTrigger className="hidden md:flex" />
+                </SidebarFooter>
+            </Sidebar>
+            <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                <AppHeader handleNavigation={handleNavigation} />
+                <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+                    <AnimatePresence>
+                    {isNavigating && <LoadingScreen />}
+                    </AnimatePresence>
+                    {children}
+                </main>
+            </div>
+        </div>
+        </SidebarProvider>
+    </AppNavigationContext.Provider>
   );
 }

@@ -37,6 +37,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { dummyContentBriefs, ContentBrief } from '@/lib/dummy-data';
 import Link from 'next/link';
+import { useAppNavigation } from '@/context/AppNavigationContext';
 
 // ----- TYPES AND CONFIGS -----
 
@@ -215,6 +216,7 @@ const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ a
 };
 
 const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => {
+    const { handleNavigation } = useAppNavigation();
     const profileKeywords = profile?.primaryKeywords?.split(',').map((k: string) => k.trim().toLowerCase()) || [];
     
     const prioritizedBriefs = [
@@ -303,7 +305,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                         }}
                     >
                     {getVisibleBriefs().map((brief) => (
-                        <Link href="/content-brief" key={brief.id} className="block hover:no-underline">
+                        <Link href="/content-brief" key={brief.id} onClick={(e) => handleNavigation(e, "/content-brief")} className="block hover:no-underline">
                             <Card className="h-full w-[160px] flex flex-col shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden cursor-pointer">
                                 <CardHeader className="p-3 pb-2">
                                     <CardTitle className="text-sm font-bold font-headline truncate" title={brief.title}>{brief.title}</CardTitle>
