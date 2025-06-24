@@ -199,10 +199,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    if (isNavigating) {
-      setIsNavigating(false);
-    }
-  }, [pathname, isNavigating]);
+    // This effect runs when the page navigation completes and the path changes.
+    setIsNavigating(false);
+  }, [pathname]); // Only depend on the pathname
 
   if (loading || !user) {
     return <LoadingScreen />;
@@ -234,7 +233,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <AnimatePresence>
                     {isNavigating && <LoadingScreen />}
                     </AnimatePresence>
-                    {children}
+                    {!isNavigating && children}
                 </main>
             </div>
         </div>
