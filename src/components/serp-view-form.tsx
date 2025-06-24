@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, AlertTriangle, Construction } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 import { useRef, useEffect } from 'react';
+import type { SerpViewOutput } from '@/ai/flows/serp-view';
+import SerpViewResults from './serp-view-results';
 
 const formSchema = z.object({
   keyword: z.string().min(2, { message: 'Please enter a keyword.' }),
@@ -20,7 +22,7 @@ type FormValues = z.infer<typeof formSchema>;
 interface SerpViewFormProps {
   onSubmit: (values: FormValues) => Promise<void>;
   isLoading: boolean;
-  results: any | null; // Replace 'any' with actual result type when available
+  results: SerpViewOutput | null;
   error: string | null;
 }
 
@@ -81,15 +83,16 @@ export default function SerpViewForm({ onSubmit, isLoading, results, error }: Se
                     </Card>
                 )}
                 {error && (
-                    <Card className="mt-8 border-amber-500">
+                     <Card className="mt-8 border-destructive">
                         <CardHeader>
-                            <CardTitle className="text-amber-600 font-headline flex items-center gap-2"><Construction /> Under Development</CardTitle>
+                            <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p>{error}</p>
                         </CardContent>
                     </Card>
                 )}
+                {results && <SerpViewResults results={results} />}
             </div>
         </div>
     );
