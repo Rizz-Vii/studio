@@ -55,7 +55,7 @@ export default function HomePage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild size="lg">
-            <Link href="/login">Start Free</Link>
+            <Link href="/register">Start Free</Link>
           </Button>
           <Button asChild variant="outline" size="lg">
           <Link href="/register">
@@ -195,7 +195,9 @@ function PricingCard({ title, price, features }: { title: string, price: string,
         <ul className="text-left space-y-2 text-muted-foreground">
           {features.map((f, i) => <li key={i}>• {f}</li>)}
         </ul>
-        <Button className="mt-6 w-full">Choose Plan</Button>
+        <Button className="mt-6 w-full" asChild>
+          <Link href="/register">Choose Plan</Link>
+        </Button>
       </div>
     )
   }

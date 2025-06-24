@@ -303,23 +303,25 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                         }}
                     >
                     {getVisibleBriefs().map((brief) => (
-                        <Card key={brief.id} className="h-full w-[160px] flex flex-col shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden">
-                            <CardHeader className="p-3 pb-2">
-                                <CardTitle className="text-sm font-bold font-headline truncate" title={brief.title}>{brief.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-3 pt-0 flex-grow space-y-2 text-left">
-                                <Badge variant="secondary" className="font-body">{brief.primaryKeyword}</Badge>
-                                <div className="text-xs">
-                                    <span className="font-semibold font-body">Intent:</span> <span className="font-body">{brief.searchIntent}</span>
-                                </div>
-                            </CardContent>
-                            <CardFooter className="p-3 pt-0">
-                                <div className="w-full">
-                                    <span className="text-xs text-muted-foreground font-body">SEO Score: {brief.seoScore}</span>
-                                    <Progress value={parseInt(brief.seoScore.split('/')[0])} className="h-2 mt-1" indicatorClassName={parseInt(brief.seoScore.split('/')[0]) > 80 ? "bg-green-500" : parseInt(brief.seoScore.split('/')[0]) > 60 ? "bg-yellow-500" : "bg-red-500"} />
-                                </div>
-                            </CardFooter>
-                        </Card>
+                        <Link href="/content-brief" key={brief.id} className="block hover:no-underline">
+                            <Card className="h-full w-[160px] flex flex-col shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden cursor-pointer">
+                                <CardHeader className="p-3 pb-2">
+                                    <CardTitle className="text-sm font-bold font-headline truncate" title={brief.title}>{brief.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-3 pt-0 flex-grow space-y-2 text-left">
+                                    <Badge variant="secondary" className="font-body">{brief.primaryKeyword}</Badge>
+                                    <div className="text-xs">
+                                        <span className="font-semibold font-body">Intent:</span> <span className="font-body">{brief.searchIntent}</span>
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="p-3 pt-0">
+                                    <div className="w-full">
+                                        <span className="text-xs text-muted-foreground font-body">SEO Score: {brief.seoScore}</span>
+                                        <Progress value={parseInt(brief.seoScore.split('/')[0])} className="h-2 mt-1" indicatorClassName={parseInt(brief.seoScore.split('/')[0]) > 80 ? "bg-green-500" : parseInt(brief.seoScore.split('/')[0]) > 60 ? "bg-yellow-500" : "bg-red-500"} />
+                                    </div>
+                                </CardFooter>
+                            </Card>
+                        </Link>
                     ))}
                     </motion.div>
                 </AnimatePresence>
