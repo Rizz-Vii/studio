@@ -39,6 +39,7 @@ type SidebarContext = {
   toggleSidebar: () => void
   isUserMenuOpen: boolean,
   setUserMenuOpen: (open: boolean) => void
+  hydrated: boolean
 }
 
 const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -70,6 +71,7 @@ const SidebarProvider = React.forwardRef<
     const [open, setOpen] = React.useState(false);
     const [pinned, setPinned] = React.useState(false);
     const [isUserMenuOpen, setUserMenuOpen] = React.useState(false);
+    const [hydrated, setHydrated] = React.useState(false);
 
 
     // Get pinned state from cookie
@@ -83,8 +85,12 @@ const SidebarProvider = React.forwardRef<
             if (value === "pinned") {
                 setPinned(true);
                 setOpen(true);
+            } else {
+                setPinned(false);
+                setOpen(false);
             }
         }
+        setHydrated(true);
     }, []);
 
     // Sync with cookie
@@ -122,7 +128,7 @@ const SidebarProvider = React.forwardRef<
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
-    const state = open ? 'expanded' : 'collapsed';
+    const state = open ? (pinned ? 'pinned' : 'expanded') : 'collapsed';
 
     const contextValue = React.useMemo<SidebarContext>(
       () => ({
@@ -136,7 +142,8 @@ const SidebarProvider = React.forwardRef<
         setOpenMobile,
         toggleSidebar,
         isUserMenuOpen, 
-        setUserMenuOpen
+        setUserMenuOpen,
+        hydrated,
       }),
       [
         state,
@@ -149,6 +156,7 @@ const SidebarProvider = React.forwardRef<
         setOpenMobile,
         toggleSidebar,
         isUserMenuOpen,
+        hydrated
       ]
     )
 
@@ -206,7 +214,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile, hydrated } = useSidebar()
 
     if (isMobile) {
       return (
@@ -232,8 +240,9 @@ const Sidebar = React.forwardRef<
         <aside
             ref={ref}
             className={cn(
-                "group/sidebar fixed top-0 z-50 h-full flex-shrink-0 bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col",
-                state === 'expanded' ? "w-[var(--sidebar-width)] shadow-lg" : "w-[var(--sidebar-width-icon)]",
+                "group sticky top-0 z-40 h-screen flex-shrink-0 bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col",
+                state === 'expanded' || state === 'pinned' ? "w-[var(--sidebar-width)]" : "w-[var(--sidebar-width-icon)]",
+                !hydrated && "invisible", // Hide until hydrated to prevent flicker
                 className
             )}
             data-state={state}
@@ -248,19 +257,24 @@ Sidebar.displayName = "Sidebar"
 
 const SidebarInset = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
     ({ className, style, ...props }, ref) => {
-        const { state, isMobile } = useSidebar();
+        const { state, isMobile, hydrated } = useSidebar();
         
         if (isMobile) {
             return <div ref={ref} className={className} style={style} {...props} />;
         }
         
+        // On initial render, use collapsed width to prevent content jump
+        const marginLeft = !hydrated || state === 'collapsed'
+            ? 'var(--sidebar-width-icon)'
+            : 'var(--sidebar-width)';
+
         return (
             <div
                 ref={ref}
                 data-sidebar="inset"
                 className={cn("transition-[margin] duration-300 ease-in-out", className)}
                 style={{
-                    marginLeft: state === 'expanded' ? 'var(--sidebar-width)' : 'var(--sidebar-width-icon)',
+                    marginLeft,
                     ...style,
                 }}
                 {...props}
@@ -366,7 +380,7 @@ const SidebarFooter = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex flex-col gap-2 p-2 mt-auto", className)}
       {...props}
     />
   )
