@@ -36,6 +36,7 @@ import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
 import GlobalSearch from '@/components/global-search';
 import AppNavigationContext from '@/context/AppNavigationContext';
+import { useAppNavigation } from '@/context/AppNavigationContext';
 
 const AppHeader = ({ handleNavigation }: { handleNavigation: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void; }) => {
   return (
@@ -77,11 +78,8 @@ const UserNav = () => {
     const { user, profile } = useAuth();
     const router = useRouter();
     const { open, setOpen, isMobile, setUserMenuOpen, pinned } = useSidebar();
+    const { handleNavigation } = useAppNavigation();
     const [openedByMe, setOpenedByMe] = React.useState(false);
-  
-    const handleLogout = () => {
-        router.push('/logout');
-    };
   
     const handleOpenChange = (isOpen: boolean) => {
       setUserMenuOpen(isOpen);
@@ -120,14 +118,16 @@ const UserNav = () => {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-             <Link href="/profile">
+             <Link href="/profile" onClick={(e) => handleNavigation(e, '/profile')}>
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
              </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
+          <DropdownMenuItem asChild>
+             <Link href="/logout" onClick={(e) => handleNavigation(e, '/logout')}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
