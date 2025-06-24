@@ -62,7 +62,9 @@ export default function HomePage() {
           Unlock technical, content, and off-page SEO intelligence. Analyze, optimize, and outrank — all from one smart platform.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg">Start Free</Button>
+          <Button asChild size="lg">
+            <Link href="/login">Start Free</Link>
+          </Button>
           <Button asChild variant="outline" size="lg">
           <Link href="/register">
             Request Demo
@@ -107,6 +109,7 @@ export default function HomePage() {
             width={1200}
             height={700}
             className="w-full h-auto"
+            priority
           />
         </div>
       </section>
@@ -210,3 +213,5 @@ function PricingCard({ title, price, features }: { title: string, price: string,
       </div>
     )
   }
+
+    
