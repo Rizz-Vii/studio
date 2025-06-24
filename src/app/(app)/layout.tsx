@@ -35,17 +35,6 @@ import { User, LogOut, LogIn, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 
-const AppHeader = () => {
-  return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
-      <SidebarTrigger className="md:hidden" />
-      <div className="flex items-center gap-2 md:hidden">
-        <h1 className="text-xl font-headline font-semibold">{AppName}</h1>
-      </div>
-    </header>
-  );
-};
-
 const UserNav = () => {
   const { user, profile } = useAuth();
   const router = useRouter();
@@ -209,12 +198,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarFooter>
           </Sidebar>
           <div className="flex-1 flex flex-col">
-            <AppHeader />
-            <main className="relative flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-              <AnimatePresence>
-                {isNavigating && <LoadingScreen />}
-              </AnimatePresence>
-              {children}
+            <main className="relative flex-1 overflow-y-auto">
+              <div className="sticky top-0 p-2 z-10">
+                <SidebarTrigger />
+              </div>
+              <div className="p-4 md:p-6 lg:p-8">
+                <AnimatePresence>
+                  {isNavigating && <LoadingScreen />}
+                </AnimatePresence>
+                {children}
+              </div>
             </main>
           </div>
       </div>
