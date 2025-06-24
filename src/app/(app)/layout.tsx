@@ -196,7 +196,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <UserNav />
             </SidebarFooter>
           </Sidebar>
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col hidden">
             <AppHeader />
             <main className="relative flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
               <AnimatePresence>
