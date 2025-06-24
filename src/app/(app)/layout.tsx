@@ -1,4 +1,3 @@
-
 // src/app/(app)/layout.tsx
 'use client';
 import React, { useState, useEffect } from 'react';
@@ -14,9 +13,8 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarTrigger,
-  SidebarInset,
   useSidebar,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { navItems, AppLogo, AppName } from '@/constants/nav';
@@ -33,15 +31,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, LogIn, UserPlus } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { User, LogOut } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
+import useProtectedRoute from '@/hooks/useProtectedRoute';
 
 const UserNav = () => {
   const { user, profile } = useAuth();
   const router = useRouter();
-  const { setOpen, isUserMenuOpen, setUserMenuOpen } = useSidebar();
-  
+  const { open, setOpen, isMobile, setUserMenuOpen, pinned } = useSidebar();
+  const [openedByMe, setOpenedByMe] = React.useState(false);
+
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -53,31 +53,21 @@ const UserNav = () => {
 
   const handleOpenChange = (isOpen: boolean) => {
     setUserMenuOpen(isOpen);
-    if (!isOpen && isUserMenuOpen) {
-      // Allow sidebar to auto-close if it was forced open
-    } else if (isOpen) {
-      setOpen(true); // Force sidebar open
+    if (isMobile || pinned) {
+        return;
+    }
+    if (isOpen) {
+      if (!open) {
+        setOpenedByMe(true);
+        setOpen(true);
+      }
+    } else {
+      if (openedByMe) {
+        setOpenedByMe(false);
+        setOpen(false);
+      }
     }
   };
-
-  if (!user) {
-    return (
-        <div className="flex flex-col gap-2 w-full">
-            <Button asChild className="w-full">
-                <Link href="/login">
-                    <LogIn />
-                    <span className="group-data-[state=collapsed]:hidden ml-2">Login</span>
-                </Link>
-            </Button>
-            <Button asChild variant="secondary" className="w-full">
-                <Link href="/register">
-                    <UserPlus />
-                    <span className="group-data-[state=collapsed]:hidden ml-2">Sign Up</span>
-                </Link>
-            </Button>
-        </div>
-    );
-  }
 
   const userInitial = user ? (profile?.displayName || user.email || 'U').charAt(0).toUpperCase() : '';
 
@@ -123,7 +113,7 @@ interface AppNavProps {
 const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
     const pathname = usePathname();
     const { open } = useSidebar();
-    const { user, role } = useAuth(); 
+    const { user, role } = useAuth();
 
     const handleNavigation = (href: string) => {
         if (pathname !== href) {
@@ -152,7 +142,6 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
                     )}
                   </Link>
                 </SidebarMenuButton>
-
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
@@ -160,28 +149,30 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
 };
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useProtectedRoute();
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
-  const [isClient, setIsClient] = useState(false)
 
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-  
   useEffect(() => {
     if (isNavigating) {
       setIsNavigating(false);
     }
   }, [pathname, isNavigating]);
+
+  if (loading || !user) {
+    return <LoadingScreen />;
+  }
   
   return (
     <SidebarProvider>
-        <Sidebar>
-            <SidebarHeader className="p-4">
-              <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:justify-center">
+      <div className="flex min-h-screen w-full bg-background">
+          <Sidebar>
+            <SidebarHeader className="p-4 flex items-center justify-between">
+              <Link href="/" className="flex items-center gap-2 group-data-[state=collapsed]:hidden">
                 <AppLogo className="h-8 w-8 text-primary shrink-0" />
-                <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">{AppName}</span>
+                <span className="text-2xl font-headline font-bold text-primary">{AppName}</span>
               </Link>
+               <SidebarTrigger />
             </SidebarHeader>
             <SidebarContent>
               <ScrollArea className="h-full">
@@ -191,15 +182,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarFooter className="p-2">
                 <UserNav />
             </SidebarFooter>
-        </Sidebar>
-        <SidebarInset>
-            <main className="relative flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto h-screen">
-              <AnimatePresence>
-                {isNavigating && <LoadingScreen />}
-              </AnimatePresence>
-              {children}
-            </main>
-        </SidebarInset>
+          </Sidebar>
+          <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto h-screen">
+            <AnimatePresence>
+              {isNavigating && <LoadingScreen />}
+            </AnimatePresence>
+            {children}
+          </main>
+      </div>
     </SidebarProvider>
   );
 }

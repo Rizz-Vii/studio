@@ -1,0 +1,198 @@
+// src/components/competitor-analysis-form.tsx
+'use client';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Loader2, Users, AlertTriangle } from 'lucide-react';
+import type { CompetitorAnalysisInput, CompetitorAnalysisOutput } from '@/ai/flows/competitor-analysis';
+import { useRef, useEffect } from 'react';
+
+const formSchema = z.object({
+  yourUrl: z.string().url({ message: 'Please enter a valid URL for your website.' }),
+  competitorUrls: z.string().min(1, { message: 'Please enter at least one competitor URL.' }),
+  keywords: z.string().min(1, { message: 'Please enter at least one keyword.' }),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+interface CompetitorAnalysisFormProps {
+  onSubmit: (values: CompetitorAnalysisInput) => Promise<void>;
+  isLoading: boolean;
+  results: CompetitorAnalysisOutput | null;
+  error: string | null;
+}
+
+export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, error }: CompetitorAnalysisFormProps) {
+    const form = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            yourUrl: '',
+            competitorUrls: '',
+            keywords: '',
+        },
+    });
+
+    const resultsRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (results || error) {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [results, error]);
+
+    function handleFormSubmit(values: FormValues) {
+        const submissionValues: CompetitorAnalysisInput = {
+            yourUrl: values.yourUrl,
+            competitorUrls: values.competitorUrls.split(',').map(url => url.trim()).filter(url => url),
+            keywords: values.keywords.split(',').map(kw => kw.trim()).filter(kw => kw),
+        };
+        onSubmit(submissionValues);
+    }
+    
+    // Dynamically generate table headers
+    const competitorHeaders = results ? Array.from(new Set(results.rankings.flatMap(r => Object.keys(r).filter(k => k !== 'keyword' && k !== 'yourRank')))) : [];
+
+    return (
+        <div className="space-y-6">
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="font-headline">Competitor Analysis</CardTitle>
+                    <CardDescription className="font-body">Compare your keyword rankings against your competitors.</CardDescription>
+                </CardHeader>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+                        <CardContent className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="yourUrl"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Your URL</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="https://yourwebsite.com" {...field} disabled={isLoading} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="competitorUrls"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Competitor URLs</FormLabel>
+                                        <FormControl>
+                                            <Textarea placeholder="https://competitor1.com, https://competitor2.com" {...field} disabled={isLoading} />
+                                        </FormControl>
+                                        <FormDescription>Comma-separated list of competitor URLs.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="keywords"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Keywords</FormLabel>
+                                        <FormControl>
+                                            <Textarea placeholder="seo tools, content marketing, ai writing" {...field} disabled={isLoading} />
+                                        </FormControl>
+                                        <FormDescription>Comma-separated list of keywords to analyze.</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </CardContent>
+                        <CardFooter>
+                            <Button type="submit" disabled={isLoading}>
+                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Analyze Competitors
+                            </Button>
+                        </CardFooter>
+                    </form>
+                </Form>
+            </Card>
+
+            <div ref={resultsRef}>
+                {isLoading && (
+                    <Card className="mt-8">
+                        <CardContent className="p-6 text-center">
+                            <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+                            <p className="mt-2 text-muted-foreground">Analyzing rankings...</p>
+                        </CardContent>
+                    </Card>
+                )}
+                {error && (
+                    <Card className="mt-8 border-destructive">
+                        <CardHeader>
+                            <CardTitle className="text-destructive font-headline flex items-center gap-2"><AlertTriangle /> Analysis Failed</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p>{error}</p>
+                        </CardContent>
+                    </Card>
+                )}
+                {results && (
+                    <div className="space-y-6 mt-8">
+                         <Card>
+                            <CardHeader>
+                                <CardTitle className="font-headline flex items-center gap-2"><Users /> Keyword Rankings</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Keyword</TableHead>
+                                            <TableHead className="text-center">Your Rank</TableHead>
+                                            {competitorHeaders.map(url => (
+                                                <TableHead key={url} className="text-center truncate" title={url}>{new URL(url).hostname}</TableHead>
+                                            ))}
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {results.rankings.map((item) => (
+                                            <TableRow key={item.keyword}>
+                                                <TableCell className="font-medium">{item.keyword}</TableCell>
+                                                <TableCell className="text-center">{item.yourRank?.rank ?? 'N/A'}</TableCell>
+                                                {competitorHeaders.map(url => (
+                                                    <TableCell key={url} className="text-center">
+                                                        {(item as any)[url]?.rank ?? 'N/A'}
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="font-headline">Content Gap Opportunities</CardTitle>
+                                <CardDescription>Keywords where competitors rank well but you don't.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {results.contentGaps.length > 0 ? (
+                                <ul className="list-disc pl-5 space-y-2">
+                                    {results.contentGaps.map((gap, index) => (
+                                        <li key={index}>{gap}</li>
+                                    ))}
+                                </ul>
+                                ) : (
+                                    <p className="text-muted-foreground">No significant content gaps found. Great job!</p>
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}

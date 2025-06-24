@@ -1,4 +1,4 @@
-// src/app/dashboard/page.tsx
+// src/app/(app)/dashboard/page.tsx
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import {
@@ -173,7 +173,7 @@ const KeywordToolSummary: React.FC<{ activities: UserActivity[] }> = ({ activiti
 
 const CompetitorAnalysisSummary: React.FC<{ activities: UserActivity[] }> = ({ activities }) => {
     const competitors = activities
-        .flatMap(a => a.details?.competitors || [])
+        .flatMap(a => a.details?.competitorUrls || [])
         .filter(Boolean)
         .map(url => {
             try {
