@@ -37,7 +37,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { dummyContentBriefs, ContentBrief } from '@/lib/dummy-data';
 import Link from 'next/link';
-import { Skeleton } from '@/components/ui/skeleton';
 
 // ----- TYPES AND CONFIGS -----
 
@@ -381,66 +380,11 @@ const toolSummaryComponents: Record<string, React.FC<{ activities: UserActivity[
   "Link View": LinkViewSummary,
 };
 
-const GuestDashboardView = () => (
-    <div className="relative max-w-7xl mx-auto space-y-8">
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-lg p-4">
-            <Card className="p-8 text-center shadow-2xl">
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl">
-                        <Rocket className="mx-auto h-12 w-12 text-primary mb-4" />
-                        Unlock Your Full Dashboard
-                    </CardTitle>
-                    <CardDescription>
-                        Log in or create an account to access personalized insights, track your progress, and use all our powerful SEO tools.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                <div className="flex justify-center gap-4">
-                    <Button asChild size="lg">
-                        <Link href="/login">Login</Link>
-                    </Button>
-                    <Button asChild size="lg" variant="outline">
-                        <Link href="/register">Sign Up for Free</Link>
-                    </Button>
-                </div>
-                </CardContent>
-            </Card>
-        </div>
-
-        {/* Placeholder content underneath the blur */}
-        <h1 className="text-3xl font-headline font-semibold text-foreground">
-            Welcome, Guest!
-        </h1>
-        <p className="text-muted-foreground font-body">Here's a preview of your SEO command center.</p>
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-            {Object.entries(toolConfig).filter(([key]) => key !== 'Default').map(([toolName, config]) => {
-                const Icon = config.icon;
-                return (
-                    <Card key={toolName} className="shadow-lg flex flex-col opacity-50">
-                        <CardHeader>
-                            <CardTitle className="font-headline flex items-center gap-2">
-                            <Icon className={`h-6 w-6 ${config.color}`} />
-                            {toolName}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex-grow space-y-4 pt-4">
-                            <div className="space-y-2">
-                            <Skeleton className="h-4 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
-                            <Skeleton className="h-4 w-2/3" />
-                            </div>
-                        </CardContent>
-                    </Card>
-                );
-            })}
-        </div>
-    </div>
-);
 
 // ----- MAIN COMPONENT -----
 
 export default function DashboardPage() {
-  const { user: currentUser, loading: authLoading, profile } = useAuth();
+  const { user: currentUser, profile } = useAuth();
   
   const [groupedActivities, setGroupedActivities] = useState<GroupedActivities>({});
   const [loadingData, setLoadingData] = useState(true);
@@ -479,19 +423,8 @@ export default function DashboardPage() {
           setLoadingData(false);
       }
     };
-
-    if (!authLoading) {
-      fetchActivities();
-    }
-  }, [currentUser, authLoading]);
-
-  if (authLoading) {
-    return <LoadingScreen />;
-  }
-
-  if (!currentUser) {
-      return <GuestDashboardView />;
-  }
+    fetchActivities();
+  }, [currentUser]);
 
   if (loadingData) {
       return <LoadingScreen />

@@ -35,6 +35,7 @@ import { User, LogOut, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingScreen from '@/components/ui/loading-screen';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import useProtectedRoute from '@/hooks/useProtectedRoute';
 
 
 const AppHeader = () => {
@@ -81,33 +82,7 @@ const UserNav = () => {
     }
   };
 
-
-  if (!user) {
-    return (
-       <>
-        <div className="flex w-full flex-col items-center gap-2 group-data-[state=collapsed]:hidden px-2">
-            <Button asChild className="w-full font-body">
-                <Link href="/login">Login</Link>
-            </Button>
-            <Button asChild variant="secondary" className="w-full font-body">
-                <Link href="/register">Sign Up</Link>
-            </Button>
-        </div>
-        <div className="hidden w-full flex-col items-center gap-2 group-data-[state=collapsed]:flex">
-             <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button asChild variant="outline" size="icon">
-                        <Link href="/login"><LogIn /></Link>
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">Login</TooltipContent>
-            </Tooltip>
-        </div>
-      </>
-    );
-  }
-
-  const userInitial = (profile?.displayName || user.email || 'U').charAt(0).toUpperCase();
+  const userInitial = user ? (profile?.displayName || user.email || 'U').charAt(0).toUpperCase() : '';
 
   return (
     <DropdownMenu onOpenChange={handleOpenChange}>
@@ -121,7 +96,7 @@ const UserNav = () => {
           </Avatar>
           <div className="group-data-[state=collapsed]:hidden">
             <p className="max-w-[7rem] truncate font-medium">
-              {profile?.displayName || user.email}
+              {profile?.displayName || user?.email}
             </p>
           </div>
         </Button>
@@ -190,24 +165,18 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isNavigating, setIsNavigating] = useState(false);
   const pathname = usePathname();
-  const [isClient, setIsClient] = useState(false);
+  const { user, loading } = useProtectedRoute();
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Listen for route changes to stop the loader.
   useEffect(() => {
     if (isNavigating) {
       setIsNavigating(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [pathname, isNavigating]);
 
-  if (!isClient) {
-    return null;
+  if (loading || !user) {
+    return <LoadingScreen />;
   }
-
+  
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen">
