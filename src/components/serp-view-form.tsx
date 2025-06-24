@@ -42,7 +42,7 @@ export default function SerpViewForm({ onSubmit, isLoading, results, error }: Se
 
     return (
         <div className="space-y-6">
-            <Card className="shadow-lg">
+            <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">SERP Visualizer</CardTitle>
                     <CardDescription className="font-body">Enter a keyword to see a simulated Search Engine Results Page.</CardDescription>

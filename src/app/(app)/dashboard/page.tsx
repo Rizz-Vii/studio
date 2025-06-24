@@ -346,7 +346,7 @@ const ContentBriefSummary: React.FC<{ profile: any | null }> = ({ profile }) => 
                     >
                     {getVisibleBriefs().map((brief) => (
                         <Link href="/content-brief" key={brief.id} className="block hover:no-underline">
-                            <Card className="h-full w-[160px] flex flex-col shadow-md bg-muted/50 hover:bg-muted transition-colors overflow-hidden cursor-pointer">
+                            <Card className="h-full w-[160px] flex flex-col bg-muted/50 hover:bg-muted transition-colors overflow-hidden cursor-pointer">
                                 <CardHeader className="p-3 pb-2">
                                     <CardTitle className="text-sm font-bold font-headline truncate" title={brief.title}>{brief.title}</CardTitle>
                                 </CardHeader>
@@ -519,7 +519,7 @@ export default function DashboardPage() {
                 <motion.div key={tool} variants={itemVariants}>
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Card className="shadow-lg flex flex-col cursor-pointer h-full">
+                            <Card className="flex flex-col cursor-pointer h-full">
                                 <CardHeader>
                                     <div className="flex justify-between items-start">
                                         <CardTitle className="font-headline flex items-center gap-2">
@@ -578,10 +578,10 @@ export default function DashboardPage() {
           })}
         </motion.div>
       ) : (
-        <Card className="shadow-lg">
+        <Card>
           <CardContent className="p-10 text-center">
             <h3 className="text-xl font-headline mb-2">No Activity Yet</h3>
-            <p className="font-body text-muted-foreground">Start using the tools to see your activity summary here.</p>
+            <p className="font-body text-muted-foreground">Start using the tools to perform some SEO tasks. We'll analyze your activity and provide personalized recommendations here.</p>
           </CardContent>
         </Card>
       )}

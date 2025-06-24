@@ -85,7 +85,7 @@ export default function InsightsPage() {
             </div>
 
             {error && (
-                <Card className="shadow-lg border-destructive">
+                <Card className="border-destructive">
                     <CardHeader>
                         <CardTitle className="text-destructive font-headline flex items-center gap-2">
                            <AlertTriangle /> Error Generating Insights
@@ -98,8 +98,8 @@ export default function InsightsPage() {
             )}
 
             {!error && insights.length === 0 && (
-                <Card className="shadow-lg text-center">
-                    <CardContent className="p-10">
+                <Card>
+                    <CardContent className="p-10 text-center">
                         <Lightbulb className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                         <h3 className="text-xl font-headline mb-2">No Insights Yet</h3>
                         <p className="font-body text-muted-foreground">Use the tools in the sidebar to perform some SEO tasks. We'll analyze your activity and provide personalized recommendations here.</p>
@@ -110,7 +110,7 @@ export default function InsightsPage() {
             {!error && insights.length > 0 && (
                 <div className="space-y-4">
                     {insights.map(insight => (
-                        <Card key={insight.id} className="shadow-md hover:shadow-lg transition-shadow">
+                        <Card key={insight.id}>
                             <CardHeader>
                                 <div className="flex justify-between items-start">
                                     <CardTitle className="font-headline">{insight.title}</CardTitle>

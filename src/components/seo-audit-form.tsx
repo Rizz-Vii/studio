@@ -70,7 +70,7 @@ export default function SeoAuditForm({ onSubmit, isLoading, results, error }: Se
 
     return (
         <div className="space-y-6">
-            <Card className="shadow-lg">
+            <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Technical SEO Audit</CardTitle>
                     <CardDescription className="font-body">Enter a URL to run a quick technical and content SEO audit.</CardDescription>

@@ -16,7 +16,7 @@ export default function AdminOnlyPage() {
 
     return (
         <div className="max-w-4xl mx-auto">
-             <Card className="shadow-lg">
+             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline flex items-center gap-2">
                         <ShieldCheck className="h-6 w-6 text-success" />

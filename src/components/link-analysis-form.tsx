@@ -43,7 +43,7 @@ export default function LinkAnalysisForm({ onSubmit, isLoading, results, error }
 
     return (
         <div className="space-y-6">
-            <Card className="shadow-lg">
+            <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Backlink Analyzer</CardTitle>
                     <CardDescription className="font-body">Enter a URL to discover its backlink profile.</CardDescription>

@@ -174,7 +174,7 @@ export default function KeywordToolForm({ onSubmit, isLoading, results }: Keywor
                         >
                         {results.keywords.map((keyword, index) => (
                             <motion.div key={index} variants={itemVariants}>
-                                <Card className="p-4 flex items-center justify-center text-center shadow-md hover:shadow-lg transition-shadow bg-card h-24">
+                                <Card className="p-4 flex items-center justify-center text-center h-24">
                                     <p className="font-medium font-body">{keyword}</p>
                                 </Card>
                             </motion.div>

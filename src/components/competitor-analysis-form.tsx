@@ -62,7 +62,7 @@ export default function CompetitorAnalysisForm({ onSubmit, isLoading, results, e
 
     return (
         <div className="space-y-6">
-            <Card className="shadow-lg">
+            <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Competitor Analysis</CardTitle>
                     <CardDescription className="font-body">Compare your keyword rankings against your competitors.</CardDescription>

@@ -66,7 +66,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
 
   return (
     <div className="space-y-6">
-      <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300">
+      <Card>
         <CardHeader>
           <CardTitle className="font-headline">Optimize Your Content</CardTitle>
           <CardDescription className="font-body">
@@ -132,7 +132,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
       <div ref={resultsRef}>
         {isLoading && <LoadingScreen text="Analyzing content..." />}
         {error && (
-          <Card className="shadow-lg border-destructive mt-8">
+          <Card className="border-destructive mt-8">
             <CardHeader>
               <CardTitle className="text-destructive font-headline">Analysis Failed</CardTitle>
             </CardHeader>
@@ -143,7 +143,7 @@ export default function ContentAnalyzerForm({ onSubmit, isLoading, analysisResul
         )}
 
         {analysisResult && (
-          <Card className="shadow-lg hover:shadow-2xl transition-shadow duration-300 mt-8">
+          <Card className="mt-8">
             <CardHeader>
               <CardTitle className="font-headline">Analysis Results</CardTitle>
               <CardDescription className="font-body">This analysis provides a holistic view of your content's quality. Use the suggestions to improve your scores and increase your chances of ranking.</CardDescription>

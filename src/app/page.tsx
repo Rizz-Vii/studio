@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SiteHeader from '@/components/site-header';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 
 const fadeIn = {
     hidden: { opacity: 0, y: 30 },
@@ -145,9 +146,13 @@ export default function HomePage() {
               text: "Everything I need — in one dashboard. No more switching tools constantly."
             }
           ].map((t, i) => (
-            <motion.div key={i} variants={fadeIn} initial="hidden" animate="visible" custom={i} className="p-6 border rounded-lg shadow-lg hover:shadow-2xl bg-card transition-shadow duration-300">
-              <p className="text-muted-foreground italic mb-4">“{t.text}”</p>
-              <p className="text-sm font-semibold">— {t.name}, {t.company}</p>
+            <motion.div key={i} variants={fadeIn} initial="hidden" animate="visible" custom={i}>
+              <Card className="h-full">
+                  <CardContent className="p-6">
+                    <p className="text-muted-foreground italic mb-4">“{t.text}”</p>
+                    <p className="text-sm font-semibold">— {t.name}, {t.company}</p>
+                  </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>
@@ -179,26 +184,36 @@ export default function HomePage() {
 
 function Feature({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
     return (
-      <div className="p-6 border rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-card h-full">
-        <div className="text-primary mb-4">{React.cloneElement(icon as React.ReactElement, { className: 'h-6 w-6' })}</div>
-        <h4 className="text-xl font-semibold mb-2">{title}</h4>
-        <p className="text-muted-foreground">{children}</p>
-      </div>
+        <Card className="h-full rounded-2xl">
+          <CardHeader>
+            <div className="text-primary mb-4">{React.cloneElement(icon as React.ReactElement, { className: 'h-6 w-6' })}</div>
+            <CardTitle className="text-xl">{title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">{children}</p>
+          </CardContent>
+        </Card>
     );
   }
 
 function PricingCard({ title, price, features }: { title: string, price: string, features: string[] }) {
     return (
-      <div className="border p-6 rounded-xl shadow-lg hover:shadow-2xl bg-card transition-shadow duration-300">
-        <h4 className="text-lg font-bold mb-1">{title}</h4>
-        <p className="text-2xl font-semibold mb-4">{price}</p>
-        <ul className="text-left space-y-2 text-muted-foreground">
-          {features.map((f, i) => <li key={i}>• {f}</li>)}
-        </ul>
-        <Button className="mt-6 w-full" asChild>
-          <Link href="/register">Choose Plan</Link>
-        </Button>
-      </div>
+        <Card className="rounded-xl flex flex-col text-center">
+            <CardHeader>
+              <CardTitle as="h4" className="text-lg">{title}</CardTitle>
+              <p className="text-2xl font-semibold">{price}</p>
+            </CardHeader>
+            <CardContent className="flex-grow">
+              <ul className="text-left space-y-2 text-muted-foreground">
+                {features.map((f, i) => <li key={i}>• {f}</li>)}
+              </ul>
+            </CardContent>
+            <CardFooter>
+                <Button className="w-full" asChild>
+                    <Link href="/register">Choose Plan</Link>
+                </Button>
+            </CardFooter>
+          </Card>
     )
   }
   
