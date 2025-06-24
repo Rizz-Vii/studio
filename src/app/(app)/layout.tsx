@@ -112,7 +112,7 @@ interface AppNavProps {
 
 const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
     const pathname = usePathname();
-    const { open } = useSidebar();
+    const { open, isMobile } = useSidebar();
     const { user, role } = useAuth();
 
     const handleNavigation = (href: string) => {
@@ -120,6 +120,10 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
             setIsNavigating(true);
         }
     };
+    
+    // On mobile, the sidebar is a sheet, so when it's visible, the text should be too.
+    // On desktop, the `open` state controls text visibility.
+    const showText = open || isMobile;
 
     return (
         <SidebarMenu>
@@ -135,8 +139,8 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
                 >
               <Link href={item.href} onClick={() => handleNavigation(item.href)}>
                     <item.icon />
-                    {open && (
-                       <span className="whitespace-nowrap overflow-hidden">
+                    {showText && (
+                       <span className="group-data-[state=collapsed]:hidden whitespace-nowrap overflow-hidden">
                             {item.title}
                         </span>
                     )}

@@ -7,6 +7,7 @@ import { Rocket, Search, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import SiteHeader from '@/components/site-header';
 
 const fadeIn = {
     hidden: { opacity: 0, y: 30 },
@@ -40,25 +41,16 @@ export default function HomePage() {
       ];
 
   return (
-    <main className="flex flex-col items-center justify-start min-h-screen px-4 py-12 bg-white text-gray-900">
-        
-        <motion.div
-        className="fixed top-6 right-6 z-50 bg-white border shadow-md rounded-lg px-4 py-2 hidden md:flex space-x-4"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        >
-        <a href="#pricing" className="text-sm text-blue-600 font-medium hover:underline">Pricing</a>
-        <a href="#faq" className="text-sm text-blue-600 font-medium hover:underline">FAQ</a>
-        <a href="#about" className="text-sm text-blue-600 font-medium hover:underline">About</a>
-        </motion.div>
+    <div className="flex flex-col min-h-screen bg-background">
+      <SiteHeader />
+      <main className="flex-grow flex flex-col items-center px-4 py-12 text-foreground">
         
       {/* Hero */}
       <motion.section initial="hidden" animate="visible" variants={fadeIn} custom={0} className="max-w-6xl w-full text-center pt-12">
         <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-          SEO Insights <span className="text-blue-600">Supercharged by AI</span>
+          SEO Insights <span className="text-primary">Supercharged by AI</span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-600 mb-8">
+        <p className="text-lg md:text-xl text-muted-foreground mb-8">
           Unlock technical, content, and off-page SEO intelligence. Analyze, optimize, and outrank — all from one smart platform.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -100,7 +92,7 @@ export default function HomePage() {
        {/* Screenshot */}
        <section className="mt-24 w-full max-w-6xl text-center">
         <h2 className="text-3xl md:text-4xl font-semibold mb-4">Your SEO Command Center</h2>
-        <p className="text-gray-600 mb-6">All your SEO tools — crawler, analyzer, optimizer — in one clean, intuitive dashboard designed to turn data into action.</p>
+        <p className="text-muted-foreground mb-6">All your SEO tools — crawler, analyzer, optimizer — in one clean, intuitive dashboard designed to turn data into action.</p>
         <div className="rounded-xl shadow-xl hover:shadow-2xl overflow-hidden border border-gray-200 transition-shadow duration-300">
           <Image
             src="https://placehold.co/1200x700.png"
@@ -117,17 +109,19 @@ export default function HomePage() {
       {/* About Us */}
       <motion.section id="about" className="mt-24 w-full max-w-4xl text-center">
         <h2 className="text-3xl font-bold mb-6">About RankPilot</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-muted-foreground mb-6">
           RankPilot is built to give SEO professionals a single dashboard that replaces half a dozen tools.
           From crawling and content scoring to tracking and reporting — it's all here, powered by AI.
         </p>
       </motion.section>
        
         {/* CTA */}
-        <motion.section initial="hidden" animate="visible" variants={fadeIn} custom={7} className="mt-32 max-w-4xl w-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-10 text-white text-center shadow-xl hover:shadow-2xl transition-shadow duration-300">
+        <motion.section initial="hidden" animate="visible" variants={fadeIn} custom={7} className="mt-32 max-w-4xl w-full bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-10 text-primary-foreground text-center shadow-xl hover:shadow-2xl transition-shadow duration-300">
                 <h4 className="text-3xl font-bold mb-4">Start Ranking Better — Today</h4>
-                <p className="text-lg mb-6">Sign up free. No credit card needed. Get results from day one.</p>
-                <Button size="lg" className="bg-white text-blue-700 hover:bg-gray-100">Get Started</Button>
+                <p className="text-lg mb-6 opacity-90">Sign up free. No credit card needed. Get results from day one.</p>
+                <Button size="lg" variant="secondary" asChild>
+                    <Link href="/register">Get Started for Free</Link>
+                </Button>
             </motion.section>
          
         {/* Testimonials */}
@@ -151,8 +145,8 @@ export default function HomePage() {
               text: "Everything I need — in one dashboard. No more switching tools constantly."
             }
           ].map((t, i) => (
-            <motion.div key={i} variants={fadeIn} initial="hidden" animate="visible" custom={i} className="p-6 border rounded-lg shadow-lg hover:shadow-2xl bg-white transition-shadow duration-300">
-              <p className="text-gray-600 italic mb-4">“{t.text}”</p>
+            <motion.div key={i} variants={fadeIn} initial="hidden" animate="visible" custom={i} className="p-6 border rounded-lg shadow-lg hover:shadow-2xl bg-card transition-shadow duration-300">
+              <p className="text-muted-foreground italic mb-4">“{t.text}”</p>
               <p className="text-sm font-semibold">— {t.name}, {t.company}</p>
             </motion.div>
           ))}
@@ -179,25 +173,26 @@ export default function HomePage() {
       </section>
 
     </main>
+    </div>
   )
 }
 
 function Feature({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
     return (
-      <div className="p-6 border border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-white h-full">
-        <div className="text-blue-600 mb-4">{React.cloneElement(icon as React.ReactElement, { className: 'h-6 w-6' })}</div>
+      <div className="p-6 border rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-card h-full">
+        <div className="text-primary mb-4">{React.cloneElement(icon as React.ReactElement, { className: 'h-6 w-6' })}</div>
         <h4 className="text-xl font-semibold mb-2">{title}</h4>
-        <p className="text-gray-600">{children}</p>
+        <p className="text-muted-foreground">{children}</p>
       </div>
     );
   }
 
 function PricingCard({ title, price, features }: { title: string, price: string, features: string[] }) {
     return (
-      <div className="border p-6 rounded-xl shadow-lg hover:shadow-2xl bg-white transition-shadow duration-300">
+      <div className="border p-6 rounded-xl shadow-lg hover:shadow-2xl bg-card transition-shadow duration-300">
         <h4 className="text-lg font-bold mb-1">{title}</h4>
         <p className="text-2xl font-semibold mb-4">{price}</p>
-        <ul className="text-left space-y-2 text-gray-600">
+        <ul className="text-left space-y-2 text-muted-foreground">
           {features.map((f, i) => <li key={i}>• {f}</li>)}
         </ul>
         <Button className="mt-6 w-full">Choose Plan</Button>
@@ -209,9 +204,7 @@ function PricingCard({ title, price, features }: { title: string, price: string,
     return (
       <div className="mb-6">
         <h4 className="text-lg font-semibold">{question}</h4>
-        <p className="text-gray-600">{answer}</p>
+        <p className="text-muted-foreground">{answer}</p>
       </div>
     )
   }
-
-    
