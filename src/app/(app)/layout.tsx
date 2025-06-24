@@ -13,8 +13,8 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  useSidebar,
   SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { navItems, AppLogo, AppName } from '@/constants/nav';
@@ -140,7 +140,7 @@ const AppNav: React.FC<AppNavProps> = ({ setIsNavigating }) => {
               <Link href={item.href} onClick={() => handleNavigation(item.href)}>
                     <item.icon />
                     {showText && (
-                       <span className="group-data-[state=collapsed]:hidden whitespace-nowrap overflow-hidden">
+                       <span className="whitespace-nowrap">
                             {item.title}
                         </span>
                     )}

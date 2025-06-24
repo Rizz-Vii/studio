@@ -19,7 +19,7 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_pinned"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 // 1 year
-const SIDEBAR_WIDTH = "18rem" // Adjusted width to fit content
+const SIDEBAR_WIDTH = "18rem" // Generous width to fit all menu item titles
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
 
