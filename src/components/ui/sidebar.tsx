@@ -72,8 +72,24 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
-    const [open, setOpen] = React.useState(defaultOpen)
+    const [open, setOpen] = React.useState(defaultOpen && !isMobile)
     const [isUserMenuOpen, setUserMenuOpen] = React.useState(false)
+
+    // Sync with controlled prop
+    React.useEffect(() => {
+      if (openProp !== undefined) {
+        setOpen(openProp)
+      }
+    }, [openProp])
+
+    // Sync with cookie
+    React.useEffect(() => {
+      // Don't save state on mobile
+      if (!isMobile) {
+        document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; max-age=${SIDEBAR_COOKIE_MAX_AGE}; path=/`
+      }
+    }, [open, isMobile])
+
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
@@ -136,7 +152,7 @@ const SidebarProvider = React.forwardRef<
               } as React.CSSProperties
             }
             className={cn(
-              "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
+              "group/sidebar-wrapper flex min-h-svh w-full",
               className
             )}
             ref={ref}
@@ -176,7 +192,7 @@ const Sidebar = React.forwardRef<
       return (
         <aside
           className={cn(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground z-40",
+            "flex h-full w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground z-50",
             className
           )}
           ref={ref}
@@ -211,7 +227,7 @@ const Sidebar = React.forwardRef<
       <aside
         ref={ref}
         className={cn(
-            "group md:block text-sidebar-foreground transition-all duration-300 ease-in-out flex-shrink-0 z-50",
+            "hidden md:block text-sidebar-foreground transition-all duration-300 ease-in-out flex-shrink-0 z-50",
             state === 'expanded' ? "w-[var(--sidebar-width)]" : "w-[var(--sidebar-width-icon)]",
             className
         )}
@@ -219,20 +235,6 @@ const Sidebar = React.forwardRef<
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
-         onMouseEnter={() => {
-            if (collapsible === "icon" && state === "collapsed") {
-            setOpen(true)
-            }
-        }}
-        onMouseLeave={() => {
-            if (
-            collapsible === "icon" &&
-            state === "expanded" &&
-            !isUserMenuOpen
-            ) {
-            setOpen(false)
-            }
-        }}
         {...props}
       >
         <div
@@ -301,24 +303,6 @@ const SidebarRail = React.forwardRef<
   )
 })
 SidebarRail.displayName = "SidebarRail"
-
-const SidebarInset = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"main">
->(({ className, ...props }, ref) => {
-  return (
-    <main
-      ref={ref}
-      className={cn(
-        "relative flex min-h-svh flex-1 flex-col bg-background",
-        "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
-        className
-      )}
-      {...props}
-    />
-  )
-})
-SidebarInset.displayName = "SidebarInset"
 
 const SidebarInput = React.forwardRef<
   React.ElementRef<typeof Input>,
@@ -733,7 +717,6 @@ export {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarInput,
-  SidebarInset,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuBadge,

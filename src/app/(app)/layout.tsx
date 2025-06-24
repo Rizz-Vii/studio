@@ -13,7 +13,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarInset,
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
