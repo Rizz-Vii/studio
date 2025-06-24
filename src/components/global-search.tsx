@@ -10,6 +10,15 @@ import type { SearchOutput } from '@/ai/flows/search';
 import { useDebounce } from '@/hooks/useDebounce';
 import Link from 'next/link';
 
+const placeholderQueries = [
+  "Audit my competitor's site...",
+  "Find keywords for 'vertical farming'...",
+  "How can I improve my homepage title?",
+  "Analyze my blog post for SEO...",
+  "Show me my backlink profile",
+  "Generate a content brief for 'AI ethics'",
+];
+
 export default function GlobalSearch() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchOutput['results']>([]);
@@ -18,6 +27,39 @@ export default function GlobalSearch() {
   const debouncedQuery = useDebounce(query, 300);
   const { handleNavigation } = useAppNavigation();
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  
+  const [placeholder, setPlaceholder] = useState(placeholderQueries[0]);
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+
+  useEffect(() => {
+    let typingTimeout: NodeJS.Timeout;
+    let nextPlaceholderTimeout: NodeJS.Timeout;
+
+    const currentQuery = placeholderQueries[placeholderIndex];
+
+    const typeNextCharacter = (text: string, index: number) => {
+      if (index <= text.length) {
+        setPlaceholder(text.substring(0, index));
+        typingTimeout = setTimeout(() => typeNextCharacter(text, index + 1), 80); // Typing speed
+      } else {
+        // Wait for a bit before switching to the next placeholder
+        nextPlaceholderTimeout = setTimeout(() => {
+          setPlaceholderIndex((prevIndex) => (prevIndex + 1) % placeholderQueries.length);
+        }, 3000); // 3-second delay after typing finishes
+      }
+    };
+
+    // Start typing the current placeholder
+    const startTyping = setTimeout(() => typeNextCharacter(currentQuery, 0), 500);
+
+    // Cleanup function to clear timeouts
+    return () => {
+      clearTimeout(typingTimeout);
+      clearTimeout(nextPlaceholderTimeout);
+      clearTimeout(startTyping);
+    };
+  }, [placeholderIndex]);
+
 
   useEffect(() => {
     const performSearch = async () => {
@@ -57,7 +99,7 @@ export default function GlobalSearch() {
       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
       <Input
         type="search"
-        placeholder="Search features..."
+        placeholder={placeholder}
         className="pl-8 sm:w-[200px] lg:w-[300px] bg-background transition-all duration-300 ease-in-out focus:w-[300px] lg:focus:w-[400px]"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
