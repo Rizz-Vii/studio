@@ -17,7 +17,7 @@ function generateSiteMap(paths: string[]) {
            </url>
          `;
        })
-       .join('')}
+       .join("")}
    </urlset>
  `;
 }
@@ -25,14 +25,14 @@ function generateSiteMap(paths: string[]) {
 export async function GET() {
   // Define the public paths of your application
   const publicPaths = [
-    '/',
-    '/keyword-tool',
-    '/content-analyzer',
-    '/competitors',
-    '/serp-view',
-    '/seo-audit',
-    '/link-view',
-    '/content-brief',
+    "/",
+    "/keyword-tool",
+    "/content-analyzer",
+    "/competitors",
+    "/serp-view",
+    "/seo-audit",
+    "/link-view",
+    "/content-brief",
   ];
 
   const body = generateSiteMap(publicPaths);
@@ -40,8 +40,8 @@ export async function GET() {
   return new Response(body, {
     status: 200,
     headers: {
-      'Content-Type': 'application/xml',
-      'Cache-control': 'public, s-maxage=86400, stale-while-revalidate',
+      "Content-Type": "application/xml",
+      "Cache-control": "public, s-maxage=86400, stale-while-revalidate",
     },
   });
 }

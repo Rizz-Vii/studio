@@ -1,1 +1,9 @@
-["^ ","~:members",["^ ","derEncode",["~#set",[["^ ","~:flags",["^2",["~:method","~:public"]]]]]]]
+[
+  "^ ",
+  "~:members",
+  [
+    "^ ",
+    "derEncode",
+    ["~#set", [["^ ", "~:flags", ["^2", ["~:method", "~:public"]]]]]
+  ]
+]

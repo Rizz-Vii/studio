@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { Input } from '@/components/ui/input';
-import { Search, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { searchFeatures } from '@/ai/flows/search';
-import type { SearchOutput } from '@/ai/flows/search';
-import { useDebounce } from '@/hooks/useDebounce';
-import Link from 'next/link';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Input } from "@/components/ui/input";
+import { Search, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { searchFeatures } from "@/ai/flows/search";
+import type { SearchOutput } from "@/ai/flows/search";
+import { useDebounce } from "@/hooks/useDebounce";
+import Link from "next/link";
 
 const placeholderQueries = [
   "Audit my competitor's site...",
@@ -19,13 +19,13 @@ const placeholderQueries = [
 ];
 
 export default function GlobalSearch() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchOutput['results']>([]);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchOutput["results"]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const debouncedQuery = useDebounce(query, 300);
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  
+
   const [placeholder, setPlaceholder] = useState(placeholderQueries[0]);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
@@ -38,17 +38,25 @@ export default function GlobalSearch() {
     const typeNextCharacter = (text: string, index: number) => {
       if (index <= text.length) {
         setPlaceholder(text.substring(0, index));
-        typingTimeout = setTimeout(() => typeNextCharacter(text, index + 1), 80); // Typing speed
+        typingTimeout = setTimeout(
+          () => typeNextCharacter(text, index + 1),
+          80
+        ); // Typing speed
       } else {
         // Wait for a bit before switching to the next placeholder
         nextPlaceholderTimeout = setTimeout(() => {
-          setPlaceholderIndex((prevIndex) => (prevIndex + 1) % placeholderQueries.length);
+          setPlaceholderIndex(
+            (prevIndex) => (prevIndex + 1) % placeholderQueries.length
+          );
         }, 3000); // 3-second delay after typing finishes
       }
     };
 
     // Start typing the current placeholder
-    const startTyping = setTimeout(() => typeNextCharacter(currentQuery, 0), 500);
+    const startTyping = setTimeout(
+      () => typeNextCharacter(currentQuery, 0),
+      500
+    );
 
     // Cleanup function to clear timeouts
     return () => {
@@ -57,7 +65,6 @@ export default function GlobalSearch() {
       clearTimeout(startTyping);
     };
   }, [placeholderIndex]);
-
 
   useEffect(() => {
     const performSearch = async () => {
@@ -82,13 +89,16 @@ export default function GlobalSearch() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
         setIsFocused(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -104,7 +114,7 @@ export default function GlobalSearch() {
         onFocus={() => setIsFocused(true)}
       />
       <AnimatePresence>
-        {isFocused && (query.length > 0) && (
+        {isFocused && query.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -126,26 +136,30 @@ export default function GlobalSearch() {
                       href={item.href}
                       onClick={() => {
                         setIsFocused(false);
-                        setQuery('');
+                        setQuery("");
                       }}
                       className="block w-full px-4 py-2 text-left hover:bg-accent"
                     >
                       <p className="font-semibold">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
                     </Link>
                   </li>
                 ))}
               </ul>
             )}
-            {!isLoading && results.length === 0 && debouncedQuery.length >= 3 && (
-               <div className="p-4 text-center text-muted-foreground">
-                No results found for "{debouncedQuery}".
-               </div>
-            )}
-            {!isLoading && debouncedQuery.length < 3 && query.length > 0 && (
+            {!isLoading &&
+              results.length === 0 &&
+              debouncedQuery.length >= 3 && (
                 <div className="p-4 text-center text-muted-foreground">
-                    Keep typing to search...
+                  No results found for "{debouncedQuery}".
                 </div>
+              )}
+            {!isLoading && debouncedQuery.length < 3 && query.length > 0 && (
+              <div className="p-4 text-center text-muted-foreground">
+                Keep typing to search...
+              </div>
             )}
           </motion.div>
         )}

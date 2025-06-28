@@ -5,12 +5,12 @@ import { getFirestore } from "firebase/firestore";
 import { getFunctions } from "firebase/functions";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB_HzRrVdysW3o-UXUdCkPqW9rH4fWWjyY",
-    authDomain: "rankpilot-h3jpc.firebaseapp.com",
-    projectId: "rankpilot-h3jpc",
-    storageBucket: "rankpilot-h3jpc.firebasestorage.app",
-    messagingSenderId: "283736429782",
-    appId: "1:283736429782:web:a3e387a3a79a592121e577"
+  apiKey: "AIzaSyB_HzRrVdysW3o-UXUdCkPqW9rH4fWWjyY",
+  authDomain: "rankpilot-h3jpc.firebaseapp.com",
+  projectId: "rankpilot-h3jpc",
+  storageBucket: "rankpilot-h3jpc.firebasestorage.app",
+  messagingSenderId: "283736429782",
+  appId: "1:283736429782:web:a3e387a3a79a592121e577",
 };
 
 // Initialize Firebase

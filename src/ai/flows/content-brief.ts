@@ -1,5 +1,4 @@
-
-'use server';
+"use server";
 /**
  * @fileOverview AI-powered content brief generation.
  *
@@ -8,39 +7,72 @@
  * - ContentBriefOutput - The return type for the generateContentBrief function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from "@/ai/genkit";
+import { z } from "zod";
+
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const googleApiKey = process.env.GOOGLE_API_KEY;
 
 const ContentBriefInputSchema = z.object({
-  keyword: z.string().describe('The primary target keyword for the content brief.'),
+  keyword: z
+    .string()
+    .describe("The primary target keyword for the content brief."),
 });
 export type ContentBriefInput = z.infer<typeof ContentBriefInputSchema>;
 
 const ContentBriefOutputSchema = z.object({
-  title: z.string().describe('A compelling, SEO-optimized title for the article.'),
-  primaryKeyword: z.string().describe('The primary keyword the brief is targeting.'),
-  searchIntent: z.string().describe('The user\'s likely intent (e.g., "Informational", "Commercial", "Transactional").'),
-  seoScore: z.number().min(0).max(100).describe('A simulated SEO potential score from 0 to 100.'),
-  llmGeneratedOutline: z.array(z.string()).describe('An ordered list of suggested headings to structure the content.'),
+  title: z
+    .string()
+    .describe("A compelling, SEO-optimized title for the article."),
+  primaryKeyword: z
+    .string()
+    .describe("The primary keyword the brief is targeting."),
+  searchIntent: z
+    .string()
+    .describe(
+      'The user\'s likely intent (e.g., "Informational", "Commercial", "Transactional").'
+    ),
+  seoScore: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe("A simulated SEO potential score from 0 to 100."),
+  llmGeneratedOutline: z
+    .array(z.string())
+    .describe(
+      "An ordered list of suggested headings to structure the content."
+    ),
   recommendedMeta: z.object({
-    title: z.string().describe('The suggested meta title.'),
-    description: z.string().describe('A concise and engaging meta description (155-160 characters).'),
+    title: z.string().describe("The suggested meta title."),
+    description: z
+      .string()
+      .describe(
+        "A concise and engaging meta description (155-160 characters)."
+      ),
   }),
-  competitorInsights: z.array(z.string()).describe('A list of insights about competitors for this keyword.'),
-  briefSummary: z.string().describe('A summary of the brief and the main strategy to follow.'),
+  competitorInsights: z
+    .array(z.string())
+    .describe("A list of insights about competitors for this keyword."),
+  briefSummary: z
+    .string()
+    .describe("A summary of the brief and the main strategy to follow."),
 });
 export type ContentBriefOutput = z.infer<typeof ContentBriefOutputSchema>;
 
-export async function generateContentBrief(input: ContentBriefInput): Promise<ContentBriefOutput> {
+export async function generateContentBrief(
+  input: ContentBriefInput
+): Promise<ContentBriefOutput> {
   return contentBriefFlow(input);
 }
 
 const briefPrompt = ai.definePrompt({
-  name: 'contentBriefPrompt',
-  input: {schema: ContentBriefInputSchema},
-  output: {schema: ContentBriefOutputSchema},
+  name: "contentBriefPrompt",
+  input: { schema: ContentBriefInputSchema },
+  output: { schema: ContentBriefOutputSchema },
   prompt: `You are an expert Content Strategist and SEO specialist. Your task is to generate a comprehensive content brief for a given target keyword. The brief should provide a clear roadmap for a writer to create a high-quality, SEO-optimized piece of content that can rank well on search engines.
-
+Use the following API keys for enhanced analysis:
+  - GEMINI_API_KEY: ${geminiApiKey}
+  - GOOGLE_API_KEY: ${googleApiKey}
 **Target Keyword:** {{{keyword}}}
 
 **Instructions:**
@@ -63,12 +95,12 @@ Your entire output MUST be a single, valid JSON object that conforms to the prov
 
 const contentBriefFlow = ai.defineFlow(
   {
-    name: 'contentBriefFlow',
+    name: "contentBriefFlow",
     inputSchema: ContentBriefInputSchema,
     outputSchema: ContentBriefOutputSchema,
   },
-  async input => {
-    const {output} = await briefPrompt(input);
+  async (input) => {
+    const { output } = await briefPrompt(input);
     return output!;
   }
 );

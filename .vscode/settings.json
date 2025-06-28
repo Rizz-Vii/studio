@@ -1,9 +1,24 @@
 {
-    "IDX.aI.enableInlineCompletion": true,
-    "IDX.aI.enableCodebaseIndexing": true,
-    "css.lint.unknownAtRules": "ignore",
-    "editor.fontSize": 18,
-    "editor.defaultFormatter": "GitHub.copilot",
-    "editor.formatOnPaste": true,
-    "editor.mouseWheelZoom": true
+  "IDX.aI.enableInlineCompletion": true,
+  "IDX.aI.enableCodebaseIndexing": true,
+  "css.lint.unknownAtRules": "ignore",
+  "editor.fontSize": 18,
+  "editor.defaultFormatter": "esbenp.prettier-vscode", // Set Prettier as the global default formatter
+  "editor.formatOnPaste": true,
+  "editor.mouseWheelZoom": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // Ensure TSX also uses Prettier for consistency
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // Explicitly set Prettier for JSON
+  },
+  "prettier.documentSelectors": [
+    ""
+  ]
 }

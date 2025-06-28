@@ -1,6 +1,5 @@
-
 // src/ai/flows/competitor-analysis.ts
-'use server';
+"use server";
 /**
  * @fileOverview Competitor analysis flow that compares keyword rankings and identifies content gaps.
  *
@@ -9,15 +8,17 @@
  * - CompetitorAnalysisOutput - The return type for the analyzeCompetitors function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from "@/ai/genkit";
+import { z } from "zod";
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const googleApiKey = process.env.GOOGLE_API_KEY;
 
 const CompetitorAnalysisInputSchema = z.object({
-  yourUrl: z.string().url().describe('The URL of your website.'),
+  yourUrl: z.string().url().describe("The URL of your website."),
   competitorUrls: z
     .array(z.string().url())
     .describe("An array of your competitors' URLs."),
-  keywords: z.array(z.string()).describe('An array of keywords to compare.'),
+  keywords: z.array(z.string()).describe("An array of keywords to compare."),
 });
 export type CompetitorAnalysisInput = z.infer<
   typeof CompetitorAnalysisInputSchema
@@ -49,12 +50,12 @@ const CompetitorAnalysisOutputSchema = z.object({
   rankings: z
     .array(RankingDataItemSchema)
     .describe(
-      'An array of keyword ranking data for your site and competitors.'
+      "An array of keyword ranking data for your site and competitors."
     ),
   contentGaps: z
     .array(z.string())
     .describe(
-      'An array of keywords or topics that competitors rank for but you do not.'
+      "An array of keywords or topics that competitors rank for but you do not."
     ),
 });
 export type CompetitorAnalysisOutput = z.infer<
@@ -68,11 +69,13 @@ export async function analyzeCompetitors(
 }
 
 const analysisPrompt = ai.definePrompt({
-  name: 'competitorAnalysisPrompt',
-  input: {schema: CompetitorAnalysisInputSchema},
-  output: {schema: CompetitorAnalysisOutputSchema},
+  name: "competitorAnalysisPrompt",
+  input: { schema: CompetitorAnalysisInputSchema },
+  output: { schema: CompetitorAnalysisOutputSchema },
   prompt: `You are a world-class SEO strategist with deep expertise in competitive analysis and content strategy. Your primary goal is to provide actionable intelligence by analyzing search engine ranking positions and identifying strategic content gaps.
-
+Use the following API keys for enhanced analysis:
+  - GEMINI_API_KEY: ${geminiApiKey}
+  - GOOGLE_API_KEY: ${googleApiKey}
 **Analysis Context:**
 
 *   **My Website URL:** {{{yourUrl}}}
@@ -111,15 +114,15 @@ const analysisPrompt = ai.definePrompt({
 
 const competitorAnalysisFlow = ai.defineFlow(
   {
-    name: 'competitorAnalysisFlow',
+    name: "competitorAnalysisFlow",
     inputSchema: CompetitorAnalysisInputSchema,
     outputSchema: CompetitorAnalysisOutputSchema,
   },
-  async input => {
+  async (input) => {
     // In a real-world scenario, you would first scrape the SERPs for each keyword
     // to get actual ranking data. Then, you might pass that data to the AI for
     // gap analysis. For this prototype, we will rely on the AI to simulate the data.
-    const {output} = await analysisPrompt(input);
+    const { output } = await analysisPrompt(input);
     return output!;
   }
 );

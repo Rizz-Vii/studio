@@ -1,5 +1,4 @@
-
-'use server';
+"use server";
 /**
  * @fileOverview AI-powered search for application features.
  *
@@ -8,35 +7,45 @@
  * - SearchOutput - The return type for the searchFeatures function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from "@/ai/genkit";
+import { z } from "zod";
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const googleApiKey = process.env.GOOGLE_API_KEY;
 
 const SearchInputSchema = z.object({
-  query: z.string().describe('The user\'s search query.'),
+  query: z.string().describe("The user's search query."),
 });
 export type SearchInput = z.infer<typeof SearchInputSchema>;
 
 const SearchResultItemSchema = z.object({
-    title: z.string().describe('The title of the feature or page.'),
-    href: z.string().describe('The relative URL path to the feature.'),
-    description: z.string().describe('A brief description of what the feature does.'),
+  title: z.string().describe("The title of the feature or page."),
+  href: z.string().describe("The relative URL path to the feature."),
+  description: z
+    .string()
+    .describe("A brief description of what the feature does."),
 });
 
 const SearchOutputSchema = z.object({
-  results: z.array(SearchResultItemSchema).describe('An array of relevant features.'),
+  results: z
+    .array(SearchResultItemSchema)
+    .describe("An array of relevant features."),
 });
 export type SearchOutput = z.infer<typeof SearchOutputSchema>;
 
-export async function searchFeatures(input: SearchInput): Promise<SearchOutput> {
+export async function searchFeatures(
+  input: SearchInput
+): Promise<SearchOutput> {
   return searchFeaturesFlow(input);
 }
 
 const searchPrompt = ai.definePrompt({
-  name: 'searchFeaturesPrompt',
-  input: {schema: SearchInputSchema},
-  output: {schema: SearchOutputSchema},
+  name: "searchFeaturesPrompt",
+  input: { schema: SearchInputSchema },
+  output: { schema: SearchOutputSchema },
   prompt: `You are a search engine for the RankPilot application. Based on the user's query, find the most relevant features.
-
+Use the following API keys for enhanced analysis:
+  - GEMINI_API_KEY: ${geminiApiKey}
+  - GOOGLE_API_KEY: ${googleApiKey}
 **Available Features:**
 - **Dashboard**: href="/dashboard", description="Overview of key SEO metrics and activity."
 - **Insights**: href="/insights", description="AI-generated actionable recommendations."
@@ -58,12 +67,12 @@ Return a JSON array of the most relevant features based on the query. If the que
 
 const searchFeaturesFlow = ai.defineFlow(
   {
-    name: 'searchFeaturesFlow',
+    name: "searchFeaturesFlow",
     inputSchema: SearchInputSchema,
     outputSchema: SearchOutputSchema,
   },
-  async input => {
-    const {output} = await searchPrompt(input);
+  async (input) => {
+    const { output } = await searchPrompt(input);
     return output!;
   }
 );

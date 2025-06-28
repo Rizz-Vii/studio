@@ -1,4 +1,4 @@
-'use server';
+"use server";
 /**
  * @fileOverview SEO Audit flow that analyzes a URL for technical and content SEO factors.
  *
@@ -7,37 +7,61 @@
  * - AuditUrlOutput - The return type for the auditUrl function.
  */
 
-import { ai } from '@/ai/genkit';
-import { z } from 'zod';
+import { ai } from "@/ai/genkit";
+import { z } from "zod";
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const googleApiKey = process.env.GOOGLE_API_KEY;
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 
 // Define the input schema for the SEO audit flow
 const AuditUrlInputSchema = z.object({
-  url: z.string().describe('The URL to audit.'),
+  url: z.string().describe("The URL to audit."),
 });
 export type AuditUrlInput = z.infer<typeof AuditUrlInputSchema>;
 
 // Define the output schema for the SEO audit flow
 const AuditUrlOutputSchema = z.object({
-  overallScore: z.number().describe('The overall SEO score for the URL (0-100).'),
-  items: z.array(z.object({
-    id: z.string().describe('A unique identifier for the audit item.'),
-    name: z.string().describe('The name of the audit item (e.g., "Title Tags", "Mobile-Friendliness").'),
-    score: z.number().describe('The score for this specific audit item (0-100).'),
-    details: z.string().describe('Detailed findings or suggestions for this item.'),
-    status: z.enum(['good', 'warning', 'error']).describe('The status of the audit item.'),
-  })).describe('A list of detailed audit items.'),
-  summary: z.string().describe('A brief overall summary of the audit findings.'),
+  overallScore: z
+    .number()
+    .describe("The overall SEO score for the URL (0-100)."),
+  items: z
+    .array(
+      z.object({
+        id: z.string().describe("A unique identifier for the audit item."),
+        name: z
+          .string()
+          .describe(
+            'The name of the audit item (e.g., "Title Tags", "Mobile-Friendliness").'
+          ),
+        score: z
+          .number()
+          .describe("The score for this specific audit item (0-100)."),
+        details: z
+          .string()
+          .describe("Detailed findings or suggestions for this item."),
+        status: z
+          .enum(["good", "warning", "error"])
+          .describe("The status of the audit item."),
+      })
+    )
+    .describe("A list of detailed audit items."),
+  summary: z
+    .string()
+    .describe("A brief overall summary of the audit findings."),
 });
 export type AuditUrlOutput = z.infer<typeof AuditUrlOutputSchema>;
 
 // Define the prompt to the AI model
 const auditUrlPrompt = ai.definePrompt({
-  name: 'seoAuditPrompt',
-  input: { schema: AuditUrlInputSchema.extend({ content: z.string().optional() }) },
+  name: "seoAuditPrompt",
+  input: {
+    schema: AuditUrlInputSchema.extend({ content: z.string().optional() }),
+  },
   output: { schema: AuditUrlOutputSchema },
   prompt: `You are a world-class SEO expert, providing a detailed technical and content audit for a given URL. Your analysis must be thorough, actionable, and formatted as a JSON object adhering to the provided schema.
-
+Use the following API keys for enhanced analysis:
+  - GEMINI_API_KEY: ${geminiApiKey}
+  - GOOGLE_API_KEY: ${googleApiKey}
   **Analysis Instructions:**
 
   For the given URL and its content, perform the following checks. For each check, provide a score (0-100), a status ('good', 'warning', 'error'), and a 'details' string with clear, actionable advice.
@@ -91,7 +115,7 @@ const auditUrlPrompt = ai.definePrompt({
 // Define the Genkit flow
 const auditUrlFlow = ai.defineFlow(
   {
-    name: 'seoAuditFlow',
+    name: "seoAuditFlow",
     inputSchema: AuditUrlInputSchema,
     outputSchema: AuditUrlOutputSchema,
   },
@@ -100,27 +124,30 @@ const auditUrlFlow = ai.defineFlow(
     let pageContent: string | undefined;
 
     try {
-        console.log(`Attempting to fetch content for: ${url}`);
-        const loader = new CheerioWebBaseLoader(url, {
-            timeout: 15000, // 15-second timeout
-            fetchOptions: {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-                }
-            }
-        });
+      console.log(`Attempting to fetch content for: ${url}`);
+      const loader = new CheerioWebBaseLoader(url, {
+        timeout: 15000, // 15-second timeout
+        fetchOptions: {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+          },
+        },
+      });
       const docs = await loader.load();
       pageContent = docs.length > 0 ? docs[0].pageContent : undefined;
 
       if (pageContent) {
-          console.log(`Successfully fetched ${pageContent.length} characters.`);
-          // Truncate content to avoid overwhelming the model and hitting token limits.
-          if (pageContent.length > 100000) {
-              console.log('Content is very long, truncating to 100,000 characters.');
-              pageContent = pageContent.substring(0, 100000);
-          }
+        console.log(`Successfully fetched ${pageContent.length} characters.`);
+        // Truncate content to avoid overwhelming the model and hitting token limits.
+        if (pageContent.length > 100000) {
+          console.log(
+            "Content is very long, truncating to 100,000 characters."
+          );
+          pageContent = pageContent.substring(0, 100000);
+        }
       } else {
-          console.log('No content fetched.');
+        console.log("No content fetched.");
       }
     } catch (e) {
       console.error(`Could not fetch content for ${url}:`, e);

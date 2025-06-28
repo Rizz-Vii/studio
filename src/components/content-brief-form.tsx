@@ -1,18 +1,35 @@
 // src/components/content-brief-form.tsx
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
-import type { ContentBriefInput } from '@/ai/flows/content-brief';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
+import type { ContentBriefInput } from "@/ai/flows/content-brief";
 
 const formSchema = z.object({
-  keyword: z.string().min(3, { message: 'Keyword must be at least 3 characters long.' }),
+  keyword: z
+    .string()
+    .min(3, { message: "Keyword must be at least 3 characters long." }),
 });
 
 type ContentBriefFormValues = z.infer<typeof formSchema>;
@@ -22,16 +39,21 @@ interface ContentBriefFormProps {
   isLoading: boolean;
 }
 
-export default function ContentBriefForm({ onSubmit, isLoading }: ContentBriefFormProps) {
+export default function ContentBriefForm({
+  onSubmit,
+  isLoading,
+}: ContentBriefFormProps) {
   const form = useForm<ContentBriefFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { keyword: '' },
+    defaultValues: { keyword: "" },
   });
 
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="font-headline">Generate a Content Brief</CardTitle>
+        <CardTitle className="font-headline">
+          Generate a Content Brief
+        </CardTitle>
         <CardDescription className="font-body">
           Enter a target keyword to generate a comprehensive SEO content brief.
         </CardDescription>
@@ -62,7 +84,11 @@ export default function ContentBriefForm({ onSubmit, isLoading }: ContentBriefFo
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading} className="font-body w-full sm:w-auto">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="font-body w-full sm:w-auto"
+            >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generate Brief
             </Button>

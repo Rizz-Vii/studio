@@ -1,10 +1,18 @@
 // src/context/AuthContext.tsx
-'use client';
+"use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { User } from "firebase/auth";
+import { auth, db } from "@/lib/firebase";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
 
 interface UserActivity {
   id: string;
@@ -23,7 +31,13 @@ interface AuthContextType {
   activities: UserActivity[];
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true, role: null, profile: null, activities: [] });
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  role: null,
+  profile: null,
+  activities: [],
+});
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -43,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           setRole(userData?.role || null);
-          setProfile(userData || null );
+          setProfile(userData || null);
         } else {
           setRole(null);
           setProfile(null);
@@ -53,12 +67,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const activitiesRef = collection(db, "users", user.uid, "activities");
         const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(50));
         const querySnapshot = await getDocs(q);
-        const fetchedActivities = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-        } as UserActivity));
+        const fetchedActivities = querySnapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            }) as UserActivity
+        );
         setActivities(fetchedActivities);
-
       } else {
         setRole(null);
         setProfile(null);

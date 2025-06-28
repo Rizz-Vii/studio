@@ -1,50 +1,54 @@
 // src/app/(auth)/register/page.tsx
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase'; // Import auth and db
-import { doc, setDoc } from 'firebase/firestore'; // Import firestore functions
-import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // Import Link
-import { useAuth } from '@/context/AuthContext'; // Import useAuth
+import { useState, useEffect } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "@/lib/firebase"; // Import auth and db
+import { doc, setDoc } from "firebase/firestore"; // Import firestore functions
+import { useRouter } from "next/navigation";
+import Link from "next/link"; // Import Link
+import { useAuth } from "@/context/AuthContext"; // Import useAuth
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
 
   const { user, loading } = useAuth(); // Use the useAuth hook
-  
-    // Add this useEffect hook to check authentication state and redirect
-    useEffect(() => {
-      if (!loading && user) {
-        // Redirect to dashboard if user is already logged in and not loading
-        router.push('/');
-      }
-    }, [user, loading, router]);
-  
-    // Add this condition to not render the form while loading or if user is logged in
-    if (loading || user) {
-      return null; // Or you could return a loading spinner
+
+  // Add this useEffect hook to check authentication state and redirect
+  useEffect(() => {
+    if (!loading && user) {
+      // Redirect to dashboard if user is already logged in and not loading
+      router.push("/dashboard");
     }
+  }, [user, loading, router]);
+
+  // Add this condition to not render the form while loading or if user is logged in
+  if (loading || user) {
+    return null; // Or you could return a loading spinner
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       // Store additional user data in Firestore
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
-        role: 'user', // Default role is 'user'
+        role: "user", // Default role is 'user'
         createdAt: new Date(),
         // Add other initial user data here
       });
 
       // Redirect to dashboard or desired page after successful registration
-      router.push('/');
+      router.push("/");
     } catch (error: any) {
       console.error("Error registering:", error.message);
       // Display an error message to the user
@@ -57,7 +61,9 @@ export default function RegisterPage() {
         <h2 className="text-2xl font-bold text-center">Register</h2>
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               required
@@ -67,7 +73,9 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               required
@@ -84,7 +92,7 @@ export default function RegisterPage() {
           </button>
         </form>
         <p className="text-center text-sm text-gray-600">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link href="/login" className="text-primary hover:underline">
             Login
           </Link>
