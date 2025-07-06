@@ -8,7 +8,7 @@
  * - CompetitorAnalysisOutput - The return type for the analyzeCompetitors function.
  */
 
-import { ai } from "@/ai/genkit";
+import { ai } from "../genkit";
 import { z } from "zod";
 const geminiApiKey = process.env.GEMINI_API_KEY;
 const googleApiKey = process.env.GOOGLE_API_KEY;

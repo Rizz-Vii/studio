@@ -36,10 +36,10 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-  Tooltip as RechartsTooltip,
 } from "recharts";
 import {
   ChartContainer,
+  ChartTooltip,
   ChartTooltipContent,
   ChartConfig,
 } from "@/components/ui/chart";
@@ -118,11 +118,11 @@ const RankingsChart = ({
                 domain={[0, 101]}
                 reversed={true}
               />
-              <RechartsTooltip
+              <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent />}
+                content={(props) => <ChartTooltipContent {...props} />}
               />
-              <Bar dataKey="rank" layout="vertical" radius={5} key="rank-bar" />
+              <Bar dataKey="rank" radius={5} key="rank-bar" />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>

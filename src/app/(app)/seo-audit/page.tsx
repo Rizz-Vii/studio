@@ -130,8 +130,13 @@ const AuditCharts = ({ items }: { items: AuditUrlOutput["items"] }) => {
                 className="text-xs"
               />
               <XAxis dataKey="score" type="number" hide />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-              <Bar dataKey="score" layout="vertical" radius={5} />
+              <ChartTooltip
+                cursor={false}
+                content={(props) => (
+                  <ChartTooltipContent {...props}  />
+                )}
+              />
+              <Bar dataKey="score" radius={5} />
             </BarChart>
           </ChartContainer>
         </CardContent>
@@ -149,7 +154,9 @@ const AuditCharts = ({ items }: { items: AuditUrlOutput["items"] }) => {
             >
               <PieChart>
                 <ChartTooltip
-                  content={<ChartTooltipContent nameKey="name" hideLabel />}
+                  content={(props) => (
+                    <ChartTooltipContent {...props} nameKey="name" hideLabel />
+                  )}
                 />
                 <Pie data={imageData} dataKey="value">
                   <Cell key="withAlt" fill="var(--color-withAlt)" />

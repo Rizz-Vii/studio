@@ -9,9 +9,11 @@
 
 import { ai } from "@/ai/genkit";
 import { z } from "zod";
+import fetch from "node-fetch";
+import * as cheerio from "cheerio";
+
 const geminiApiKey = process.env.GEMINI_API_KEY;
 const googleApiKey = process.env.GOOGLE_API_KEY;
-import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 
 // Define the input schema for the SEO audit flow
 const AuditUrlInputSchema = z.object({
@@ -125,17 +127,18 @@ const auditUrlFlow = ai.defineFlow(
 
     try {
       console.log(`Attempting to fetch content for: ${url}`);
-      const loader = new CheerioWebBaseLoader(url, {
-        timeout: 15000, // 15-second timeout
-        fetchOptions: {
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-          },
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         },
+        // @ts-ignore: node-fetch v2 does not support timeout, v3+ does
+        timeout: 15000,
       });
-      const docs = await loader.load();
-      pageContent = docs.length > 0 ? docs[0].pageContent : undefined;
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const html = await response.text();
+      const $ = cheerio.load(html);
+      pageContent = $("body").text();
 
       if (pageContent) {
         console.log(`Successfully fetched ${pageContent.length} characters.`);

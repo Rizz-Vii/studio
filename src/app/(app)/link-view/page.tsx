@@ -36,10 +36,10 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-  Tooltip as RechartsTooltip,
 } from "recharts";
 import {
   ChartContainer,
+   ChartTooltip,
   ChartTooltipContent,
   ChartConfig,
 } from "@/components/ui/chart";
@@ -92,7 +92,12 @@ const DomainAuthorityChart = ({
             <CartesianGrid vertical={false} />
             <XAxis dataKey="range" tickLine={false} axisLine={false} />
             <YAxis tickLine={false} axisLine={false} />
-            <RechartsTooltip cursor={false} content={<ChartTooltipContent />} />
+            <ChartTooltip
+              cursor={false}
+              content={(props) => (
+                <ChartTooltipContent {...props} indicator="line" />
+              )}
+            />
             <Bar dataKey="count" fill="var(--color-count)" radius={4} />
           </BarChart>
         </ChartContainer>

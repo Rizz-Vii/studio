@@ -117,7 +117,9 @@ const SeoScoreTrendChart = () => (
             <YAxis domain={[0, 100]} tickLine={false} axisLine={false} />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={(props) => (
+                <ChartTooltipContent {...props} indicator="line" />
+              )}
             />
             <Line
               type="monotone"
@@ -204,7 +206,9 @@ const DomainAuthorityChart = () => (
           <YAxis domain={[0, 100]} tickLine={false} axisLine={false} />
           <ChartTooltip
             cursor={false}
-            content={<ChartTooltipContent indicator="line" />}
+            content={(props) => (
+              <ChartTooltipContent {...props} indicator="line" />
+            )}
           />
           <Line
             type="monotone"
@@ -239,7 +243,9 @@ const BacklinksChart = () => (
             <YAxis tickLine={false} axisLine={false} />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dot" />}
+              content={(props) => (
+                <ChartTooltipContent {...props} indicator="line" />
+              )}
             />
             <Bar dataKey="new" fill="var(--color-new)" radius={4} />
             <Bar dataKey="lost" fill="var(--color-lost)" radius={4} />
@@ -264,7 +270,9 @@ const TrafficSourcesChart = () => (
           <PieChart>
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={(props) => (
+                <ChartTooltipContent {...props} indicator="line" />
+              )}
             />
             <Pie
               data={dummyDashboardData.trafficSources}

@@ -9,6 +9,8 @@
 
 import { ai } from "@/ai/genkit";
 import { z } from "zod";
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const googleApiKey = process.env.GOOGLE_API_KEY;
 
 const ActivitySchema = z.object({
   type: z.string(),
@@ -75,7 +77,9 @@ const insightsPrompt = ai.definePrompt({
   input: { schema: GenerateInsightsInputSchema },
   output: { schema: GenerateInsightsOutputSchema },
   prompt: `You are an expert SEO consultant reviewing a user's recent activity on an SEO platform. Your task is to analyze their actions and provide 3-5 highly relevant, actionable insights.
-
+Use the following API keys for enhanced analysis:
+  - GEMINI_API_KEY: ${geminiApiKey}
+  - GOOGLE_API_KEY: ${googleApiKey}
 **User's Recent Activities:**
 {{#each activities}}
 - **Tool:** {{{tool}}}

@@ -20,5 +20,6 @@
   },
   "prettier.documentSelectors": [
     ""
-  ]
+  ],
+  "git.ignoreLimitWarning": true
 }

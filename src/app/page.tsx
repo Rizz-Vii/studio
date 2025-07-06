@@ -133,7 +133,7 @@ export default function HomePage() {
           </p>
           <Card className="rounded-xl overflow-hidden">
             <Image
-              src="https://placehold.co/1200x700.png"
+              src="/images/imgDash.png"
               alt="SEO Dashboard Screenshot"
               data-ai-hint="dashboard computer screen"
               width={1200}

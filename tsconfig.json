@@ -7,8 +7,8 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "esnext", // Changed from "nodenext"
+    "moduleResolution": "node", // Changed from "nodenext"
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -30,7 +30,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "functions/src/**/*.ts" // Add this line to include the functions directory
+    // Add this line to include the functions directory
   ],
   "exclude": ["node_modules"]
 }

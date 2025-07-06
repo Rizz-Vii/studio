@@ -1,5 +1,5 @@
 import { onCall, HttpsOptions } from "firebase-functions/v2/https";
-import { ai } from "@/ai/genkit";
+import { ai } from "../ai/genkit.js"; // Import AI generation module
 
 // Set options for the content analyzer function
 const httpsOptions: HttpsOptions = {

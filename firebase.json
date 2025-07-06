@@ -8,6 +8,7 @@
   "functions": {
     "source": "functions",
     "codebase": "default",
+    "runtime" : "nodejs20",
     "ignore": [
       "node_modules",
       ".git",
@@ -23,8 +24,7 @@
   "emulators": {
     "apphosting": {
       "port": 9002,
-      "rootDirectory": "",
-      "start": "npm run dev"
+      "rootDirectory": ""
     },
     "functions": {
       "port": 9050
@@ -37,5 +37,16 @@
       "port": 9000
     },
     "singleProjectMode": true
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "australia-southeast2"
+    }
   }
 }

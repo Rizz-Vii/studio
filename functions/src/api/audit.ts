@@ -1,5 +1,5 @@
 import { onCall, HttpsOptions } from "firebase-functions/v2/https";
-import { ai } from "@/ai/genkit";
+import { ai } from "@/ai/genkit.js";
 
 // Set options for the audit function
 const httpsOptions: HttpsOptions = {

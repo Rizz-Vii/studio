@@ -32,7 +32,7 @@ const formSchema = z.object({
   topic: z
     .string()
     .min(3, { message: "Topic must be at least 3 characters long." }),
-  includeLongTailKeywords: z.boolean().default(false),
+  includeLongTailKeywords: z.boolean().default(false).optional(),
 });
 
 type KeywordFormValues = z.infer<typeof formSchema>;
