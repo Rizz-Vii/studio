@@ -11,7 +11,7 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
-      <div className="container flex h-16 max-w-7xl items-center justify-between px-4">
+      <div className="container flex h-16 max-w-7xl items-center justify-between px-4 mx-auto">
         <Link href="/" className="flex items-center gap-2">
           <AppLogo className="h-8 w-8 text-primary" />
           <span className="text-2xl font-bold font-headline text-primary">
