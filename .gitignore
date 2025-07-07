@@ -67,11 +67,6 @@ functions/.tsbuildinfo
 functions/.env
 functions/.env.*
 
-# Ignore lockfiles in functions if using different package managers
-functions/package-lock.json
-functions/yarn.lock
-functions/pnpm-lock.yaml
-
-# Ignore generated files
-*.bak
-*.tmp
+# firebase
+firebase-debug.log
+firestore-debug.log

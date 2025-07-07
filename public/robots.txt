@@ -1,0 +1,14 @@
+# Block crawlers from accessing private user areas and API routes
+User-agent: *
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /adminonly/
+Disallow: /login/
+Disallow: /register/
+
+# Allow crawlers to access all other public pages
+Allow: /
+
+# Location of sitemap
+Sitemap: https://yourdomain.com/sitemap.xml

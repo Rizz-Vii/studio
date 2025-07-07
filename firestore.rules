@@ -2,8 +2,42 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // By default, deny all reads and writes
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
+    }
+
+    // Helper function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to get the user's role from their document
+    function getUserRole(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data.role;
+    }
+
+    // Users can read and update their own profiles
+    match /users/{userId} {
+      allow read, update: if isAuthenticated() && request.auth.uid == userId;
+      // Admins can read any user's profile
+      allow get: if isAuthenticated() && getUserRole(request.auth.uid) == 'admin';
+    }
+    
+    // Users can only create their own user document upon signup
+    match /users/{userId} {
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Allow admins to list all users (for the admin dashboard)
+    match /users/{userId} {
+        allow list: if isAuthenticated() && getUserRole(request.auth.uid) == 'admin';
+    }
+    
+    // Users can read and write to their own 'activities' subcollection
+    match /users/{userId}/activities/{activityId} {
+      allow read, write, create, delete: if isAuthenticated() && request.auth.uid == userId;
     }
   }
 }

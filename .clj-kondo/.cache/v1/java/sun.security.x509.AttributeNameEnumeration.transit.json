@@ -1,1 +1,9 @@
-["^ ","~:members",["^ ","AttributeNameEnumeration",["~#set",[["^ ","~:flags",["^2",["~:method","~:public"]]]]]]]
+[
+  "^ ",
+  "~:members",
+  [
+    "^ ",
+    "AttributeNameEnumeration",
+    ["~#set", [["^ ", "~:flags", ["^2", ["~:method", "~:public"]]]]]
+  ]
+]

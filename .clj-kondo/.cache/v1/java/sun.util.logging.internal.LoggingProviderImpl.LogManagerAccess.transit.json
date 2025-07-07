@@ -1,1 +1,9 @@
-["^ ","~:members",["^ ","demandLoggerFor",["~#set",[["^ ","~:flags",["^2",["~:method"]]]]]]]
+[
+  "^ ",
+  "~:members",
+  [
+    "^ ",
+    "demandLoggerFor",
+    ["~#set", [["^ ", "~:flags", ["^2", ["~:method"]]]]]
+  ]
+]
