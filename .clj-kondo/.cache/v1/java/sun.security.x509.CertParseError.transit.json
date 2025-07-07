@@ -1,1 +1,5 @@
-["^ ","~:members",["^ ","CertParseError",["~#set",[["^ ","~:flags",["^2",["~:method"]]]]]]]
+[
+  "^ ",
+  "~:members",
+  ["^ ", "CertParseError", ["~#set", [["^ ", "~:flags", ["^2", ["~:method"]]]]]]
+]

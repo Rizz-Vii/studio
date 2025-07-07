@@ -1,1 +1,9 @@
-["^ ","~:members",["^ ","sequenceComplete",["~#set",[["^ ","~:flags",["^2",["~:field"]]]]]]]
+[
+  "^ ",
+  "~:members",
+  [
+    "^ ",
+    "sequenceComplete",
+    ["~#set", [["^ ", "~:flags", ["^2", ["~:field"]]]]]
+  ]
+]
