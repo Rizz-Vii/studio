@@ -1,8 +1,6 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
+# Node dependencies
+node_modules/
+.pnp/
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -10,36 +8,70 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# Testing
+coverage/
+.nyc_output/
 
-# next.js
-/.next/
-/out/
+# Next.js
+.next/
+out/
+build/
 
-# production
-/build
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+.storage/
+.firebaserc
 
-# misc
-.DS_Store
-*.pem
+# Genkit
+.genkit/
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
+# Vercel
+.vercel/
 
-# vercel
-.vercel
-
-# typescript
+# TypeScript
 *.tsbuildinfo
 next-env.d.ts
 
-.genkit/*
-.env*
+# Miscellaneous
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.sublime-workspace
+*.sublime-project
 
-# firebase
-firebase-debug.log
-firestore-debug.log
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Build output (functions)
+functions/lib/
+functions/node_modules/
+functions/.tsbuildinfo
+functions/.env
+functions/.env.*
+
+# Ignore lockfiles in functions if using different package managers
+functions/package-lock.json
+functions/yarn.lock
+functions/pnpm-lock.yaml
+
+# Ignore generated files
+*.bak
+*.tmp
