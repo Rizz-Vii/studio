@@ -6,7 +6,7 @@ runConfig:
   # more instances in response to increased traffic.
   maxInstances: 1
 env:
-  - variable: GEMINI_API_KEY
-    secret: AIzaSyDduXau_HEXRgB4bz3c1iWwAq4cXkdgR-g # Replace with the actual ID of your secret in Secret Manager
+  - key: GEMINI_API_KEY
+    secret: GEMINI_API_KEY # This references the secret name in Google Secret Manager
     availability:
       - RUNTIME
