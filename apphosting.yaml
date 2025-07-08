@@ -5,3 +5,8 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+env:
+  - variable: GEMINI_API_KEY
+    secret: AIzaSyDduXau_HEXRgB4bz3c1iWwAq4cXkdgR-g # Replace with the actual ID of your secret in Secret Manager
+    availability:
+      - RUNTIME
