@@ -12,6 +12,9 @@ import { z } from "zod";
 const geminiApiKey = process.env.GEMINI_API_KEY;
 const googleApiKey = process.env.GOOGLE_API_KEY;
 
+console.log("GEMINI_API_KEY:", process.env.GEMINI_API_KEY);
+console.log("GOOGLE_API_KEY:", googleApiKey);
+
 const ActivitySchema = z.object({
   type: z.string(),
   tool: z.string(),
