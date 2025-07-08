@@ -54,10 +54,10 @@ export const analyzeContent = onCall(httpsOptions, async (request) => {
     // In production, this would use AI to analyze the content
     const prompt = `Analyze the following content for readability, SEO, and sentiment.
                   ${
-                    targetKeywords.length > 0
-                      ? `Target keywords: ${targetKeywords.join(", ")}`
-                      : ""
-                  }
+  targetKeywords.length > 0
+    ? `Target keywords: ${targetKeywords.join(", ")}`
+    : ""
+}
                   Analysis type: ${analysisType}
                   
                   Content:
