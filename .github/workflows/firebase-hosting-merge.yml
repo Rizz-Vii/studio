@@ -11,10 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # This step installs dependencies and builds the Next.js app.
+      # The env vars are available here for the build process if needed.
       - run: npm ci && npm run build
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+
+      # This is the new, critical step.
+      # It creates the .env file inside the functions directory that Firebase needs for deployment.
+      - name: Create functions .env file for production
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> functions/.env.rankpilot-h3jpc
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> functions/.env.rankpilot-h3jpc
+
+      # This step deploys the app. It will now find the .env file created above.
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -23,5 +35,3 @@ jobs:
           projectId: rankpilot-h3jpc
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}

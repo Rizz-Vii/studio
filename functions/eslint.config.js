@@ -1,10 +1,10 @@
-import pluginTs from "@typescript-eslint/eslint-plugin";
-import parserTs from "@typescript-eslint/parser";
-import pluginImport from "eslint-plugin-import";
+const pluginTs = require("@typescript-eslint/eslint-plugin");
+const parserTs = require("@typescript-eslint/parser");
+const pluginImport = require("eslint-plugin-import");
 
-export default [
+module.exports = [
   {
-    ignores: ["lib/**/*", "generated/**/*"],
+    ignores: ["lib/**/*", "generated/**/*", "eslint.config.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",

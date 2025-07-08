@@ -46,7 +46,8 @@
       "**/node_modules/**"
     ],
     "frameworksBackend": {
-      "region": "australia-southeast2"
+      "region": "australia-southeast2",
+      "secrets": ["GEMINI_API_KEY", "GOOGLE_API_KEY"]
     }
   }
 }
