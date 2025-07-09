@@ -1,21 +1,23 @@
 "use server";
 /**
  * @fileOverview Link analysis flow that simulates finding backlinks for a target URL.
- *
- * - analyzeLinks - A function that handles the link analysis process.
- * - LinkAnalysisInput - The input type for the analyzeLinks function.
- * - LinkAnalysisOutput - The return type for the analyzeLinks function.
+ * This version uses the standard Genkit defineFlow/definePrompt pattern with a
+ * resilient fallback to OpenAI.
  */
 
 import { ai } from "@/ai/genkit";
 import { z } from "zod";
-const geminiApiKey = process.env.GEMINI_API_KEY;
-const googleApiKey = process.env.GOOGLE_API_KEY;
+import OpenAI from "openai";
+import { zodToJsonSchema } from "zod-to-json-schema";
+
+// Initialize the OpenAI client for fallback use
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// --- Zod Schemas and Types ---
 
 const LinkAnalysisInputSchema = z.object({
   url: z.string().url().describe("The URL to analyze for backlinks."),
 });
-export type LinkAnalysisInput = z.infer<typeof LinkAnalysisInputSchema>;
 
 const BacklinkSchema = z.object({
   referringDomain: z
@@ -49,41 +51,59 @@ const LinkAnalysisOutputSchema = z.object({
     })
     .describe("A summary of the backlink profile."),
 });
+
+export type LinkAnalysisInput = z.infer<typeof LinkAnalysisInputSchema>;
 export type LinkAnalysisOutput = z.infer<typeof LinkAnalysisOutputSchema>;
+
+// --- Main Exported Function (Client-facing) ---
 
 export async function analyzeLinks(
   input: LinkAnalysisInput
 ): Promise<LinkAnalysisOutput> {
+  // This function now correctly calls the Genkit flow.
   return linkAnalysisFlow(input);
 }
 
-const analysisPrompt = ai.definePrompt({
+// --- Genkit Prompt Definition ---
+
+const analysisSystemPrompt = `
+You are a world-class SEO Analyst and Data Simulation Engine. Your mission is to perform a deep, analytical backlink profile simulation for a given URL. You must think step-by-step to generate a realistic and diverse dataset that reflects a genuine backlink profile.
+
+**Persona:** Act as an expert SEO with 15 years of experience using tools like Ahrefs and Majestic.
+
+**Core Task:** Generate a comprehensive and plausible backlink profile. The profile must be diverse in terms of link type, authority, and anchor text.
+
+**Step-by-Step Thinking Process:**
+
+1.  **Analyze the Target URL (Conceptually):** First, infer the likely industry and topic of the target URL. This will inform the types of referring domains you generate. For example, a tech product URL should have links from tech blogs, review sites, and forums.
+
+2.  **Simulate Backlink Diversity:** A real backlink profile is not uniform. You must generate a list of 10 to 20 backlinks that includes a mix of the following types:
+    *   **High-Authority Contextual Links:** (2-3 links) From reputable news sites or top-tier industry blogs (e.g., a guest post). These should have high Domain Authority (70-95).
+    *   **Medium-Authority Links:** (5-10 links) From standard blogs, niche forums, or business directories. These should have medium Domain Authority (30-69).
+    *   **Low-Authority Links:** (3-7 links) From smaller blogs, forum comments, or general web directories. These should have low Domain Authority (10-29).
+
+3.  **Simulate Anchor Text Diversity:** A natural anchor text profile is critical. Distribute your anchor texts as follows:
+    *   **Branded:** The company or brand name (e.g., "GitHub Copilot").
+    *   **Naked URL:** The URL itself (e.g., "https://copilot.github.com").
+    *   **Keyword-Related:** Keywords relevant to the target page's topic (e.g., "AI programming assistant").
+    *   **Generic:** Non-descriptive text (e.g., "click here," "read more," "this website").
+
+4.  **Construct the Final JSON Output:** After simulating the data, assemble it into a single JSON object. The summary values (\`totalBacklinks\`, \`referringDomains\`) must be calculated accurately from the backlinks array you created.
+
+**CRITICAL OUTPUT REQUIREMENTS:**
+
+*   Your entire response MUST be a single, valid JSON object.
+*   The JSON object must strictly adhere to the provided output schema.
+`;
+
+const linkAnalysisPrompt = ai.definePrompt({
   name: "linkAnalysisPrompt",
   input: { schema: LinkAnalysisInputSchema },
   output: { schema: LinkAnalysisOutputSchema },
-  prompt: `You are an advanced SEO analysis tool that simulates a backlink crawler. Your task is to generate a realistic list of backlinks for a given URL.
-    Use the following API keys for enhanced analysis:
-  - GEMINI_API_KEY: ${geminiApiKey}
-  - GOOGLE_API_KEY: ${googleApiKey}
-  
-**URL to Analyze:** {{{url}}}
-
-**Instructions:**
-
-1.  **Generate Backlinks:**
-    *   Create a list of 5 to 15 plausible, diverse backlinks pointing to the given URL.
-    *   For each backlink, provide a realistic \`referringDomain\`, \`backlinkUrl\`, \`anchorText\`, and a \`domainAuthority\` score between 0 and 100.
-    *   The backlinks should come from a variety of domain types (e.g., blogs, news sites, forums, directories).
-    *   The anchor text should be varied (e.g., brand name, exact match keyword, generic text like "click here").
-
-2.  **Generate Summary:**
-    *   Calculate the \`totalBacklinks\` (which is the number of backlinks you generated).
-    *   Calculate the number of unique \`referringDomains\` from the list you created.
-
-3.  **Strictly Adhere to Output Format:**
-    *   Your entire output MUST be a single, valid JSON object that conforms to the provided output schema.
-  `,
+  prompt: `${analysisSystemPrompt}\n\n**URL to Analyze:** {{{url}}}`,
 });
+
+// --- Genkit Flow Definition with Fallback Logic ---
 
 const linkAnalysisFlow = ai.defineFlow(
   {
@@ -91,22 +111,53 @@ const linkAnalysisFlow = ai.defineFlow(
     inputSchema: LinkAnalysisInputSchema,
     outputSchema: LinkAnalysisOutputSchema,
   },
-  async (input: LinkAnalysisInput) => {
-    // In a real-world scenario, this would involve using a third-party API
-    // like Ahrefs, Moz, or Majestic. For this prototype, we simulate it with AI.
-    const { output } = await analysisPrompt(input);
+  async (input) => {
+    try {
+      // --- Attempt 1: Primary Provider (Google via Genkit) ---
+      console.log("Attempting analysis with primary provider (Google)...");
+      const { output } = await linkAnalysisPrompt(input);
+      if (!output) {
+        throw new Error("Primary AI provider returned no output.");
+      }
+      return output;
+    } catch (error: any) {
+      console.warn("Primary provider (Google) failed:", error.message);
+      // Check if it's a service availability error
+      if (
+        (error.cause as any)?.status === 503 ||
+        (error.message && error.message.includes("overloaded"))
+      ) {
+        // --- Attempt 2: Fallback Provider (OpenAI) ---
+        try {
+          console.log("Falling back to secondary provider (OpenAI)...");
+          const openAISystemPrompt = `${analysisSystemPrompt}\n\nCRITICAL: Your entire response MUST be a single, valid JSON object that strictly adheres to the following JSON Schema: ${JSON.stringify(
+            zodToJsonSchema(LinkAnalysisOutputSchema)
+          )}`;
 
-    if (!output) {
-      throw new Error("AI did not return valid link analysis data.");
+          const response = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+              { role: "system", content: openAISystemPrompt },
+              { role: "user", content: `Analyze the URL: ${input.url}` },
+            ],
+            response_format: { type: "json_object" },
+          });
+
+          const text = response.choices[0].message.content;
+          if (!text) throw new Error("OpenAI returned no content.");
+
+          const jsonOutput = JSON.parse(text);
+          return LinkAnalysisOutputSchema.parse(jsonOutput);
+        } catch (fallbackError) {
+          console.error(
+            "Secondary provider (OpenAI) also failed:",
+            fallbackError
+          );
+          throw new Error("Both primary and fallback AI services failed.");
+        }
+      }
+      // Re-throw other types of errors from the primary provider
+      throw error;
     }
-
-    // Ensure summary is consistent with the generated backlinks array
-    const uniqueDomains = new Set(
-      output.backlinks.map((b) => b.referringDomain)
-    );
-    output.summary.totalBacklinks = output.backlinks.length;
-    output.summary.referringDomains = uniqueDomains.size;
-
-    return output;
   }
 );
