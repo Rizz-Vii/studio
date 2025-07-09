@@ -172,7 +172,7 @@ const textSpanVariants = {
 
 const AppNav: React.FC<AppNavProps> = () => {
   const pathname = usePathname();
-  const { open, isMobile } = useSidebar();
+  const { open, isMobile, setOpenMobile } = useSidebar();
   const { user, role } = useAuth();
 
   const showText = open || isMobile;
@@ -180,7 +180,11 @@ const AppNav: React.FC<AppNavProps> = () => {
   const baseNavItems = navItems.filter(
     (item) => !item.adminOnly || (user && role === "admin")
   );
-
+  const handleMobileNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
   return (
     <SidebarMenu asChild>
       <motion.ul variants={navVariants} initial="closed" animate="open">
@@ -192,7 +196,7 @@ const AppNav: React.FC<AppNavProps> = () => {
               className="font-body"
               asChild
             >
-              <Link href={item.href}>
+              <Link href={item.href} onClick={handleMobileNavClick}>
                 <item.icon />
                 <AnimatePresence>
                   {showText && (

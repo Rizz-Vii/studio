@@ -56,7 +56,7 @@ const SheetContent = React.forwardRef<
     >
       {/* Add DialogTitle here */}
       <DialogPrimitive.Title className="text-lg font-semibold">
-        Sheet Title
+        
       </DialogPrimitive.Title>{" "}
       {/* You can make this title dynamic or hide it visually */}
       {children}
