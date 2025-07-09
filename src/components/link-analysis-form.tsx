@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import type { LinkAnalysisInput } from "@/ai/flows/link-analysis";
+import { useHydrated } from "./../hooks/useHydrated";
 
 const formSchema = z.object({
   url: z.string().min(1, { message: "Please enter a valid URL." }),
@@ -32,14 +33,15 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface LinkAnalysisFormProps {
-  onSubmit: (values: LinkAnalysisInput) => Promise<void>;
+  onFormSubmit: (values: LinkAnalysisInput) => Promise<void>;
   isLoading: boolean;
 }
 
 export default function LinkAnalysisForm({
-  onSubmit,
+  onFormSubmit,
   isLoading,
 }: LinkAnalysisFormProps) {
+  const hydrated = useHydrated();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { url: "" },
@@ -60,7 +62,7 @@ export default function LinkAnalysisForm({
     const submissionValues: LinkAnalysisInput = {
       url: normalizeUrl(values.url),
     };
-    onSubmit(submissionValues);
+    onFormSubmit(submissionValues);
   }
 
   return (
@@ -85,7 +87,7 @@ export default function LinkAnalysisForm({
                   <FormLabel>URL to Analyze</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="example.com"
+                      placeholder="www.example.com"
                       {...field}
                       disabled={isLoading}
                     />

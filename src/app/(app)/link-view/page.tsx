@@ -224,7 +224,7 @@ export default function LinkViewPage() {
         )}
       >
         <motion.div layout className="lg:col-span-1">
-          <LinkAnalysisForm onSubmit={handleSubmit} isLoading={isLoading} />
+          <LinkAnalysisForm onFormSubmit={handleSubmit} isLoading={isLoading} />
         </motion.div>
 
         <div className="lg:col-span-2" ref={resultsRef}>
