@@ -79,6 +79,7 @@ export default function LinkAnalysisForm({
           className="space-y-8"
         >
           <CardContent>
+          {hydrated && (
             <FormField
               control={form.control}
               name="url"
@@ -96,6 +97,7 @@ export default function LinkAnalysisForm({
                 </FormItem>
               )}
             />
+          )}
           </CardContent>
           <CardFooter>
             <Button type="submit" disabled={isLoading}>
