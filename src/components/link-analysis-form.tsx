@@ -90,7 +90,7 @@ export default function LinkAnalysisForm({
                       <Input
                         placeholder="www.example.com"
                         {...field}
-                        disabled={isLoading}
+                        disabled={!hydrated}
                       />
                     </FormControl>
                     <FormMessage />
