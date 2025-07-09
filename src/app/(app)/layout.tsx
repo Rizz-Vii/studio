@@ -248,14 +248,22 @@ const MainPanel = ({ children }: { children: React.ReactNode }) => {
     >
       <AppHeader />
       <TopLoader />
-      <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-        <AnimatePresence mode="wait">
+      <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative">
+        <AnimatePresence>
           <motion.div
             key={pathname}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            exit={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              opacity: 0,
+              y: -20,
+            }}
             transition={{ duration: 0.3 }}
+            className="p-4 md:p-6 lg:p-8"
           >
             {children}
           </motion.div>

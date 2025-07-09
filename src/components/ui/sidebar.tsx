@@ -400,7 +400,7 @@ const SidebarMenu = forwardRef<HTMLUListElement, SidebarMenuProps>(
 
 SidebarMenu.displayName = "SidebarMenu";
 
-const SidebarMenuItem = motion(
+const SidebarMenuItem = motion.create(
   forwardRef<HTMLLIElement, React.ComponentPropsWithoutRef<"li">>( // Use ComponentPropsWithoutRef
     ({ className, ...props }, ref) => (
       <li

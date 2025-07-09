@@ -132,8 +132,8 @@ const LinkAnalysisResults = ({ results }: { results: LinkAnalysisOutput }) => (
             </TableRow>
           </TableHeader>
           <TableBody>
-            {results.backlinks.map((link, index) => (
-              <TableRow key={index}>
+            {results.backlinks.map((link) => (
+              <TableRow key={link.backlinkUrl}>
                 <TableCell
                   className="font-medium truncate"
                   style={{ maxWidth: "200px" }}
