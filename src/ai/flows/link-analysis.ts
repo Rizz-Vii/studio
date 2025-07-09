@@ -10,9 +10,6 @@ import { z } from "zod";
 import OpenAI from "openai";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
-// Initialize the OpenAI client for fallback use
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 // --- Zod Schemas and Types ---
 
 const LinkAnalysisInputSchema = z.object({
@@ -129,6 +126,10 @@ const linkAnalysisFlow = ai.defineFlow(
       ) {
         // --- Attempt 2: Fallback Provider (OpenAI) ---
         try {
+          // Initialize the OpenAI client for fallback use
+          const openaiKey = process.env.OPENAI_API_KEY;
+          console.log("openai_API_KEY:", openaiKey);
+          const openai = new OpenAI({ apiKey: openaiKey });
           console.log("Falling back to secondary provider (OpenAI)...");
           const openAISystemPrompt = `${analysisSystemPrompt}\n\nCRITICAL: Your entire response MUST be a single, valid JSON object that strictly adheres to the following JSON Schema: ${JSON.stringify(
             zodToJsonSchema(LinkAnalysisOutputSchema)

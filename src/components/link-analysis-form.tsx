@@ -33,12 +33,12 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface LinkAnalysisFormProps {
-  onFormSubmit: (values: LinkAnalysisInput) => Promise<void>;
+  onFormSubmitAction: (values: LinkAnalysisInput) => Promise<void>;
   isLoading: boolean;
 }
 
 export default function LinkAnalysisForm({
-  onFormSubmit,
+  onFormSubmitAction,
   isLoading,
 }: LinkAnalysisFormProps) {
   const hydrated = useHydrated();
@@ -62,7 +62,7 @@ export default function LinkAnalysisForm({
     const submissionValues: LinkAnalysisInput = {
       url: normalizeUrl(values.url),
     };
-    onFormSubmit(submissionValues);
+    onFormSubmitAction(submissionValues);
   }
 
   return (
@@ -79,28 +79,28 @@ export default function LinkAnalysisForm({
           className="space-y-8"
         >
           <CardContent>
-          {hydrated && (
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL to Analyze</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="www.example.com"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+            {hydrated && (
+              <FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>URL to Analyze</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="www.example.com"
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || !hydrated }>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Analyze Backlinks
             </Button>
