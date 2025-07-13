@@ -35,6 +35,7 @@ import LoadingScreen from "@/components/ui/loading-screen";
 import useProtectedRoute from "@/hooks/useProtectedRoute";
 import GlobalSearch from "@/components/global-search";
 import TopLoader from "@/components/ui/top-loader";
+import { HydrationProvider } from "@/components/HydrationContext";
 
 const AppHeader = () => {
   return (
@@ -285,31 +286,34 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="flex h-screen w-full bg-background">
-        <Sidebar>
-          <SidebarHeader className="p-4 flex items-center justify-between">
-            <Link
-              href="/"
-              className="flex items-center gap-2 group-data-[state=collapsed]:justify-center"
-            >
-              <AppLogo className="h-8 w-8 text-primary shrink-0" />
-              <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">
-                {AppName}
-              </span>
-            </Link>
-          </SidebarHeader>
-          <SidebarContent>
-            <ScrollArea className="h-full">
-              <AppNav />
-            </ScrollArea>
-          </SidebarContent>
-          <SidebarFooter>
-            <SidebarPinControl />
-          </SidebarFooter>
-        </Sidebar>
-        <MainPanel>{children}</MainPanel>
-      </div>
-    </SidebarProvider>
+    <HydrationProvider>
+      <SidebarProvider defaultOpen={true}>
+        <div className="flex h-screen w-full bg-background">
+          <Sidebar>
+            <SidebarHeader className="p-4 flex items-center justify-between">
+              <Link
+                href="/"
+                className="flex items-center gap-2 group-data-[state=collapsed]:justify-center"
+              >
+                <AppLogo className="h-8 w-8 text-primary shrink-0" />
+                <span className="text-2xl font-headline font-bold text-primary group-data-[state=collapsed]:hidden">
+                  {AppName}
+                </span>
+              </Link>
+              <SidebarMenuButton />
+            </SidebarHeader>
+            <SidebarContent>
+              <ScrollArea className="h-full">
+                <AppNav />
+              </ScrollArea>
+            </SidebarContent>
+            <SidebarFooter>
+              <SidebarPinControl />
+            </SidebarFooter>
+          </Sidebar>
+          <MainPanel>{children}</MainPanel>
+        </div>
+      </SidebarProvider>
+    </HydrationProvider>
   );
 }

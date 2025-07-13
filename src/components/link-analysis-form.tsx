@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import type { LinkAnalysisInput } from "@/ai/flows/link-analysis";
-import { useHydrated } from "./../hooks/useHydrated";
+import { HydrationProvider, useHydration } from "@/components/HydrationContext";
 
 const formSchema = z.object({
   url: z.string().min(1, { message: "Please enter a valid URL." }),
@@ -41,7 +41,8 @@ export default function LinkAnalysisForm({
   onFormSubmitAction,
   isLoading,
 }: LinkAnalysisFormProps) {
-  const hydrated = useHydrated();
+  const hydrated = useHydration();
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { url: "" },
@@ -64,6 +65,7 @@ export default function LinkAnalysisForm({
     };
     onFormSubmitAction(submissionValues);
   }
+  const isFormReady = hydrated && !isLoading;
 
   return (
     <Card className="h-full">
@@ -79,28 +81,30 @@ export default function LinkAnalysisForm({
           className="space-y-8"
         >
           <CardContent>
-            {hydrated && (
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>URL to Analyze</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="www.example.com"
-                        {...field}
-                        disabled={!hydrated}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="url-input">URL to Analyze</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="url-input"
+                      name="url"
+                      autoComplete="url"
+                      placeholder="www.example.com"
+                      disabled={!isFormReady}
+                      className={!hydrated ? "opacity-50" : ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading || !hydrated }>
+            <Button type="submit" disabled={!isFormReady}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Analyze Backlinks
             </Button>

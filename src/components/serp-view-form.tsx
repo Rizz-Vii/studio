@@ -22,7 +22,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import { Loader2 } from "lucide-react";
+import { useHydration } from "@/components/HydrationContext";
 
 const formSchema = z.object({
   keyword: z.string().min(2, { message: "Please enter a keyword." }),
@@ -35,14 +37,13 @@ interface SerpViewFormProps {
   isLoading: boolean;
 }
 
-export default function SerpViewForm({
-  onSubmit,
-  isLoading,
-}: SerpViewFormProps) {
+export default function SerpViewForm({ onSubmit, isLoading }: SerpViewFormProps) {
+  const hydrated = useHydration();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { keyword: "" },
   });
+  const isFormReady = hydrated && !isLoading;
 
   return (
     <Card className="h-full">
@@ -60,12 +61,16 @@ export default function SerpViewForm({
               name="keyword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Keyword</FormLabel>
+                  <FormLabel htmlFor="keyword-input">Keyword</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., best seo tools 2025"
                       {...field}
-                      disabled={isLoading}
+                      id="keyword-input"
+                      name="keyword"
+                      autoComplete="off"
+                      placeholder="e.g. AI content tools"
+                      disabled={!isFormReady}
+                      className={!hydrated ? "opacity-50" : ""}
                     />
                   </FormControl>
                   <FormMessage />

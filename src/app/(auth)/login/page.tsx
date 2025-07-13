@@ -92,42 +92,51 @@ export default function LoginPage() {
     }
   };
 
-  if (loading || user) {
-    return null;
-  }
+
 
   return (
     <div className="flex min-h-60px items-center justify-center">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center">Login</h2>
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-4" noValidate>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
+              id="email"
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 mt-1 border rounded shadow-sm focus:ring-primary focus:border-primary"
+              disabled={loading}
             />
+            {email === "" && (
+              <p className="text-red-600 text-xs mt-1">Email is required.</p>
+            )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
+              id="password"
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 mt-1 border rounded shadow-sm focus:ring-primary focus:border-primary"
+              disabled={loading}
             />
+            {password === "" && (
+              <p className="text-red-600 text-xs mt-1">Password is required.</p>
+            )}
           </div>
           <button
             type="submit"
             className="w-full px-4 py-2 text-white bg-primary rounded hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            disabled={loading}
           >
             Login
           </button>
@@ -147,6 +156,7 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleSignIn}
           className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          disabled={loading}
         >
           <GoogleIcon />
           Sign in with Google
