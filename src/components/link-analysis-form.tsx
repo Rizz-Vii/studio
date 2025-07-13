@@ -68,7 +68,7 @@ export default function LinkAnalysisForm({
   const isFormReady = hydrated && !isLoading;
 
   return (
-    <Card className="h-full">
+    <Card className="h-full shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardHeader>
         <CardTitle className="font-headline">Backlink Analyzer</CardTitle>
         <CardDescription className="font-body">
@@ -76,10 +76,7 @@ export default function LinkAnalysisForm({
         </CardDescription>
       </CardHeader>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleFormSubmit)}
-          className="space-y-8"
-        >
+        <form onSubmit={form.handleSubmit(handleFormSubmit)}>
           <CardContent>
             <FormField
               control={form.control}
@@ -91,7 +88,6 @@ export default function LinkAnalysisForm({
                     <Input
                       {...field}
                       id="url-input"
-                      name="url"
                       autoComplete="url"
                       placeholder="www.example.com"
                       disabled={!isFormReady}

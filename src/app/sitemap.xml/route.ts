@@ -1,7 +1,7 @@
 // src/app/sitemap.xml/route.ts
 
 // IMPORTANT: Replace this with your actual production domain
-const URL = "https://yourdomain.com";
+const URL = "https://rankpilot.ai"; // Use your production domain
 
 function generateSiteMap(paths: string[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -23,16 +23,24 @@ function generateSiteMap(paths: string[]) {
 }
 
 export async function GET() {
-  // Define the public paths of your application
   const publicPaths = [
     "/",
+    "/seo-audit",
     "/keyword-tool",
     "/content-analyzer",
     "/competitors",
     "/serp-view",
-    "/seo-audit",
     "/link-view",
     "/content-brief",
+    "/privacy",
+    "/guides/broken-links",
+    "/guides/xml-sitemap",
+    "/guides/web-scraping",
+    "/guides/learn-seo",
+    "/blog/enterprise-seo-audit",
+    "/blog/ai-seo-tools",
+    "/blog/seo-metrics",
+    "/blog/competitor-analysis",
   ];
 
   const body = generateSiteMap(publicPaths);

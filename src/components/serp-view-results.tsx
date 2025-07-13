@@ -63,7 +63,7 @@ const SerpFeatures: React.FC<{ features: SerpViewOutput["serpFeatures"] }> = ({
   }
 
   return (
-    <Card className="mb-6 bg-muted/50">
+    <Card className="mb-6 bg-muted/50 shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardHeader>
         <CardTitle className="font-headline text-lg">
           SERP Features Detected
@@ -108,7 +108,7 @@ export default function SerpViewResults({ results }: SerpViewResultsProps) {
       </motion.div>
 
       <motion.div variants={itemVariant}>
-        <Card>
+        <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2">
               <ListOrdered /> Organic Search Results

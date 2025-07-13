@@ -22,7 +22,6 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-
 const fadeIn = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
@@ -32,31 +31,95 @@ const fadeIn = {
   }),
 };
 
-export default function HomePage() {
-  const features = [
-    {
-      title: "Site Audit",
-      desc: "Crawl your site broken links, indexability, page speed, meta issues, and more.",
-      icon: Search,
-      detailedDescription:
-        "Our comprehensive Site Audit tool crawls every page of your website to identify technical SEO issues that could be harming your rankings. We check for over 100 common problems, including broken links, slow page load times, missing or duplicate meta tags, and crawlability errors. Get a prioritized list of issues with clear, actionable recommendations to improve your site's health.",
-    },
-    {
-      title: "Keyword Intelligence",
-      desc: "Track keywords, visibility scores, and keyword gaps with real-time updates.",
-      icon: TrendingUp,
-      detailedDescription:
-        "Discover high-potential keywords your customers are searching for. Our AI-powered tool provides thousands of suggestions, including long-tail variations and questions. Track your ranking positions in real-time, monitor your overall search visibility, and identify valuable keyword gaps between you and your competitors to inform your content strategy.",
-    },
-    {
-      title: "Competitor Tracking",
-      desc: "Benchmark your SEO progress against your top rivals with historical trend graphs.",
-      icon: Rocket,
-      detailedDescription:
-        "Stay ahead of the competition by tracking their every move. Monitor your competitors' keyword rankings, see their top-performing content, and analyze their backlink profiles. Our side-by-side comparisons and historical data trends help you identify opportunities to outrank them and capture more market share.",
-    },
-  ];
+type FeatureTitle =
+  | "Site Audit"
+  | "Keyword Intelligence"
+  | "Competitor Tracking";
 
+import type { Variants } from "framer-motion";
+
+const iconAnimations: Record<FeatureTitle, Variants> = {
+  "Site Audit": {
+    initial: { x: -24, opacity: 0, scale: 0.7, rotate: -20 },
+    animate: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: { type: "spring", stiffness: 300, damping: 18 },
+    },
+    hover: {
+      scale: 1.2,
+      rotate: 15,
+      x: 40,
+      transition: { type: "spring", stiffness: 200, damping: 15 },
+    },
+  },
+  "Keyword Intelligence": {
+    initial: { x: 4, opacity: 0, scale: 0.7, rotate: 20 },
+    animate: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: { type: "spring", stiffness: 300, damping: 18 },
+    },
+    hover: {
+      scale: 1.2,
+      rotate: 15,
+      x: 30,
+      transition: { type: "spring", stiffness: 200, damping: 15 },
+    },
+  },
+  "Competitor Tracking": {
+    initial: { x: 24, opacity: 0, scale: 0.7, rotate: 20 },
+    animate: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      rotate: 0,
+      transition: { type: "spring", stiffness: 320, damping: 18 },
+    },
+    hover: {
+      scale: 1.2,
+      rotate: 2,
+      x: 40,
+      transition: { type: "spring", stiffness: 200, damping: 15 },
+    },
+  },
+};
+
+const features: {
+  title: FeatureTitle;
+  desc: string;
+  icon: React.ComponentType<{ className?: string }>;
+  detailedDescription: string;
+}[] = [
+  {
+    title: "Site Audit",
+    desc: "Crawl your site broken links, indexability, page speed, meta issues, and more.",
+    icon: Search,
+    detailedDescription:
+      "Our comprehensive Site Audit tool crawls every page of your website to identify technical SEO issues that could be harming your rankings. We check for over 100 common problems, including broken links, slow page load times, missing or duplicate meta tags, and crawlability errors. Get a prioritized list of issues with clear, actionable recommendations to improve your site's health.",
+  },
+  {
+    title: "Keyword Intelligence",
+    desc: "Track keywords, visibility scores, and keyword gaps with real-time updates.",
+    icon: TrendingUp,
+    detailedDescription:
+      "Discover high-potential keywords your customers are searching for. Our AI-powered tool provides thousands of suggestions, including long-tail variations and questions. Track your ranking positions in real-time, monitor your overall search visibility, and identify valuable keyword gaps between you and your competitors to inform your content strategy.",
+  },
+  {
+    title: "Competitor Tracking",
+    desc: "Benchmark your SEO progress against your top rivals with historical trend graphs.",
+    icon: Rocket,
+    detailedDescription:
+      "Stay ahead of the competition by tracking their every move. Monitor your competitors' keyword rankings, see their top-performing content, and analyze their backlink profiles. Our side-by-side comparisons and historical data trends help you identify opportunities to outrank them and capture more market share.",
+  },
+];
+
+export default function HomePage() {
+  const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <SiteHeader />
@@ -87,7 +150,7 @@ export default function HomePage() {
           </div>
         </motion.section>
 
-        {/* Feature Highlights */}
+        {/* Feature Highlights with animated icons */}
         <section
           id="features"
           className="mt-24 grid md:grid-cols-3 gap-8 max-w-6xl w-full text-left"
@@ -101,10 +164,28 @@ export default function HomePage() {
                   animate="visible"
                   custom={i}
                   className="cursor-pointer h-full"
+                  onMouseEnter={() => setHoveredIdx(i)}
+                  onMouseLeave={() => setHoveredIdx(null)}
                 >
-                  <Feature icon={item.icon} title={item.title}>
-                    {item.desc}
-                  </Feature>
+                  <Card className="h-full">
+                    <CardHeader className="flex flex-row items-center gap-1">
+                      <CardTitle className="text-xl">{item.title}</CardTitle>
+                      <div style={{ width: 100, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'visible' }}>
+                        <motion.span
+                          variants={iconAnimations[item.title]}
+                          initial="initial"
+                          animate={hoveredIdx === i ? "hover" : "animate"}
+                          className="text-primary"
+                          style={{ display: "inline-block" }}
+                        >
+                          <item.icon className="h-7 w-7" />
+                        </motion.span>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground">{item.desc}</p>
+                    </CardContent>
+                  </Card>
                 </motion.div>
               </DialogTrigger>
               <DialogContent>
@@ -123,7 +204,7 @@ export default function HomePage() {
         </section>
 
         {/* Screenshot */}
-        <section className="mt-24 w-full max-w-6xl text-center">
+        <section className="mt-20 w-full max-w-6xl text-center">
           <h2 className="text-3xl md:text-4xl font-semibold mb-4">
             Your SEO Command Center
           </h2>
@@ -133,12 +214,12 @@ export default function HomePage() {
           </p>
           <Card className="rounded-xl overflow-hidden">
             <Image
-              src="/images/imgDash.png"
+              src="/images/CaptureDash.png"
               alt="SEO Dashboard Screenshot"
               data-ai-hint="dashboard computer screen"
               width={1200}
               height={700}
-              className="w-full h-auto"
+              className="w-full h-full object-cover"
               priority
             />
           </Card>
@@ -238,7 +319,7 @@ export default function HomePage() {
         </section>
 
         {/* Pricing */}
-        <section id="pricing" className="mt-24 text-center max-w-6xl w-full">
+        <section id="pricing" className="mt-24 mb-24 text-center max-w-6xl w-full">
           <h2 className="text-3xl font-bold mb-6">
             Simple, Transparent Pricing
           </h2>
@@ -270,21 +351,15 @@ export default function HomePage() {
 }
 
 function Feature({
-  icon,
   title,
   children,
 }: {
-  icon: React.ElementType;
   title: string;
   children: React.ReactNode;
 }) {
-  const Icon = icon;
   return (
     <Card className="h-full">
       <CardHeader>
-        <div className="text-primary mb-4">
-          <Icon className="h-6 w-6" />
-        </div>
         <CardTitle className="text-xl">{title}</CardTitle>
       </CardHeader>
       <CardContent>

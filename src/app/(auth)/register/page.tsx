@@ -1,51 +1,55 @@
-// src/app/(auth)/register/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/lib/firebase"; // Import auth and db
-import { doc, setDoc } from "firebase/firestore"; // Import firestore functions
+import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Link from "next/link"; // Import Link
-import { useAuth } from "@/context/AuthContext"; // Import useAuth
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
+import ReCAPTCHA from "react-google-recaptcha";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
-  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+    terms?: string;
+    captcha?: string;
+    form?: string;
+  }>({});
 
-  const { user, loading } = useAuth(); // Use the useAuth hook
+  if (loading || user) return null;
 
-  // Add this useEffect hook to check authentication state and redirect
-  useEffect(() => {
-    if (!loading && user) {
-      // Redirect to dashboard if user is already logged in and not loading
-      router.push("/dashboard");
-    }
-  }, [user, loading, router]);
-
-  // Add this condition to not render the form while loading or if user is logged in
-  if (loading || user) {
-    return null; // Or you could return a loading spinner
+  function validate() {
+    const newErrors: typeof errors = {};
+    if (!email.trim()) newErrors.email = "Email is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      newErrors.email = "Invalid email address.";
+    if (!password) newErrors.password = "Password is required.";
+    else if (password.length < 6)
+      newErrors.password = "Password must be at least 6 characters.";
+    if (!confirmPassword)
+      newErrors.confirmPassword = "Please confirm your password.";
+    else if (password !== confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match.";
+    if (!agreeTerms)
+      newErrors.terms = "You must agree to the Terms & Conditions.";
+    if (!captchaToken) newErrors.captcha = "Please verify that you're human.";
+    return newErrors;
   }
 
-  const validate = () => {
-    const newErrors: { email?: string; password?: string } = {};
-    if (!email) {
-      newErrors.email = "Email is required.";
-    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      newErrors.email = "Enter a valid email address.";
-    }
-    if (!password) {
-      newErrors.password = "Password is required.";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters.";
-    }
-    return newErrors;
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
+  async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     const newErrors = validate();
     setErrors(newErrors);
@@ -53,88 +57,133 @@ export default function RegisterPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        email,
-        password
+        email.trim(),
+        password.trim()
       );
-      const user = userCredential.user;
-
-      // Store additional user data in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        email: user.email,
-        role: "user", // Default role is 'user'
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        email: userCredential.user.email,
+        role: "user",
         createdAt: new Date(),
-        // Add other initial user data here
       });
-
-      // Redirect to dashboard or desired page after successful registration
-      router.push("/");
+      router.push("/dashboard");
     } catch (error: any) {
-      setErrors((prev) => ({ ...prev, form: "Registration failed. Please try again." }));
+      setErrors({
+        form: error?.message || "Registration failed. Please try again.",
+      });
     }
-  };
+  }
 
   return (
-    <div className="flex min-h-60px items-center justify-center">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-        <h2 className="text-2xl font-bold text-center">Register</h2>
-        <form onSubmit={handleRegister} className="space-y-4" noValidate>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setErrors((prev) => ({ ...prev, email: undefined, form: undefined }));
-              }}
-              className={`w-full px-3 py-2 mt-1 border rounded shadow-sm focus:ring-primary focus:border-primary ${errors.email ? 'border-red-500' : ''}`}
-              autoComplete="email"
-            />
-            {errors.email && (
-              <p className="text-red-600 text-xs mt-1">{errors.email}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setErrors((prev) => ({ ...prev, password: undefined, form: undefined }));
-              }}
-              className={`w-full px-3 py-2 mt-1 border rounded shadow-sm focus:ring-primary focus:border-primary ${errors.password ? 'border-red-500' : ''}`}
-              autoComplete="new-password"
-            />
-            {errors.password && (
-              <p className="text-red-600 text-xs mt-1">{errors.password}</p>
-            )}
-          </div>
-          {errors.form && (
-            <p className="text-red-600 text-xs mt-2 text-center">{errors.form}</p>
-          )}
+    <div className=" inset-0 flex items-center justify-center bg-gray-100">
+      <form
+        onSubmit={handleRegister}
+        className="w-full max-w-md p-8 space-y-6 rounded-1xl shadow-xl border bg-white"
+        style={{ marginTop: "-4rem" }} // Pull form up visually
+      >
+        <h2 className="text-2xl font-bold text-center text-gray-800 underline mb-2">
+          Register
+        </h2>
+        <div>
+          <label htmlFor="email" className="block font-medium mb-1">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition"
+          />
+          <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+        </div>
+        <div className="relative">
+          <label htmlFor="password" className="block font-medium mb-1">
+            Password
+          </label>
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg pr-10 focus:outline-none focus:border-blue-500 transition"
+          />
           <button
-            type="submit"
-            className="w-full px-4 py-2 text-white bg-primary rounded hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            type="button"
+            tabIndex={-1}
+            className="absolute right-3 top-9 text-gray-600"
+            onClick={() => setShowPassword((v) => !v)}
           >
-            Register
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-        </form>
+          <p className="text-xs text-red-600 mt-1">{errors.password}</p>
+        </div>
+        <div className="relative">
+          <label htmlFor="confirmPassword" className="block font-medium mb-1">
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            type={showConfirm ? "text" : "password"}
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg pr-10 focus:outline-none focus:border-blue-500 transition"
+          />
+          <button
+            type="button"
+            tabIndex={-1}
+            className="absolute right-3 top-9 text-gray-600"
+            onClick={() => setShowConfirm((v) => !v)}
+          >
+            {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+          <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>
+        </div>
+        <div>
+          <ReCAPTCHA
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+            onChange={(token) => setCaptchaToken(token || "")}
+          />
+          <p className="text-xs text-red-600 mt-1">{errors.captcha}</p>
+        </div>
+        <div className="flex flex-col items-center justify-center">
+          <div className="flex items-center">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={agreeTerms}
+              onChange={(e) => setAgreeTerms(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="terms" className="text-sm">
+              I agree to the{" "}
+              <a href="/terms" className="underline text-blue-600">
+                Terms & Conditions
+              </a>
+            </label>
+          </div>
+          {errors.terms && (
+            <p className="text-xs text-red-600 mt-1">{errors.terms}</p>
+          )}
+        </div>
+        {errors.form && (
+          <p className="text-xs text-red-600 mt-1">{errors.form}</p>
+        )}
+        <button
+          type="submit"
+          className="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 transition"
+        >
+          Register
+        </button>
         <p className="text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/login" className="text-blue-600 hover:underline">
             Login
           </Link>
         </p>
-      </div>
+      </form>
     </div>
   );
 }
