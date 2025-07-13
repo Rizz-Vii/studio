@@ -18,7 +18,10 @@ if (!fs.existsSync(storageDir)) {
 
 export const test = base.extend<TestFixtures>({
   // Setup authenticated page
-  authenticatedPage: async ({ page, context }, use) => {
+  authenticatedPage: async (
+    { page, context }: { page: import('@playwright/test').Page; context: import('@playwright/test').BrowserContext },
+    use: (page: import('@playwright/test').Page) => Promise<void>
+  ) => {
     const storageFile = path.join(storageDir, "auth-standard.json");
 
     try {
@@ -36,15 +39,17 @@ export const test = base.extend<TestFixtures>({
     } catch {
       // If no saved state or expired, do fresh login
       const user = testConfig.testUsers.standard;
-      await login(page, user.email, user.password);
+      await login(page, "standard");
       await context.storageState({ path: storageFile });
     }
 
     await use(page);
   },
 
-  // Setup admin page
-  adminPage: async ({ page, context }, use) => {
+  adminPage: async (
+    { page, context }: { page: import('@playwright/test').Page; context: import('@playwright/test').BrowserContext },
+    use: (page: import('@playwright/test').Page) => Promise<void>
+  ) => {
     const storageFile = path.join(storageDir, "auth-admin.json");
 
     try {
@@ -60,7 +65,7 @@ export const test = base.extend<TestFixtures>({
       }
     } catch {
       const user = testConfig.testUsers.admin;
-      await login(page, user.email, user.password);
+      await login(page, "admin");
       await context.storageState({ path: storageFile });
     }
 
