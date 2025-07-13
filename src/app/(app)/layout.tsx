@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import SiteFooter from "@/components/site-footer";
 import {
   SidebarProvider,
   Sidebar,
@@ -248,7 +249,7 @@ const MainPanel = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div
-      className="flex-1 flex flex-col h-screen overflow-hidden"
+      className="flex-1 flex flex-col h-full overflow-hidden"
       onClick={handleClickOutside}
     >
       <AppHeader />
@@ -259,14 +260,7 @@ const MainPanel = ({ children }: { children: React.ReactNode }) => {
             key={pathname}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              opacity: 0,
-              y: -20,
-            }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
             className="p-4 md:p-6 lg:p-8"
           >
@@ -274,6 +268,7 @@ const MainPanel = ({ children }: { children: React.ReactNode }) => {
           </motion.div>
         </AnimatePresence>
       </main>
+      {/* If you want the footer to be flush, place <SiteFooter /> here */}
     </div>
   );
 };
@@ -288,7 +283,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <HydrationProvider>
       <SidebarProvider defaultOpen={true}>
-        <div className="flex h-screen w-full bg-background">
+        <div className="flex h-screen w-screen bg-background">
           <Sidebar>
             <SidebarHeader className="p-4 flex items-center justify-between">
               <Link

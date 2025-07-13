@@ -1,4 +1,3 @@
-// src/app/(auth)/login/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,13 +6,14 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { auth, db } from "@/lib/firebase"; // Import auth and db
+import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { Eye, EyeOff } from "lucide-react";
 
-// A simple inline SVG for the Google logo
+// Google logo SVG
 const GoogleIcon = () => (
   <svg
     className="mr-2 h-4 w-4"
@@ -46,6 +46,12 @@ const GoogleIcon = () => (
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    form?: string;
+  }>({});
   const router = useRouter();
 
   const { user, loading, role } = useAuth();
@@ -60,13 +66,25 @@ export default function LoginPage() {
     }
   }, [user, loading, role, router]);
 
+  function validate() {
+    const newErrors: typeof errors = {};
+    if (!email.trim()) newErrors.email = "Email is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      newErrors.email = "Invalid email address.";
+    if (!password) newErrors.password = "Password is required.";
+    return newErrors;
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const newErrors = validate();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // Redirection is handled by the useEffect hook
     } catch (error: any) {
-      console.error("Error logging in:", error.message);
+      setErrors({ form: error?.message || "Login failed. Please try again." });
     }
   };
 
@@ -88,19 +106,22 @@ export default function LoginPage() {
       }
       // Redirection is handled by the useEffect hook
     } catch (error: any) {
-      console.error("Error with Google Sign-In:", error.message);
+      setErrors({
+        form: error?.message || "Google sign-in failed. Please try again.",
+      });
     }
   };
 
-
-
   return (
-    <div className="flex min-h-60px items-center justify-center">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-        <h2 className="text-2xl font-bold text-center">Login</h2>
+    <div className="inset-0 flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md p-8 space-y-6 rounded-1xl shadow-xl border bg-white">
+        <h2 className="text-2xl font-bold text-center underline mb-2">Login</h2>
         <form onSubmit={handleLogin} className="space-y-4" noValidate>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium mb-1 text-gray-700"
+            >
               Email
             </label>
             <input
@@ -109,37 +130,55 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border rounded shadow-sm focus:ring-primary focus:border-primary"
+              className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition"
               disabled={loading}
             />
-            {email === "" && (
-              <p className="text-red-600 text-xs mt-1">Email is required.</p>
+            {errors.email && (
+              <p className="text-red-600 text-xs mt-1">{errors.email}</p>
             )}
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <div className="relative">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium mb-1 text-gray-700"
+            >
               Password
             </label>
             <input
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border rounded shadow-sm focus:ring-primary focus:border-primary"
+              className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg pr-10 focus:outline-none focus:border-blue-500 transition"
               disabled={loading}
             />
-            {password === "" && (
-              <p className="text-red-600 text-xs mt-1">Password is required.</p>
+            <button
+              type="button"
+              tabIndex={-1}
+              className="absolute right-3 top-9 text-gray-600"
+              onClick={() => setShowPassword((v) => !v)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+            {errors.password && (
+              <p className="text-red-600 text-xs mt-1">{errors.password}</p>
             )}
           </div>
+          {errors.form && (
+            <p className="text-red-600 text-xs mt-1">{errors.form}</p>
+          )}
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-primary rounded hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 transition"
             disabled={loading}
           >
             Login
           </button>
+          <p className="text-center text-xs text-gray-500 mt-2">
+            For your convenience, your session will remain active until you
+            choose to log out.
+          </p>
         </form>
 
         <div className="relative my-4">
@@ -155,7 +194,7 @@ export default function LoginPage() {
 
         <button
           onClick={handleGoogleSignIn}
-          className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          className="w-full inline-flex items-center justify-center py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           disabled={loading}
         >
           <GoogleIcon />
@@ -164,7 +203,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-gray-600">
           Don't have an account?{" "}
-          <Link href="/register" className="text-primary hover:underline">
+          <Link href="/register" className="text-blue-600 hover:underline">
             Register
           </Link>
         </p>

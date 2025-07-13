@@ -59,7 +59,7 @@ export default function KeywordToolForm({
   }
 
   return (
-    <Card className="h-full">
+    <Card className="h-full shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardHeader>
         <CardTitle className="font-headline">Discover Keywords</CardTitle>
         <CardDescription className="font-body">

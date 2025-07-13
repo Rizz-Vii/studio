@@ -86,7 +86,7 @@ export default function LoadingScreen({
   }
 
   return (
-    <Card className={`mt-8 ${className}`}>
+    <Card className={`mt-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 ${className}`}>
       <CardContent className="p-6 flex items-center justify-center">
         {inlineContent}
       </CardContent>

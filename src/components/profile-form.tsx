@@ -81,7 +81,7 @@ export default function ProfileForm({ user, profile }: ProfileFormProps) {
   }
 
   return (
-    <Card>
+      <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardHeader>
         <CardTitle>Public Profile</CardTitle>
         <CardDescription>

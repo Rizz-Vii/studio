@@ -45,7 +45,7 @@
 - **Deploy:** GitHub Actions auto-deploys to Firebase on push to `master`
 - **Backend:** Deploy functions with `firebase deploy --only functions`
 
-## Integration Points
+## Integration Pointsg
 - **OpenAI:** Used for AI-powered features (see `/ai/flows/`)
 - **Genkit:** Used for advanced AI orchestration
 - **Firestore:** Used for user data, logs, and results
