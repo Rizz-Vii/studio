@@ -12,6 +12,14 @@ export default function TopLoader() {
     if (pathname !== prevPath) {
       setLoading(true);
       setPrevPath(pathname);
+
+      // Add timeout to prevent infinite loading
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+
     }
   }, [pathname, prevPath]);
 

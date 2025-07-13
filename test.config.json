@@ -1,0 +1,13 @@
+{
+  "testUsers": {
+    "standard": {
+      "email": "test@example.com",
+      "password": "testpass123"
+    },
+    "admin": {
+      "email": "admin@example.com",
+      "password": "adminpass123"
+    }
+  },
+  "baseURL": "https://rankpilot-h3jpc.web.app"
+}

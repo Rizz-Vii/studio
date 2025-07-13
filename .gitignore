@@ -45,7 +45,7 @@ pnpm-debug.log*
 *.sublime-workspace
 *.sublime-project
 
-# Environment variables
+# Environment files
 .env
 .env.*
 !.env.example

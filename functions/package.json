@@ -16,6 +16,7 @@
   "main": "./lib/index.js",
   "dependencies": {
     "@genkit-ai/googleai": "^1.13.0",
+    "@google-cloud/error-reporting": "^3.0.5",
     "@google-cloud/storage": "^7.16.0",
     "@langchain/core": "^0.3.62",
     "@tailwindcss/postcss": "^4.1.11",

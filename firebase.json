@@ -9,6 +9,7 @@
     "source": "functions",
     "codebase": "default",
     "runtime": "nodejs20",
+    "region": "australia-southeast2",
     "ignore": [
       "node_modules",
       ".git",
