@@ -1,17 +1,6 @@
 import { initializeApp } from "firebase-admin/app";
 import { onCall, HttpsOptions } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
-import { ErrorReporting } from "@google-cloud/error-reporting";
-
-// Initialize Error Reporting with always-on mode
-const errors = new ErrorReporting({
-  projectId: "rankpilot-h3jpc",
-  reportMode: "always",
-  serviceContext: {
-    service: "cloud-functions",
-    version: "1.0.0",
-  },
-});
 
 // Initialize Firebase Admin SDK first
 initializeApp();
@@ -28,7 +17,6 @@ const httpsOptions: HttpsOptions = {
 // Global error handler for unhandled promises
 process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled Rejection at:", promise, "reason:", reason);
-  errors.report(reason as Error);
 });
 
 // Health check function to confirm functions are working correctly
@@ -47,7 +35,7 @@ export const healthCheck = onCall(httpsOptions, async (request) => {
     };
   } catch (error) {
     logger.error("Health check function failed:", error);
-    errors.report(error);
+
     throw new Error("Health check failed");
   }
 });

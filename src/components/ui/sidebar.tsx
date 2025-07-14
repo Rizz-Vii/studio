@@ -350,7 +350,7 @@ const SidebarFooter = forwardRef<
     <div
       ref={ref as any} // Cast ref to any
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 mt-auto", className)}
+      className={cn("flex flex-col gap-2", className)}
       {...props}
     />
   );
