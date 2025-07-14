@@ -302,9 +302,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <AppNav />
               </ScrollArea>
             </SidebarContent>
-            <SidebarFooter>
-              <SidebarPinControl />
-            </SidebarFooter>
+            {/* Removed SidebarFooter to eliminate extra space or content below the sidebar header */}
           </Sidebar>
           <MainPanel>{children}</MainPanel>
         </div>
