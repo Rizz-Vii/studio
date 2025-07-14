@@ -19,6 +19,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
+          RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
 
       # This is the new, critical step.
       # It creates the .env file inside the functions directory that Firebase needs for deployment.
@@ -27,6 +29,8 @@ jobs:
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> functions/.env.rankpilot-h3jpc
           echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> functions/.env.rankpilot-h3jpc
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> functions/.env.rankpilot-h3jpc
+          echo "NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}" >> functions/.env.rankpilot-h3jpc
+          echo "RECAPTCHA_SECRET_KEY=${{ secrets.RECAPTCHA_SECRET_KEY }}" >> functions/.env.rankpilot-h3jpc
 
       # This step deploys the app. It will now find the .env file created above.
       - uses: FirebaseExtended/action-hosting-deploy@v0
