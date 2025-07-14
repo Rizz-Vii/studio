@@ -32,6 +32,11 @@ jobs:
           echo "NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}" >> functions/.env.rankpilot-h3jpc
           echo "RECAPTCHA_SECRET_KEY=${{ secrets.RECAPTCHA_SECRET_KEY }}" >> functions/.env.rankpilot-h3jpc
 
+      # Add this step to expose the sitekey to the Next.js frontend
+      - name: Create .env.local for Next.js frontend
+        run: |
+          echo "NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}" >> .env.local
+
       # This step deploys the app. It will now find the .env file created above.
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
