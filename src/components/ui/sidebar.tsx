@@ -230,16 +230,23 @@ const Sidebar = forwardRef<
     setOpenMobile,
     pinned,
     isUserMenuOpen,
+    hydrated
   } = useSidebar();
 
+  // Prevent hydration mismatch
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleMouseEnter = () => {
-    if (!pinned) {
+    if (!pinned && mounted) {
       setOpen(true);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!pinned && !isUserMenuOpen) {
+    if (!pinned && !isUserMenuOpen && mounted) {
       setOpen(false);
     }
   };

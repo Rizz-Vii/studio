@@ -156,8 +156,8 @@ const AnalysisResults = ({
               </AccordionTrigger>
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
-                  {analysisResult.readabilitySuggestions.map((s, i) => (
-                    <li key={i}>{s}</li>
+                  {analysisResult.readabilitySuggestions.map((suggestion) => (
+                    <li key={`readability-${suggestion.slice(0, 32)}`}>{suggestion}</li>
                   ))}
                 </ul>
               </AccordionContent>
@@ -185,8 +185,8 @@ const AnalysisResults = ({
               </AccordionTrigger>
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
-                  {analysisResult.keywordSuggestions.map((s, i) => (
-                    <li key={i}>{s}</li>
+                  {analysisResult.keywordSuggestions.map((suggestion) => (
+                    <li key={`keyword-${suggestion.slice(0, 32)}`}>{suggestion}</li>
                   ))}
                 </ul>
               </AccordionContent>
@@ -214,8 +214,8 @@ const AnalysisResults = ({
               </AccordionTrigger>
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
-                  {analysisResult.semanticSuggestions.map((s, i) => (
-                    <li key={i}>{s}</li>
+                  {analysisResult.semanticSuggestions.map((suggestion) => (
+                    <li key={`semantic-${suggestion.slice(0, 32)}`}>{suggestion}</li>
                   ))}
                 </ul>
               </AccordionContent>
@@ -299,10 +299,15 @@ export default function ContentAnalyzerPage() {
         </motion.div>
 
         <div className="lg:col-span-2" ref={resultsRef}>
-          <AnimatePresence>
-            {isLoading && <LoadingScreen text="Analyzing content..." />}
+          <AnimatePresence mode="wait">
+            {isLoading && (
+              <motion.div key="loading">
+                <LoadingScreen text="Analyzing content..." />
+              </motion.div>
+            )}
             {error && (
               <motion.div
+                key="error"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -322,7 +327,9 @@ export default function ContentAnalyzerPage() {
               </motion.div>
             )}
             {analysisResult && (
-              <AnalysisResults analysisResult={analysisResult} />
+              <motion.div key="results">
+                <AnalysisResults analysisResult={analysisResult} />
+              </motion.div>
             )}
           </AnimatePresence>
         </div>

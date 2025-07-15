@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Keep only basic image optimization if you absolutely need it to run
-  // Otherwise, remove this entire `images` block too for the absolute minimum.
   images: {
     remotePatterns: [
       {
@@ -13,8 +11,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Do NOT include webpack function, turbopack, transpilePackages, eslint, typescript ignores.
-  // We want to test with pure Next.js defaults.
+  webpack: (config, { isServer }) => {
+    // Handle Handlebars
+    config.resolve.alias.handlebars = "handlebars/dist/handlebars.min.js";
+
+    // Ignore specific Node.js only modules in browser
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+      };
+    }
+
+    return config;
+  },
 };
 
 export default nextConfig;

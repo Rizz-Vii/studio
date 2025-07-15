@@ -132,8 +132,8 @@ const LinkAnalysisResults = ({ results }: { results: LinkAnalysisOutput }) => (
             </TableRow>
           </TableHeader>
           <TableBody>
-            {results.backlinks.map((link, index) => (
-              <TableRow key={index}>
+            {results.backlinks.map((link) => (
+              <TableRow key={`${link.referringDomain}-${link.backlinkUrl}`}>
                 <TableCell
                   className="font-medium truncate"
                   style={{ maxWidth: "200px" }}
@@ -228,10 +228,15 @@ export default function LinkViewPage() {
         </motion.div>
 
         <div className="lg:col-span-2" ref={resultsRef}>
-          <AnimatePresence>
-            {isLoading && <LoadingScreen text="Discovering backlinks..." />}
+          <AnimatePresence mode="wait">
+            {isLoading && (
+              <motion.div key="loading">
+                <LoadingScreen text="Discovering backlinks..." />
+              </motion.div>
+            )}
             {error && (
               <motion.div
+                key="error"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -248,7 +253,11 @@ export default function LinkViewPage() {
                 </Card>
               </motion.div>
             )}
-            {results && <LinkAnalysisResults results={results} />}
+            {results && (
+              <motion.div key="results">
+                <LinkAnalysisResults results={results} />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>
