@@ -1,7 +1,6 @@
 import "@/styles/globals.css";
-import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/context/AuthContext";
-import SiteFooter from "@/components/site-footer";
+import { ClientLayout } from "@/components/client-layout";
 
 export default function RootLayout({
   children,
@@ -24,9 +23,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased h-full">
         <AuthProvider>
-          {children}
-          <Toaster />
-          <SiteFooter />
+          <ClientLayout>
+            {children}
+          </ClientLayout>
         </AuthProvider>
       </body>
     </html>

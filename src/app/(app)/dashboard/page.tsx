@@ -41,6 +41,7 @@ import {
 } from "recharts";
 import { Variants, motion } from "framer-motion";
 import { dummyDashboardData } from "@/lib/dummy-data";
+import { useEffect, useState } from "react";
 
 // ----- CHART CONFIGS -----
 
@@ -314,13 +315,19 @@ const TrafficSourcesChart = () => (
 
 export default function DashboardPage() {
   const { user, profile, loading: authLoading } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const containerVariants: Variants = {
-    hidden: { opacity: 1 },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
+        when: "beforeChildren",
       },
     },
   };
@@ -333,17 +340,23 @@ export default function DashboardPage() {
       transition: {
         type: "spring",
         stiffness: 100,
+        mass: 0.5,
       },
     },
   };
 
-  if (authLoading) {
+  if (authLoading || !mounted) {
     return <LoadingScreen fullScreen text="Loading dashboard data..." />;
   }
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      <motion.div initial="hidden" animate="visible" variants={itemVariants}>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={itemVariants}
+        layoutId="dashboard-header"
+      >
         <h1 className="text-3xl font-headline font-semibold text-foreground">
           Welcome, {profile?.displayName || user?.email}!
         </h1>

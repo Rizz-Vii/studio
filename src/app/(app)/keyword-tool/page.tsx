@@ -99,8 +99,8 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {results.keywords.map((item, index) => (
-                <TableRow key={index}>
+              {results.keywords.map((item) => (
+                <TableRow key={`keyword-${item.keyword}`}>
                   <TableCell className="font-medium">{item.keyword}</TableCell>
                   <TableCell className="text-right">
                     {item.searchVolume.toLocaleString()}
@@ -191,13 +191,20 @@ export default function KeywordToolPage() {
         </motion.div>
 
         <div className="lg:col-span-2" ref={resultsRef}>
-          <AnimatePresence>
-            {isLoading && <LoadingScreen text="Generating suggestions..." />}
+          <AnimatePresence mode="wait">
+            {isLoading && (
+              <motion.div key="loading">
+                <LoadingScreen text="Generating suggestions..." />
+              </motion.div>
+            )}
             {results && results.keywords.length > 0 && (
-              <KeywordResults results={results} />
+              <motion.div key="results">
+                <KeywordResults results={results} />
+              </motion.div>
             )}
             {results && results.keywords.length === 0 && !isLoading && (
               <motion.div
+                key="empty"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}

@@ -80,10 +80,15 @@ export default function SerpViewPage() {
           <SerpViewForm onSubmit={handleSubmit} isLoading={isLoading} />
         </motion.div>
         <div className="lg:col-span-2" ref={resultsRef}>
-          <AnimatePresence>
-            {isLoading && <LoadingScreen text="Fetching search results..." />}
+          <AnimatePresence mode="wait">
+            {isLoading && (
+              <motion.div key="loading">
+                <LoadingScreen text="Fetching search results..." />
+              </motion.div>
+            )}
             {error && (
               <motion.div
+                key="error"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}

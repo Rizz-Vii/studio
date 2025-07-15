@@ -301,10 +301,15 @@ export default function SeoAuditPage() {
         </motion.div>
 
         <div className="lg:col-span-2" ref={resultsRef}>
-          <AnimatePresence>
-            {isLoading && <LoadingScreen text="Auditing page..." />}
+          <AnimatePresence mode="wait">
+            {isLoading && (
+              <motion.div key="loading">
+                <LoadingScreen text="Auditing page..." />
+              </motion.div>
+            )}
             {error && (
               <motion.div
+                key="error"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -321,7 +326,11 @@ export default function SeoAuditPage() {
                 </Card>
               </motion.div>
             )}
-            {results && <AuditResults results={results} />}
+            {results && (
+              <motion.div key="results">
+                <AuditResults results={results} />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>
