@@ -79,5 +79,4 @@
     - link "Disclaimer & Privacy Policy":
       - /url: /privacy
   - paragraph: © 2025 RankPilot
-- alert
 ```
