@@ -4,6 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import { getFunctions } from "firebase/functions";
 
 // Firebase configuration from environment variables with fallbacks
+// Firebase configuration from environment variables with fallbacks
 const firebaseConfig = {
   apiKey:
     process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
