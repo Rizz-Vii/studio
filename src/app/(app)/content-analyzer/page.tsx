@@ -44,6 +44,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import LoadingScreen from "@/components/ui/loading-screen";
 import { cn } from "@/lib/utils";
+import { withTimeout, TimeoutError } from "@/lib/timeout";
 
 const getProgressColor = (score: number) => {
   if (score > 85) return "bg-success";
@@ -251,7 +252,12 @@ export default function ContentAnalyzerPage() {
     setAnalysisResult(null);
     setError(null);
     try {
-      const result = await analyzeContent(values);
+      // Try to get real data with timeout
+      const result = await withTimeout(
+        analyzeContent(values),
+        15000, // 15 second timeout
+        "Content analysis is taking longer than expected."
+      );
       setAnalysisResult(result);
       if (user) {
         const userActivitiesRef = collection(
@@ -275,7 +281,12 @@ export default function ContentAnalyzerPage() {
         });
       }
     } catch (e: any) {
-      setError(e.message || "An unexpected error occurred.");
+      if (e instanceof TimeoutError) {
+        console.warn("Content analysis timed out:", e.message);
+        setError("Content analysis is taking longer than expected. Please try again with shorter content or check back later.");
+      } else {
+        setError(e.message || "An unexpected error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }

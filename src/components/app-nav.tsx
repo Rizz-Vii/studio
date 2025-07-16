@@ -63,7 +63,7 @@ export default function AppNav() {
               href={item.href}
               onClick={handleMobileNavClick}
               className={`
-                flex items-center gap-2 px-3 py-2 rounded-md
+                flex items-center gap-2 px-3 py-3 rounded-md min-h-[44px]
                 transition-colors duration-200
                 hover:bg-accent hover:text-accent-foreground
                 ${pathname === item.href ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground'}

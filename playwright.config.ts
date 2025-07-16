@@ -1,60 +1,102 @@
-import { defineConfig, devices } from '@playwright/test';
-import path from 'path';
-
-// Read from test.config.json
-const testConfig = require('./test.config.json');
+import { defineConfig, devices } from "@playwright/test";
+import { getProxyConfig } from "./tests/utils/proxy";
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: "./tests",
   timeout: 30000,
-  expect: {
-    timeout: 5000
-  },
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: [
-    ['html'],
-    ['list']
+    ["html"],
+    ["junit", { outputFile: "test-results/junit.xml" }],
+    ["list"],
   ],
   use: {
-    baseURL: testConfig.baseURL,
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    baseURL: process.env.TEST_BASE_URL || "https://rankpilot-h3jpc.web.app",
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
     actionTimeout: 15000,
     navigationTimeout: 15000,
   },
-  outputDir: 'test-results/',
-  snapshotDir: 'test-snapshots/',
-  
+  expect: {
+    timeout: 5000,
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.1,
+      threshold: 0.2,
+      animations: "disabled",
+    },
+  },
+  outputDir: "test-results/",
+  snapshotDir: "test-snapshots/",
   projects: [
+    // Desktop Browsers
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 720 },
+        proxy: getProxyConfig(),
+      },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      name: "firefox",
+      use: {
+        ...devices["Desktop Firefox"],
+        viewport: { width: 1280, height: 720 },
+      },
     },
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      name: "webkit",
+      use: {
+        ...devices["Desktop Safari"],
+        viewport: { width: 1280, height: 720 },
+      },
+    },
+    // Mobile Devices
+    {
+      name: "mobile-chrome",
+      use: {
+        ...devices["Pixel 5"],
+        contextOptions: {
+          reducedMotion: "reduce",
+        },
+      },
     },
     {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      name: "mobile-safari",
+      use: {
+        ...devices["iPhone 13"],
+        contextOptions: {
+          reducedMotion: "reduce",
+        },
+      },
+    },
+    // Tablet Devices
+    {
+      name: "tablet",
+      use: {
+        ...devices["iPad (gen 7)"],
+        contextOptions: {
+          reducedMotion: "reduce",
+        },
+      },
+    },
+    // Test Type Projects
+    {
+      name: "accessibility",
+      testMatch: "**/?(*.)@(accessibility|a11y).spec.ts",
+      use: {
+        ...devices["Desktop Chrome"],
+        colorScheme: "light",
+      },
     },
     {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      name: "visual",
+      testMatch: "**/?(*.)@(visual|screenshot).spec.ts",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 720 },
+      },
     },
   ],
-  
-  webServer: process.env.CI ? undefined : {
-    command: 'npm run dev',
-    port: 3000,
-    reuseExistingServer: !process.env.CI,
-  },
 });

@@ -42,6 +42,8 @@ import {
 import { Variants, motion } from "framer-motion";
 import { dummyDashboardData } from "@/lib/dummy-data";
 import { useEffect, useState } from "react";
+import ToolGrid from "@/components/tool-grid";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // ----- CHART CONFIGS -----
 
@@ -316,6 +318,7 @@ const TrafficSourcesChart = () => (
 export default function DashboardPage() {
   const { user, profile, loading: authLoading } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setMounted(true);
@@ -446,6 +449,27 @@ export default function DashboardPage() {
           <BacklinksChart />
         </motion.div>
       </motion.div>
+
+      {/* Mobile Tool Grid */}
+      {isMobile && (
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline">SEO Tools</CardTitle>
+              <CardDescription>
+                Quick access to all your SEO analysis tools
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ToolGrid />
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 }

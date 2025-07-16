@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.test.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "commonjs",
+    "target": "es2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["tests", "**/*.spec.ts", "**/*.test.ts", "playwright.config.ts", "playwright.config.*.ts"],
+  "exclude": ["node_modules", "dist", "build"]
+}

@@ -1,7 +1,7 @@
 // src/ai/flows/keyword-suggestions.ts
 "use server";
 /**
- * @fileOverview A keyword suggestion AI agent.
+ * @fileOverview A keyword suggestion AI agent with performance optimization.
  *
  * - suggestKeywords - A function that handles the keyword suggestion process.
  * - SuggestKeywordsInput - The input type for the suggestKeywords function.
@@ -10,6 +10,8 @@
 
 import { ai } from "@/ai/genkit";
 import { z } from "zod";
+import { optimizeOpenAI } from "@/lib/ai-optimizer";
+import { withPerformanceMonitoring } from "@/lib/performance-monitor";
 
 const SuggestKeywordsInputSchema = z.object({
   topic: z.string().describe("The topic for which to generate keywords."),
@@ -46,7 +48,32 @@ export type SuggestKeywordsOutput = z.infer<typeof SuggestKeywordsOutputSchema>;
 export async function suggestKeywords(
   input: SuggestKeywordsInput
 ): Promise<SuggestKeywordsOutput> {
-  return suggestKeywordsFlow(input);
+  return withPerformanceMonitoring(
+    "keyword-suggestions",
+    async () => {
+      // Generate cache key for this specific request
+      const cacheKey = `${input.topic.toLowerCase().trim()}-${input.includeLongTailKeywords}`;
+
+      return optimizeOpenAI(
+        (prompt: string) =>
+          suggestKeywordsFlow({
+            topic: input.topic,
+            includeLongTailKeywords: input.includeLongTailKeywords,
+          }),
+        cacheKey,
+        {
+          enableCaching: true,
+          ttlMs: 15 * 60 * 1000, // 15 minutes cache for keyword suggestions
+          operationType: "llm-generation",
+          expectedTokens: 800, // Estimate for keyword list response
+        }
+      );
+    },
+    {
+      userId: "system", // Could be passed from context
+      expectedTokens: 800,
+    }
+  );
 }
 
 const prompt = ai.definePrompt({

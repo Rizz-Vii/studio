@@ -21,5 +21,6 @@
   "prettier.documentSelectors": [
     ""
   ],
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "playwright.reuseBrowser": true
 }

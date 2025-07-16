@@ -44,6 +44,7 @@ import {
   ChartConfig,
 } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
+import { withTimeout, TimeoutError } from "@/lib/timeout";
 
 const RankingsChart = ({
   rankings,
@@ -245,7 +246,12 @@ export default function CompetitorsPage() {
     setResults(null);
     setError(null);
     try {
-      const result = await analyzeCompetitors(values);
+      // Try to get real data with timeout
+      const result = await withTimeout(
+        analyzeCompetitors(values),
+        15000, // 15 second timeout
+        "Competitor analysis is taking longer than expected."
+      );
       setResults(result);
 
       if (user) {
@@ -267,7 +273,12 @@ export default function CompetitorsPage() {
         });
       }
     } catch (e: any) {
-      setError(e.message || "An unexpected error occurred during analysis.");
+      if (e instanceof TimeoutError) {
+        console.warn("Competitor analysis timed out:", e.message);
+        setError("Competitor analysis is taking longer than expected. Please try again later or with fewer competitors.");
+      } else {
+        setError(e.message || "An unexpected error occurred during analysis.");
+      }
     } finally {
       setIsLoading(false);
     }

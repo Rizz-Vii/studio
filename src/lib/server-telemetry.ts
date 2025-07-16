@@ -140,19 +140,26 @@ async function createRealProvider(): Promise<TelemetryProvider> {
     // });
 
     // --- Logging Setup ---
+    // Create the log exporter
+    const logExporter = new ConsoleLogRecordExporter(); // Or your OTLPLogRecordExporter(...)
+
+    // Create the log processor
+    const logProcessor = new BatchLogRecordProcessor(logExporter);
+
     // LoggerProvider manages Loggers.
-    const loggerProvider = new LoggerProvider({ resource });
-    // BatchLogRecordProcessor buffers log records and exports them in batches.
-    // Using ConsoleLogRecordExporter for simplicity; replace with OTLPLogRecordExporter
-    // for sending to a collector.
-    loggerProvider.addLogRecordProcessor(
-      new BatchLogRecordProcessor(new ConsoleLogRecordExporter())
-    );
+    // Pass the processors directly in the constructor options
+    const loggerProvider = new LoggerProvider({
+      resource: mergedResource, // Use the merged resource here
+      processors: [logProcessor], // THIS IS THE CORRECTION
+    });
+
+    // You can optionally set the global logger provider if you intend to use api.logs.getLogger
+    // api.logs.setGlobalLoggerProvider(loggerProvider);
 
     // --- OpenTelemetry Node.js SDK Initialization ---
     // Create the NodeSDK instance with all configured components.
     sdkInstance = new OpenTelemetry.NodeSDK({
-      resource, // Apply the defined resource
+      resource: mergedResource, // Apply the defined resource
       sampler, // Set the span sampler
       spanProcessor, // Add the span processor
       instrumentations: getNodeAutoInstrumentations(), // Enable automatic instrumentations
@@ -169,7 +176,10 @@ async function createRealProvider(): Promise<TelemetryProvider> {
     // of the application to retrieve them using `api.trace.getTracer()`, etc.
 
     // Corrected: Use api.diag.setLogger with api.diag.console for diagnostics.
-    api.diag.setLogger(logger, api.DiagLogLevel.INFO);
+    const { DiagConsoleLogger, DiagLogLevel } = await import(
+      "@opentelemetry/api"
+    );
+    api.diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
 
     tracer = api.trace.getTracer(serviceName);
     meter = api.metrics.getMeter(serviceName);

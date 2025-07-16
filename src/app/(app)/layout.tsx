@@ -8,11 +8,8 @@ import { AppLogo, AppName } from '@/constants/nav';
 import Link from 'next/link';
 import LoadingScreen from '@/components/ui/loading-screen';
 import useProtectedRoute from '@/hooks/useProtectedRoute';
-// If the file is actually named 'app-nav.tsx', update the import:
 import AppNav from '@/components/app-nav';
-// Or, if the correct file is 'appnav.tsx', use:
- // import AppNav from '@/components/appnav';
-// Otherwise, create 'AppNav.tsx' in 'src/components/' if it doesn't exist.
+import MobileNav from '@/components/mobile-nav';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useProtectedRoute();
@@ -24,6 +21,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
       <HydrationProvider>
         <SidebarProvider defaultOpen={true}>
+          {/* Mobile Navigation */}
+          <div className="fixed top-4 left-4 z-50 md:hidden">
+            <MobileNav />
+          </div>
+          
           <div className="flex h-screen w-screen bg-background">
             <Sidebar>
               <SidebarHeader className="p-4 flex items-center justify-between">

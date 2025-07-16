@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import type { ServiceAccount } from "firebase-admin";
 import * as dotenv from "dotenv";
-import testConfig from "../../test.config.json";
+import config from "../../test.config";
 
 // Load environment variables
 dotenv.config({ path: ".env.test" });
