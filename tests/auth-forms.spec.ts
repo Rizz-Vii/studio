@@ -82,7 +82,7 @@ test.describe("Authentication Form Testing", () => {
 
     // Check if browser validation or custom validation appears
     const isEmailInvalid = await emailField.evaluate(
-      (el) => !(el as HTMLInputElement).checkValidity()
+      (el) => !el.checkValidity()
     );
     if (isEmailInvalid) {
       console.log("📋 Browser validation is working for email field");

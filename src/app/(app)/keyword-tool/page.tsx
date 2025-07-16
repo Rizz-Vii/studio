@@ -244,7 +244,7 @@ export default function KeywordToolPage() {
       endOperation(true); // Force show feedback on error
       
       if (error instanceof TimeoutError) {
-        console.warn("Keyword analysis timed out, using demo data:", (error as TimeoutError).message);
+        console.warn("Keyword analysis timed out, using demo data:", error.message);
         // Use demo data as fallback
         const demoData = getDemoData('keyword-tool');
         if (demoData) {
