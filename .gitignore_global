@@ -1,0 +1,86 @@
+# ===============================
+# Global GitIgnore Template
+# For RankPilot Development Team
+# ===============================
+
+# Personal IDE Settings
+# ---------------------
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/.ropeproject
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries
+.idea/shelf/
+
+# Personal Development
+# --------------------
+TODO.md
+NOTES.md
+.personal/
+scratch/
+experiments/
+
+# AI Development Tools
+# -------------------
+.copilot/
+.cursor-tutor/
+.github-copilot/
+.ai-assistant/
+
+# Performance Profiling
+# ---------------------
+*.prof
+*.cpuprofile
+*.heapprofile
+flame-graph-*.html
+
+# Database Development
+# -------------------
+*.db-journal
+*.sqlite
+*.sqlite3
+*.db3
+
+# Backup Files
+# -----------
+*.bak
+*.backup
+*.orig
+*~
+.#*
+
+# MacOS Specific
+# --------------
+.AppleDouble
+.LSOverride
+Icon
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows Specific
+# ---------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux Specific
+# --------------
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*

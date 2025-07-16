@@ -1,0 +1,42 @@
+# =========================
+# AI Directory - .gitignore
+# =========================
+
+# AI Model Cache
+# --------------
+.openai-cache/
+.ai-cache/
+model-cache/
+*.ai-cache
+cache/
+
+# AI Response Data
+# ---------------
+responses/
+generated/
+*.response.json
+*.ai-response
+
+# Training Data
+# -------------
+training-data/
+datasets/
+*.dataset
+*.training
+
+# AI Debug Files
+# --------------
+ai-debug-*.json
+model-debug-*.log
+prompt-debug-*.txt
+
+# Token Usage Logs
+# ----------------
+token-usage-*.json
+usage-metrics-*.json
+
+# Temporary AI Files
+# ------------------
+.ai-temp/
+ai-scratch/
+*.ai-temp
