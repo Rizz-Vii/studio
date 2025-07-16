@@ -18,7 +18,7 @@ test.describe("Accessibility Tests", () => {
 
   test("link analysis form is keyboard accessible", async ({ page }) => {
     const linkView = new LinkViewPage(page);
-    await linkView.navigateTo("/link-view");
+    await linkView.navigateTo();
 
     // Test tab navigation
     await page.keyboard.press("Tab");
