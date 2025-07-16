@@ -1,7 +1,11 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * Smart test runner that checks feature availability before running tests
+ * Sm      const available = await checkFeatureAvailability(page, "auth");
+      if (!available) {
+        testInfo.skip(true); // Skip test if auth features not available
+        return;
+      }est runner that checks feature availability before running tests
  * This prevents false failures for unimplemented features
  */
 
@@ -62,7 +66,7 @@ export const conditionalTest = {
     test(title, async ({ page }, testInfo) => {
       const available = await checkFeatureAvailability(page, "auth");
       if (!available) {
-        testInfo.skip("Authentication features not implemented yet");
+        testInfo.skip(true, "Authentication features not implemented yet");
         return;
       }
       return testFn({ page }, testInfo);
@@ -75,7 +79,7 @@ export const conditionalTest = {
         "api-analyze-link"
       );
       if (!available) {
-        testInfo.skip("API endpoints not implemented yet");
+        testInfo.skip(true, "API endpoints not implemented yet");
         return;
       }
       return testFn({ page }, testInfo);
@@ -85,7 +89,7 @@ export const conditionalTest = {
     test(title, async ({ page }, testInfo) => {
       const available = await checkFeatureAvailability(page, "dashboard");
       if (!available) {
-        testInfo.skip("Dashboard not implemented yet");
+        testInfo.skip(true, "Dashboard not implemented yet");
         return;
       }
       return testFn({ page }, testInfo);
