@@ -66,7 +66,7 @@ test.describe("Accessibility Tests", () => {
     page,
   }) => {
     const linkView = new LinkViewPage(page);
-    await linkView.navigateTo("/link-view");
+    await linkView.navigateTo();
 
     // Monitor aria-live regions
     const liveAnnouncements: string[] = [];
@@ -79,7 +79,7 @@ test.describe("Accessibility Tests", () => {
       }
     });
 
-    await linkView.analyzeDomain("https://example.com");
+    await linkView.analyzeSingleLink("https://example.com");
 
     // Verify loading state announcement
     expect(liveAnnouncements).toContain(
@@ -93,7 +93,7 @@ test.describe("Accessibility Tests", () => {
 
   test("form validation errors are properly announced", async ({ page }) => {
     const linkView = new LinkViewPage(page);
-    await linkView.navigateTo("/link-view");
+    await linkView.navigateTo();
 
     // Submit empty form
     await linkView.analyzeButton.click();

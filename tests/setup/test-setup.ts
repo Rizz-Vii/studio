@@ -1,5 +1,5 @@
 import { test as base, expect, Page, BrowserContext } from "@playwright/test";
-import { login, saveAuthenticationState } from "../utils/auth-helper.js";
+import { login, saveAuthenticationState } from "../utils/auth-helper";
 import { existsSync, mkdirSync } from "fs";
 import { join } from "path";
 import { defaultConfig, type TestConfig } from "../config/test-config";

@@ -30,7 +30,7 @@ export const defaultConfig: TestConfig = {
       password: process.env.TEST_ADMIN_PASSWORD || "adminpass123",
     },
   },
-  baseUrl: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000",
+  baseUrl: process.env.TEST_BASE_URL || "http://localhost:3000",
   timeouts: {
     defaultNavigationTimeout: 30000,
     defaultActionTimeout: 10000,

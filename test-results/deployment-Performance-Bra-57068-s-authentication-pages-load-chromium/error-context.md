@@ -1,0 +1,112 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - link "RankPilot":
+    - /url: /
+  - navigation:
+    - link "Features":
+      - /url: /#features
+    - link "Pricing":
+      - /url: /#pricing
+    - link "FAQ":
+      - /url: /#faq
+  - link "Login":
+    - /url: /login
+  - link "Sign Up":
+    - /url: /register
+- main:
+  - heading "Login" [level=2]
+  - text: Email
+  - textbox "Email" [disabled]
+  - text: Password
+  - textbox "Password" [disabled]
+  - button
+  - button "Login" [disabled]
+  - paragraph: For your convenience, your session will remain active until you choose to log out.
+  - text: Or continue with
+  - button "Sign in with Google" [disabled]:
+    - img
+    - text: Sign in with Google
+  - paragraph:
+    - text: Don't have an account?
+    - link "Register":
+      - /url: /register
+- region "Notifications (F8)":
+  - list
+- contentinfo:
+  - heading "Services" [level=4]
+  - list:
+    - listitem:
+      - link "SEO Audit":
+        - /url: /seo-audit
+    - listitem:
+      - link "Keyword Intelligence":
+        - /url: /keyword-tool
+    - listitem:
+      - link "Content Analyzer":
+        - /url: /content-analyzer
+    - listitem:
+      - link "Competitor Tracking":
+        - /url: /competitors
+    - listitem:
+      - link "Link Analysis":
+        - /url: /link-view
+    - listitem:
+      - link "SERP View":
+        - /url: /serp-view
+    - listitem:
+      - link "Content Brief":
+        - /url: /content-brief
+  - heading "Latest Posts" [level=4]
+  - list:
+    - listitem:
+      - link "How to Do an Enterprise SEO Audit the Right Way":
+        - /url: /blog/enterprise-seo-audit
+    - listitem:
+      - 'link "AI SEO Tools: What’s New in 2025"':
+        - /url: /blog/ai-seo-tools
+    - listitem:
+      - link "Understanding SEO Metrics":
+        - /url: /blog/seo-metrics
+    - listitem:
+      - link "Competitor Analysis Best Practices":
+        - /url: /blog/competitor-analysis
+  - heading "Latest Guides" [level=4]
+  - list:
+    - listitem:
+      - link "How To Find Broken Links":
+        - /url: /guides/broken-links
+    - listitem:
+      - link "XML Sitemap Generator":
+        - /url: /guides/xml-sitemap
+    - listitem:
+      - link "Web Scraping for SEO":
+        - /url: /guides/web-scraping
+    - listitem:
+      - link "Learn SEO":
+        - /url: /guides/learn-seo
+  - heading "Contact Us" [level=4]
+  - img
+  - text: 3/107 Albert Street Mordialloc, Victoria 3195
+  - img
+  - text: 0483 210 312
+  - img
+  - link "support@rankpilot.ai":
+    - /url: mailto:support@rankpilot.ai
+  - link "LinkedIn":
+    - /url: https://linkedin.com
+    - img
+  - link "Twitter":
+    - /url: https://twitter.com
+    - img
+  - link "YouTube":
+    - /url: https://youtube.com
+    - img
+  - heading "About Us" [level=4]
+  - paragraph: RankPilot is an AI-first SEO platform for agencies and professionals.
+  - paragraph:
+    - link "Disclaimer & Privacy Policy":
+      - /url: /privacy
+  - paragraph: © 2025 RankPilot
+```
