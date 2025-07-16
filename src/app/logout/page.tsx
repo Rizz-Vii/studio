@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase";
 import LoadingScreen from "@/components/ui/loading-screen";
 
 export default function LogoutPage() {
@@ -11,11 +10,23 @@ export default function LogoutPage() {
   useEffect(() => {
     const performLogout = async () => {
       try {
-        await auth.signOut();
+        // Only perform Firebase operations on the client side
+        if (typeof window !== 'undefined') {
+          // Import Firebase auth directly from Firebase SDK
+          const { signOut, getAuth } = await import("firebase/auth");
+          const { getApps, getApp } = await import("firebase/app");
+          
+          // Get the existing Firebase app if it exists
+          const app = getApps().length > 0 ? getApp() : null;
+          if (app) {
+            const auth = getAuth(app);
+            await signOut(auth);
+          }
+        }
       } catch (error) {
         console.error("Error during logout:", error);
       } finally {
-        // Ensure redirection happens even if signOut fails for some reason
+        // Always redirect to home page
         router.push("/");
       }
     };
