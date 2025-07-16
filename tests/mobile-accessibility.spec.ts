@@ -321,7 +321,7 @@ test.describe("Mobile Accessibility and Navigation", () => {
         }
       } catch (error) {
         console.log(
-          `   ❌ ${tool.name} error: ${error instanceof Error ? error.message.slice(0, 100) : String(error).slice(0, 100)}...`
+          `   ❌ ${tool.name} error: ${error.message.slice(0, 100)}...`
         );
       }
     }

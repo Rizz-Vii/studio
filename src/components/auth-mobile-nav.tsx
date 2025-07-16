@@ -9,37 +9,13 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
 const drawerVariants = {
-  closed: { 
-    x: "-100%",
-    transition: {
-      type: "spring" as const,
-      stiffness: 400,
-      damping: 40,
-    },
-  },
-  open: { 
-    x: "0%",
-    transition: {
-      type: "spring" as const,
-      stiffness: 400,
-      damping: 40,
-    },
-  },
+  closed: { x: "-100%" },
+  open: { x: "0%" },
 };
 
 const overlayVariants = {
-  closed: { 
-    opacity: 0,
-    transition: {
-      duration: 0.2,
-    },
-  },
-  open: { 
-    opacity: 1,
-    transition: {
-      duration: 0.2,
-    },
-  },
+  closed: { opacity: 0 },
+  open: { opacity: 1 },
 };
 
 export default function AuthMobileNav() {

@@ -20,17 +20,6 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Utility function for severity colors
-const getSeverityColor = (sev: string) => {
-  switch (sev) {
-    case 'low': return 'bg-green-100 text-green-800';
-    case 'medium': return 'bg-yellow-100 text-yellow-800';
-    case 'high': return 'bg-orange-100 text-orange-800';
-    case 'critical': return 'bg-red-100 text-red-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-};
-
 interface FeedbackData {
   operationType: string;
   rating: number;
@@ -114,7 +103,6 @@ export function PerformanceFeedback({
       setIsVisible(false);
       resetForm();
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
       toast({
         variant: "destructive",
         title: "Submission failed",
@@ -151,6 +139,16 @@ export function PerformanceFeedback({
         ))}
       </div>
     );
+  };
+
+  const getSeverityColor = (sev: string) => {
+    switch (sev) {
+      case 'low': return 'bg-green-100 text-green-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'critical': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   if (!isVisible) {

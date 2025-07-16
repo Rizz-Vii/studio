@@ -62,7 +62,7 @@ export const conditionalTest = {
     test(title, async ({ page }, testInfo) => {
       const available = await checkFeatureAvailability(page, "auth");
       if (!available) {
-        testInfo.skip();
+        testInfo.skip("Authentication features not implemented yet");
         return;
       }
       return testFn({ page }, testInfo);
@@ -75,7 +75,7 @@ export const conditionalTest = {
         "api-analyze-link"
       );
       if (!available) {
-        testInfo.skip();
+        testInfo.skip("API endpoints not implemented yet");
         return;
       }
       return testFn({ page }, testInfo);
@@ -85,7 +85,7 @@ export const conditionalTest = {
     test(title, async ({ page }, testInfo) => {
       const available = await checkFeatureAvailability(page, "dashboard");
       if (!available) {
-        testInfo.skip();
+        testInfo.skip("Dashboard not implemented yet");
         return;
       }
       return testFn({ page }, testInfo);
