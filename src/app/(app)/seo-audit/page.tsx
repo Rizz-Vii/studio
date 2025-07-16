@@ -36,6 +36,8 @@ import {
   Cell,
 } from "recharts";
 import { cn } from "@/lib/utils";
+import { withTimeout, TimeoutError } from "@/lib/timeout";
+import { getDemoData } from "@/lib/demo-data";
 
 const statusIcons: { [key: string]: React.ElementType } = {
   good: CheckCircle,
@@ -255,7 +257,12 @@ export default function SeoAuditPage() {
     setResults(null);
     setError(null);
     try {
-      const result = await auditUrl(values);
+      // Try to get real data with timeout
+      const result = await withTimeout(
+        auditUrl(values),
+        15000, // 15 second timeout
+        "SEO audit is taking longer than expected. Using demo data instead."
+      );
       setResults(result);
 
       if (user) {
@@ -277,7 +284,18 @@ export default function SeoAuditPage() {
         });
       }
     } catch (e: any) {
-      setError(e.message || "An unexpected error occurred during the audit.");
+      if (e instanceof TimeoutError) {
+        console.warn("SEO audit timed out, using demo data:", e.message);
+        // Use demo data as fallback
+        const demoData = getDemoData('seo-audit');
+        if (demoData) {
+          setResults(demoData);
+        } else {
+          setError("Analysis timed out and no demo data available.");
+        }
+      } else {
+        setError(e.message || "An unexpected error occurred during the audit.");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -1,32 +1,35 @@
-import { test as base, expect } from "@playwright/test";
-import { login, saveAuthenticationState } from "../utils/auth-helper";
-import testConfig from "../../test.config.json";
-import fs from "fs";
-import path from "path";
+import { test as base, expect, Page, BrowserContext } from "@playwright/test";
+import { login, saveAuthenticationState } from "../utils/auth-helper.js";
+import { existsSync, mkdirSync } from "fs";
+import { join } from "path";
+import { defaultConfig, type TestConfig } from "../config/test-config";
 
 // Extend the test context with auth
 export type TestFixtures = {
-  authenticatedPage: any;
-  adminPage: any;
+  authenticatedPage: Page;
+  adminPage: Page;
+  config: TestConfig;
 };
 
 // Ensure storage directory exists
-const storageDir = path.join(process.cwd(), "tests", "state");
-if (!fs.existsSync(storageDir)) {
-  fs.mkdirSync(storageDir, { recursive: true });
+const storageDir = join(process.cwd(), "tests", "state");
+if (!existsSync(storageDir)) {
+  mkdirSync(storageDir, { recursive: true });
 }
 
 export const test = base.extend<TestFixtures>({
+  // Provide config to all tests
+  config: async ({}, use) => {
+    await use(defaultConfig);
+  },
+
   // Setup authenticated page
-  authenticatedPage: async (
-    { page, context }: { page: import('@playwright/test').Page; context: import('@playwright/test').BrowserContext },
-    use: (page: import('@playwright/test').Page) => Promise<void>
-  ) => {
-    const storageFile = path.join(storageDir, "auth-standard.json");
+  authenticatedPage: async ({ page, context, config }, use) => {
+    const storageFile = join(storageDir, "auth-standard.json");
 
     try {
       // Try to use saved auth state
-      if (fs.existsSync(storageFile)) {
+      if (existsSync(storageFile)) {
         await context.storageState({ path: storageFile });
         await page.goto("/dashboard"); // Verify auth still works
         const isLoggedIn = await page.evaluate(() => {
@@ -38,22 +41,19 @@ export const test = base.extend<TestFixtures>({
       }
     } catch {
       // If no saved state or expired, do fresh login
-      const user = testConfig.testUsers.standard;
-      await login(page, "standard");
+      const credentials = config.testUsers.standard;
+      await login(page, credentials);
       await context.storageState({ path: storageFile });
     }
 
     await use(page);
   },
 
-  adminPage: async (
-    { page, context }: { page: import('@playwright/test').Page; context: import('@playwright/test').BrowserContext },
-    use: (page: import('@playwright/test').Page) => Promise<void>
-  ) => {
-    const storageFile = path.join(storageDir, "auth-admin.json");
+  adminPage: async ({ page, context, config }, use) => {
+    const storageFile = join(storageDir, "auth-admin.json");
 
     try {
-      if (fs.existsSync(storageFile)) {
+      if (existsSync(storageFile)) {
         await context.storageState({ path: storageFile });
         await page.goto("/dashboard");
         const isLoggedIn = await page.evaluate(() => {
@@ -64,8 +64,8 @@ export const test = base.extend<TestFixtures>({
         throw new Error("No saved auth state");
       }
     } catch {
-      const user = testConfig.testUsers.admin;
-      await login(page, "admin");
+      const credentials = config.testUsers.admin;
+      await login(page, credentials);
       await context.storageState({ path: storageFile });
     }
 

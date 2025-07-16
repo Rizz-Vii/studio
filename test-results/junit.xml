@@ -1,0 +1,45 @@
+<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="0" time="35.696484999999996">
+<testsuite name="mobile-nav-complete.spec.ts" timestamp="2025-07-16T15:21:42.309Z" hostname="mobile-chrome" tests="3" failures="0" skipped="0" time="32.644" errors="0">
+<testcase name="Mobile Navigation - Complete Coverage › auth pages mobile navigation" classname="mobile-nav-complete.spec.ts" time="17.414">
+<system-out>
+<![CDATA[🔐 Testing auth pages mobile navigation...
+📋 Checking auth mobile menu on login page...
+📋 Auth mobile menu: exists=true, visible=true
+🎯 SUCCESS: Auth mobile menu found!
+📋 Auth drawer visible: true
+📋 Auth nav items: 4
+📋 Auth drawer closed successfully
+📋 Testing register page...
+📋 Auth mobile menu on register: false
+✅ Auth pages mobile navigation test complete
+]]>
+</system-out>
+</testcase>
+<testcase name="Mobile Navigation - Complete Coverage › component test page validation" classname="mobile-nav-complete.spec.ts" time="5.872">
+<system-out>
+<![CDATA[🧪 Re-testing component test page for validation...
+📋 Component test hamburger: exists=true, visible=true
+📋 Component test drawer opens: true
+✅ Component test validation complete
+]]>
+</system-out>
+</testcase>
+<testcase name="Mobile Navigation - Complete Coverage › cross-layout mobile navigation comparison" classname="mobile-nav-complete.spec.ts" time="9.358">
+<system-out>
+<![CDATA[🔄 Testing cross-layout mobile navigation...
+📋 Testing Auth Layout...
+   📋 Menu: exists=true, visible=true
+   📋 Touch target: 48x48px OK=true
+   📋 Accessibility: aria-label="Toggle mobile menu", aria-expanded=false
+   📋 Drawer opens: true
+📋 Testing Component Test...
+   📋 Menu: exists=true, visible=true
+   📋 Touch target: 48x48px OK=true
+   📋 Accessibility: aria-label="Toggle mobile menu", aria-expanded=false
+   📋 Drawer opens: true
+✅ Cross-layout comparison complete
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
