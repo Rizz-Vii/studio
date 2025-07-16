@@ -1,4 +1,9 @@
-# Node dependencies
+# =================================
+# RankPilot (Studio) - .gitignore
+# =================================
+
+# Node.js Dependencies
+# --------------------
 node_modules/
 .pnp/
 .pnp.*
@@ -7,62 +12,135 @@ node_modules/
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
-# Testing
-coverage/
-.nyc_output/
-
-# Next.js
-.next/
-out/
-build/
-
-# Firebase
-.firebase/
-firebase-debug.log
-firestore-debug.log
-.storage/
-.firebaserc
-
-# Genkit
-.genkit/
-
-# Vercel
-.vercel/
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# Miscellaneous
-.DS_Store
-*.pem
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-*.sublime-workspace
-*.sublime-project
+lerna-debug.log*
 
-# Environment files
+# Next.js Build Output
+# -------------------
+.next/
+out/
+build/
+dist/
+.vercel/
+
+# TypeScript Build
+# ---------------
+*.tsbuildinfo
+next-env.d.ts
+*.d.ts.map
+
+# Testing & Coverage
+# -----------------
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+test-snapshots/
+TEST_RESULTS_SUMMARY.md
+*.spec.js.map
+*.test.js.map
+
+# Playwright Debug Files
+# ---------------------
+pglite-debug.log
+debug-*.png
+test-results-*.json
+
+# Firebase & Cloud
+# ----------------
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+firebase-functions-debug.log
+.storage/
+.firebaserc
+
+# Genkit AI Framework
+# ------------------
+.genkit/
+genkit-debug.log
+
+# Environment Variables
+# --------------------
 .env
 .env.*
 !.env.example
+!.env.test.example
+.env.backup
 
-# Editor directories and files
+# Development Tools
+# ----------------
 .vscode/
 .idea/
+.cursor/
+.idx/
+.lsp/
+.clj-kondo/
 *.swp
+*.swo
+*~
 
-# OS files
-Thumbs.db
+# OS Generated Files
+# -----------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 ehthumbs.db
+Thumbs.db
 Desktop.ini
 
-# Build output (functions)
+# Logs & Debug
+# ------------
+*.log
+*.log.*
+logs/
+debug.log
+error.log
+combined.log
+
+# Cache & Temporary
+# ----------------
+.cache/
+.tmp/
+.temp/
+*.tmp
+*.temp
+.modified
+
+# AI & ML Cache
+# -------------
+.openai-cache/
+.ai-cache/
+*.ai-cache
+model-cache/
+
+# Security & Secrets
+# -----------------
+*.pem
+*.p12
+*.key
+*.crt
+*.cert
+secrets/
+.secrets/
+
+# Performance & Monitoring
+# ------------------------
+performance-*.json
+metrics-*.json
+trace-*.json
+
+# Firebase Functions
+# -----------------
 functions/lib/
 functions/node_modules/
 functions/.tsbuildinfo
 functions/.env
 functions/.env.*
+functions/firebase-debug.log
