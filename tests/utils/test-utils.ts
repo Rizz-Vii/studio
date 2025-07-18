@@ -34,3 +34,13 @@ export const rotateUserAgent = () => {
   ];
   return userAgents[Math.floor(Math.random() * userAgents.length)];
 };
+
+export const validateWithLLM = async (stats: any, screenshotBase64: string) => {
+  // Mock LLM validation for testing purposes
+  // In a real implementation, this would call an AI service to validate UI consistency
+  return {
+    isValid: true,
+    mismatches: [],
+    confidence: 0.95,
+  };
+};

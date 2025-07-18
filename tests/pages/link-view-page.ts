@@ -33,8 +33,12 @@ export class LinkViewPage extends BasePage {
     this.errorMessage = page.locator('[data-testid="error-message"]');
   }
 
-  async navigateTo() {
-    await this.page.goto("/link-view");
+  async navigateTo(path?: string) {
+    await this.page.goto(path || "/link-view");
+  }
+
+  async analyzeDomain(url: string) {
+    await this.analyzeSingleLink(url);
   }
 
   async analyzeSingleLink(url: string) {
