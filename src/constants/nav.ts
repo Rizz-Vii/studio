@@ -11,6 +11,7 @@ import {
   BookText,
   Shield,
   Lightbulb,
+  User,
 } from "lucide-react";
 
 export interface NavItem {
@@ -67,6 +68,11 @@ export const navItems: NavItem[] = [
     title: "Link View",
     href: "/link-view",
     icon: Link,
+  },
+  {
+    title: "Profile",
+    href: "/profile",
+    icon: User,
   },
   {
     title: "Admin",
