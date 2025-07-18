@@ -85,9 +85,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       size="sm" 
                       className="w-full justify-start h-10 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:px-2"
                     >
-                      <Link href="/profile" className="flex items-center gap-3">
+                      <Link href="/settings" className="flex items-center gap-3">
                         <User className="h-4 w-4 shrink-0" />
-                        <span className="group-data-[state=collapsed]:hidden">Profile Settings</span>
+                        <span className="group-data-[state=collapsed]:hidden">Settings</span>
                       </Link>
                     </Button>
                     
