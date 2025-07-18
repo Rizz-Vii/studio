@@ -39,8 +39,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex h-screen w-screen bg-background pt-16 md:pt-0">
-            <Sidebar>
-              <SidebarHeader className="p-4 flex items-center justify-between">
+            <Sidebar className="flex flex-col">
+              <SidebarHeader className="p-4 flex items-center justify-between shrink-0">
                 <Link
                   href="/"
                   className="flex items-center gap-2 group-data-[state=collapsed]:justify-center"
@@ -51,43 +51,43 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   </span>
                 </Link>
               </SidebarHeader>
-              <SidebarContent>
+              <SidebarContent className="flex-1 overflow-hidden">
                 <ScrollArea className="h-full">
                   <AppNav />
                 </ScrollArea>
               </SidebarContent>
               
               {/* Desktop User Menu Footer */}
-              <SidebarFooter className="p-4 border-t">
-                <div className="space-y-2">
+              <SidebarFooter className="p-4 border-t border-sidebar-border bg-sidebar shrink-0">
+                <div className="space-y-3">
                   {/* User Info */}
-                  <div className="flex items-center gap-3 px-3 py-2">
-                    <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
+                  <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-sidebar-accent/50">
+                    <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center shrink-0">
                       <span className="text-primary-foreground font-medium text-sm">
                         {user?.email?.[0].toUpperCase() || "U"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0 group-data-[state=collapsed]:hidden">
-                      <p className="text-sm font-medium truncate">
+                      <p className="text-sm font-medium text-sidebar-foreground truncate">
                         {user?.email}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-sidebar-foreground/70">
                         {role === "admin" ? "Administrator" : "User"}
                       </p>
                     </div>
                   </div>
                   
                   {/* Action Buttons */}
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <Button 
                       asChild 
                       variant="ghost" 
                       size="sm" 
-                      className="w-full justify-start h-9 group-data-[state=collapsed]:justify-center"
+                      className="w-full justify-start h-10 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:px-2"
                     >
                       <Link href="/profile" className="flex items-center gap-3">
-                        <User className="h-4 w-4" />
-                        <span className="group-data-[state=collapsed]:hidden">Profile</span>
+                        <User className="h-4 w-4 shrink-0" />
+                        <span className="group-data-[state=collapsed]:hidden">Profile Settings</span>
                       </Link>
                     </Button>
                     
@@ -95,10 +95,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       asChild 
                       variant="ghost" 
                       size="sm" 
-                      className="w-full justify-start h-9 text-red-600 hover:text-red-700 hover:bg-red-50 group-data-[state=collapsed]:justify-center"
+                      className="w-full justify-start h-10 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:px-2"
                     >
                       <Link href="/logout" className="flex items-center gap-3">
-                        <LogOut className="h-4 w-4" />
+                        <LogOut className="h-4 w-4 shrink-0" />
                         <span className="group-data-[state=collapsed]:hidden">Sign Out</span>
                       </Link>
                     </Button>

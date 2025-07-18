@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { navItems } from "@/constants/nav";
+import { navItems, AppLogo, AppName } from "@/constants/nav";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -33,13 +33,13 @@ const overlayVariants = {
   closed: {
     opacity: 0,
     transition: {
-      duration: 0.2,
+      duration: 0.3,
     },
   },
   open: {
     opacity: 1,
     transition: {
-      duration: 0.2,
+      duration: 0.3,
     },
   },
 };
@@ -68,6 +68,20 @@ export default function MobileNav() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Lock body scroll when mobile nav is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
@@ -117,7 +131,8 @@ export default function MobileNav() {
               animate="open"
               exit="closed"
               variants={overlayVariants}
-              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+              className="fixed inset-0 h-screen w-screen bg-black/90 backdrop-blur-md z-[60] md:hidden"
+              style={{ height: '100dvh' }}
               onClick={closeMenu}
             />
 
@@ -127,42 +142,31 @@ export default function MobileNav() {
               animate="open"
               exit="closed"
               variants={drawerVariants}
-              className="fixed left-0 top-0 h-full w-80 bg-sidebar text-sidebar-foreground z-50 md:hidden shadow-2xl"
+              className="fixed left-0 top-0 h-screen w-80 max-w-[60vw] bg-sidebar text-sidebar-foreground z-[70] md:hidden shadow-2xl border-r border-sidebar-border"
+              style={{ height: '100dvh' }}
               data-testid="drawer"
               role="dialog"
               aria-modal="true"
               aria-label="Mobile navigation menu"
             >
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col h-full bg-sidebar" style={{ height: '100dvh' }}>
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
+                <div className="flex items-center justify-center p-4 border-b border-sidebar-border bg-sidebar shrink-0 min-h-[80px]">
                   <Link
-                    href="/dashboard"
+                    href="/"
                     className="flex items-center gap-2"
                     onClick={closeMenu}
                   >
-                    <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-                      <span className="text-primary-foreground font-bold text-lg">R</span>
-                    </div>
-                    <span className="text-xl font-headline font-bold text-sidebar-foreground">
-                      RankPilot
+                    <AppLogo className="h-8 w-8 text-primary shrink-0" />
+                    <span className="text-2xl font-headline font-bold text-primary">
+                      {AppName}
                     </span>
                   </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={closeMenu}
-                    className="h-12 w-12 min-h-[48px] min-w-[48px] text-sidebar-foreground hover:bg-sidebar-accent"
-                    aria-label="Close mobile menu"
-                    data-testid="close"
-                  >
-                    <X className="h-6 w-6" />
-                  </Button>
                 </div>
 
                 {/* Navigation Items */}
-                <nav className="flex-1 px-6 py-4">
-                  <div className="space-y-2">
+                <nav className="flex-1 px-2 py-4 bg-sidebar overflow-y-auto overflow-x-hidden">
+                  <div className="flex flex-col gap-1 min-h-0">
                     {visibleNavItems.map((item, index) => (
                       <motion.div
                         key={item.href}
@@ -175,15 +179,16 @@ export default function MobileNav() {
                           href={item.href}
                           onClick={closeMenu}
                           className={cn(
-                            "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors duration-200 min-h-[44px]",
-                            "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                            "flex items-center gap-2 px-3 py-3 rounded-md min-h-[44px]",
+                            "transition-colors duration-200",
+                            "hover:bg-accent hover:text-accent-foreground",
                             pathname === item.href
-                              ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                              : "text-sidebar-foreground"
+                              ? "bg-accent text-accent-foreground font-medium"
+                              : "text-muted-foreground"
                           )}
                         >
-                          <item.icon className="h-6 w-6 shrink-0" />
-                          <span className="font-medium text-base">{item.title}</span>
+                          <item.icon className="h-5 w-5 shrink-0" />
+                          <span className="whitespace-nowrap">{item.title}</span>
                         </Link>
                       </motion.div>
                     ))}
@@ -191,53 +196,53 @@ export default function MobileNav() {
                 </nav>
 
                 {/* User Actions */}
-                <div className="p-6 border-t border-sidebar-border space-y-3">
-                  {/* User Info */}
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center">
-                      <span className="text-primary-foreground font-medium">
-                        {user?.email?.[0].toUpperCase() || "U"}
-                      </span>
+                <div className="p-4 border-t border-sidebar-border bg-sidebar shrink-0">
+                  <div className="space-y-3">
+                    {/* User Info */}
+                    <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-sidebar-accent/50">
+                      <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center shrink-0">
+                        <span className="text-primary-foreground font-medium text-sm">
+                          {user?.email?.[0].toUpperCase() || "U"}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-sidebar-foreground truncate">
+                          {user?.email}
+                        </p>
+                        <p className="text-xs text-sidebar-foreground/70">
+                          {role === "admin" ? "Administrator" : "User"}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-sidebar-foreground truncate">
-                        {user?.email}
-                      </p>
-                      <p className="text-xs text-sidebar-foreground/70">
-                        {role === "admin" ? "Administrator" : "User"}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* User Action Buttons */}
-                  <div className="space-y-2">
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="w-full justify-start h-11"
-                      onClick={closeMenu}
-                    >
-                      <Link href="/profile" className="flex items-center gap-3">
-                        <div className="h-5 w-5 rounded bg-muted flex items-center justify-center">
-                          <span className="text-xs">👤</span>
-                        </div>
-                        Profile Settings
-                      </Link>
-                    </Button>
                     
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="w-full justify-start h-11 border-red-200 text-red-600 hover:bg-red-50"
-                      onClick={closeMenu}
-                    >
-                      <Link href="/logout" className="flex items-center gap-3">
-                        <div className="h-5 w-5 rounded bg-red-100 flex items-center justify-center">
-                          <span className="text-xs">↪</span>
-                        </div>
-                        Sign Out
-                      </Link>
-                    </Button>
+                    {/* Action Buttons */}
+                    <div className="space-y-2">
+                      <Button 
+                        asChild 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full justify-start h-10 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        onClick={closeMenu}
+                      >
+                        <Link href="/settings" className="flex items-center gap-3">
+                          <User className="h-4 w-4 shrink-0" />
+                          <span>Settings</span>
+                        </Link>
+                      </Button>
+                      
+                      <Button 
+                        asChild 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full justify-start h-10 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                        onClick={closeMenu}
+                      >
+                        <Link href="/logout" className="flex items-center gap-3">
+                          <LogOut className="h-4 w-4 shrink-0" />
+                          <span>Sign Out</span>
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

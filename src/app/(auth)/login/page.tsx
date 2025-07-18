@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { Eye, EyeOff } from "lucide-react";
+import LoadingScreen from "@/components/ui/loading-screen";
 
 // Google logo SVG
 const GoogleIcon = () => (
@@ -111,6 +112,10 @@ export default function LoginPage() {
       });
     }
   };
+
+  if (loading) {
+    return <LoadingScreen fullScreen text="Verifying your credentials..." />;
+  }
 
   return (
     <div className="inset-0 flex items-center justify-center bg-gray-100">

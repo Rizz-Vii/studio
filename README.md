@@ -34,6 +34,9 @@ This project leverages a modern, scalable, and serverless tech stack.
 *   **Backend:** ⚙️ Firebase Cloud Functions (Node.js)
 *   **Database:** 🔥 Firestore (NoSQL)
 *   **Authentication:** 🔒 Firebase Authentication
+*   **Payments:** 💳 Stripe, PayPal, Multi-gateway Support
+*   **Email:** 📧 Nodemailer with Transactional Templates
+*   **Analytics:** 📊 Firebase Analytics with Custom Event Tracking
 *   **AI & Processing:** 🧠 OpenAI API (GPT-4o), Playwright/Puppeteer
 *   **Deployment & CI/CD:** 🚀 GitHub Actions & Firebase Hosting
 

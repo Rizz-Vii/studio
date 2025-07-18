@@ -35,11 +35,18 @@ export const healthCheck = onCall(httpsOptions, async (request) => {
     };
   } catch (error) {
     logger.error("Health check function failed:", error);
-
     throw new Error("Health check failed");
   }
 });
 
+// Export AI-powered functions
+// Temporarily disabled for deployment testing
 // export * from "./api/keyword-suggestions";
 // export * from "./api/audit";
 // export * from "./api/analyze-content";
+
+// Export Stripe payment functions
+export * from "./stripe";
+
+// Export email functions
+export * from "./email";
