@@ -24,8 +24,8 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const planId = searchParams.get('plan') as PlanType;
-  const billingInterval = (searchParams.get('billing') || 'monthly') as BillingInterval;
+  const planId = (searchParams?.get('plan') || 'professional') as PlanType;
+  const billingInterval = (searchParams?.get('billing') || 'monthly') as BillingInterval;
 
   useEffect(() => {
     setMounted(true);
