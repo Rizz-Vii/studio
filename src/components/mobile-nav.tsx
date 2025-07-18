@@ -190,8 +190,9 @@ export default function MobileNav() {
                   </div>
                 </nav>
 
-                {/* User Info */}
-                <div className="p-6 border-t border-sidebar-border">
+                {/* User Actions */}
+                <div className="p-6 border-t border-sidebar-border space-y-3">
+                  {/* User Info */}
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center">
                       <span className="text-primary-foreground font-medium">
@@ -206,6 +207,37 @@ export default function MobileNav() {
                         {role === "admin" ? "Administrator" : "User"}
                       </p>
                     </div>
+                  </div>
+
+                  {/* User Action Buttons */}
+                  <div className="space-y-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full justify-start h-11"
+                      onClick={closeMenu}
+                    >
+                      <Link href="/profile" className="flex items-center gap-3">
+                        <div className="h-5 w-5 rounded bg-muted flex items-center justify-center">
+                          <span className="text-xs">👤</span>
+                        </div>
+                        Profile Settings
+                      </Link>
+                    </Button>
+                    
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full justify-start h-11 border-red-200 text-red-600 hover:bg-red-50"
+                      onClick={closeMenu}
+                    >
+                      <Link href="/logout" className="flex items-center gap-3">
+                        <div className="h-5 w-5 rounded bg-red-100 flex items-center justify-center">
+                          <span className="text-xs">↪</span>
+                        </div>
+                        Sign Out
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </div>
