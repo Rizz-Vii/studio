@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getFunctions } from "firebase/functions";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 // Firebase configuration from environment variables with fallbacks
 // Firebase configuration from environment variables with fallbacks
@@ -34,3 +35,14 @@ export const db = getFirestore(app);
 
 // Initialize Cloud Functions and get a reference to the service
 export const functions = getFunctions(app);
+
+// Initialize Analytics (only in browser and if supported)
+let analytics: any = null;
+if (typeof window !== "undefined") {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  });
+}
+export { analytics };

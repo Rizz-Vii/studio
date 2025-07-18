@@ -1,5 +1,5 @@
 import { onCall, HttpsOptions } from "firebase-functions/v2/https";
-import { ai } from "@/ai/genkit.js";
+import { getAI } from "../ai/genkit";
 
 // Set options for the keyword suggestions function
 const httpsOptions: HttpsOptions = {
@@ -41,37 +41,44 @@ export const getKeywordSuggestions = onCall(httpsOptions, async (request) => {
       return mockKeywordResponse(query, count);
     }
 
-    // In production, this would use the AI to generate suggestions
-    const prompt = `Generate ${count} keyword suggestions related to "${query}" 
-                  for SEO purposes. Include a mix of head terms and long-tail keywords.`;
+    // In production, use AI to generate suggestions
+    const prompt = `Generate ${count} SEO keyword suggestions related to "${query}". 
+                   Include a mix of head terms and long-tail keywords.
+                   Return as JSON with this structure:
+                   {
+                     "suggestions": [
+                       {"keyword": "example keyword", "searchVolume": 1200, "competition": "medium", "difficulty": 65}
+                     ],
+                     "relatedQueries": ["related query 1", "related query 2"]
+                   }`;
 
     try {
-      await ai.generate(prompt);
-    } catch (error) {
-      console.error("Error calling AI generate function:", error);
-      throw new Error("AI generation failed.");
-    }
+      const ai = getAI();
+      const response = await ai.generate(prompt);
 
-    // Process AI response (simplified for this example)
-    // In a real implementation, you would parse the AI response more thoroughly
-    return {
-      suggestions: [
-        {
-          keyword: query + " best practices",
-          searchVolume: 1200,
-          competition: "medium",
-          difficulty: 65,
-        },
-        {
-          keyword: "how to " + query,
-          searchVolume: 880,
-          competition: "low",
-          difficulty: 42,
-        },
-        // More suggestions would be parsed from the AI response
-      ],
-      relatedQueries: ["similar to " + query, query + " alternatives"],
-    };
+      // Parse AI response or fall back to mock data
+      if (response && response.text) {
+        try {
+          const aiResult = JSON.parse(response.text);
+          return aiResult;
+        } catch (parseError) {
+          console.warn(
+            "Failed to parse AI response, using mock data:",
+            parseError
+          );
+          return mockKeywordResponse(query, count);
+        }
+      } else {
+        console.warn("AI response was empty, using mock data");
+        return mockKeywordResponse(query, count);
+      }
+    } catch (aiError) {
+      console.error(
+        "AI generation failed, falling back to mock data:",
+        aiError
+      );
+      return mockKeywordResponse(query, count);
+    }
   } catch (error) {
     console.error("Error generating keyword suggestions:", error);
     throw new Error(

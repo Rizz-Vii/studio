@@ -1,5 +1,5 @@
 import { onCall, HttpsOptions } from "firebase-functions/v2/https";
-import { ai } from "../ai/genkit.js"; // Import AI generation module
+import { getAI } from "../ai/genkit"; // Import AI generation module
 
 // Set options for the content analyzer function
 const httpsOptions: HttpsOptions = {
@@ -64,6 +64,7 @@ export const analyzeContent = onCall(httpsOptions, async (request) => {
                   ${content.substring(0, 1000)}...`;
 
     // AI call - result will be used in production implementation
+    const ai = getAI();
     await ai.generate(prompt);
 
     // Process AI response (simplified for demo)

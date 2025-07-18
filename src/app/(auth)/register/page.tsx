@@ -9,6 +9,7 @@ import { auth, db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Eye, EyeOff } from "lucide-react";
+import LoadingScreen from "@/components/ui/loading-screen";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -29,7 +30,11 @@ export default function RegisterPage() {
     form?: string;
   }>({});
 
-  if (loading || user) return null;
+  if (loading) {
+    return <LoadingScreen fullScreen text="Setting up your account..." />;
+  }
+
+  if (user) return null;
 
   function validate() {
     const newErrors: typeof errors = {};
