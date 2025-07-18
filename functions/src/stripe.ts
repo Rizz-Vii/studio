@@ -9,11 +9,22 @@ if (!getApps().length) {
   initializeApp();
 }
 
-setGlobalOptions({ region: "us-central1" });
+setGlobalOptions({ region: "australia-southeast2" });
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-06-30.basil",
-});
+// Lazy initialization of Stripe to avoid deployment issues
+let stripe: Stripe;
+function getStripe(): Stripe {
+  if (!stripe) {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) {
+      throw new Error("STRIPE_SECRET_KEY environment variable is not set");
+    }
+    stripe = new Stripe(secretKey, {
+      apiVersion: "2025-06-30.basil",
+    });
+  }
+  return stripe;
+}
 
 const db = getFirestore();
 
@@ -62,7 +73,7 @@ export const createCheckoutSession = onRequest(
         return;
       }
 
-      const session = await stripe.checkout.sessions.create({
+      const session = await getStripe().checkout.sessions.create({
         customer_email: userData.email,
         payment_method_types: ["card"],
         line_items: [
@@ -104,7 +115,7 @@ export const stripeWebhook = onRequest(
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(
+      event = getStripe().webhooks.constructEvent(
         request.rawBody,
         sig as string,
         process.env.STRIPE_WEBHOOK_SECRET!
@@ -158,10 +169,12 @@ async function handleSubscriptionCreated(session: Stripe.Checkout.Session) {
   const userId = session.metadata?.userId;
   if (!userId) return;
 
-  const subscription = await stripe.subscriptions.retrieve(
+  const subscription = await getStripe().subscriptions.retrieve(
     session.subscription as string
   );
-  const customer = await stripe.customers.retrieve(session.customer as string);
+  const customer = await getStripe().customers.retrieve(
+    session.customer as string
+  );
 
   // Cast subscription to access current_period_end
   const sub = subscription as any;
@@ -215,7 +228,8 @@ async function handleSubscriptionCanceled(subscription: Stripe.Subscription) {
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
   const subscriptionId = (invoice as any).subscription as string | null;
   if (subscriptionId && typeof subscriptionId === "string") {
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const subscription =
+      await getStripe().subscriptions.retrieve(subscriptionId);
     const userId = subscription.metadata?.userId;
 
     if (userId) {
@@ -240,7 +254,8 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
   const subscriptionId = (invoice as any).subscription as string | null;
   if (subscriptionId && typeof subscriptionId === "string") {
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const subscription =
+      await getStripe().subscriptions.retrieve(subscriptionId);
     const userId = subscription.metadata?.userId;
 
     if (userId) {
@@ -272,7 +287,7 @@ export const createPortalSession = onRequest(
         return;
       }
 
-      const session = await stripe.billingPortal.sessions.create({
+      const session = await getStripe().billingPortal.sessions.create({
         customer: userData.stripeCustomerId,
         return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?tab=billing`,
       });

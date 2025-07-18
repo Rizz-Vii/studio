@@ -46,7 +46,7 @@ export const healthCheck = onCall(httpsOptions, async (request) => {
 // export * from "./api/analyze-content";
 
 // Export Stripe payment functions
-export * from "./stripe";
+export * from "./stripe-webhook";
 
 // Export email functions
 export * from "./email";
