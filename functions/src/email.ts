@@ -36,6 +36,11 @@ interface BillingReminderData {
 
 // Send payment receipt email
 export const sendPaymentReceipt = onCall<PaymentReceiptData>(
+  {
+    region: "australia-southeast2",
+    timeoutSeconds: 60,
+    memory: "256MiB",
+  },
   async (request: CallableRequest<PaymentReceiptData>) => {
     try {
       // Verify authentication
@@ -95,6 +100,11 @@ export const sendPaymentReceipt = onCall<PaymentReceiptData>(
 
 // Send welcome email
 export const sendWelcomeEmailFunction = onCall<WelcomeEmailData>(
+  {
+    region: "australia-southeast2",
+    timeoutSeconds: 60,
+    memory: "256MiB",
+  },
   async (request: CallableRequest<WelcomeEmailData>) => {
     try {
       // Verify authentication
@@ -143,6 +153,11 @@ export const sendWelcomeEmailFunction = onCall<WelcomeEmailData>(
 
 // Send billing reminder email
 export const sendBillingReminder = onCall<BillingReminderData>(
+  {
+    region: "australia-southeast2",
+    timeoutSeconds: 60,
+    memory: "256MiB",
+  },
   async (request: CallableRequest<BillingReminderData>) => {
     try {
       // Verify authentication
