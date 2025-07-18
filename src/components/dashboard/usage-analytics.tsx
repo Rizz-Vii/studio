@@ -86,31 +86,31 @@ export function UsageAnalytics() {
   const usageLimits: UsageLimit[] = [
     {
       name: "Projects",
-      current: usage.projects,
-      limit: limits.projects,
+      current: usage.projects || 0,
+      limit: limits.auditsPerMonth,
       icon: <FileText className="w-4 h-4" />,
-      color: usage.projects >= limits.projects * 0.8 ? "text-red-500" : "text-blue-500"
+      color: (usage.projects || 0) >= limits.auditsPerMonth * 0.8 ? "text-red-500" : "text-blue-500"
     },
     {
       name: "Keywords",
-      current: usage.keywords,
-      limit: limits.keywords,
+      current: usage.keywords || 0,
+      limit: limits.keywordTracking,
       icon: <Zap className="w-4 h-4" />,
-      color: usage.keywords >= limits.keywords * 0.8 ? "text-red-500" : "text-green-500"
+      color: (usage.keywords || 0) >= limits.keywordTracking * 0.8 ? "text-red-500" : "text-green-500"
     },
     {
       name: "Reports",
-      current: usage.reports,
-      limit: limits.reports,
+      current: usage.reports || 0,
+      limit: limits.auditsPerMonth,
       icon: <BarChart3 className="w-4 h-4" />,
-      color: usage.reports >= limits.reports * 0.8 ? "text-red-500" : "text-purple-500"
+      color: (usage.reports || 0) >= limits.auditsPerMonth * 0.8 ? "text-red-500" : "text-purple-500"
     },
     {
       name: "Team Members",
-      current: usage.users,
-      limit: limits.users,
+      current: usage.users || 0,
+      limit: limits.competitorAnalysis,
       icon: <Users className="w-4 h-4" />,
-      color: usage.users >= limits.users * 0.8 ? "text-red-500" : "text-orange-500"
+      color: (usage.users || 0) >= limits.competitorAnalysis * 0.8 ? "text-red-500" : "text-orange-500"
     }
   ];
 
@@ -162,7 +162,7 @@ export function UsageAnalytics() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 {isPremium ? <Crown className="w-5 h-5 text-yellow-500" /> : <Zap className="w-5 h-5" />}
-                Current Plan: {subscription?.tier?.charAt(0).toUpperCase() + subscription?.tier?.slice(1) || "Free"}
+                Current Plan: {(subscription?.tier?.charAt(0).toUpperCase() || '') + (subscription?.tier?.slice(1) || '') || "Free"}
               </CardTitle>
               <CardDescription>
                 {isActive ? "Active subscription" : "Inactive or free plan"}
@@ -282,13 +282,20 @@ export function UsageAnalytics() {
                   <span>Plan Features</span>
                   <div className="text-right">
                     <div className="text-xs text-muted-foreground">
-                      {limits.features.join(", ")}
+                      {[
+                        `${limits.auditsPerMonth === -1 ? 'Unlimited' : limits.auditsPerMonth} audits/month`,
+                        `${limits.keywordTracking === -1 ? 'Unlimited' : limits.keywordTracking} keywords`,
+                        limits.exportData ? 'Data export' : 'No export',
+                        limits.apiAccess ? 'API access' : 'No API'
+                      ].join(", ")}
                     </div>
                   </div>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Support Level</span>
-                  <span className="font-medium capitalize">{limits.support}</span>
+                  <span className="font-medium capitalize">
+                    {limits.prioritySupport ? 'Priority' : 'Standard'}
+                  </span>
                 </div>
               </div>
             </div>
