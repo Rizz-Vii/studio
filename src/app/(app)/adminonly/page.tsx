@@ -17,6 +17,7 @@ import AdminUserManagement from "@/components/admin/admin-user-management";
 import AdminSystemMetrics from "@/components/admin/admin-system-metrics";
 import AdminAnalytics from "@/components/admin/admin-analytics";
 import AdminSettings from "@/components/admin/admin-settings";
+import { AdminUserSubscriptionManager } from "@/components/admin/AdminUserSubscriptionManager";
 
 export default function AdminOnlyPage() {
   const { user, loading, role } = useAdminRoute();
@@ -47,10 +48,14 @@ export default function AdminOnlyPage() {
       </div>
 
       <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Users
+          </TabsTrigger>
+          <TabsTrigger value="subscriptions" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Subscriptions
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
@@ -68,6 +73,10 @@ export default function AdminOnlyPage() {
 
         <TabsContent value="users" className="space-y-6">
           <AdminUserManagement />
+        </TabsContent>
+
+        <TabsContent value="subscriptions" className="space-y-6">
+          <AdminUserSubscriptionManager />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">

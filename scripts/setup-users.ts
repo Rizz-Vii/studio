@@ -13,7 +13,7 @@ async function main() {
     console.log("✅ User setup completed successfully!");
 
     console.log("\n📋 Summary:");
-    console.log("- abbas_ali_rivi@hotmail.com: Free tier (5 audits/month)");
+    console.log("- abbas_ali_rizvi@hotmail.com: Free tier (5 audits/month)");
     console.log(
       "- abba7254@gmail.com: Starter tier (50 audits/month, 3 months paid)"
     );

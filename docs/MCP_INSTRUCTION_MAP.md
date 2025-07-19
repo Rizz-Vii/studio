@@ -1,6 +1,25 @@
+
 # MCP Server Tool Mapping Instructions
 
-This document provides guidelines for mapping different types of user queries to the appropriate MCP server tools.
+**Document Purpose:**
+Provides guidelines for mapping user queries to the appropriate MCP server tools, ensuring correct tool selection and workflow.
+
+**Product Name:** RankPilot  
+**Author:** Product & Engineering Team  
+**Last Updated:** July 9, 2025  
+**Version:** 1.0
+
+---
+
+## Table of Contents
+1. [Available MCP Servers](#available-mcp-servers)
+2. [Priority Rules](#priority-rules)
+3. [Context Awareness](#context-awareness)
+4. [Revision History](#revision-history)
+5. [Related Documents](#related-documents)
+
+---
+
 
 ## Available MCP Servers
 
@@ -54,6 +73,7 @@ This document provides guidelines for mapping different types of user queries to
     - Trigger keywords: "git", "repository", "commit", "pull request"
     - Example: "Create a new branch for feature development"
 
+
 ## Priority Rules
 
 When multiple tools could apply, follow these priority rules:
@@ -73,7 +93,27 @@ When multiple tools could apply, follow these priority rules:
    - Github (for markdown files)
    - Perplexity Search (for references)
 
+
 ## Context Awareness
+
+---
+
+## Revision History
+| Version | Date | Author | Description |
+|---------|------|--------|-------------|
+| 1.0     | 2025-07-09 | Product & Engineering Team | Initial draft |
+
+---
+
+## Related Documents
+- [01_EXECUTIVE_SUMMARY.md](./01_EXECUTIVE_SUMMARY.md)
+- [02_PRODUCT_REQUIREMENTS_DOCUMENT.md](./02_PRODUCT_REQUIREMENTS_DOCUMENT.md)
+- [03_EXECUTION_PLAN.md](./03_EXECUTION_PLAN.md)
+- [COMPREHENSIVE_INSTRUCTIONS.md](./COMPREHENSIVE_INSTRUCTIONS.md)
+
+---
+
+*© 2025 RankPilot, Inc. All rights reserved.*
 
 The tool selection should consider:
 

@@ -5,6 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { useMockAuth } from "@/lib/dev-auth";
+import { ensureUserSubscription } from "@/lib/user-subscription-sync";
 import {
   doc,
   getDoc,
@@ -76,6 +77,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleAuthStateChange = async (currentUser: User | null) => {
     setUser(currentUser);
     if (currentUser) {
+      // Ensure user has proper subscription data
+      try {
+        await ensureUserSubscription(currentUser.uid, currentUser.email || "");
+      } catch (error) {
+        console.error("Error ensuring user subscription:", error);
+      }
+      
       // Fetch user profile and role
       const userDocRef = doc(db, "users", currentUser.uid);
       const userDocSnap = await getDoc(userDocRef);

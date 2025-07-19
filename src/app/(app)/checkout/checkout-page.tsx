@@ -139,6 +139,16 @@ export default function CheckoutPage() {
       "Dedicated account manager",
       "Custom integrations",
       "Team collaboration tools"
+    ],
+    agency: [
+      "Everything in Enterprise",
+      "Unlimited everything",
+      "Complete white labeling",
+      "Priority support",
+      "Custom integrations",
+      "Dedicated support team",
+      "Custom onboarding",
+      "Advanced team management"
     ]
   };
 

@@ -1,15 +1,28 @@
-# Document 5: Key User Workflows - RankPilot
+# RankPilot Key User Workflows
 
-**Product Name:** RankPilot
-**Date:** July 9, 2025
-**Purpose:** To define the step-by-step user journeys for achieving key goals within the application.
+**Document Purpose:**
+Defines the step-by-step user journeys for achieving key goals within the RankPilot application. Serves as a reference for product, engineering, and support teams.
+
+**Product Name:** RankPilot  
+**Author:** Product & UX Team  
+**Last Updated:** July 9, 2025  
+**Version:** 1.0
+
+---
+
+## Table of Contents
+1. [Workflow 1: New User Onboarding & First Audit](#workflow-1-new-user-onboarding--first-audit)
+2. [Workflow 2: Upgrading to a Paid Plan](#workflow-2-upgrading-to-a-paid-plan)
+3. [Workflow 3: Agency Consultant Managing a Client Project](#workflow-3-agency-consultant-managing-a-client-project)
+4. [Revision History](#revision-history)
+5. [Related Documents](#related-documents)
 
 ---
 
 ### Workflow 1: New User Onboarding & First Audit
 
-*   **Persona:** A first-time visitor (e.g., Content Writer, Marketing Manager).
-*   **Goal:** Sign up for a free account and experience the core value by running one audit.
+- **Persona:** A first-time visitor (e.g., Content Writer, Marketing Manager).
+- **Goal:** Sign up for a free account and experience the core value by running one audit.
 
 | Step | User Action | System Response / Backend Action |
 | :--- | :--- | :--- |
@@ -26,8 +39,8 @@
 
 ### Workflow 2: Upgrading to a Paid Plan
 
-*   **Persona:** A free user who has seen the value and hit a usage limit or feature wall.
-*   **Goal:** Subscribe to a paid tier (e.g., Pro).
+- **Persona:** A free user who has seen the value and hit a usage limit or feature wall.
+- **Goal:** Subscribe to a paid tier (e.g., Pro).
 
 | Step | User Action | System Response / Backend Action |
 | :--- | :--- | :--- |
@@ -41,8 +54,8 @@
 
 ### Workflow 3: Agency Consultant Managing a Client Project
 
-*   **Persona:** Alex, the SEO Consultant (Agency Tier).
-*   **Goal:** Run a comprehensive audit for a client, analyze the results, and export a report.
+- **Persona:** Alex, the SEO Consultant (Agency Tier).
+- **Goal:** Run a comprehensive audit for a client, analyze the results, and export a report.
 
 | Step | User Action | System Response / Backend Action |
 | :--- | :--- | :--- |
@@ -53,3 +66,22 @@
 | 5 | Uses `RewriteGen™` to draft improved headings and paragraphs. | The tool provides AI-powered suggestions based on the audit's findings. |
 | 6 | Clicks "Export Report (PDF)". | **(Backend)** A report generation function pulls the audit data and creates a professional, white-labeled PDF. |
 | 7 | Downloads the PDF. | The user can now share this tangible deliverable with their client. |
+
+---
+
+## Revision History
+| Version | Date | Author | Description |
+|---------|------|--------|-------------|
+| 1.0     | 2025-07-09 | Product & UX Team | Initial draft |
+
+---
+
+## Related Documents
+- [01_EXECUTIVE_SUMMARY.md](./01_EXECUTIVE_SUMMARY.md)
+- [02_PRODUCT_REQUIREMENTS_DOCUMENT.md](./02_PRODUCT_REQUIREMENTS_DOCUMENT.md)
+- [03_EXECUTION_PLAN.md](./03_EXECUTION_PLAN.md)
+- [COMPREHENSIVE_INSTRUCTIONS.md](./COMPREHENSIVE_INSTRUCTIONS.md)
+
+---
+
+*© 2025 RankPilot, Inc. All rights reserved.*

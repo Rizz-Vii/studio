@@ -74,3 +74,18 @@ export const FREE_PLAN = {
 
 export type PlanType = keyof typeof STRIPE_PLANS;
 export type BillingInterval = "monthly" | "yearly";
+
+/**
+ * Get user plan from subscription tier
+ */
+export function getUserPlan(subscriptionTier: string): PlanType | "free" {
+  if (subscriptionTier === "free" || !subscriptionTier) {
+    return "free";
+  }
+
+  if (subscriptionTier in STRIPE_PLANS) {
+    return subscriptionTier as PlanType;
+  }
+
+  return "free";
+}
