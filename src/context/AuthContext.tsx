@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
+import { useMockAuth } from "@/lib/dev-auth";
 import {
   doc,
   getDoc,
@@ -45,26 +46,52 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [role, setRole] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [activities, setActivities] = useState<UserActivity[]>([]);
+  
+  // Use mock auth in development
+  const { user: mockUser } = useMockAuth();
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setUser(user);
-      if (user) {
-        // Fetch user profile and role
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
+    // Always use Firebase auth, but also listen for mock auth events in development
+    const unsubscribe = auth.onAuthStateChanged(handleAuthStateChange);
+    
+    // In development, also listen for mock auth events
+    if (isDevelopment) {
+      const handleMockAuthEvent = (event: CustomEvent) => {
+        const mockUser = event.detail;
+        handleAuthStateChange(mockUser);
+      };
+      
+      window.addEventListener('mockUserLogin', handleMockAuthEvent as EventListener);
+      
+      return () => {
+        unsubscribe();
+        window.removeEventListener('mockUserLogin', handleMockAuthEvent as EventListener);
+      };
+    }
+    
+    return () => unsubscribe();
+  }, [isDevelopment]);
 
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          setRole(userData?.role || null);
-          setProfile(userData || null);
-        } else {
-          setRole(null);
-          setProfile(null);
-        }
+  const handleAuthStateChange = async (currentUser: User | null) => {
+    setUser(currentUser);
+    if (currentUser) {
+      // Fetch user profile and role
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const userDocSnap = await getDoc(userDocRef);
 
-        // Fetch user activities
-        const activitiesRef = collection(db, "users", user.uid, "activities");
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        setRole(userData?.role || null);
+        setProfile(userData || null);
+      } else {
+        setRole(null);
+        setProfile(null);
+      }
+
+      // Fetch user activities
+      try {
+        const activitiesRef = collection(db, "users", currentUser.uid, "activities");
         const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(50));
         const querySnapshot = await getDocs(q);
         const fetchedActivities = querySnapshot.docs.map(
@@ -75,17 +102,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             }) as UserActivity
         );
         setActivities(fetchedActivities);
-      } else {
-        setRole(null);
-        setProfile(null);
-        setActivities([]); // Clear activities on logout
+      } catch (error) {
+        console.log('Activities not found, setting empty array');
+        setActivities([]);
       }
+    } else {
+      setRole(null);
+      setProfile(null);
+      setActivities([]); // Clear activities on logout
+    }
 
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+    setLoading(false);
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, role, profile, activities }}>

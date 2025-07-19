@@ -20,12 +20,14 @@ import {
   Lock,
   Download,
   Trash2,
+  ExternalLink,
 } from "lucide-react";
 import AccountSettingsForm from "@/components/settings/account-settings-form";
 import SecuritySettingsForm from "@/components/settings/security-settings-form";
 import NotificationSettingsForm from "@/components/settings/notification-settings-form";
-import BillingSettingsCard from "@/components/settings/billing-settings-card";
 import PrivacySettingsCard from "@/components/settings/privacy-settings-card";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
   const { user, profile, loading: authLoading } = useAuth();
@@ -96,7 +98,35 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="billing" className="space-y-6">
-          <BillingSettingsCard user={user} profile={profile} />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Billing & Subscription
+              </CardTitle>
+              <CardDescription>
+                Manage your subscription plan and billing information
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <div className="mb-4">
+                  <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                  <h3 className="text-lg font-semibold mb-2">Complete Billing Management</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Access your full billing dashboard with subscription details, payment history, and plan management.
+                  </p>
+                </div>
+                <Link href="/settings/billing">
+                  <Button className="gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    Go to Billing Dashboard
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="privacy" className="space-y-6">

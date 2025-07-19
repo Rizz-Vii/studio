@@ -330,7 +330,7 @@ export default function HomePage() {
               features={["5 audits/month", "Basic Reports", "Limited Keywords"]}
             />
             <PricingCard
-              title="Pro"
+              title="Starter"
               price="$29/mo"
               features={["50 audits", "Full Reports", "Competitor Tracking"]}
             />
