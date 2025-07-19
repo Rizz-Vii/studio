@@ -11,12 +11,15 @@ import useProtectedRoute from '@/hooks/useProtectedRoute';
 import AppNav from '@/components/app-nav';
 import MobileNav from '@/components/mobile-nav';
 import { Button } from '@/components/ui/button';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Crown, Zap } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
+import { DevUserSwitcher } from '@/components/dev/DevUserSwitcher';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user: authUser, loading: authLoading } = useProtectedRoute();
   const { user, role } = useAuth();
+  const { subscription } = useSubscription();
 
   if (authLoading || !authUser) {
     return <LoadingScreen fullScreen />;
@@ -71,9 +74,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       <p className="text-sm font-medium text-sidebar-foreground truncate">
                         {user?.email}
                       </p>
-                      <p className="text-xs text-sidebar-foreground/70">
-                        {role === "admin" ? "Administrator" : "User"}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-sidebar-foreground/70">
+                          {role === "admin" ? "Administrator" : "User"}
+                        </p>
+                        <div className="flex items-center gap-1">
+                          {subscription?.tier === "agency" && (
+                            <Crown className="h-3 w-3 text-purple-500" />
+                          )}
+                          {subscription?.tier === "starter" && (
+                            <Zap className="h-3 w-3 text-blue-500" />
+                          )}
+                          <span className="text-xs font-medium capitalize text-sidebar-foreground/90">
+                            {subscription?.planName || "Free"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
@@ -90,6 +106,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <span className="group-data-[state=collapsed]:hidden">Settings</span>
                       </Link>
                     </Button>
+
+                    {subscription?.tier === "free" && (
+                      <Button 
+                        asChild 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full justify-start h-10 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:px-2"
+                      >
+                        <Link href="/settings/billing" className="flex items-center gap-3">
+                          <Zap className="h-4 w-4 shrink-0" />
+                          <span className="group-data-[state=collapsed]:hidden">Upgrade Plan</span>
+                        </Link>
+                      </Button>
+                    )}
                     
                     <Button 
                       asChild 
@@ -111,6 +141,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <FeedbackToast />
           <GlobalLoadingIndicator />
           <TopLoader />
+          <DevUserSwitcher />
         </SidebarProvider>
       </HydrationProvider>
   );

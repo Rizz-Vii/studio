@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSidebar } from "@/components/ui/sidebar";
 import { navItems } from "@/constants/nav";
 import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import Link from "next/link";
 
 const menuItemVariants = {
@@ -33,6 +34,7 @@ export default function AppNav() {
   const pathname = usePathname();
   const { open, isMobile, setOpenMobile } = useSidebar();
   const { user, role } = useAuth();
+  const { subscription, canUseFeature } = useSubscription();
 
   const showText = open || isMobile;
   const handleMobileNavClick = () => {
@@ -41,10 +43,27 @@ export default function AppNav() {
     }
   };
 
-  // Filter nav items based on user role
-  const visibleNavItems = navItems.filter(
-    (item) => !item.adminOnly || (user && role === "admin")
-  );
+  // Filter nav items based on user role and subscription
+  const visibleNavItems = navItems.filter((item) => {
+    // First check admin permissions
+    if (item.adminOnly && (!user || role !== "admin")) {
+      return false;
+    }
+
+    // Then check subscription requirements
+    if (item.requiredTier) {
+      return subscription?.tier === item.requiredTier || 
+             (item.requiredTier === "starter" && subscription?.tier === "agency") ||
+             subscription?.tier === "agency";
+    }
+
+    // Check specific feature requirements
+    if (item.feature && !canUseFeature(item.feature)) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <nav className="px-2">

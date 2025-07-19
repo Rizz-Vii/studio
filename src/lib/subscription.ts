@@ -94,15 +94,7 @@ export function getSubscriptionLimits(tier: PlanType | "free") {
       prioritySupport: false,
       apiAccess: false,
     },
-    professional: {
-      auditsPerMonth: 500,
-      keywordTracking: 500,
-      competitorAnalysis: 25,
-      exportData: true,
-      prioritySupport: true,
-      apiAccess: true,
-    },
-    enterprise: {
+    agency: {
       auditsPerMonth: -1, // Unlimited
       keywordTracking: -1, // Unlimited
       competitorAnalysis: -1, // Unlimited
@@ -131,9 +123,9 @@ export function canAccessFeature(
     case "advanced_audit":
       return userTier !== "free";
     case "white_label":
-      return ["professional", "enterprise"].includes(userTier);
+      return userTier === "agency";
     case "custom_integrations":
-      return userTier === "enterprise";
+      return userTier === "agency";
     default:
       return true;
   }
@@ -196,8 +188,8 @@ export function getUpgradeRecommendation(
         currentTier === "free"
           ? "starter"
           : currentTier === "starter"
-            ? "professional"
-            : "enterprise",
+            ? "agency"
+            : "agency",
       reason: "You're approaching your monthly audit limit",
     };
   }
@@ -212,8 +204,8 @@ export function getUpgradeRecommendation(
         currentTier === "free"
           ? "starter"
           : currentTier === "starter"
-            ? "professional"
-            : "enterprise",
+            ? "agency"
+            : "agency",
       reason: "You're approaching your keyword tracking limit",
     };
   }

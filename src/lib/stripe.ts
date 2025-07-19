@@ -29,28 +29,46 @@ export const STRIPE_PLANS = {
       monthly: 29,
       yearly: 290,
     },
-  },
-  professional: {
-    name: "Professional",
-    priceId: {
-      monthly: "price_professional_monthly",
-      yearly: "price_professional_yearly",
-    },
-    price: {
-      monthly: 79,
-      yearly: 790,
+    features: ["50 audits", "Full Reports", "Competitor Tracking"],
+    limits: {
+      auditsPerMonth: 50,
+      keywords: 500,
+      reports: 50,
+      competitors: 5,
     },
   },
-  enterprise: {
-    name: "Enterprise",
+  agency: {
+    name: "Agency",
     priceId: {
-      monthly: "price_enterprise_monthly",
-      yearly: "price_enterprise_yearly",
+      monthly: "price_agency_monthly",
+      yearly: "price_agency_yearly",
     },
     price: {
-      monthly: 199,
-      yearly: 1990,
+      monthly: 99,
+      yearly: 990,
     },
+    features: ["Unlimited Everything", "White Label", "Priority Support"],
+    limits: {
+      auditsPerMonth: -1, // unlimited
+      keywords: -1,
+      reports: -1,
+      competitors: -1,
+    },
+  },
+} as const;
+
+export const FREE_PLAN = {
+  name: "Free",
+  price: {
+    monthly: 0,
+    yearly: 0,
+  },
+  features: ["5 audits/month", "Basic Reports", "Limited Keywords"],
+  limits: {
+    auditsPerMonth: 5,
+    keywords: 50,
+    reports: 5,
+    competitors: 1,
   },
 } as const;
 
