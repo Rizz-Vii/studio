@@ -13,21 +13,16 @@ This guide walks you through setting up Stripe integration for RankPilot in prod
 ### Create Products and Prices
 Create the following products in your Stripe Dashboard:
 
+
 #### Starter Plan
 - **Product Name**: RankPilot Starter
 - **Description**: Perfect for small businesses getting started with SEO
 - **Pricing**: $29/month or $290/year
 - **Billing**: Recurring
 
-#### Professional Plan  
-- **Product Name**: RankPilot Professional
-- **Description**: Advanced features for growing businesses
-- **Pricing**: $79/month or $790/year
-- **Billing**: Recurring
-
-#### Enterprise Plan
-- **Product Name**: RankPilot Enterprise
-- **Description**: Full-featured solution for large organizations
+#### Agency Plan
+- **Product Name**: RankPilot Agency
+- **Description**: Full-featured solution for agencies and large teams
 - **Pricing**: $199/month or $1990/year
 - **Billing**: Recurring
 
