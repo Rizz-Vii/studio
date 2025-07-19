@@ -46,13 +46,9 @@ export const createCheckoutSession = onRequest(
           monthly: "price_starter_monthly",
           yearly: "price_starter_yearly",
         },
-        professional: {
-          monthly: "price_professional_monthly",
-          yearly: "price_professional_yearly",
-        },
-        enterprise: {
-          monthly: "price_enterprise_monthly",
-          yearly: "price_enterprise_yearly",
+        agency: {
+          monthly: "price_agency_monthly",
+          yearly: "price_agency_yearly",
         },
       };
 
@@ -128,33 +124,33 @@ export const stripeWebhook = onRequest(
 
     try {
       switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        await handleSubscriptionCreated(session);
-        break;
-      }
-      case "customer.subscription.updated": {
-        const subscription = event.data.object as Stripe.Subscription;
-        await handleSubscriptionUpdated(subscription);
-        break;
-      }
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
-        await handleSubscriptionCanceled(subscription);
-        break;
-      }
-      case "invoice.payment_succeeded": {
-        const invoice = event.data.object as Stripe.Invoice;
-        await handlePaymentSucceeded(invoice);
-        break;
-      }
-      case "invoice.payment_failed": {
-        const invoice = event.data.object as Stripe.Invoice;
-        await handlePaymentFailed(invoice);
-        break;
-      }
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
+        case "checkout.session.completed": {
+          const session = event.data.object as Stripe.Checkout.Session;
+          await handleSubscriptionCreated(session);
+          break;
+        }
+        case "customer.subscription.updated": {
+          const subscription = event.data.object as Stripe.Subscription;
+          await handleSubscriptionUpdated(subscription);
+          break;
+        }
+        case "customer.subscription.deleted": {
+          const subscription = event.data.object as Stripe.Subscription;
+          await handleSubscriptionCanceled(subscription);
+          break;
+        }
+        case "invoice.payment_succeeded": {
+          const invoice = event.data.object as Stripe.Invoice;
+          await handlePaymentSucceeded(invoice);
+          break;
+        }
+        case "invoice.payment_failed": {
+          const invoice = event.data.object as Stripe.Invoice;
+          await handlePaymentFailed(invoice);
+          break;
+        }
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
       }
 
       response.json({ received: true });
@@ -184,7 +180,7 @@ async function handleSubscriptionCreated(session: Stripe.Checkout.Session) {
     .doc(userId)
     .update({
       subscriptionStatus: "active",
-      subscriptionTier: session.metadata?.planId || "professional",
+      subscriptionTier: session.metadata?.planId || "agency",
       stripeCustomerId: (customer as Stripe.Customer).id,
       stripeSubscriptionId: subscription.id,
       subscriptionStartDate: new Date(),

@@ -71,6 +71,44 @@ const getReceiptEmailTemplate = (data: {
             </div>
           </div>
           
+            <h3>Your ${data.plan} Features Include:</h3>
+            ${
+              data.plan === "Starter"
+                ? `
+              <div class="feature-item">
+                <span class="feature-icon">📊</span>
+                <span>50 Link Analyses per month</span>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon">🔍</span>
+                <span>Basic SERP Analysis</span>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon">💬</span>
+                <span>Email Support</span>
+              </div>
+            `
+                : data.plan === "Agency"
+                  ? `
+              <div class="feature-item">
+                <span class="feature-icon">♾️</span>
+                <span>Unlimited Link Analyses</span>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon">🎯</span>
+                <span>Premium SERP Analysis</span>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon">📞</span>
+                <span>24/7 Priority Support</span>
+              </div>
+              <div class="feature-item">
+                <span class="feature-icon">🔧</span>
+                <span>Custom Integrations</span>
+              </div>
+            `
+                  : ""
+            }
           ${data.invoiceUrl ? `<a href="${data.invoiceUrl}" class="btn">Download Invoice</a>` : ""}
           
           <h3>What's Next?</h3>

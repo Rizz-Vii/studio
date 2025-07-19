@@ -69,10 +69,10 @@ export default function SiteFooter() {
           <ul className="space-y-1">
             <li>
               <Link
-                href="/blog/enterprise-seo-audit"
+                href="/blog/agency-seo-audit"
                 className="hover:underline"
               >
-                How to Do an Enterprise SEO Audit the Right Way
+                How to Do an Agency SEO Audit the Right Way
               </Link>
             </li>
             <li>
@@ -172,8 +172,7 @@ export default function SiteFooter() {
             About Us
           </h4>
           <p className="mb-2">
-            RankPilot is an AI-first SEO platform for agencies and
-            professionals.
+            RankPilot is an AI-first SEO platform for agencies and teams.
           </p>
           <p className="mb-2">
             <Link href="/privacy" className="hover:underline">

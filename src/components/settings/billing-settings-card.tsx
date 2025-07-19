@@ -39,7 +39,7 @@ const createCheckoutSession = httpsCallable(functions, 'createCheckoutSession');
 
 interface BillingData {
   subscriptionStatus: 'active' | 'cancelled' | 'past_due' | 'incomplete' | 'free';
-  subscriptionTier: 'starter' | 'professional' | 'enterprise' | 'free';
+  subscriptionTier: 'starter' | 'agency' | 'free';
   billingInterval: 'monthly' | 'yearly';
   currentPeriodStart: string;
   currentPeriodEnd: string;
@@ -81,22 +81,37 @@ const planFeatures = {
   starter: {
     name: "Starter",
     price: { monthly: 29, yearly: 290 },
-    features: ["50 keywords", "5 competitors", "Basic audit", "Email support"]
+    features: [
+      "50 keywords",
+      "5 competitors",
+      "Basic audit",
+      "Email support"
+    ]
   },
-  professional: {
-    name: "Professional", 
-    price: { monthly: 79, yearly: 790 },
-    features: ["500 keywords", "25 competitors", "Advanced audit", "Priority support", "API access"]
-  },
-  enterprise: {
-    name: "Enterprise",
+  agency: {
+    name: "Agency",
     price: { monthly: 199, yearly: 1990 },
-    features: ["Unlimited keywords", "Unlimited competitors", "Premium audit", "24/7 support", "Custom integrations"]
+    features: [
+      "Unlimited keywords",
+      "Unlimited competitors",
+      "Premium audit",
+      "24/7 support",
+      "Custom integrations",
+      "White-label reports",
+      "Priority support",
+      "API access",
+      "Dedicated account manager",
+      "SLA & security review"
+    ]
   },
   free: {
     name: "Free",
     price: { monthly: 0, yearly: 0 },
-    features: ["10 keywords", "1 competitor", "Basic features"]
+    features: [
+      "10 keywords",
+      "1 competitor",
+      "Basic features"
+    ]
   }
 };
 
@@ -405,7 +420,7 @@ export default function BillingSettingsCard({
                 </div>
                 <p className="text-sm text-yellow-700 mt-1">
                   You're using {Math.round((billingData.usage.keywordsTracked / billingData.usage.keywordsLimit) * 100)}% of your keyword quota.
-                  {billingData.subscriptionTier !== 'enterprise' && ' Consider upgrading for unlimited tracking.'}
+                  {billingData.subscriptionTier !== 'agency' && ' Consider upgrading for unlimited tracking.'}
                 </p>
               </motion.div>
             )}

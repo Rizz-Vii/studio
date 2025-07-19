@@ -61,7 +61,7 @@ export function useSubscription() {
 
   const isActive = subscription?.status === "active";
   const isPremium = subscription?.tier !== "free";
-  const isEnterprise = subscription?.tier === "enterprise";
+  const isAgency = subscription?.tier === "agency";
 
   return {
     subscription,
@@ -72,7 +72,7 @@ export function useSubscription() {
     getUsageRemaining,
     isActive,
     isPremium,
-    isEnterprise,
+    isAgency,
     refetch: () => {
       if (user) {
         getUserSubscription(user.uid).then(setSubscription);
