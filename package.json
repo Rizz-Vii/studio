@@ -1,7 +1,8 @@
 {
-  "name": "nextn",
-  "version": "0.1.0",
+  "name": "rankpilot-studio",
+  "version": "1.0.0",
   "private": true,
+  "description": "RankPilot - AI-First SEO Platform (Internal: Studio)",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--max-old-space-size=2048' next dev",
     "dev-turbopack": "cross-env NODE_OPTIONS='--max-old-space-size=2048' next dev --turbopack",

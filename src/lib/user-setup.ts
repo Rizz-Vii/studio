@@ -3,10 +3,10 @@ import { db } from "@/lib/firebase";
 
 export async function setupSpecificUsers() {
   try {
-    // Set up free user: abbas_ali_rivi@hotmail.com
+    // Set up free user: abbas_ali_rizvi@hotmail.com
     const freeUserId = "free-user-abbas"; // This would normally be the Firebase Auth UID
     await setDoc(doc(db, "users", freeUserId), {
-      email: "abbas_ali_rivi@hotmail.com",
+      email: "abbas_ali_rizvi@hotmail.com",
       subscriptionStatus: "free",
       subscriptionTier: "free",
       role: "user",
@@ -74,6 +74,6 @@ export async function setupSpecificUsers() {
 }
 
 export const USER_EMAILS = {
-  FREE_USER: "abbas_ali_rivi@hotmail.com",
+  FREE_USER: "abbas_ali_rizvi@hotmail.com",
   STARTER_USER: "abba7254@gmail.com",
 } as const;

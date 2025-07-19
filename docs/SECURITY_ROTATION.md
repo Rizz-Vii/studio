@@ -1,5 +1,24 @@
 # Security Credentials Rotation Guide
 
+**Document Purpose:**
+Provides step-by-step instructions for secure rotation of credentials and API keys for RankPilot.
+
+**Product Name:** RankPilot  
+**Author:** Security & DevOps Team  
+**Last Updated:** July 9, 2025  
+**Version:** 1.0
+
+---
+
+## Table of Contents
+1. [Firebase Service Account Rotation](#firebase-service-account-rotation)
+2. [API Keys Rotation](#api-keys-rotation)
+3. [Test Account Security](#test-account-security)
+4. [After Rotation](#after-rotation)
+5. [Revision History](#revision-history)
+6. [Related Documents](#related-documents)
+
+---
 ## Firebase Service Account Rotation
 1. Go to [Firebase Console](https://console.firebase.google.com/project/rankpilot-h3jpc/settings/serviceaccounts/adminsdk)
 2. Click "Generate New Private Key"
@@ -47,3 +66,22 @@ firebase auth:create-user --email new.admin@example.com --admin
 2. Update CI/CD environment variables
 3. Update development team with new test account credentials
 4. Verify all services are working with new credentials 
+
+---
+
+## Revision History
+| Version | Date | Author | Description |
+|---------|------|--------|-------------|
+| 1.0     | 2025-07-09 | Security & DevOps Team | Initial draft |
+
+---
+
+## Related Documents
+- [01_EXECUTIVE_SUMMARY.md](./01_EXECUTIVE_SUMMARY.md)
+- [02_PRODUCT_REQUIREMENTS_DOCUMENT.md](./02_PRODUCT_REQUIREMENTS_DOCUMENT.md)
+- [03_EXECUTION_PLAN.md](./03_EXECUTION_PLAN.md)
+- [COMPREHENSIVE_INSTRUCTIONS.md](./COMPREHENSIVE_INSTRUCTIONS.md)
+
+---
+
+*© 2025 RankPilot, Inc. All rights reserved.*

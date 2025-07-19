@@ -34,7 +34,7 @@ export function DevUserSwitcher() {
         await signInWithPopup(auth, provider);
       } else {
         // Use email/password for free user
-        await signInWithEmailAndPassword(auth, 'abbas_ali_rivi@hotmail.com', '123456');
+        await signInWithEmailAndPassword(auth, 'abbas_ali_rizvi@hotmail.com', '123456');
       }
     } catch (error) {
       console.error('Failed to switch user:', error);
@@ -48,7 +48,7 @@ export function DevUserSwitcher() {
         <button
           onClick={() => handleUserSwitch('free')}
           className={`block w-full text-left px-2 py-1 rounded ${
-            user?.email === 'abbas_ali_rivi@hotmail.com' ? 'bg-blue-600' : 'hover:bg-gray-600'
+            user?.email === 'abbas_ali_rizvi@hotmail.com' ? 'bg-blue-600' : 'hover:bg-gray-600'
           }`}
         >
           Free User (Abbas)

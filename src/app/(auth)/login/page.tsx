@@ -216,7 +216,7 @@ export default function LoginPage() {
                 onClick={async () => {
                   try {
                     // Use real Firebase authentication
-                    await signInWithEmailAndPassword(auth, 'abbas_ali_rivi@hotmail.com', '123456');
+                    await signInWithEmailAndPassword(auth, 'abbas_ali_rizvi@hotmail.com', '123456');
                     router.push('/dashboard');
                   } catch (error) {
                     console.error('Dev login failed:', error);

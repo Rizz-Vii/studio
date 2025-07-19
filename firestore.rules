@@ -21,17 +21,22 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
+    function getUserRole(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data.role;
+    }
+
     // By default, deny all reads and writes
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // User profiles
+    // User profiles - Enhanced RBAC
     match /users/{userId} {
       allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
       allow create: if isAuthenticated() && isOwner(userId);
       allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
       allow delete: if isAdmin();
+      allow list: if isAuthenticated() && isAdmin();
 
       // User activities subcollection
       match /activities/{activityId} {
@@ -40,9 +45,17 @@ service cloud.firestore {
         allow update: if isAuthenticated() && isOwner(userId);
         allow delete: if isAuthenticated() && (isOwner(userId) || isAdmin());
       }
+
+      // User usage tracking subcollection
+      match /usage/{usageId} {
+        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+        allow create: if isAuthenticated() && isOwner(userId);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAdmin();
+      }
     }
 
-    // SEO audits collection
+    // SEO audits collection - Enhanced with usage limits
     match /audits/{auditId} {
       allow read: if isValidUser() && (
         resource.data.userId == request.auth.uid || isAdmin()
@@ -68,46 +81,26 @@ service cloud.firestore {
       );
     }
 
-    // Rate limiting collection
+    // Rate limiting collection - Enhanced
     match /rateLimits/{userId} {
-      allow read: if isOwner(userId);
+      allow read: if isOwner(userId) || isAdmin();
       allow create, update: if isOwner(userId) && (
         request.time.toMillis() - (resource == null ? 0 : resource.data.lastRequest.toMillis()) > 1000
       );
     }
-  }
-}
 
-    // Helper function to check if the user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    // Helper function to get the user's role from their document
-    function getUserRole(uid) {
-      return get(/databases/$(database)/documents/users/$(uid)).data.role;
+    // Subscription data
+    match /subscriptions/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create, update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow delete: if isAdmin();
     }
 
-    // Users can read and update their own profiles
-    match /users/{userId} {
-      allow read, update: if isAuthenticated() && request.auth.uid == userId;
-      // Admins can read any user's profile
-      allow get: if isAuthenticated() && getUserRole(request.auth.uid) == 'admin';
-    }
-    
-    // Users can only create their own user document upon signup
-    match /users/{userId} {
-      allow create: if isAuthenticated() && request.auth.uid == userId;
-    }
-    
-    // Allow admins to list all users (for the admin dashboard)
-    match /users/{userId} {
-        allow list: if isAuthenticated() && getUserRole(request.auth.uid) == 'admin';
-    }
-    
-    // Users can read and write to their own 'activities' subcollection
-    match /users/{userId}/activities/{activityId} {
-      allow read, write, create, delete: if isAuthenticated() && request.auth.uid == userId;
+    // Usage quotas and limits
+    match /quotas/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create, update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow delete: if isAdmin();
     }
   }
 }

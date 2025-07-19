@@ -14,7 +14,7 @@ import { auth } from "@/lib/firebase";
 // Real user credentials for development convenience
 export const DEV_USERS = {
   free: {
-    email: "abbas_ali_rivi@hotmail.com",
+    email: "abbas_ali_rizvi@hotmail.com",
     password: "123456",
     authMethod: "email" as const,
     uid: "abbas_free_user_uid",
