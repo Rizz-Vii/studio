@@ -134,16 +134,19 @@ const nextConfig: NextConfig = {
         cacheName = nextRuntime === "edge" ? "dev-edge-cache" : "dev-server-cache";
       }
       
+      // Use memory cache for development to avoid filesystem cache issues
       config.cache = {
-        type: "filesystem",
-        buildDependencies: {
-          config: [__filename],
-        },
-        cacheDirectory: path.resolve(process.cwd(), ".next/cache"),
-        maxMemoryGenerations: 5,
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        name: cacheName,
-        version: "1.0.0",
+        type: "memory",
+        maxGenerations: 3,
+      };
+
+      // Add resolver fallbacks to prevent cache resolution issues
+      config.resolve = config.resolve || {};
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
       };
 
       // Optimize resolver for faster module resolution

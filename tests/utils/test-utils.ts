@@ -1,5 +1,11 @@
 import { Page } from "@playwright/test";
 
+// Login credentials interface
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
 export const randomDelay = async () => {
   const delay = Math.floor(Math.random() * 600) + 200; // 200-800ms
   await new Promise((resolve) => setTimeout(resolve, delay));

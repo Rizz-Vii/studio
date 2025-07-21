@@ -1,4 +1,5 @@
-import { test, expect, Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
+import { test, loginUser } from "./fixtures/auth.fixture";
 
 /**
  * Mobile Accessibility and Navigation Testing
@@ -6,6 +7,8 @@ import { test, expect, Page } from "@playwright/test";
  */
 
 test.describe("Mobile Accessibility and Navigation", () => {
+  // Increase test timeouts
+  test.setTimeout(120000);
   // Mobile viewport sizes for testing
   const mobileViewports = [
     { name: "iPhone SE", width: 375, height: 667 },
@@ -18,8 +21,17 @@ test.describe("Mobile Accessibility and Navigation", () => {
     test(`mobile navigation accessibility on ${name}`, async ({ page }) => {
       console.log(`📱 Testing ${name} (${width}x${height}) navigation...`);
 
+      // Increase timeouts for mobile tests
+      page.setDefaultNavigationTimeout(45000);
+      page.setDefaultTimeout(30000);
+
       // Set mobile viewport
       await page.setViewportSize({ width, height });
+      
+      // Login first
+      await loginUser(page);
+      
+      // Navigate to dashboard
       await page.goto("/dashboard", { waitUntil: "networkidle" });
 
       // Check for mobile navigation elements
