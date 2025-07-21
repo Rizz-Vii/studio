@@ -49,6 +49,16 @@
 - **Deploy:** GitHub Actions auto-deploys to Firebase on push to `master`
 - **Backend:** Deploy functions with `firebase deploy --only functions`
 
+## Platform-Specific Commands
+
+- **Windows Environment:** Always provide PowerShell commands (not bash/cmd)
+- **Command Format:** Use PowerShell syntax with proper semicolon separators
+- **File Paths:** Use Windows-style backslashes for local paths
+- **Examples:**
+  - Start dev server: `npm run dev-no-turbopack`
+  - Run tests: `npm run test:role-based`
+  - Check status: `Get-Process | Where-Object {$_.ProcessName -eq "node"}`
+
 ## Integration Pointsg
 
 - **OpenAI:** Used for AI-powered features (see `/ai/flows/`)
@@ -73,3 +83,37 @@
 ---
 
 For more, see `/docs/COMPREHENSIVE_INSTRUCTIONS.md` and `/docs/PROJECT_STATUS_AND_NEXT_STEPS.md`.
+
+## PilotBuddy Development Assistant
+
+### Response Style & Commands
+- **Ultra-Concise**: Prioritize shortest actionable responses (3 bullets or less)
+- **PowerShell-First**: Always provide PowerShell commands for Windows environment (never bash/cmd)
+- **Context-Aware**: Remember project structure and reference correct files automatically
+- **Code-First**: Default to providing code snippets rather than explanations
+- **Pattern-Driven**: Recognize and apply established project patterns automatically
+
+### Productivity Commands (PowerShell)
+```powershell
+# Development commands
+npm run dev-no-turbopack           # Start dev server
+npm run test:role-based            # Run complete role-based tests
+.\scripts\run-role-based-tests.ps1 # Windows-specific test runner
+
+# Project navigation
+Get-ChildItem src\app\(app)\       # Feature pages
+Get-ChildItem src\components\      # UI components  
+Get-ChildItem functions\           # Backend logic
+Get-ChildItem docs\                # Documentation
+
+# Performance monitoring
+Get-Process | Where-Object {$_.ProcessName -eq "node"}  # Check Node processes
+npm run optimize-windows           # Windows filesystem optimization
+npm run emfile:check              # Check for EMFILE issues
+```
+
+### Quick Actions
+- `@pattern [type]`: Generate code (form|state|ai-flow|firebase)
+- `@optimize`: Performance suggestions for current file/feature
+- `@security`: Security review based on SECURITY_ROTATION.md
+- `@neuro`: NeuroSEO™ implementation guidance

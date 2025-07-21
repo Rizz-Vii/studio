@@ -11,7 +11,7 @@ export default defineConfig({
     ["list"],
   ],
   use: {
-    baseURL: process.env.TEST_BASE_URL || "https://rankpilot-h3jpc.web.app",
+    baseURL: process.env.TEST_BASE_URL || "http://localhost:3000",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
