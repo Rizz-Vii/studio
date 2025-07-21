@@ -29,20 +29,23 @@ export default function CheckoutCancelPage() {
             >
               <XCircle className="h-20 w-20 text-red-500 mx-auto" />
             </motion.div>
-            
+
             <CardTitle className="text-3xl font-bold text-red-700 mb-4">
               Checkout Canceled
             </CardTitle>
-            
+
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              No worries! Your checkout was canceled and no payment was processed. You can try again whenever you're ready.
+              No worries! Your checkout was canceled and no payment was
+              processed. You can try again whenever you're ready.
             </p>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             {/* Why Upgrade Section */}
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-100">
-              <h3 className="font-semibold text-lg mb-4 text-blue-900">Why upgrade to RankPilot Pro?</h3>
+              <h3 className="font-semibold text-lg mb-4 text-blue-900">
+                Why upgrade to RankPilot Pro?
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -70,7 +73,9 @@ export default function CheckoutCancelPage() {
                   <RefreshCw className="h-5 w-5 text-yellow-600" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-yellow-900">Limited Time Offer</h4>
+                  <h4 className="font-medium text-yellow-900">
+                    Limited Time Offer
+                  </h4>
                   <p className="text-sm text-yellow-700">
                     Get 20% off your first year with annual billing!
                   </p>
@@ -86,7 +91,7 @@ export default function CheckoutCancelPage() {
                   Try Again
                 </Link>
               </Button>
-              
+
               <Button asChild variant="outline" size="lg" className="flex-1">
                 <Link href="/dashboard">
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -102,25 +107,24 @@ export default function CheckoutCancelPage() {
                 <span className="font-medium">Need help?</span>
               </div>
               <p className="text-sm text-muted-foreground mb-3">
-                Our team is here to answer any questions about our plans and features.
+                Our team is here to answer any questions about our plans and
+                features.
               </p>
               <div className="flex flex-col sm:flex-row gap-2 justify-center">
                 <Button asChild variant="link" size="sm">
-                  <Link href="/contact">
-                    Contact Sales
-                  </Link>
+                  <Link href="/contact">Contact Sales</Link>
                 </Button>
-                <span className="hidden sm:inline text-muted-foreground">•</span>
+                <span className="hidden sm:inline text-muted-foreground">
+                  •
+                </span>
                 <Button asChild variant="link" size="sm">
-                  <Link href="/support">
-                    Get Support
-                  </Link>
+                  <Link href="/support">Get Support</Link>
                 </Button>
-                <span className="hidden sm:inline text-muted-foreground">•</span>
+                <span className="hidden sm:inline text-muted-foreground">
+                  •
+                </span>
                 <Button asChild variant="link" size="sm">
-                  <Link href="/pricing">
-                    View Plans
-                  </Link>
+                  <Link href="/pricing">View Plans</Link>
                 </Button>
               </div>
             </div>

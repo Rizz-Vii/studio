@@ -1,38 +1,44 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { 
-  MessageSquare, 
-  Clock, 
-  AlertTriangle, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  MessageSquare,
+  Clock,
+  AlertTriangle,
   CheckCircle,
   Star,
   Send,
-  X
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+  X,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Helper function to get severity-based color classes
 const getSeverityColor = (severity: string): string => {
   switch (severity.toLowerCase()) {
-    case 'critical':
-      return 'bg-red-500 text-white hover:bg-red-600';
-    case 'high':
-      return 'bg-orange-500 text-white hover:bg-orange-600';
-    case 'medium':
-      return 'bg-yellow-500 text-white hover:bg-yellow-600';
-    case 'low':
-      return 'bg-green-500 text-white hover:bg-green-600';
+    case "critical":
+      return "bg-red-500 text-white hover:bg-red-600";
+    case "high":
+      return "bg-orange-500 text-white hover:bg-orange-600";
+    case "medium":
+      return "bg-yellow-500 text-white hover:bg-yellow-600";
+    case "low":
+      return "bg-green-500 text-white hover:bg-green-600";
     default:
-      return 'bg-gray-500 text-white hover:bg-gray-600';
+      return "bg-gray-500 text-white hover:bg-gray-600";
   }
 };
 
@@ -41,8 +47,8 @@ interface FeedbackData {
   rating: number;
   responseTime: number;
   feedback: string;
-  category: 'performance' | 'accuracy' | 'usability' | 'bug' | 'feature';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  category: "performance" | "accuracy" | "usability" | "bug" | "feature";
+  severity: "low" | "medium" | "high" | "critical";
   timestamp: Date;
   userId?: string;
 }
@@ -60,13 +66,14 @@ export function PerformanceFeedback({
   responseTime,
   onSubmit,
   autoShow = false,
-  showThreshold = 10000 // 10 seconds
+  showThreshold = 10000, // 10 seconds
 }: PerformanceFeedbackProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState('');
-  const [category, setCategory] = useState<FeedbackData['category']>('performance');
-  const [severity, setSeverity] = useState<FeedbackData['severity']>('medium');
+  const [feedback, setFeedback] = useState("");
+  const [category, setCategory] =
+    useState<FeedbackData["category"]>("performance");
+  const [severity, setSeverity] = useState<FeedbackData["severity"]>("medium");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -84,7 +91,7 @@ export function PerformanceFeedback({
       toast({
         variant: "destructive",
         title: "Please provide a rating",
-        description: "Rating is required to submit feedback"
+        description: "Rating is required to submit feedback",
       });
       return;
     }
@@ -98,7 +105,7 @@ export function PerformanceFeedback({
       feedback,
       category,
       severity,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     try {
@@ -107,13 +114,15 @@ export function PerformanceFeedback({
       }
 
       // Store in localStorage for demo purposes
-      const existingFeedback = JSON.parse(localStorage.getItem('ai-feedback') || '[]');
+      const existingFeedback = JSON.parse(
+        localStorage.getItem("ai-feedback") || "[]"
+      );
       existingFeedback.push(feedbackData);
-      localStorage.setItem('ai-feedback', JSON.stringify(existingFeedback));
+      localStorage.setItem("ai-feedback", JSON.stringify(existingFeedback));
 
       toast({
         title: "Feedback submitted",
-        description: "Thank you for helping us improve!"
+        description: "Thank you for helping us improve!",
       });
 
       setIsVisible(false);
@@ -122,7 +131,7 @@ export function PerformanceFeedback({
       toast({
         variant: "destructive",
         title: "Submission failed",
-        description: "Could not submit feedback. Please try again."
+        description: "Could not submit feedback. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -131,9 +140,9 @@ export function PerformanceFeedback({
 
   const resetForm = () => {
     setRating(0);
-    setFeedback('');
-    setCategory('performance');
-    setSeverity('medium');
+    setFeedback("");
+    setCategory("performance");
+    setSeverity("medium");
   };
 
   const renderStars = () => {
@@ -145,9 +154,9 @@ export function PerformanceFeedback({
             type="button"
             onClick={() => setRating(star)}
             className={`p-1 rounded transition-colors ${
-              star <= rating 
-                ? 'text-yellow-500 hover:text-yellow-600' 
-                : 'text-gray-300 hover:text-gray-400'
+              star <= rating
+                ? "text-yellow-500 hover:text-yellow-600"
+                : "text-gray-300 hover:text-gray-400"
             }`}
           >
             <Star className="h-6 w-6 fill-current" />
@@ -215,15 +224,18 @@ export function PerformanceFeedback({
             {/* Rating */}
             <div>
               <Label className="text-sm font-medium">Rate this operation</Label>
-              <div className="mt-1">
-                {renderStars()}
-              </div>
+              <div className="mt-1">{renderStars()}</div>
             </div>
 
             {/* Category */}
             <div>
               <Label className="text-sm font-medium">Category</Label>
-              <Select value={category} onValueChange={(value: FeedbackData['category']) => setCategory(value)}>
+              <Select
+                value={category}
+                onValueChange={(value: FeedbackData["category"]) =>
+                  setCategory(value)
+                }
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
@@ -240,7 +252,12 @@ export function PerformanceFeedback({
             {/* Severity */}
             <div>
               <Label className="text-sm font-medium">Severity</Label>
-              <Select value={severity} onValueChange={(value: FeedbackData['severity']) => setSeverity(value)}>
+              <Select
+                value={severity}
+                onValueChange={(value: FeedbackData["severity"]) =>
+                  setSeverity(value)
+                }
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
@@ -256,7 +273,8 @@ export function PerformanceFeedback({
             {/* Feedback */}
             <div>
               <Label className="text-sm font-medium">
-                Additional feedback {responseTime > showThreshold && '(optional)'}
+                Additional feedback{" "}
+                {responseTime > showThreshold && "(optional)"}
               </Label>
               <Textarea
                 placeholder="Tell us about your experience..."
@@ -314,7 +332,7 @@ export function useFeedbackCollection(operationType: string) {
     if (startTime) {
       const elapsed = Date.now() - startTime;
       setResponseTime(elapsed);
-      
+
       // Auto-show feedback for slow operations or force show
       if (forceShow || elapsed > 8000) {
         setShowFeedback(true);
@@ -338,11 +356,11 @@ export function useFeedbackCollection(operationType: string) {
         responseTime={responseTime}
         autoShow={false}
         onSubmit={(feedback) => {
-          console.log('Feedback submitted:', feedback);
+          console.log("Feedback submitted:", feedback);
           hideFeedback();
         }}
       />
-    ) : null
+    ) : null,
   };
 }
 
@@ -351,25 +369,32 @@ export function FeedbackSummary() {
   const [feedbackData, setFeedbackData] = useState<FeedbackData[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('ai-feedback');
+    const stored = localStorage.getItem("ai-feedback");
     if (stored) {
       setFeedbackData(JSON.parse(stored));
     }
   }, []);
 
-  const averageRating = feedbackData.length > 0 
-    ? feedbackData.reduce((sum, f) => sum + f.rating, 0) / feedbackData.length 
-    : 0;
+  const averageRating =
+    feedbackData.length > 0
+      ? feedbackData.reduce((sum, f) => sum + f.rating, 0) / feedbackData.length
+      : 0;
 
-  const categoryBreakdown = feedbackData.reduce((acc, f) => {
-    acc[f.category] = (acc[f.category] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const categoryBreakdown = feedbackData.reduce(
+    (acc, f) => {
+      acc[f.category] = (acc[f.category] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
-  const severityBreakdown = feedbackData.reduce((acc, f) => {
-    acc[f.severity] = (acc[f.severity] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const severityBreakdown = feedbackData.reduce(
+    (acc, f) => {
+      acc[f.severity] = (acc[f.severity] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -382,17 +407,15 @@ export function FeedbackSummary() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
-            <div className="text-2xl font-bold">
-              {averageRating.toFixed(1)}
-            </div>
+            <div className="text-2xl font-bold">{averageRating.toFixed(1)}</div>
             <div className="flex">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
                   className={`h-4 w-4 ${
-                    star <= averageRating 
-                      ? 'text-yellow-500 fill-current' 
-                      : 'text-gray-300'
+                    star <= averageRating
+                      ? "text-yellow-500 fill-current"
+                      : "text-gray-300"
                   }`}
                 />
               ))}
@@ -412,9 +435,7 @@ export function FeedbackSummary() {
           <div className="space-y-2">
             {Object.entries(severityBreakdown).map(([severity, count]) => (
               <div key={severity} className="flex items-center justify-between">
-                <Badge className={getSeverityColor(severity)}>
-                  {severity}
-                </Badge>
+                <Badge className={getSeverityColor(severity)}>{severity}</Badge>
                 <span className="text-sm font-medium">{count}</span>
               </div>
             ))}

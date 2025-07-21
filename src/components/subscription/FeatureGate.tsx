@@ -10,7 +10,7 @@ import Link from "next/link";
 interface FeatureGateProps {
   children?: ReactNode;
   feature?: string;
-  requiredTier?: "starter" | "agency";
+  requiredTier?: "starter" | "agency" | "enterprise";
   fallback?: ReactNode;
   showUpgrade?: boolean;
 }
@@ -28,10 +28,15 @@ export function FeatureGate({
   const hasAccess = feature ? canUseFeature(feature) : true;
   
   // Check if user meets the required tier
-  const meetsTierRequirement = requiredTier ? 
-    (subscription?.tier === requiredTier || 
-     (requiredTier === "starter" && subscription?.tier === "agency") ||
-     subscription?.tier === "agency") : true;
+  const meetsTierRequirement = requiredTier ? (() => {
+    if (!subscription?.tier) return false;
+    
+    const tierHierarchy = ["starter", "agency", "enterprise"];
+    const userTierIndex = tierHierarchy.indexOf(subscription.tier);
+    const requiredTierIndex = tierHierarchy.indexOf(requiredTier);
+    
+    return userTierIndex >= requiredTierIndex;
+  })() : true;
 
   if (hasAccess && meetsTierRequirement) {
     return <>{children}</>;
@@ -54,12 +59,14 @@ export function FeatureGate({
         </div>
         <CardTitle className="mb-2">
           {requiredTier === "starter" ? "Starter" : 
-           requiredTier === "agency" ? "Agency" : "Premium"} Feature
+           requiredTier === "agency" ? "Agency" : 
+           requiredTier === "enterprise" ? "Enterprise" : "Premium"} Feature
         </CardTitle>
         <CardDescription className="mb-4 max-w-sm">
           This feature is available with the{" "}
           {requiredTier === "starter" ? "Starter" : 
-           requiredTier === "agency" ? "Agency" : "premium"} plan.
+           requiredTier === "agency" ? "Agency" : 
+           requiredTier === "enterprise" ? "Enterprise" : "premium"} plan.
           Upgrade to unlock advanced capabilities.
         </CardDescription>
         <Link href="/settings/billing">

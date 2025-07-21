@@ -6,6 +6,18 @@
 import { useSubscription } from "@/hooks/useSubscription";
 import type { NavItem } from "@/constants/nav";
 
+// Define comprehensive tier types
+export type TierName = "free" | "starter" | "agency" | "enterprise";
+
+// Tier mapping for backward compatibility
+export const TIER_ALIASES: Record<string, TierName> = {
+  free: "free",
+  starter: "starter",
+  agency: "agency",
+  professional: "agency", // Map professional to agency for compatibility
+  enterprise: "enterprise",
+};
+
 // Define tools/features available per tier
 export const TIER_TOOL_ACCESS = {
   free: {
@@ -62,6 +74,38 @@ export const TIER_TOOL_ACCESS = {
       "custom-integrations",
       "bulk-operations",
       "automated-reporting",
+    ] as const,
+    restrictions: {
+      auditsPerMonth: -1, // unlimited
+      reportsPerMonth: -1,
+      keywordTracking: -1,
+      competitorTracking: -1,
+      exportFormats: ["PDF", "CSV", "Excel", "PowerPoint", "Custom"] as const,
+      supportType: "dedicated" as const,
+    },
+  },
+  enterprise: {
+    maxTools: -1, // unlimited
+    allowedTools: [
+      "basic-audit",
+      "keyword-research",
+      "simple-reports",
+      "competitor-analysis",
+      "technical-audit",
+      "content-analysis",
+      "advanced-reports",
+      "rank-tracking",
+      "backlink-analysis",
+      "site-performance",
+      "white-label-reports",
+      "api-access",
+      "team-collaboration",
+      "custom-integrations",
+      "bulk-operations",
+      "automated-reporting",
+      "enterprise-features",
+      "custom-development",
+      "advanced-analytics",
     ] as const,
     restrictions: {
       auditsPerMonth: -1, // unlimited
@@ -212,7 +256,13 @@ export function filterNavBySubscription(
       if (!item.requiredTier) return true;
 
       // Check if user's tier meets the requirement
-      const tierHierarchy = { free: 0, starter: 1, agency: 2 };
+      const tierHierarchy = {
+        free: 0,
+        starter: 1,
+        agency: 2,
+        professional: 2,
+        enterprise: 3,
+      };
       const userTierLevel =
         tierHierarchy[subscription.tier as keyof typeof tierHierarchy] ?? -1;
       const requiredTierLevel =

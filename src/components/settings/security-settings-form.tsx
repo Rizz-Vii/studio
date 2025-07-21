@@ -24,24 +24,40 @@ import {
 } from "@/components/ui/card";
 import { Loader2, Shield, Eye, EyeOff, AlertTriangle } from "lucide-react";
 import { useState } from "react";
-import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import {
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "firebase/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, { message: "Current password is required." }),
-  newPassword: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." })
-    .regex(/(?=.*[a-z])/, { message: "Password must contain at least one lowercase letter." })
-    .regex(/(?=.*[A-Z])/, { message: "Password must contain at least one uppercase letter." })
-    .regex(/(?=.*\d)/, { message: "Password must contain at least one number." }),
-  confirmPassword: z.string().min(1, { message: "Please confirm your password." }),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match.",
-  path: ["confirmPassword"],
-});
+const passwordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(1, { message: "Current password is required." }),
+    newPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters." })
+      .regex(/(?=.*[a-z])/, {
+        message: "Password must contain at least one lowercase letter.",
+      })
+      .regex(/(?=.*[A-Z])/, {
+        message: "Password must contain at least one uppercase letter.",
+      })
+      .regex(/(?=.*\d)/, {
+        message: "Password must contain at least one number.",
+      }),
+    confirmPassword: z
+      .string()
+      .min(1, { message: "Please confirm your password." }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match.",
+    path: ["confirmPassword"],
+  });
 
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
@@ -49,7 +65,9 @@ interface SecuritySettingsFormProps {
   user: User;
 }
 
-export default function SecuritySettingsForm({ user }: SecuritySettingsFormProps) {
+export default function SecuritySettingsForm({
+  user,
+}: SecuritySettingsFormProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -87,7 +105,7 @@ export default function SecuritySettingsForm({ user }: SecuritySettingsFormProps
       form.reset();
     } catch (error: any) {
       let errorMessage = "Failed to update password. Please try again.";
-      
+
       if (error.code === "auth/wrong-password") {
         errorMessage = "Current password is incorrect.";
       } else if (error.code === "auth/weak-password") {
@@ -104,7 +122,7 @@ export default function SecuritySettingsForm({ user }: SecuritySettingsFormProps
     }
   }
 
-  const lastSignIn = user.metadata.lastSignInTime 
+  const lastSignIn = user.metadata.lastSignInTime
     ? new Date(user.metadata.lastSignInTime).toLocaleString()
     : "Never";
 
@@ -122,12 +140,16 @@ export default function SecuritySettingsForm({ user }: SecuritySettingsFormProps
           </CardDescription>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handlePasswordUpdate)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(handlePasswordUpdate)}
+            className="space-y-6"
+          >
             <CardContent className="space-y-4">
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  You'll need to re-authenticate with your current password to make changes.
+                  You'll need to re-authenticate with your current password to
+                  make changes.
                 </AlertDescription>
               </Alert>
 
@@ -150,7 +172,9 @@ export default function SecuritySettingsForm({ user }: SecuritySettingsFormProps
                           variant="ghost"
                           size="sm"
                           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          onClick={() =>
+                            setShowCurrentPassword(!showCurrentPassword)
+                          }
                         >
                           {showCurrentPassword ? (
                             <EyeOff className="h-4 w-4" />
@@ -195,7 +219,8 @@ export default function SecuritySettingsForm({ user }: SecuritySettingsFormProps
                       </div>
                     </FormControl>
                     <FormDescription>
-                      Must be at least 8 characters with uppercase, lowercase, and numbers.
+                      Must be at least 8 characters with uppercase, lowercase,
+                      and numbers.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -221,7 +246,9 @@ export default function SecuritySettingsForm({ user }: SecuritySettingsFormProps
                           variant="ghost"
                           size="sm"
                           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                         >
                           {showConfirmPassword ? (
                             <EyeOff className="h-4 w-4" />
@@ -259,10 +286,9 @@ export default function SecuritySettingsForm({ user }: SecuritySettingsFormProps
             <div>
               <label className="text-sm font-medium">Account Created</label>
               <p className="text-sm text-muted-foreground">
-                {user.metadata.creationTime 
+                {user.metadata.creationTime
                   ? new Date(user.metadata.creationTime).toLocaleDateString()
-                  : "Unknown"
-                }
+                  : "Unknown"}
               </p>
             </div>
             <div>

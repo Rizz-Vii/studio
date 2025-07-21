@@ -1,10 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
-
 export default defineConfig({
-
   use: {
-
     baseURL: "https://rankpilot-h3jpc.web.app",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",

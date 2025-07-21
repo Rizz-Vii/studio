@@ -18,8 +18,14 @@ const mockNavItems = [
 ];
 
 const drawerVariants = {
-  closed: { x: "-100%", transition: { type: "spring" as const, stiffness: 400, damping: 40 } },
-  open: { x: "0%", transition: { type: "spring" as const, stiffness: 400, damping: 40 } },
+  closed: {
+    x: "-100%",
+    transition: { type: "spring" as const, stiffness: 400, damping: 40 },
+  },
+  open: {
+    x: "0%",
+    transition: { type: "spring" as const, stiffness: 400, damping: 40 },
+  },
 };
 
 const overlayVariants = {
@@ -42,7 +48,9 @@ export default function MobileNavTestPage() {
     return (
       <div className="p-4">
         <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-          <h1 className="text-2xl font-bold mb-2">Mobile Navigation Test Page</h1>
+          <h1 className="text-2xl font-bold mb-2">
+            Mobile Navigation Test Page
+          </h1>
           <p>Loading...</p>
         </div>
       </div>
@@ -108,7 +116,9 @@ export default function MobileNavTestPage() {
                     <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
                       <span className="text-white font-bold text-lg">R</span>
                     </div>
-                    <span className="text-xl font-bold text-gray-900">RankPilot</span>
+                    <span className="text-xl font-bold text-gray-900">
+                      RankPilot
+                    </span>
                   </div>
                   <Button
                     variant="ghost"
@@ -131,10 +141,12 @@ export default function MobileNavTestPage() {
                         href={item.href}
                         onClick={closeMenu}
                         className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px]"
-                        data-testid={`nav-item-${item.title.toLowerCase().replace(' ', '-')}`}
+                        data-testid={`nav-item-${item.title.toLowerCase().replace(" ", "-")}`}
                       >
                         <span className="text-lg">{item.icon}</span>
-                        <span className="font-medium text-gray-700">{item.title}</span>
+                        <span className="font-medium text-gray-700">
+                          {item.title}
+                        </span>
                       </Link>
                     ))}
                   </div>
@@ -165,9 +177,15 @@ export default function MobileNavTestPage() {
             <div className="p-4 bg-white rounded-lg shadow">
               <h3 className="font-medium mb-2">Test Elements</h3>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• <code>data-testid="mobile-menu"</code> - Hamburger button</li>
-                <li>• <code>data-testid="mobile-drawer"</code> - Navigation drawer</li>
-                <li>• <code>data-testid="mobile-close"</code> - Close button</li>
+                <li>
+                  • <code>data-testid="mobile-menu"</code> - Hamburger button
+                </li>
+                <li>
+                  • <code>data-testid="mobile-drawer"</code> - Navigation drawer
+                </li>
+                <li>
+                  • <code>data-testid="mobile-close"</code> - Close button
+                </li>
                 <li>• Touch targets: All buttons 44px minimum</li>
               </ul>
             </div>

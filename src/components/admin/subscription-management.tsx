@@ -1,30 +1,56 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { doc, getDoc, updateDoc, query, collection, where, getDocs } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  query,
+  collection,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { 
-  CreditCard, 
-  Users, 
-  TrendingUp, 
-  AlertTriangle, 
+import {
+  CreditCard,
+  Users,
+  TrendingUp,
+  AlertTriangle,
   Calendar,
   DollarSign,
   Search,
   MoreHorizontal,
   Mail,
   Crown,
-  Zap
+  Zap,
 } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface SubscriptionUser {
   id: string;
@@ -48,7 +74,7 @@ interface SubscriptionStats {
   pastDue: number;
   revenue: number;
   starterCount: number;
-  professionalCount: number;
+  agencyCount: number;
   enterpriseCount: number;
 }
 
@@ -61,8 +87,8 @@ export function SubscriptionManagement() {
     pastDue: 0,
     revenue: 0,
     starterCount: 0,
-    professionalCount: 0,
-    enterpriseCount: 0
+    agencyCount: 0,
+    enterpriseCount: 0,
   });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -74,13 +100,13 @@ export function SubscriptionManagement() {
   const fetchSubscriptionData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all users with subscriptions
       const usersQuery = query(
         collection(db, "users"),
         where("subscription.tier", "!=", "free")
       );
-      
+
       const usersSnapshot = await getDocs(usersQuery);
       const usersData: SubscriptionUser[] = [];
       let tempStats = {
@@ -90,8 +116,8 @@ export function SubscriptionManagement() {
         pastDue: 0,
         revenue: 0,
         starterCount: 0,
-        professionalCount: 0,
-        enterpriseCount: 0
+        agencyCount: 0,
+        enterpriseCount: 0,
       };
 
       usersSnapshot.forEach((doc) => {
@@ -100,26 +126,29 @@ export function SubscriptionManagement() {
           id: doc.id,
           email: userData.email,
           displayName: userData.displayName,
-          subscription: userData.subscription || { tier: "free", status: "inactive" },
+          subscription: userData.subscription || {
+            tier: "free",
+            status: "inactive",
+          },
           createdAt: userData.createdAt?.seconds * 1000 || Date.now(),
-          lastLoginAt: userData.lastLoginAt?.seconds * 1000
+          lastLoginAt: userData.lastLoginAt?.seconds * 1000,
         };
-        
+
         usersData.push(user);
-        
+
         // Calculate stats
         tempStats.total++;
-        
+
         if (user.subscription.status === "active") {
           tempStats.active++;
-          
+
           // Calculate revenue (rough estimate)
           if (user.subscription.tier === "starter") {
             tempStats.revenue += 29;
             tempStats.starterCount++;
-          } else if (user.subscription.tier === "professional") {
+          } else if (user.subscription.tier === "agency") {
             tempStats.revenue += 79;
-            tempStats.professionalCount++;
+            tempStats.agencyCount++;
           } else if (user.subscription.tier === "enterprise") {
             tempStats.revenue += 199;
             tempStats.enterpriseCount++;
@@ -141,16 +170,19 @@ export function SubscriptionManagement() {
     }
   };
 
-  const updateUserSubscription = async (userId: string, updates: { [key: string]: any }) => {
+  const updateUserSubscription = async (
+    userId: string,
+    updates: { [key: string]: any }
+  ) => {
     try {
       const userRef = doc(db, "users", userId);
       const updateData: { [key: string]: any } = {};
-      Object.keys(updates).forEach(key => {
+      Object.keys(updates).forEach((key) => {
         updateData[`subscription.${key}`] = updates[key];
       });
-      
+
       await updateDoc(userRef, updateData);
-      
+
       toast.success("Subscription updated successfully");
       fetchSubscriptionData(); // Refresh data
     } catch (error) {
@@ -159,20 +191,23 @@ export function SubscriptionManagement() {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.subscription.tier.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.subscription.tier.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusBadge = (status: string) => {
-    const variants: { [key: string]: "default" | "secondary" | "destructive" | "outline" } = {
+    const variants: {
+      [key: string]: "default" | "secondary" | "destructive" | "outline";
+    } = {
       active: "default",
-      canceled: "destructive", 
+      canceled: "destructive",
       past_due: "destructive",
-      inactive: "secondary"
+      inactive: "secondary",
     };
-    
+
     return (
       <Badge variant={variants[status] || "outline"}>
         {status.replace("_", " ").toUpperCase()}
@@ -184,7 +219,7 @@ export function SubscriptionManagement() {
     switch (tier) {
       case "starter":
         return <Zap className="w-4 h-4" />;
-      case "professional":
+      case "agency":
         return <Crown className="w-4 h-4" />;
       case "enterprise":
         return <CreditCard className="w-4 h-4" />;
@@ -216,7 +251,9 @@ export function SubscriptionManagement() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Subscribers</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Subscribers
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -226,10 +263,12 @@ export function SubscriptionManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Monthly Revenue
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -239,20 +278,18 @@ export function SubscriptionManagement() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Professional Plans</CardTitle>
+            <CardTitle className="text-sm font-medium">agency Plans</CardTitle>
             <Crown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.professionalCount}</div>
-            <p className="text-xs text-muted-foreground">
-              Most popular tier
-            </p>
+            <div className="text-2xl font-bold">{stats.agencyCount}</div>
+            <p className="text-xs text-muted-foreground">Most popular tier</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Issues</CardTitle>
@@ -260,9 +297,7 @@ export function SubscriptionManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pastDue}</div>
-            <p className="text-xs text-muted-foreground">
-              Past due payments
-            </p>
+            <p className="text-xs text-muted-foreground">Past due payments</p>
           </CardContent>
         </Card>
       </div>
@@ -281,7 +316,7 @@ export function SubscriptionManagement() {
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="users" className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Search className="w-4 h-4 text-muted-foreground" />
@@ -292,7 +327,7 @@ export function SubscriptionManagement() {
                   className="max-w-sm"
                 />
               </div>
-              
+
               <div className="border rounded-md">
                 <Table>
                   <TableHeader>
@@ -310,14 +345,20 @@ export function SubscriptionManagement() {
                       <TableRow key={user.id}>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{user.displayName || "Anonymous"}</div>
-                            <div className="text-sm text-muted-foreground">{user.email}</div>
+                            <div className="font-medium">
+                              {user.displayName || "Anonymous"}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {user.email}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {getTierIcon(user.subscription.tier)}
-                            <span className="capitalize">{user.subscription.tier}</span>
+                            <span className="capitalize">
+                              {user.subscription.tier}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -327,10 +368,9 @@ export function SubscriptionManagement() {
                           {new Date(user.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          {user.lastLoginAt 
+                          {user.lastLoginAt
                             ? new Date(user.lastLoginAt).toLocaleDateString()
-                            : "Never"
-                          }
+                            : "Never"}
                         </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -341,12 +381,20 @@ export function SubscriptionManagement() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
-                                onClick={() => updateUserSubscription(user.id, { status: "active" })}
+                                onClick={() =>
+                                  updateUserSubscription(user.id, {
+                                    status: "active",
+                                  })
+                                }
                               >
                                 Activate Subscription
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => updateUserSubscription(user.id, { status: "canceled" })}
+                                onClick={() =>
+                                  updateUserSubscription(user.id, {
+                                    status: "canceled",
+                                  })
+                                }
                               >
                                 Cancel Subscription
                               </DropdownMenuItem>
@@ -363,7 +411,7 @@ export function SubscriptionManagement() {
                 </Table>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="analytics" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <Card>
@@ -374,20 +422,26 @@ export function SubscriptionManagement() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-sm">Starter</span>
-                        <span className="text-sm font-medium">{stats.starterCount}</span>
+                        <span className="text-sm font-medium">
+                          {stats.starterCount}
+                        </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm">Professional</span>
-                        <span className="text-sm font-medium">{stats.professionalCount}</span>
+                        <span className="text-sm">agency</span>
+                        <span className="text-sm font-medium">
+                          {stats.agencyCount}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Enterprise</span>
-                        <span className="text-sm font-medium">{stats.enterpriseCount}</span>
+                        <span className="text-sm font-medium">
+                          {stats.enterpriseCount}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-sm">Revenue Breakdown</CardTitle>
@@ -396,20 +450,26 @@ export function SubscriptionManagement() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-sm">Starter ($29)</span>
-                        <span className="text-sm font-medium">${stats.starterCount * 29}</span>
+                        <span className="text-sm font-medium">
+                          ${stats.starterCount * 29}
+                        </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm">Professional ($79)</span>
-                        <span className="text-sm font-medium">${stats.professionalCount * 79}</span>
+                        <span className="text-sm">agency ($79)</span>
+                        <span className="text-sm font-medium">
+                          ${stats.agencyCount * 79}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Enterprise ($199)</span>
-                        <span className="text-sm font-medium">${stats.enterpriseCount * 199}</span>
+                        <span className="text-sm font-medium">
+                          ${stats.enterpriseCount * 199}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-sm">Health Metrics</CardTitle>
@@ -419,18 +479,26 @@ export function SubscriptionManagement() {
                       <div className="flex justify-between">
                         <span className="text-sm">Active Rate</span>
                         <span className="text-sm font-medium">
-                          {stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}%
+                          {stats.total > 0
+                            ? Math.round((stats.active / stats.total) * 100)
+                            : 0}
+                          %
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Churn Rate</span>
                         <span className="text-sm font-medium">
-                          {stats.total > 0 ? Math.round((stats.canceled / stats.total) * 100) : 0}%
+                          {stats.total > 0
+                            ? Math.round((stats.canceled / stats.total) * 100)
+                            : 0}
+                          %
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm">Issues</span>
-                        <span className="text-sm font-medium text-red-600">{stats.pastDue}</span>
+                        <span className="text-sm font-medium text-red-600">
+                          {stats.pastDue}
+                        </span>
                       </div>
                     </div>
                   </CardContent>

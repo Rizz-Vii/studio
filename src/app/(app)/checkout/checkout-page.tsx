@@ -24,7 +24,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const planId = (searchParams?.get('plan') || 'professional') as PlanType;
+  const planId = (searchParams?.get('plan') || 'agency') as PlanType;
   const billingInterval = (searchParams?.get('billing') || 'monthly') as BillingInterval;
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export default function CheckoutPage() {
       "Email support",
       "Monthly reports"
     ],
-    professional: [
+    agency: [
       "500 keyword tracking",
       "25 competitor analysis", 
       "Advanced SEO audit",

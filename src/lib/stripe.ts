@@ -17,7 +17,7 @@ const getStripe = () => {
 
 export default getStripe;
 
-// Stripe pricing configuration
+// Stripe pricing configuration - Standardized 4-tier system
 export const STRIPE_PLANS = {
   starter: {
     name: "Starter",
@@ -29,10 +29,17 @@ export const STRIPE_PLANS = {
       monthly: 29,
       yearly: 290,
     },
-    features: ["50 audits", "Full Reports", "Competitor Tracking"],
+    features: [
+      "50 audits/month",
+      "50 keyword tracking", 
+      "5 competitor analysis",
+      "Advanced reports",
+      "Email support",
+      "PDF export"
+    ],
     limits: {
       auditsPerMonth: 50,
-      keywords: 500,
+      keywords: 50,
       reports: 50,
       competitors: 5,
     },
@@ -47,7 +54,43 @@ export const STRIPE_PLANS = {
       monthly: 99,
       yearly: 990,
     },
-    features: ["Unlimited Everything", "White Label", "Priority Support"],
+    features: [
+      "Unlimited audits",
+      "Unlimited keyword tracking",
+      "Unlimited competitor analysis", 
+      "White-label reports",
+      "Priority support",
+      "API access",
+      "Team collaboration",
+      "Advanced integrations"
+    ],
+    limits: {
+      auditsPerMonth: -1, // unlimited
+      keywords: -1,
+      reports: -1,
+      competitors: -1,
+    },
+  },
+  enterprise: {
+    name: "Enterprise",
+    priceId: {
+      monthly: "price_enterprise_monthly",
+      yearly: "price_enterprise_yearly",
+    },
+    price: {
+      monthly: 299,
+      yearly: 2990,
+    },
+    features: [
+      "Everything in Agency",
+      "Custom integrations",
+      "Dedicated account manager",
+      "24/7 phone support", 
+      "Custom solutions",
+      "Enterprise SLA",
+      "Advanced security",
+      "Custom branding"
+    ],
     limits: {
       auditsPerMonth: -1, // unlimited
       keywords: -1,

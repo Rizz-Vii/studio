@@ -2,7 +2,13 @@
 
 import React from "react";
 import { UserSubscriptionDebugger } from "@/components/debug/UserSubscriptionDebugger";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +29,8 @@ export default function DebugPage() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fix user",
+        description:
+          error instanceof Error ? error.message : "Failed to fix user",
       });
     }
   };
@@ -47,9 +54,7 @@ export default function DebugPage() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Button onClick={handleFixUser}>
-              Fix Abba User Subscription
-            </Button>
+            <Button onClick={handleFixUser}>Fix Abba User Subscription</Button>
           </div>
         </CardContent>
       </Card>
@@ -64,9 +69,15 @@ export default function DebugPage() {
         </CardHeader>
         <CardContent>
           <div className="text-sm space-y-2">
-            <div>Node Environment: <code>{process.env.NODE_ENV}</code></div>
-            <div>Current User Email: <code>{user?.email || "Not logged in"}</code></div>
-            <div>Current User UID: <code>{user?.uid || "Not logged in"}</code></div>
+            <div>
+              Node Environment: <code>{process.env.NODE_ENV}</code>
+            </div>
+            <div>
+              Current User Email: <code>{user?.email || "Not logged in"}</code>
+            </div>
+            <div>
+              Current User UID: <code>{user?.uid || "Not logged in"}</code>
+            </div>
           </div>
         </CardContent>
       </Card>

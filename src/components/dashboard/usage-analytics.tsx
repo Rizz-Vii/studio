@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,15 +15,15 @@ import { useSubscription } from "@/hooks/use-subscription";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { 
-  TrendingUp, 
-  Zap, 
-  Users, 
-  FileText, 
+import {
+  TrendingUp,
+  Zap,
+  Users,
+  FileText,
   BarChart3,
   ArrowUpRight,
   Crown,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -48,7 +54,7 @@ export function UsageAnalytics() {
     reports: 0,
     apiCalls: 0,
     storage: 0,
-    users: 1
+    users: 1,
   });
   const [loading, setLoading] = useState(true);
 
@@ -60,19 +66,19 @@ export function UsageAnalytics() {
 
   const fetchUsageData = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
       const userDoc = await getDoc(doc(db, "users", user.uid));
       const userData = userDoc.data();
-      
+
       setUsage({
         projects: userData?.usage?.projects || 0,
         keywords: userData?.usage?.keywords || 0,
         reports: userData?.usage?.reports || 0,
         apiCalls: userData?.usage?.apiCalls || 0,
         storage: userData?.usage?.storage || 0,
-        users: userData?.usage?.users || 1
+        users: userData?.usage?.users || 1,
       });
     } catch (error) {
       console.error("Error fetching usage data:", error);
@@ -82,36 +88,48 @@ export function UsageAnalytics() {
   };
 
   const limits = getLimits();
-  
+
   const usageLimits: UsageLimit[] = [
     {
       name: "Projects",
       current: usage.projects || 0,
       limit: limits.auditsPerMonth,
       icon: <FileText className="w-4 h-4" />,
-      color: (usage.projects || 0) >= limits.auditsPerMonth * 0.8 ? "text-red-500" : "text-blue-500"
+      color:
+        (usage.projects || 0) >= limits.auditsPerMonth * 0.8
+          ? "text-red-500"
+          : "text-blue-500",
     },
     {
       name: "Keywords",
       current: usage.keywords || 0,
       limit: limits.keywordTracking,
       icon: <Zap className="w-4 h-4" />,
-      color: (usage.keywords || 0) >= limits.keywordTracking * 0.8 ? "text-red-500" : "text-green-500"
+      color:
+        (usage.keywords || 0) >= limits.keywordTracking * 0.8
+          ? "text-red-500"
+          : "text-green-500",
     },
     {
       name: "Reports",
       current: usage.reports || 0,
       limit: limits.auditsPerMonth,
       icon: <BarChart3 className="w-4 h-4" />,
-      color: (usage.reports || 0) >= limits.auditsPerMonth * 0.8 ? "text-red-500" : "text-purple-500"
+      color:
+        (usage.reports || 0) >= limits.auditsPerMonth * 0.8
+          ? "text-red-500"
+          : "text-purple-500",
     },
     {
       name: "Team Members",
       current: usage.users || 0,
       limit: limits.competitorAnalysis,
       icon: <Users className="w-4 h-4" />,
-      color: (usage.users || 0) >= limits.competitorAnalysis * 0.8 ? "text-red-500" : "text-orange-500"
-    }
+      color:
+        (usage.users || 0) >= limits.competitorAnalysis * 0.8
+          ? "text-red-500"
+          : "text-orange-500",
+    },
   ];
 
   const getUsagePercentage = (current: number, limit: number) => {
@@ -129,10 +147,14 @@ export function UsageAnalytics() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "exceeded": return "text-red-500";
-      case "warning": return "text-yellow-500";
-      case "unlimited": return "text-green-500";
-      default: return "text-gray-500";
+      case "exceeded":
+        return "text-red-500";
+      case "warning":
+        return "text-yellow-500";
+      case "unlimited":
+        return "text-green-500";
+      default:
+        return "text-gray-500";
     }
   };
 
@@ -161,8 +183,14 @@ export function UsageAnalytics() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                {isPremium ? <Crown className="w-5 h-5 text-yellow-500" /> : <Zap className="w-5 h-5" />}
-                Current Plan: {(subscription?.tier?.charAt(0).toUpperCase() || '') + (subscription?.tier?.slice(1) || '') || "Free"}
+                {isPremium ? (
+                  <Crown className="w-5 h-5 text-yellow-500" />
+                ) : (
+                  <Zap className="w-5 h-5" />
+                )}
+                Current Plan:{" "}
+                {(subscription?.tier?.charAt(0).toUpperCase() || "") +
+                  (subscription?.tier?.slice(1) || "") || "Free"}
               </CardTitle>
               <CardDescription>
                 {isActive ? "Active subscription" : "Inactive or free plan"}
@@ -180,14 +208,14 @@ export function UsageAnalytics() {
         {usageLimits.map((item) => {
           const percentage = getUsagePercentage(item.current, item.limit);
           const status = getUsageStatus(item.current, item.limit);
-          
+
           return (
             <Card key={item.name}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{item.name}</CardTitle>
-                <div className={item.color}>
-                  {item.icon}
-                </div>
+                <CardTitle className="text-sm font-medium">
+                  {item.name}
+                </CardTitle>
+                <div className={item.color}>{item.icon}</div>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -195,19 +223,22 @@ export function UsageAnalytics() {
                   {item.limit === -1 ? "" : `/${item.limit}`}
                   {item.unit && ` ${item.unit}`}
                 </div>
-                
+
                 {item.limit !== -1 && (
                   <div className="mt-2 space-y-1">
                     <Progress value={percentage} className="h-2" />
                     <p className={`text-xs ${getStatusColor(status)}`}>
-                      {status === "unlimited" ? "Unlimited" : 
-                       status === "exceeded" ? "Limit exceeded!" :
-                       status === "warning" ? "Approaching limit" :
-                       `${Math.round(percentage)}% used`}
+                      {status === "unlimited"
+                        ? "Unlimited"
+                        : status === "exceeded"
+                          ? "Limit exceeded!"
+                          : status === "warning"
+                            ? "Approaching limit"
+                            : `${Math.round(percentage)}% used`}
                     </p>
                   </div>
                 )}
-                
+
                 {item.limit === -1 && (
                   <p className="text-xs text-green-500 mt-2">Unlimited</p>
                 )}
@@ -218,8 +249,11 @@ export function UsageAnalytics() {
       </div>
 
       {/* Warnings and Recommendations */}
-      {usageLimits.some(item => getUsageStatus(item.current, item.limit) === "warning" || 
-                               getUsageStatus(item.current, item.limit) === "exceeded") && (
+      {usageLimits.some(
+        (item) =>
+          getUsageStatus(item.current, item.limit) === "warning" ||
+          getUsageStatus(item.current, item.limit) === "exceeded"
+      ) && (
         <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
@@ -229,22 +263,42 @@ export function UsageAnalytics() {
           </CardHeader>
           <CardContent className="space-y-2">
             {usageLimits
-              .filter(item => getUsageStatus(item.current, item.limit) !== "normal" && 
-                             getUsageStatus(item.current, item.limit) !== "unlimited")
-              .map(item => (
-                <div key={item.name} className="flex items-center justify-between text-sm">
-                  <span>{item.name}: {item.current}/{item.limit}</span>
-                  <Badge variant={getUsageStatus(item.current, item.limit) === "exceeded" ? "destructive" : "secondary"}>
-                    {getUsageStatus(item.current, item.limit) === "exceeded" ? "Exceeded" : "Near Limit"}
+              .filter(
+                (item) =>
+                  getUsageStatus(item.current, item.limit) !== "normal" &&
+                  getUsageStatus(item.current, item.limit) !== "unlimited"
+              )
+              .map((item) => (
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span>
+                    {item.name}: {item.current}/{item.limit}
+                  </span>
+                  <Badge
+                    variant={
+                      getUsageStatus(item.current, item.limit) === "exceeded"
+                        ? "destructive"
+                        : "secondary"
+                    }
+                  >
+                    {getUsageStatus(item.current, item.limit) === "exceeded"
+                      ? "Exceeded"
+                      : "Near Limit"}
                   </Badge>
                 </div>
               ))}
-            
+
             <div className="pt-2 border-t border-yellow-200 dark:border-yellow-800">
               <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-2">
                 Consider upgrading your plan to continue using all features.
               </p>
-              <Button asChild size="sm" className="bg-yellow-600 hover:bg-yellow-700">
+              <Button
+                asChild
+                size="sm"
+                className="bg-yellow-600 hover:bg-yellow-700"
+              >
                 <Link href="/pricing" className="flex items-center gap-1">
                   Upgrade Plan
                   <ArrowUpRight className="w-3 h-3" />
@@ -269,24 +323,26 @@ export function UsageAnalytics() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>API Calls (this month)</span>
-                  <span className="font-medium">{usage.apiCalls.toLocaleString()}</span>
+                  <span className="font-medium">
+                    {usage.apiCalls.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Storage Used</span>
                   <span className="font-medium">{usage.storage} MB</span>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Plan Features</span>
                   <div className="text-right">
                     <div className="text-xs text-muted-foreground">
                       {[
-                        `${limits.auditsPerMonth === -1 ? 'Unlimited' : limits.auditsPerMonth} audits/month`,
-                        `${limits.keywordTracking === -1 ? 'Unlimited' : limits.keywordTracking} keywords`,
-                        limits.exportData ? 'Data export' : 'No export',
-                        limits.apiAccess ? 'API access' : 'No API'
+                        `${limits.auditsPerMonth === -1 ? "Unlimited" : limits.auditsPerMonth} audits/month`,
+                        `${limits.keywordTracking === -1 ? "Unlimited" : limits.keywordTracking} keywords`,
+                        limits.exportData ? "Data export" : "No export",
+                        limits.apiAccess ? "API access" : "No API",
                       ].join(", ")}
                     </div>
                   </div>
@@ -294,12 +350,12 @@ export function UsageAnalytics() {
                 <div className="flex justify-between text-sm">
                   <span>Support Level</span>
                   <span className="font-medium capitalize">
-                    {limits.prioritySupport ? 'Priority' : 'Standard'}
+                    {limits.prioritySupport ? "Priority" : "Standard"}
                   </span>
                 </div>
               </div>
             </div>
-            
+
             {!isPremium && (
               <div className="pt-4 border-t">
                 <div className="flex items-center justify-between">

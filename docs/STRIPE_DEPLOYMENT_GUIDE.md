@@ -1,39 +1,44 @@
 # Stripe Integration Deployment Guide
 
 ## Overview
+
 This guide walks you through setting up Stripe integration for RankPilot in production.
 
 ## 1. Stripe Dashboard Setup
 
 ### Create Stripe Account
+
 1. Sign up at [stripe.com](https://stripe.com)
 2. Complete account verification
 3. Switch to live mode for production
 
 ### Create Products and Prices
+
 Create the following products in your Stripe Dashboard:
 
-
 #### Starter Plan
+
 - **Product Name**: RankPilot Starter
 - **Description**: Perfect for small businesses getting started with SEO
 - **Pricing**: $29/month or $290/year
 - **Billing**: Recurring
 
 #### Agency Plan
+
 - **Product Name**: RankPilot Agency
 - **Description**: Full-featured solution for agencies and large teams
 - **Pricing**: $199/month or $1990/year
 - **Billing**: Recurring
 
 ### Update Price IDs
+
 After creating products, update the price IDs in `src/lib/stripe.ts`:
 
 ```typescript
 export const STRIPE_PLANS = {
   starter: {
     monthly: "price_XXXXXXXXXXXXXXXX", // Replace with actual price ID
-    yearly: "price_XXXXXXXXXXXXXXXX",  // Replace with actual price ID
+    yearly: "price_XXXXXXXXXXXXXXXX", // Replace with actual price ID
     // ... rest of config
   },
   // ... other plans
@@ -43,6 +48,7 @@ export const STRIPE_PLANS = {
 ## 2. Environment Variables
 
 ### Firebase Secret Manager
+
 Set the following secrets in Firebase:
 
 ```bash
@@ -56,6 +62,7 @@ firebase functions:secrets:set STRIPE_WEBHOOK_SECRET_TEST="whsec_..." # Test web
 ```
 
 ### Local Development (.env.local)
+
 ```env
 # Stripe Keys (Test Mode)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
@@ -71,6 +78,7 @@ STRIPE_WEBHOOK_SECRET_LIVE=whsec_...
 ## 3. Webhook Configuration
 
 ### Create Webhook Endpoint
+
 1. Go to Stripe Dashboard > Developers > Webhooks
 2. Click "Add endpoint"
 3. Set endpoint URL: `https://your-domain.com/api/webhooks/stripe`
@@ -83,7 +91,9 @@ STRIPE_WEBHOOK_SECRET_LIVE=whsec_...
    - `invoice.payment_failed`
 
 ### Update Firebase Functions
+
 Ensure your Firebase function is deployed:
+
 ```bash
 firebase deploy --only functions:stripeWebhook
 ```
@@ -91,19 +101,19 @@ firebase deploy --only functions:stripeWebhook
 ## 4. Firebase Configuration
 
 ### Update firebase.json
+
 The configuration should include:
+
 ```json
 {
   "functions": {
-    "secrets": [
-      "STRIPE_SECRET_KEY",
-      "STRIPE_WEBHOOK_SECRET"
-    ]
+    "secrets": ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
   }
 }
 ```
 
 ### Deploy Functions
+
 ```bash
 cd functions
 npm run build
@@ -114,7 +124,9 @@ firebase deploy --only functions
 ## 5. Security Configuration
 
 ### Content Security Policy
+
 Update CSP headers in `firebase.json` to include Stripe domains:
+
 ```json
 {
   "key": "Content-Security-Policy",
@@ -123,7 +135,9 @@ Update CSP headers in `firebase.json` to include Stripe domains:
 ```
 
 ### Firestore Security Rules
+
 Update Firestore rules to protect subscription data:
+
 ```javascript
 rules_version = '2';
 service cloud.firestore {
@@ -131,7 +145,7 @@ service cloud.firestore {
     // Users can only read/write their own subscription data
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      
+
       // Subscription data is read-only from client
       match /subscription/{document=**} {
         allow read: if request.auth != null && request.auth.uid == userId;
@@ -145,12 +159,14 @@ service cloud.firestore {
 ## 6. Testing
 
 ### Test Mode Setup
+
 1. Use Stripe test card numbers:
    - Success: `4242424242424242`
    - Declined: `4000000000000002`
    - 3D Secure: `4000002500003155`
 
 ### Test Scenarios
+
 - [ ] Successful checkout flow
 - [ ] Failed payment handling
 - [ ] Subscription cancellation
@@ -158,7 +174,9 @@ service cloud.firestore {
 - [ ] Customer portal access
 
 ### Webhook Testing
+
 Use Stripe CLI for local webhook testing:
+
 ```bash
 stripe listen --forward-to localhost:5001/your-project/us-central1/stripeWebhook
 ```
@@ -166,6 +184,7 @@ stripe listen --forward-to localhost:5001/your-project/us-central1/stripeWebhook
 ## 7. Production Deployment
 
 ### Pre-deployment Checklist
+
 - [ ] All environment variables set
 - [ ] Stripe products and prices created
 - [ ] Webhook endpoints configured
@@ -174,16 +193,20 @@ stripe listen --forward-to localhost:5001/your-project/us-central1/stripeWebhook
 - [ ] CSP headers configured
 
 ### Deployment Steps
+
 1. Update price IDs in production code
 2. Deploy to Firebase Hosting:
+
    ```bash
    npm run build
    firebase deploy
    ```
+
 3. Verify webhook endpoints are receiving events
 4. Test complete payment flow
 
 ### Post-deployment Verification
+
 - [ ] Checkout flow works end-to-end
 - [ ] Webhooks are processing correctly
 - [ ] Subscription status updates in real-time
@@ -193,18 +216,22 @@ stripe listen --forward-to localhost:5001/your-project/us-central1/stripeWebhook
 ## 8. Monitoring and Maintenance
 
 ### Stripe Dashboard Monitoring
+
 Monitor these metrics:
+
 - Payment success rate
 - Failed payment notifications
 - Subscription churn rate
 - Revenue tracking
 
 ### Firebase Monitoring
+
 - Function execution logs
 - Error rates and alerts
 - Database usage and costs
 
 ### User Experience Monitoring
+
 - Checkout abandonment rate
 - Time to complete purchase
 - Customer support tickets
@@ -212,6 +239,7 @@ Monitor these metrics:
 ## 9. Troubleshooting
 
 ### Common Issues
+
 1. **Webhook signature verification fails**
    - Check webhook secret in environment
    - Verify raw body is passed to verification
@@ -225,6 +253,7 @@ Monitor these metrics:
    - Check Node.js version compatibility
 
 ### Debug Commands
+
 ```bash
 # Check function logs
 firebase functions:log
@@ -239,11 +268,13 @@ firebase functions:secrets:access STRIPE_SECRET_KEY
 ## 10. Support and Resources
 
 ### Documentation
+
 - [Stripe Documentation](https://stripe.com/docs)
 - [Firebase Functions](https://firebase.google.com/docs/functions)
 - [Next.js Stripe Guide](https://stripe.com/docs/payments/accept-a-payment?platform=web&ui=elements)
 
 ### Support Channels
+
 - Stripe Support: Dashboard > Help & Support
 - Firebase Support: Firebase Console > Support
 - Community: Stack Overflow, Discord

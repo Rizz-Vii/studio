@@ -230,7 +230,7 @@ const Sidebar = forwardRef<
     setOpenMobile,
     pinned,
     isUserMenuOpen,
-    hydrated
+    hydrated,
   } = useSidebar();
 
   // Prevent hydration mismatch
@@ -337,7 +337,8 @@ SidebarTrigger.displayName = "SidebarTrigger";
 const SidebarHeader = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => { // Use ComponentPropsWithoutRef
+>(({ className, ...props }, ref) => {
+  // Use ComponentPropsWithoutRef
   return (
     <div
       ref={ref as any} // Cast ref to any
@@ -352,7 +353,8 @@ SidebarHeader.displayName = "SidebarHeader";
 const SidebarFooter = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => { // Use ComponentPropsWithoutRef
+>(({ className, ...props }, ref) => {
+  // Use ComponentPropsWithoutRef
   return (
     <div
       ref={ref as any} // Cast ref to any
@@ -367,7 +369,8 @@ SidebarFooter.displayName = "SidebarFooter";
 const SidebarContent = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => { // Use ComponentPropsWithoutRef
+>(({ className, ...props }, ref) => {
+  // Use ComponentPropsWithoutRef
   return (
     <div
       ref={ref as any} // Cast ref to any
@@ -403,7 +406,6 @@ const SidebarMenu = forwardRef<HTMLUListElement, SidebarMenuProps>(
     );
   }
 );
-
 
 SidebarMenu.displayName = "SidebarMenu";
 

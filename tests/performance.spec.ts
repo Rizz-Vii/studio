@@ -1,4 +1,13 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
+
+// Helper function for authentication
+async function loginUser(page: Page) {
+  await page.goto("/login");
+  await page.fill('[data-testid="email-input"]', "test@example.com");
+  await page.fill('[data-testid="password-input"]', "TestPassword123!");
+  await page.click('[data-testid="login-button"]');
+  await page.waitForURL("/dashboard");
+}
 
 test.describe("Performance Optimization Features", () => {
   test.beforeEach(async ({ page }) => {

@@ -12,6 +12,7 @@ Outlines the strategies for scaling RankPilot's technical and operational infras
 ---
 
 ## Table of Contents
+
 1. [Architectural Philosophy: Scale by Design](#1-architectural-philosophy-scale-by-design)
 2. [Technical Scaling Pillars](#2-technical-scaling-pillars)
 3. [Operational & Security Scaling](#3-operational--security-scaling)
@@ -28,12 +29,14 @@ Our architecture is founded on serverless and managed services from Google Cloud
 ## 2. Technical Scaling Pillars
 
 ### 2.1 Compute: Serverless & Asynchronous
+
 - **Core Principle:** All stateful, long-running, or intensive processing must run in a serverless environment.
 - **Action Items:**
   - **Complete Migration to Cloud Functions:** Move all remaining backend logic from Next.js API routes to Firebase Cloud Functions to leverage auto-scaling.
   - **Implement Task Queues:** Use Google Cloud Tasks or Pub/Sub to manage long-running jobs (e.g., large site crawls, complex AI analyses) asynchronously. This ensures the UI and core APIs remain responsive.
 
 ### 2.2 Database: Firestore Optimization
+
 - **Core Principle:** Firestore scales automatically, but performance depends on efficient data modeling and querying.
 - **Action Items:**
   - **Continuous Monitoring:** Actively monitor Firestore read/write/delete operations and latency via GCP Monitoring.
@@ -41,6 +44,7 @@ Our architecture is founded on serverless and managed services from Google Cloud
   - **Strategic Denormalization:** Denormalize data where appropriate to optimize for common read patterns and reduce complex queries.
 
 ### 2.3 AI & Cost Management
+
 - **Core Principle:** LLM API consumption is a primary operational cost and must be managed actively.
 - **Action Items:**
   - **Implement Caching:** Cache results for identical AI analysis requests to reduce redundant API calls.
@@ -50,12 +54,15 @@ Our architecture is founded on serverless and managed services from Google Cloud
 ## 3. Operational & Security Scaling
 
 ### 3.1 Monitoring, Logging, and Alerting
+
 - **Action:** Implement a unified dashboard in Google Cloud Monitoring for key health metrics (error rates, latency, function execution times, costs). Configure alerts for critical thresholds to enable proactive incident response.
 
 ### 3.2 CI/CD and DevOps Maturity
+
 - **Action:** Enhance the GitHub Actions pipeline to include automated testing, staged deployments (dev -> staging -> prod), and one-click rollback capabilities.
 
 ### 3.3 Security & Compliance
+
 - **Action:**
   - **Transition to Managed Secrets:** Move all production API keys and secrets from environment variables to Google Cloud Secret Manager.
   - **Regular Security Audits:** Schedule quarterly vulnerability scans and annual penetration tests.
@@ -69,13 +76,15 @@ Our architecture is founded on serverless and managed services from Google Cloud
 ---
 
 ## Revision History
-| Version | Date | Author | Description |
-|---------|------|--------|-------------|
+
+| Version | Date       | Author                    | Description   |
+| ------- | ---------- | ------------------------- | ------------- |
 | 1.0     | 2025-07-09 | Engineering & DevOps Team | Initial draft |
 
 ---
 
 ## Related Documents
+
 - [01_EXECUTIVE_SUMMARY.md](./01_EXECUTIVE_SUMMARY.md)
 - [02_PRODUCT_REQUIREMENTS_DOCUMENT.md](./02_PRODUCT_REQUIREMENTS_DOCUMENT.md)
 - [03_EXECUTION_PLAN.md](./03_EXECUTION_PLAN.md)
@@ -83,4 +92,4 @@ Our architecture is founded on serverless and managed services from Google Cloud
 
 ---
 
-*© 2025 RankPilot, Inc. All rights reserved.*
+_© 2025 RankPilot, Inc. All rights reserved._

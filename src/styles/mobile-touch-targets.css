@@ -1,0 +1,51 @@
+/* Tool navigation touch target enhancement */
+.tool-link {
+  min-height: 48px !important; /* Increased from previous 44px to match 48px standard */
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Mobile buttons - ensure proper touch target size */
+.mobile-button {
+  min-height: 48px !important;
+  min-width: 48px !important;
+}
+
+/* Mobile form inputs */
+.mobile-input {
+  min-height: 48px !important;
+  padding: 12px 16px !important;
+}
+
+/* Mobile cards with proper spacing */
+.mobile-card {
+  padding: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Mobile-specific utility classes */
+@media (max-width: 768px) {
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  .mobile-touch-padding {
+    padding: 16px !important;
+  }
+  
+  .mobile-touch-margin {
+    margin: 16px !important;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-centered {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+}

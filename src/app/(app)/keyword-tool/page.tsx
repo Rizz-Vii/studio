@@ -12,7 +12,10 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingState from "@/components/loading-state";
-import MobileToolLayout, { MobileToolCard, MobileResultsCard } from "@/components/mobile-tool-layout";
+import MobileToolLayout, {
+  MobileToolCard,
+  MobileResultsCard,
+} from "@/components/mobile-tool-layout";
 import Breadcrumb from "@/components/breadcrumb";
 import {
   Card,
@@ -103,9 +106,12 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex-1">
-                    <Progress 
-                      value={keyword.difficulty} 
-                      className={cn("h-2", getProgressColor(keyword.difficulty))}
+                    <Progress
+                      value={keyword.difficulty}
+                      className={cn(
+                        "h-2",
+                        getProgressColor(keyword.difficulty)
+                      )}
                     />
                   </div>
                   <span className="text-xs text-gray-500">
@@ -123,7 +129,9 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle className="font-headline">Suggested Keywords</CardTitle>
+              <CardTitle className="font-headline">
+                Suggested Keywords
+              </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
@@ -164,7 +172,10 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
                       <div className="flex items-center space-x-2">
                         <Progress
                           value={keyword.difficulty}
-                          className={cn("flex-1", getProgressColor(keyword.difficulty))}
+                          className={cn(
+                            "flex-1",
+                            getProgressColor(keyword.difficulty)
+                          )}
                         />
                         <span className="text-sm text-muted-foreground font-body w-8">
                           {keyword.difficulty}
@@ -188,11 +199,8 @@ export default function KeywordToolPage() {
   const [submitted, setSubmitted] = useState(false);
 
   // Performance feedback integration
-  const { 
-    startOperation, 
-    endOperation, 
-    FeedbackComponent 
-  } = useFeedbackCollection('keyword-suggestions');
+  const { startOperation, endOperation, FeedbackComponent } =
+    useFeedbackCollection("keyword-suggestions");
 
   const resultsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -208,10 +216,10 @@ export default function KeywordToolPage() {
     setIsLoading(true);
     setSubmitted(true);
     setResults(null);
-    
+
     // Start performance monitoring
     startOperation();
-    
+
     try {
       // Try to get real data with timeout
       const result = await withTimeout(
@@ -242,11 +250,14 @@ export default function KeywordToolPage() {
     } catch (error) {
       // End performance monitoring with error
       endOperation(true); // Force show feedback on error
-      
+
       if (error instanceof TimeoutError) {
-        console.warn("Keyword analysis timed out, using demo data:", error.message);
+        console.warn(
+          "Keyword analysis timed out, using demo data:",
+          error.message
+        );
         // Use demo data as fallback
-        const demoData = getDemoData('keyword-tool');
+        const demoData = getDemoData("keyword-tool");
         if (demoData) {
           setResults(demoData);
         }
@@ -263,7 +274,7 @@ export default function KeywordToolPage() {
       <div className="mb-6">
         <Breadcrumb />
       </div>
-      
+
       <div
         className={cn(
           "mx-auto transition-all duration-500",
@@ -298,7 +309,7 @@ export default function KeywordToolPage() {
                       "💡 Long-tail keywords often have less competition",
                       "🎯 Focus on search intent, not just volume",
                       "🤔 Consider user questions and problems",
-                      "🔍 Look for keyword gaps in your niche"
+                      "🔍 Look for keyword gaps in your niche",
                     ]}
                     showTips={true}
                     variant="default"
@@ -330,7 +341,7 @@ export default function KeywordToolPage() {
           </div>
         </div>
       </div>
-      
+
       {/* Performance Feedback Component */}
       {FeedbackComponent}
     </div>

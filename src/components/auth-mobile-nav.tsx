@@ -128,7 +128,9 @@ export default function AuthMobileNav() {
                         className="flex items-center px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors min-h-[48px]"
                         data-testid={`auth-nav-${item.title.toLowerCase()}`}
                       >
-                        <span className="font-medium text-gray-700">{item.title}</span>
+                        <span className="font-medium text-gray-700">
+                          {item.title}
+                        </span>
                       </Link>
                     ))}
                   </div>

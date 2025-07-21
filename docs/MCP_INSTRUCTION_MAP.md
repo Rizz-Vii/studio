@@ -1,4 +1,3 @@
-
 # MCP Server Tool Mapping Instructions
 
 **Document Purpose:**
@@ -12,6 +11,7 @@ Provides guidelines for mapping user queries to the appropriate MCP server tools
 ---
 
 ## Table of Contents
+
 1. [Available MCP Servers](#available-mcp-servers)
 2. [Priority Rules](#priority-rules)
 3. [Context Awareness](#context-awareness)
@@ -19,7 +19,6 @@ Provides guidelines for mapping user queries to the appropriate MCP server tools
 5. [Related Documents](#related-documents)
 
 ---
-
 
 ## Available MCP Servers
 
@@ -73,7 +72,6 @@ Provides guidelines for mapping user queries to the appropriate MCP server tools
     - Trigger keywords: "git", "repository", "commit", "pull request"
     - Example: "Create a new branch for feature development"
 
-
 ## Priority Rules
 
 When multiple tools could apply, follow these priority rules:
@@ -93,19 +91,20 @@ When multiple tools could apply, follow these priority rules:
    - Github (for markdown files)
    - Perplexity Search (for references)
 
-
 ## Context Awareness
 
 ---
 
 ## Revision History
-| Version | Date | Author | Description |
-|---------|------|--------|-------------|
+
+| Version | Date       | Author                     | Description   |
+| ------- | ---------- | -------------------------- | ------------- |
 | 1.0     | 2025-07-09 | Product & Engineering Team | Initial draft |
 
 ---
 
 ## Related Documents
+
 - [01_EXECUTIVE_SUMMARY.md](./01_EXECUTIVE_SUMMARY.md)
 - [02_PRODUCT_REQUIREMENTS_DOCUMENT.md](./02_PRODUCT_REQUIREMENTS_DOCUMENT.md)
 - [03_EXECUTION_PLAN.md](./03_EXECUTION_PLAN.md)
@@ -113,7 +112,7 @@ When multiple tools could apply, follow these priority rules:
 
 ---
 
-*© 2025 RankPilot, Inc. All rights reserved.*
+_© 2025 RankPilot, Inc. All rights reserved._
 
 The tool selection should consider:
 
@@ -136,18 +135,21 @@ The tool selection should consider:
 Some queries may require multiple tools. Common combinations:
 
 1. **Feature Development**
+
    ```
    Sequential Thinking Tools → Github → Linear
    (Plan → Implement → Track)
    ```
 
 2. **Bug Investigation**
+
    ```
    Google Cloud → Github → Playwright
    (Logs → Code → Test)
    ```
 
 3. **Documentation Update**
+
    ```
    Perplexity Search → Office Word → Github
    (Research → Write → Store)
@@ -191,4 +193,4 @@ This instruction map should be updated when:
 
 - Document version: 1.0
 - Last updated: Current Date
-- Maintainer: AI Assistant 
+- Maintainer: AI Assistant

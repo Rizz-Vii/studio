@@ -11,11 +11,11 @@ export default function LogoutPage() {
     const performLogout = async () => {
       try {
         // Only perform Firebase operations on the client side
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           // Import Firebase auth directly from Firebase SDK
           const { signOut, getAuth } = await import("firebase/auth");
           const { getApps, getApp } = await import("firebase/app");
-          
+
           // Get the existing Firebase app if it exists
           const app = getApps().length > 0 ? getApp() : null;
           if (app) {

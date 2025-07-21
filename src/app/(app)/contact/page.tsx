@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Mail, 
-  Phone, 
+import {
+  Mail,
+  Phone,
   MessageSquare,
   Clock,
   HelpCircle,
@@ -23,7 +23,7 @@ import {
   CreditCard,
   Shield,
   Users,
-  Zap
+  Zap,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,7 +56,7 @@ const supportChannels = [
     description: "Get help via email within 24 hours",
     contact: "support@rankpilot.com",
     availability: "24/7",
-    responseTime: "< 24 hours"
+    responseTime: "< 24 hours",
   },
   {
     icon: <MessageSquare className="h-6 w-6" />,
@@ -64,7 +64,7 @@ const supportChannels = [
     description: "Chat with our support team in real-time",
     contact: "Available in dashboard",
     availability: "Mon-Fri 9AM-6PM EST",
-    responseTime: "< 5 minutes"
+    responseTime: "< 5 minutes",
   },
   {
     icon: <Phone className="h-6 w-6" />,
@@ -72,35 +72,41 @@ const supportChannels = [
     description: "Speak directly with our experts",
     contact: "+1 (555) 123-4567",
     availability: "Enterprise customers only",
-    responseTime: "Immediate"
-  }
+    responseTime: "Immediate",
+  },
 ];
 
 const faqItems = [
   {
     question: "How do I cancel my subscription?",
-    answer: "You can cancel your subscription anytime from the Billing page in your dashboard. Your access will continue until the end of your current billing period."
+    answer:
+      "You can cancel your subscription anytime from the Billing page in your dashboard. Your access will continue until the end of your current billing period.",
   },
   {
     question: "Can I upgrade or downgrade my plan?",
-    answer: "Yes! You can change your plan at any time. Upgrades take effect immediately, while downgrades take effect at your next billing cycle."
+    answer:
+      "Yes! You can change your plan at any time. Upgrades take effect immediately, while downgrades take effect at your next billing cycle.",
   },
   {
     question: "What payment methods do you accept?",
-    answer: "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for enterprise customers."
+    answer:
+      "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for enterprise customers.",
   },
   {
     question: "Do you offer refunds?",
-    answer: "Yes, we offer a 14-day money-back guarantee for all new subscriptions. Enterprise customers may have custom refund terms."
+    answer:
+      "Yes, we offer a 14-day money-back guarantee for all new subscriptions. Enterprise customers may have custom refund terms.",
   },
   {
     question: "How do I update my billing information?",
-    answer: "You can update your payment method and billing details from the Billing page in your account dashboard."
+    answer:
+      "You can update your payment method and billing details from the Billing page in your account dashboard.",
   },
   {
     question: "Is my data secure?",
-    answer: "Absolutely! We use enterprise-grade security measures including SSL encryption, secure data centers, and regular security audits."
-  }
+    answer:
+      "Absolutely! We use enterprise-grade security measures including SSL encryption, secure data centers, and regular security audits.",
+  },
 ];
 
 export default function ContactPage() {
@@ -111,7 +117,7 @@ export default function ContactPage() {
     register,
     handleSubmit,
     formState: { errors, isValid },
-    reset
+    reset,
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
     mode: "onChange",
@@ -119,14 +125,13 @@ export default function ContactPage() {
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       toast.success("Message sent successfully! We'll get back to you soon.");
       reset();
-      
     } catch (error) {
       console.error("Contact form error:", error);
       toast.error("Failed to send message. Please try again.");
@@ -146,10 +151,13 @@ export default function ContactPage() {
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <HelpCircle className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold font-headline">Contact Support</h1>
+            <h1 className="text-4xl font-bold font-headline">
+              Contact Support
+            </h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Need help? We're here for you. Get support via your preferred channel.
+            Need help? We're here for you. Get support via your preferred
+            channel.
           </p>
         </motion.div>
 
@@ -164,7 +172,8 @@ export default function ContactPage() {
               <CardHeader>
                 <CardTitle>Send us a Message</CardTitle>
                 <CardDescription>
-                  Fill out the form below and we'll get back to you as soon as possible
+                  Fill out the form below and we'll get back to you as soon as
+                  possible
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -178,7 +187,9 @@ export default function ContactPage() {
                         className={errors.name ? "border-red-500" : ""}
                       />
                       {errors.name && (
-                        <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
+                        <p className="text-sm text-red-500 mt-1">
+                          {errors.name.message}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -190,7 +201,9 @@ export default function ContactPage() {
                         className={errors.email ? "border-red-500" : ""}
                       />
                       {errors.email && (
-                        <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
+                        <p className="text-sm text-red-500 mt-1">
+                          {errors.email.message}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -210,7 +223,9 @@ export default function ContactPage() {
                       ))}
                     </select>
                     {errors.category && (
-                      <p className="text-sm text-red-500 mt-1">{errors.category.message}</p>
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.category.message}
+                      </p>
                     )}
                   </div>
 
@@ -222,7 +237,9 @@ export default function ContactPage() {
                       className={errors.subject ? "border-red-500" : ""}
                     />
                     {errors.subject && (
-                      <p className="text-sm text-red-500 mt-1">{errors.subject.message}</p>
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.subject.message}
+                      </p>
                     )}
                   </div>
 
@@ -236,7 +253,9 @@ export default function ContactPage() {
                       placeholder="Please describe your issue or question in detail..."
                     />
                     {errors.message && (
-                      <p className="text-sm text-red-500 mt-1">{errors.message.message}</p>
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors.message.message}
+                      </p>
                     )}
                   </div>
 
@@ -290,16 +309,26 @@ export default function ContactPage() {
                         </p>
                         <div className="space-y-1 text-xs">
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Contact:</span>
-                            <span className="font-medium">{channel.contact}</span>
+                            <span className="text-muted-foreground">
+                              Contact:
+                            </span>
+                            <span className="font-medium">
+                              {channel.contact}
+                            </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Available:</span>
+                            <span className="text-muted-foreground">
+                              Available:
+                            </span>
                             <span>{channel.availability}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">Response:</span>
-                            <span className="text-green-600">{channel.responseTime}</span>
+                            <span className="text-muted-foreground">
+                              Response:
+                            </span>
+                            <span className="text-green-600">
+                              {channel.responseTime}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -354,7 +383,9 @@ export default function ContactPage() {
         >
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl mb-2">Frequently Asked Questions</CardTitle>
+              <CardTitle className="text-2xl mb-2">
+                Frequently Asked Questions
+              </CardTitle>
               <CardDescription>
                 Quick answers to common questions
               </CardDescription>
@@ -364,12 +395,16 @@ export default function ContactPage() {
                 {faqItems.map((item, index) => (
                   <div key={index} className="border rounded-lg">
                     <button
-                      onClick={() => setSelectedFaq(selectedFaq === index ? null : index)}
+                      onClick={() =>
+                        setSelectedFaq(selectedFaq === index ? null : index)
+                      }
                       className="w-full text-left p-4 hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <h3 className="font-medium">{item.question}</h3>
-                        <div className={`transition-transform ${selectedFaq === index ? 'rotate-180' : ''}`}>
+                        <div
+                          className={`transition-transform ${selectedFaq === index ? "rotate-180" : ""}`}
+                        >
                           <HelpCircle className="h-4 w-4" />
                         </div>
                       </div>
@@ -400,8 +435,9 @@ export default function ContactPage() {
                 <h2 className="text-2xl font-bold">Enterprise Support</h2>
               </div>
               <p className="text-muted-foreground mb-6">
-                Need dedicated support for your team? Our enterprise customers get priority support, 
-                dedicated account managers, and custom solutions.
+                Need dedicated support for your team? Our enterprise customers
+                get priority support, dedicated account managers, and custom
+                solutions.
               </p>
               <Button size="lg">
                 <Phone className="h-4 w-4 mr-2" />

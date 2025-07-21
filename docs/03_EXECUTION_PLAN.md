@@ -12,6 +12,7 @@ Outlines the technical execution plan, agile phases, and risk management for Ran
 ---
 
 ## Table of Contents
+
 1. [Project Overview](#1-project-overview)
 2. [Technical Architecture Summary](#2-technical-architecture-summary)
 3. [Current Progress](#3-current-progress-as-of-july-9-2025)
@@ -38,12 +39,14 @@ This document outlines the technical execution plan for RankPilot (internally "P
 ## 3. Current Progress (As of July 9, 2025)
 
 **Phase 0: Foundation & Setup - (100% Complete)**
+
 - ✅ Firebase Project Initialized
 - ✅ Next.js Frontend Bootstrapped
 - ✅ Firebase Auth Integrated (Email/Password)
 - ✅ Basic CI/CD Workflow Configured
 
 **Phase 1: Core MVP - (60% Complete)**
+
 - ✅ Dashboard & Tools UI Framework Built
 - ✅ Core AI Audit Endpoint (`/api/audit`) Functional in Next.js
 - ✅ User Profile Management Page Live
@@ -54,19 +57,19 @@ This document outlines the technical execution plan for RankPilot (internally "P
 
 ### Phase 1 Completion: Hardening the Core (Target: Next 2 Sprints)
 
-| Task ID | Description | Dependencies | Status |
-| :--- | :--- | :--- | :--- |
-| **T1.1** | **Implement Role-Based Access Control (RBAC):** Add a `role` field to user profiles and use Firebase Custom Claims to enforce access on both frontend and backend. | Firebase Auth | **Not Started** |
+| Task ID  | Description                                                                                                                                                                | Dependencies    | Status          |
+| :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------- | :-------------- |
+| **T1.1** | **Implement Role-Based Access Control (RBAC):** Add a `role` field to user profiles and use Firebase Custom Claims to enforce access on both frontend and backend.         | Firebase Auth   | **Not Started** |
 | **T1.2** | **Implement Usage Quota System:** Create `usage` collection in Firestore. Check and increment usage on each audit. Implement a scheduled function to reset monthly quotas. | Firestore, RBAC | **Not Started** |
-| **T1.3** | **Finalize Firestore Security Rules:** Refine `firestore.rules` to enforce strict per-user and role-based data access. | RBAC | **In Progress** |
+| **T1.3** | **Finalize Firestore Security Rules:** Refine `firestore.rules` to enforce strict per-user and role-based data access.                                                     | RBAC            | **In Progress** |
 
 ### Phase 2: Monetization & Scalability (Target: Following 4 Sprints)
 
-| Task ID | Description | Dependencies | Status |
-| :--- | :--- | :--- | :--- |
+| Task ID  | Description                                                                                                                                                          | Dependencies      | Status          |
+| :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------- | :-------------- |
 | **T2.1** | **Integrate Stripe Billing:** Implement Stripe Checkout and a webhook handler (Cloud Function) to manage subscription lifecycles and update user roles in Firestore. | Stripe Acct, RBAC | **Not Started** |
-| **T2.2** | **Migrate Audit Logic to Cloud Functions:** Refactor the `/api/audit` logic into a scalable, secure Firebase Cloud Function. | Cloud Functions | **Not Started** |
-| **T2.3** | **Implement PDF/CSV Export:** Integrate a library to generate reports from audit data in Firestore, triggered via a new endpoint or function. | Firestore data | **Not Started** |
+| **T2.2** | **Migrate Audit Logic to Cloud Functions:** Refactor the `/api/audit` logic into a scalable, secure Firebase Cloud Function.                                         | Cloud Functions   | **Not Started** |
+| **T2.3** | **Implement PDF/CSV Export:** Integrate a library to generate reports from audit data in Firestore, triggered via a new endpoint or function.                        | Firestore data    | **Not Started** |
 
 ### Phase 3: NeuroSEO™ Feature Expansion (Post-Launch)
 
@@ -78,24 +81,26 @@ This document outlines the technical execution plan for RankPilot (internally "P
 
 ## 5. Risk Assessment & Mitigation
 
-| Risk | Likelihood | Impact | Mitigation Strategy |
-| :--- | :--- | :--- | :--- |
-| **High LLM API Costs** | Medium | High | Implement strict quotas, cache results, optimize prompts, and explore fine-tuning or alternative models. |
-| **Rapidly Changing AI Behavior** | High | High | Build a flexible AI integration layer (e.g., LangChain) to easily swap models/prompts. Dedicate R&D time to continuous monitoring. |
-| **Scalability Bottlenecks** | Low | High | Proactive migration to Cloud Functions, use Pub/Sub for async tasks, and continuously monitor database performance. |
-| **Security Vulnerabilities** | Medium | High | Adhere to strict security checklist, conduct regular audits, use managed secrets for production keys, and enforce hardened security rules. |
-| **Low Customer Conversion** | Medium | High | Offer a compelling free tier, focus marketing on clear value props for target personas, and iterate on pricing/features based on user feedback. |
+| Risk                             | Likelihood | Impact | Mitigation Strategy                                                                                                                             |
+| :------------------------------- | :--------- | :----- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **High LLM API Costs**           | Medium     | High   | Implement strict quotas, cache results, optimize prompts, and explore fine-tuning or alternative models.                                        |
+| **Rapidly Changing AI Behavior** | High       | High   | Build a flexible AI integration layer (e.g., LangChain) to easily swap models/prompts. Dedicate R&D time to continuous monitoring.              |
+| **Scalability Bottlenecks**      | Low        | High   | Proactive migration to Cloud Functions, use Pub/Sub for async tasks, and continuously monitor database performance.                             |
+| **Security Vulnerabilities**     | Medium     | High   | Adhere to strict security checklist, conduct regular audits, use managed secrets for production keys, and enforce hardened security rules.      |
+| **Low Customer Conversion**      | Medium     | High   | Offer a compelling free tier, focus marketing on clear value props for target personas, and iterate on pricing/features based on user feedback. |
 
 ---
 
 ## Revision History
-| Version | Date | Author | Description |
-|---------|------|--------|-------------|
+
+| Version | Date       | Author                     | Description   |
+| ------- | ---------- | -------------------------- | ------------- |
 | 1.0     | 2025-07-09 | Engineering & Product Team | Initial draft |
 
 ---
 
 ## Related Documents
+
 - [01_EXECUTIVE_SUMMARY.md](./01_EXECUTIVE_SUMMARY.md)
 - [02_PRODUCT_REQUIREMENTS_DOCUMENT.md](./02_PRODUCT_REQUIREMENTS_DOCUMENT.md)
 - [04_SCALING_STRATEGY.md](./04_SCALING_STRATEGY.md)
@@ -103,4 +108,4 @@ This document outlines the technical execution plan for RankPilot (internally "P
 
 ---
 
-*© 2025 RankPilot, Inc. All rights reserved.*
+_© 2025 RankPilot, Inc. All rights reserved._

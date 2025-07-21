@@ -14,21 +14,17 @@ export default function NotFound() {
             The page you're looking for doesn't exist or has been moved.
           </p>
         </div>
-        
+
         <div className="space-y-4">
           <Button asChild className="w-full">
-            <Link href="/">
-              Return Home
-            </Link>
+            <Link href="/">Return Home</Link>
           </Button>
-          
+
           <Button variant="outline" asChild className="w-full">
-            <Link href="/keyword-tool">
-              Try Keyword Tool
-            </Link>
+            <Link href="/keyword-tool">Try Keyword Tool</Link>
           </Button>
         </div>
-        
+
         <div className="mt-8 text-sm text-gray-400">
           <p>RankPilot - AI-First SEO Platform</p>
         </div>

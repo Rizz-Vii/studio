@@ -452,11 +452,7 @@ export default function DashboardPage() {
 
       {/* Mobile Tool Grid */}
       {isMobile && (
-        <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
           <Card>
             <CardHeader>
               <CardTitle className="font-headline">SEO Tools</CardTitle>

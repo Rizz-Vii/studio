@@ -1,26 +1,38 @@
 {
-  "IDX.aI.enableInlineCompletion": true,
-  "IDX.aI.enableCodebaseIndexing": true,
-  "css.lint.unknownAtRules": "ignore",
-  "editor.fontSize": 18,
-  "editor.defaultFormatter": "esbenp.prettier-vscode", // Set Prettier as the global default formatter
-  "editor.formatOnPaste": true,
-  "editor.mouseWheelZoom": true,
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode" // Ensure TSX also uses Prettier for consistency
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode" // Explicitly set Prettier for JSON
-  },
-  "prettier.documentSelectors": [
-    ""
-  ],
-  "git.ignoreLimitWarning": true,
-  "playwright.reuseBrowser": true
+    "workbench.settings.enableNaturalLanguageSearch":  false,
+    "extensions.autoCheckUpdates":  false,
+    "search.exclude":  {
+                           "**/dist":  true,
+                           "**/build":  true,
+                           "**/.cache":  true,
+                           "**/.turbo":  true,
+                           "**/node_modules":  true,
+                           "**/bower_components":  true,
+                           "**/.next":  true
+                       },
+    "files.hotExit":  "onExitAndWindowClose",
+    "typescript.preferences.includePackageJsonAutoImports":  "off",
+    "extensions.autoUpdate":  false,
+    "files.watcherExclude":  {
+                                 "**/.git/subtree-cache/**":  true,
+                                 "**/node_modules/*/**":  true,
+                                 "**/.cache/**":  true,
+                                 "**/.git/objects/**":  true,
+                                 "**/.turbo/**":  true,
+                                 "**/dist/**":  true,
+                                 "**/build/**":  true,
+                                 "**/.next/**":  true,
+                                 "**/coverage/**":  true
+                             },
+    "typescript.suggest.autoImports":  false,
+    "telemetry.telemetryLevel":  "off",
+    "javascript.suggest.autoImports":  false,
+    "files.exclude":  {
+                          "**/.git":  true,
+                          "**/.DS_Store":  true,
+                          "**/.hg":  true,
+                          "**/CVS":  true,
+                          "**/.svn":  true,
+                          "**/node_modules":  true
+                      }
 }

@@ -35,26 +35,26 @@ export default function MobileToolLayout({
               variant="ghost"
               size="icon"
               asChild
-              className="h-10 w-10 min-h-[44px] min-w-[44px]"
+              className="h-12 w-12 min-h-[48px] min-w-[48px] mobile-button"
             >
               <Link href="/dashboard" aria-label="Back to dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
           )}
-          
+
           <div className="flex items-center gap-2 flex-1 justify-center">
             {icon && <div className="text-primary">{icon}</div>}
             <h1 className="text-lg font-semibold text-foreground truncate">
               {title}
             </h1>
           </div>
-          
+
           <Button
             variant="ghost"
             size="icon"
             asChild
-            className="h-10 w-10 min-h-[44px] min-w-[44px]"
+            className="h-12 w-12 min-h-[48px] min-w-[48px] mobile-button"
           >
             <Link href="/dashboard" aria-label="Home">
               <Home className="h-5 w-5" />
@@ -93,19 +93,15 @@ export default function MobileToolLayout({
                 </p>
               </CardContent>
             </Card>
-            
+
             {/* Main Content */}
-            <div className="space-y-4">
-              {children}
-            </div>
+            <div className="space-y-4">{children}</div>
           </div>
         </div>
 
         {/* Desktop Content */}
         <div className="hidden md:block p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto space-y-6">{children}</div>
         </div>
       </div>
     </div>
@@ -149,9 +145,7 @@ export function MobileToolCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
-        {children}
-      </CardContent>
+      <CardContent className="pt-0">{children}</CardContent>
     </Card>
   );
 }

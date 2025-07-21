@@ -7,17 +7,30 @@ interface ConfettiProps {
   particleCount?: number;
 }
 
-export function Confetti({ duration = 3000, particleCount = 50 }: ConfettiProps) {
-  const [particles, setParticles] = useState<Array<{
-    id: number;
-    left: number;
-    animationDelay: number;
-    color: string;
-  }>>([]);
+export function Confetti({
+  duration = 3000,
+  particleCount = 50,
+}: ConfettiProps) {
+  const [particles, setParticles] = useState<
+    Array<{
+      id: number;
+      left: number;
+      animationDelay: number;
+      color: string;
+    }>
+  >([]);
 
   const colors = [
-    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7',
-    '#dda0dd', '#98d8c8', '#f7dc6f', '#bb8fce', '#85c1e9'
+    "#ff6b6b",
+    "#4ecdc4",
+    "#45b7d1",
+    "#96ceb4",
+    "#ffeaa7",
+    "#dda0dd",
+    "#98d8c8",
+    "#f7dc6f",
+    "#bb8fce",
+    "#85c1e9",
   ];
 
   useEffect(() => {
@@ -25,7 +38,7 @@ export function Confetti({ duration = 3000, particleCount = 50 }: ConfettiProps)
       id: i,
       left: Math.random() * 100,
       animationDelay: Math.random() * 3000,
-      color: colors[Math.floor(Math.random() * colors.length)]
+      color: colors[Math.floor(Math.random() * colors.length)],
     }));
 
     setParticles(newParticles);
@@ -49,7 +62,7 @@ export function Confetti({ duration = 3000, particleCount = 50 }: ConfettiProps)
             left: `${particle.left}%`,
             backgroundColor: particle.color,
             animation: `confetti-fall 3s linear ${particle.animationDelay}ms forwards`,
-            top: '-10px'
+            top: "-10px",
           }}
         />
       ))}

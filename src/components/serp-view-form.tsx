@@ -37,7 +37,10 @@ interface SerpViewFormProps {
   isLoading: boolean;
 }
 
-export default function SerpViewForm({ onSubmit, isLoading }: SerpViewFormProps) {
+export default function SerpViewForm({
+  onSubmit,
+  isLoading,
+}: SerpViewFormProps) {
   const hydrated = useHydration();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

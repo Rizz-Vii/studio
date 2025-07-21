@@ -1,10 +1,10 @@
 // src/app/(app)/performance/page.tsx
 "use client";
 
-import { PerformanceDashboard } from '@/components/performance-dashboard';
-import Breadcrumb from '@/components/breadcrumb';
-import MobileToolLayout from '@/components/mobile-tool-layout';
-import { Activity } from 'lucide-react';
+import { PerformanceDashboard } from "@/components/performance-dashboard";
+import Breadcrumb from "@/components/breadcrumb";
+import MobileToolLayout from "@/components/mobile-tool-layout";
+import { Activity } from "lucide-react";
 
 export default function PerformancePage() {
   return (

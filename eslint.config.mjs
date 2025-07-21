@@ -1,4 +1,4 @@
-import next from 'eslint-config-next';
+import next from "eslint-config-next";
 import pluginImport from "eslint-plugin-import";
 
 export default [

@@ -12,9 +12,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  CreditCard, 
-  Download, 
+import {
+  CreditCard,
+  Download,
   Calendar,
   DollarSign,
   AlertTriangle,
@@ -23,7 +23,7 @@ import {
   ExternalLink,
   RefreshCw,
   Crown,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -37,14 +37,14 @@ const mockBillingData = {
     price: 79,
     billingCycle: "monthly",
     nextBillingDate: "2024-02-15",
-    status: "active"
+    status: "active",
   },
   paymentMethod: {
     type: "card",
     last4: "4242",
     brand: "Visa",
     expiryMonth: 12,
-    expiryYear: 2026
+    expiryYear: 2026,
   },
   invoices: [
     {
@@ -53,24 +53,24 @@ const mockBillingData = {
       amount: 79,
       status: "paid",
       description: "Professional Plan - Monthly",
-      downloadUrl: "/invoices/inv_001.pdf"
+      downloadUrl: "/invoices/inv_001.pdf",
     },
     {
-      id: "inv_002", 
+      id: "inv_002",
       date: "2023-12-15",
       amount: 79,
       status: "paid",
       description: "Professional Plan - Monthly",
-      downloadUrl: "/invoices/inv_002.pdf"
+      downloadUrl: "/invoices/inv_002.pdf",
     },
     {
       id: "inv_003",
       date: "2023-11-15",
       amount: 79,
       status: "paid",
-      description: "Professional Plan - Monthly", 
-      downloadUrl: "/invoices/inv_003.pdf"
-    }
+      description: "Professional Plan - Monthly",
+      downloadUrl: "/invoices/inv_003.pdf",
+    },
   ],
   usage: {
     keywordsTracked: 342,
@@ -79,8 +79,8 @@ const mockBillingData = {
     competitorLimit: 25,
     reportsGenerated: 45,
     currentPeriodStart: "2024-01-15",
-    currentPeriodEnd: "2024-02-15"
-  }
+    currentPeriodEnd: "2024-02-15",
+  },
 };
 
 export default function BillingPage() {
@@ -111,26 +111,36 @@ export default function BillingPage() {
   };
 
   const handleCancelSubscription = () => {
-    if (confirm("Are you sure you want to cancel your subscription? This action cannot be undone.")) {
-      toast.error("Subscription cancelled. You'll have access until your next billing date.");
+    if (
+      confirm(
+        "Are you sure you want to cancel your subscription? This action cannot be undone."
+      )
+    ) {
+      toast.error(
+        "Subscription cancelled. You'll have access until your next billing date."
+      );
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active':
-        return <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>;
-      case 'past_due':
+      case "active":
+        return (
+          <Badge className="bg-green-100 text-green-800 border-green-200">
+            Active
+          </Badge>
+        );
+      case "past_due":
         return <Badge variant="destructive">Past Due</Badge>;
-      case 'cancelled':
+      case "cancelled":
         return <Badge variant="secondary">Cancelled</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
@@ -175,7 +185,9 @@ export default function BillingPage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <CreditCard className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold font-headline">Billing & Subscription</h1>
+            <h1 className="text-3xl font-bold font-headline">
+              Billing & Subscription
+            </h1>
           </div>
           <p className="text-muted-foreground">
             Manage your subscription, billing details, and view usage statistics
@@ -209,8 +221,12 @@ export default function BillingPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Next billing date</p>
-                    <p className="font-semibold">{formatDate(currentPlan.nextBillingDate)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Next billing date
+                    </p>
+                    <p className="font-semibold">
+                      {formatDate(currentPlan.nextBillingDate)}
+                    </p>
                   </div>
                 </div>
 
@@ -226,7 +242,10 @@ export default function BillingPage() {
                   <Button variant="outline" onClick={handleDowngrade}>
                     Downgrade
                   </Button>
-                  <Button variant="destructive" onClick={handleCancelSubscription}>
+                  <Button
+                    variant="destructive"
+                    onClick={handleCancelSubscription}
+                  >
                     Cancel Subscription
                   </Button>
                 </div>
@@ -238,44 +257,55 @@ export default function BillingPage() {
               <CardHeader>
                 <CardTitle>Usage This Month</CardTitle>
                 <CardDescription>
-                  {formatDate(usage.currentPeriodStart)} - {formatDate(usage.currentPeriodEnd)}
+                  {formatDate(usage.currentPeriodStart)} -{" "}
+                  {formatDate(usage.currentPeriodEnd)}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Keywords Tracked</span>
+                      <span className="text-sm font-medium">
+                        Keywords Tracked
+                      </span>
                       <span className="text-sm text-muted-foreground">
                         {usage.keywordsTracked} / {usage.keywordsLimit}
                       </span>
                     </div>
                     <div className="w-full bg-muted rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-primary h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${(usage.keywordsTracked / usage.keywordsLimit) * 100}%` }}
+                        style={{
+                          width: `${(usage.keywordsTracked / usage.keywordsLimit) * 100}%`,
+                        }}
                       />
                     </div>
                   </div>
 
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Competitor Analysis</span>
+                      <span className="text-sm font-medium">
+                        Competitor Analysis
+                      </span>
                       <span className="text-sm text-muted-foreground">
                         {usage.competitorAnalysis} / {usage.competitorLimit}
                       </span>
                     </div>
                     <div className="w-full bg-muted rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-primary h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${(usage.competitorAnalysis / usage.competitorLimit) * 100}%` }}
+                        style={{
+                          width: `${(usage.competitorAnalysis / usage.competitorLimit) * 100}%`,
+                        }}
                       />
                     </div>
                   </div>
 
                   <div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Reports Generated</span>
+                      <span className="text-sm font-medium">
+                        Reports Generated
+                      </span>
                       <span className="text-sm text-muted-foreground">
                         {usage.reportsGenerated} this month
                       </span>
@@ -296,7 +326,10 @@ export default function BillingPage() {
               <CardContent>
                 <div className="space-y-4">
                   {invoices.map((invoice) => (
-                    <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={invoice.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center gap-4">
                         <div className="p-2 bg-muted rounded-lg">
                           <DollarSign className="h-4 w-4" />
@@ -353,12 +386,13 @@ export default function BillingPage() {
                       {paymentMethod.brand} ending in {paymentMethod.last4}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Expires {paymentMethod.expiryMonth}/{paymentMethod.expiryYear}
+                      Expires {paymentMethod.expiryMonth}/
+                      {paymentMethod.expiryYear}
                     </p>
                   </div>
                 </div>
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   variant="outline"
                   onClick={handleUpdatePayment}
                   disabled={isLoading}
@@ -384,19 +418,31 @@ export default function BillingPage() {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button asChild className="w-full justify-start" variant="outline">
+                <Button
+                  asChild
+                  className="w-full justify-start"
+                  variant="outline"
+                >
                   <Link href="/pricing">
                     <TrendingUp className="h-4 w-4 mr-2" />
                     View All Plans
                   </Link>
                 </Button>
-                <Button asChild className="w-full justify-start" variant="outline">
+                <Button
+                  asChild
+                  className="w-full justify-start"
+                  variant="outline"
+                >
                   <Link href="/contact">
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Contact Billing Support
                   </Link>
                 </Button>
-                <Button asChild className="w-full justify-start" variant="outline">
+                <Button
+                  asChild
+                  className="w-full justify-start"
+                  variant="outline"
+                >
                   <Link href="/settings">
                     <Settings className="h-4 w-4 mr-2" />
                     Account Settings
@@ -413,8 +459,12 @@ export default function BillingPage() {
               <CardContent className="space-y-4">
                 <div className="text-sm space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Billing cycle:</span>
-                    <span className="capitalize">{currentPlan.billingCycle}</span>
+                    <span className="text-muted-foreground">
+                      Billing cycle:
+                    </span>
+                    <span className="capitalize">
+                      {currentPlan.billingCycle}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Auto-renewal:</span>
@@ -428,7 +478,8 @@ export default function BillingPage() {
                 <Separator />
                 <div className="text-xs text-muted-foreground">
                   <p>
-                    Your subscription will automatically renew on {formatDate(currentPlan.nextBillingDate)} unless cancelled.
+                    Your subscription will automatically renew on{" "}
+                    {formatDate(currentPlan.nextBillingDate)} unless cancelled.
                   </p>
                 </div>
               </CardContent>

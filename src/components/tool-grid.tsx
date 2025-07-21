@@ -4,7 +4,13 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { navItems } from "@/constants/nav";
 import { useAuth } from "@/context/AuthContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const toolDescriptions: Record<string, string> = {
@@ -48,7 +54,10 @@ interface ToolGridProps {
   showAll?: boolean;
 }
 
-export default function ToolGrid({ className, showAll = false }: ToolGridProps) {
+export default function ToolGrid({
+  className,
+  showAll = false,
+}: ToolGridProps) {
   const { user, role } = useAuth();
 
   // Filter nav items based on user role and exclude dashboard if not showAll
@@ -82,7 +91,8 @@ export default function ToolGrid({ className, showAll = false }: ToolGridProps) 
               </CardHeader>
               <CardContent className="pt-0">
                 <CardDescription className="tool-card-description">
-                  {toolDescriptions[item.href] || `Access ${item.title} functionality`}
+                  {toolDescriptions[item.href] ||
+                    `Access ${item.title} functionality`}
                 </CardDescription>
               </CardContent>
             </Card>
