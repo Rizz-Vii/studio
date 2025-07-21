@@ -42,19 +42,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  UserPlus, 
+import {
+  Users,
+  Search,
+  Filter,
+  MoreHorizontal,
+  UserPlus,
   Shield,
   Crown,
   Calendar,
   Activity,
-  Mail
+  Mail,
 } from "lucide-react";
-import { collection, query, orderBy, limit, getDocs, doc, updateDoc, where } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+  doc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -79,7 +88,9 @@ export default function AdminUserManagement() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
-  const [actionType, setActionType] = useState<"promote" | "demote" | "suspend">("promote");
+  const [actionType, setActionType] = useState<
+    "promote" | "demote" | "suspend"
+  >("promote");
 
   useEffect(() => {
     fetchUsers();
@@ -91,15 +102,15 @@ export default function AdminUserManagement() {
       const usersRef = collection(db, "users");
       const q = query(usersRef, orderBy("createdAt", "desc"), limit(100));
       const querySnapshot = await getDocs(q);
-      
+
       const usersList: User[] = [];
       for (const doc of querySnapshot.docs) {
         const userData = doc.data();
-        
+
         // Get activity count for each user
         const activitiesRef = collection(db, "users", doc.id, "activities");
         const activitiesSnapshot = await getDocs(activitiesRef);
-        
+
         usersList.push({
           id: doc.id,
           email: userData.email,
@@ -112,7 +123,7 @@ export default function AdminUserManagement() {
           activityCount: activitiesSnapshot.size,
         });
       }
-      
+
       setUsers(usersList);
     } catch (error) {
       toast({
@@ -145,11 +156,13 @@ export default function AdminUserManagement() {
       }
 
       await updateDoc(userRef, { role: newRole });
-      
+
       // Update local state
-      setUsers(users.map(user => 
-        user.id === selectedUser.id ? { ...user, role: newRole } : user
-      ));
+      setUsers(
+        users.map((user) =>
+          user.id === selectedUser.id ? { ...user, role: newRole } : user
+        )
+      );
 
       toast({
         title: "Success",
@@ -167,9 +180,10 @@ export default function AdminUserManagement() {
     }
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.displayName?.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.displayName?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
     return matchesSearch && matchesRole;
   });
@@ -177,9 +191,19 @@ export default function AdminUserManagement() {
   const getUserBadge = (role: string) => {
     switch (role) {
       case "admin":
-        return <Badge className="bg-red-100 text-red-800"><Shield className="h-3 w-3 mr-1" />Admin</Badge>;
+        return (
+          <Badge className="bg-red-100 text-red-800">
+            <Shield className="h-3 w-3 mr-1" />
+            Admin
+          </Badge>
+        );
       case "pro":
-        return <Badge className="bg-blue-100 text-blue-800"><Crown className="h-3 w-3 mr-1" />Pro</Badge>;
+        return (
+          <Badge className="bg-blue-100 text-blue-800">
+            <Crown className="h-3 w-3 mr-1" />
+            Pro
+          </Badge>
+        );
       case "suspended":
         return <Badge variant="destructive">Suspended</Badge>;
       default:
@@ -189,7 +213,9 @@ export default function AdminUserManagement() {
 
   const getSubscriptionBadge = (status?: string, tier?: string) => {
     if (status === "active") {
-      return <Badge className="bg-green-100 text-green-800">{tier || "Pro"}</Badge>;
+      return (
+        <Badge className="bg-green-100 text-green-800">{tier || "Pro"}</Badge>
+      );
     }
     return <Badge variant="outline">Free</Badge>;
   };
@@ -219,45 +245,63 @@ export default function AdminUserManagement() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Users
+                </p>
                 <p className="text-2xl font-bold">{users.length}</p>
               </div>
               <Users className="h-8 w-8 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Admin Users</p>
-                <p className="text-2xl font-bold">{users.filter(u => u.role === "admin").length}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Admin Users
+                </p>
+                <p className="text-2xl font-bold">
+                  {users.filter((u) => u.role === "admin").length}
+                </p>
               </div>
               <Shield className="h-8 w-8 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Pro Users</p>
-                <p className="text-2xl font-bold">{users.filter(u => u.subscriptionStatus === "active").length}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Pro Users
+                </p>
+                <p className="text-2xl font-bold">
+                  {
+                    users.filter((u) => u.subscriptionStatus === "active")
+                      .length
+                  }
+                </p>
               </div>
               <Crown className="h-8 w-8 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Active This Month</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Active This Month
+                </p>
                 <p className="text-2xl font-bold">
-                  {users.filter(u => u.activityCount && u.activityCount > 0).length}
+                  {
+                    users.filter((u) => u.activityCount && u.activityCount > 0)
+                      .length
+                  }
                 </p>
               </div>
               <Activity className="h-8 w-8 text-muted-foreground" />
@@ -325,7 +369,9 @@ export default function AdminUserManagement() {
                   <TableRow key={user.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{user.displayName || "No name"}</div>
+                        <div className="font-medium">
+                          {user.displayName || "No name"}
+                        </div>
                         <div className="text-sm text-muted-foreground flex items-center gap-1">
                           <Mail className="h-3 w-3" />
                           {user.email}
@@ -333,7 +379,12 @@ export default function AdminUserManagement() {
                       </div>
                     </TableCell>
                     <TableCell>{getUserBadge(user.role)}</TableCell>
-                    <TableCell>{getSubscriptionBadge(user.subscriptionStatus, user.subscriptionTier)}</TableCell>
+                    <TableCell>
+                      {getSubscriptionBadge(
+                        user.subscriptionStatus,
+                        user.subscriptionTier
+                      )}
+                    </TableCell>
                     <TableCell>
                       <div className="text-sm">
                         {user.activityCount || 0} activities
@@ -342,12 +393,20 @@ export default function AdminUserManagement() {
                     <TableCell>
                       <div className="text-sm flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        {user.createdAt ? formatDistanceToNow(user.createdAt.toDate(), { addSuffix: true }) : "Unknown"}
+                        {user.createdAt
+                          ? formatDistanceToNow(user.createdAt.toDate(), {
+                              addSuffix: true,
+                            })
+                          : "Unknown"}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm text-muted-foreground">
-                        {user.lastSignIn ? formatDistanceToNow(user.lastSignIn.toDate(), { addSuffix: true }) : "Never"}
+                        {user.lastSignIn
+                          ? formatDistanceToNow(user.lastSignIn.toDate(), {
+                              addSuffix: true,
+                            })
+                          : "Never"}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -418,19 +477,31 @@ export default function AdminUserManagement() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Confirm {actionType === "promote" ? "Promotion" : actionType === "demote" ? "Demotion" : "Suspension"}
+              Confirm{" "}
+              {actionType === "promote"
+                ? "Promotion"
+                : actionType === "demote"
+                  ? "Demotion"
+                  : "Suspension"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to {actionType} {selectedUser?.email}?
-              {actionType === "suspend" && " This will prevent them from accessing the platform."}
-              {actionType === "promote" && " This will give them admin privileges."}
-              {actionType === "demote" && " This will remove their admin privileges."}
+              {actionType === "suspend" &&
+                " This will prevent them from accessing the platform."}
+              {actionType === "promote" &&
+                " This will give them admin privileges."}
+              {actionType === "demote" &&
+                " This will remove their admin privileges."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleUserAction}>
-              {actionType === "promote" ? "Promote" : actionType === "demote" ? "Demote" : "Suspend"}
+              {actionType === "promote"
+                ? "Promote"
+                : actionType === "demote"
+                  ? "Demote"
+                  : "Suspend"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

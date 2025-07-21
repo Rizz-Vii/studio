@@ -10,11 +10,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  CreditCard, 
-  ExternalLink, 
-  Crown, 
-  Calendar, 
+import {
+  CreditCard,
+  ExternalLink,
+  Crown,
+  Calendar,
   Loader2,
   Download,
   DollarSign,
@@ -22,7 +22,7 @@ import {
   Settings,
   CheckCircle,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
 } from "lucide-react";
 import type { User } from "firebase/auth";
 import { useState, useEffect } from "react";
@@ -34,13 +34,18 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-const createPortalSession = httpsCallable(functions, 'createPortalSession');
-const createCheckoutSession = httpsCallable(functions, 'createCheckoutSession');
+const createPortalSession = httpsCallable(functions, "createPortalSession");
+const createCheckoutSession = httpsCallable(functions, "createCheckoutSession");
 
 interface BillingData {
-  subscriptionStatus: 'active' | 'cancelled' | 'past_due' | 'incomplete' | 'free';
-  subscriptionTier: 'starter' | 'agency' | 'free';
-  billingInterval: 'monthly' | 'yearly';
+  subscriptionStatus:
+    | "active"
+    | "cancelled"
+    | "past_due"
+    | "incomplete"
+    | "free";
+  subscriptionTier: "starter" | "agency" | "free";
+  billingInterval: "monthly" | "yearly";
   currentPeriodStart: string;
   currentPeriodEnd: string;
   nextBillingDate: string;
@@ -66,7 +71,7 @@ interface BillingData {
     id: string;
     date: string;
     amount: number;
-    status: 'paid' | 'pending' | 'failed';
+    status: "paid" | "pending" | "failed";
     description: string;
     downloadUrl?: string;
   }>;
@@ -81,12 +86,7 @@ const planFeatures = {
   starter: {
     name: "Starter",
     price: { monthly: 29, yearly: 290 },
-    features: [
-      "50 keywords",
-      "5 competitors",
-      "Basic audit",
-      "Email support"
-    ]
+    features: ["50 keywords", "5 competitors", "Basic audit", "Email support"],
   },
   agency: {
     name: "Agency",
@@ -101,18 +101,14 @@ const planFeatures = {
       "Priority support",
       "API access",
       "Dedicated account manager",
-      "SLA & security review"
-    ]
+      "SLA & security review",
+    ],
   },
   free: {
     name: "Free",
     price: { monthly: 0, yearly: 0 },
-    features: [
-      "10 keywords",
-      "1 competitor",
-      "Basic features"
-    ]
-  }
+    features: ["10 keywords", "1 competitor", "Basic features"],
+  },
 };
 
 export default function BillingSettingsCard({
@@ -129,17 +125,17 @@ export default function BillingSettingsCard({
     if (!user?.uid) return;
 
     const unsubscribe = onSnapshot(
-      doc(db, 'users', user.uid),
+      doc(db, "users", user.uid),
       (doc) => {
         if (doc.exists()) {
           const data = doc.data();
           setBillingData({
-            subscriptionStatus: data.subscriptionStatus || 'free',
-            subscriptionTier: data.subscriptionTier || 'free', 
-            billingInterval: data.billingInterval || 'monthly',
-            currentPeriodStart: data.currentPeriodStart || '',
-            currentPeriodEnd: data.currentPeriodEnd || '',
-            nextBillingDate: data.nextBillingDate || '',
+            subscriptionStatus: data.subscriptionStatus || "free",
+            subscriptionTier: data.subscriptionTier || "free",
+            billingInterval: data.billingInterval || "monthly",
+            currentPeriodStart: data.currentPeriodStart || "",
+            currentPeriodEnd: data.currentPeriodEnd || "",
+            nextBillingDate: data.nextBillingDate || "",
             subscriptionId: data.subscriptionId,
             customerId: data.customerId,
             paymentMethod: data.paymentMethod,
@@ -152,13 +148,13 @@ export default function BillingSettingsCard({
               apiCalls: data.usage?.apiCalls || 0,
               apiLimit: data.usage?.apiLimit || 100,
             },
-            invoices: data.invoices || []
+            invoices: data.invoices || [],
           });
         }
       },
       (error) => {
-        console.error('Error fetching billing data:', error);
-        toast.error('Failed to load billing information');
+        console.error("Error fetching billing data:", error);
+        toast.error("Failed to load billing information");
       }
     );
 
@@ -168,37 +164,40 @@ export default function BillingSettingsCard({
   const handleManageBilling = async () => {
     try {
       setIsLoading(true);
-      
+
       const result = await createPortalSession({
         userId: user.uid,
       });
 
       const { url } = result.data as { url: string };
-      window.open(url, '_blank');
+      window.open(url, "_blank");
     } catch (error: any) {
-      console.error('Error opening billing portal:', error);
-      toast.error('Failed to open billing portal');
+      console.error("Error opening billing portal:", error);
+      toast.error("Failed to open billing portal");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUpgrade = async (plan: string, interval: 'monthly' | 'yearly') => {
+  const handleUpgrade = async (
+    plan: string,
+    interval: "monthly" | "yearly"
+  ) => {
     try {
       setIsUpgrading(true);
-      
+
       const result = await createCheckoutSession({
         userId: user.uid,
         priceId: `price_${plan}_${interval}`,
         plan,
-        interval
+        interval,
       });
 
       const { url } = result.data as { url: string };
       window.location.href = url;
     } catch (error: any) {
-      console.error('Error creating checkout session:', error);
-      toast.error('Failed to start upgrade process');
+      console.error("Error creating checkout session:", error);
+      toast.error("Failed to start upgrade process");
     } finally {
       setIsUpgrading(false);
     }
@@ -206,13 +205,17 @@ export default function BillingSettingsCard({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active':
-        return <Badge className="bg-green-100 text-green-800 border-green-200">Active</Badge>;
-      case 'past_due':
+      case "active":
+        return (
+          <Badge className="bg-green-100 text-green-800 border-green-200">
+            Active
+          </Badge>
+        );
+      case "past_due":
         return <Badge variant="destructive">Past Due</Badge>;
-      case 'cancelled':
+      case "cancelled":
         return <Badge variant="secondary">Cancelled</Badge>;
-      case 'incomplete':
+      case "incomplete":
         return <Badge variant="outline">Incomplete</Badge>;
       default:
         return <Badge variant="outline">Free</Badge>;
@@ -220,11 +223,11 @@ export default function BillingSettingsCard({
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -265,16 +268,19 @@ export default function BillingSettingsCard({
             <div>
               <h3 className="text-2xl font-bold">{currentPlan.name}</h3>
               <p className="text-muted-foreground">
-                {billingData.subscriptionTier === 'free' ? 
-                  'Free plan' : 
-                  `$${currentPrice}/${billingData.billingInterval}`
-                }
+                {billingData.subscriptionTier === "free"
+                  ? "Free plan"
+                  : `$${currentPrice}/${billingData.billingInterval}`}
               </p>
             </div>
-            {billingData.subscriptionTier !== 'free' && (
+            {billingData.subscriptionTier !== "free" && (
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">Next billing date</p>
-                <p className="font-semibold">{formatDate(billingData.nextBillingDate)}</p>
+                <p className="text-sm text-muted-foreground">
+                  Next billing date
+                </p>
+                <p className="font-semibold">
+                  {formatDate(billingData.nextBillingDate)}
+                </p>
               </div>
             )}
           </div>
@@ -282,39 +288,52 @@ export default function BillingSettingsCard({
           <Separator />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {billingData.subscriptionTier === 'free' ? (
+            {billingData.subscriptionTier === "free" ? (
               <div className="md:col-span-2">
-                <h4 className="font-medium mb-3">Upgrade to unlock more features:</h4>
+                <h4 className="font-medium mb-3">
+                  Upgrade to unlock more features:
+                </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {Object.entries(planFeatures).filter(([key]) => key !== 'free').map(([key, plan]) => (
-                    <Card key={key} className="border-2 hover:border-primary/50 transition-colors">
-                      <CardContent className="p-4">
-                        <h5 className="font-semibold mb-2">{plan.name}</h5>
-                        <p className="text-lg font-bold mb-2">${plan.price.monthly}/mo</p>
-                        <Button 
-                          className="w-full mb-2" 
-                          size="sm"
-                          onClick={() => handleUpgrade(key, 'monthly')}
-                          disabled={isUpgrading}
-                        >
-                          {isUpgrading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Upgrade'}
-                        </Button>
-                        <ul className="text-xs space-y-1">
-                          {plan.features.slice(0, 3).map((feature, idx) => (
-                            <li key={idx} className="flex items-center gap-1">
-                              <CheckCircle className="h-3 w-3 text-green-500" />
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {Object.entries(planFeatures)
+                    .filter(([key]) => key !== "free")
+                    .map(([key, plan]) => (
+                      <Card
+                        key={key}
+                        className="border-2 hover:border-primary/50 transition-colors"
+                      >
+                        <CardContent className="p-4">
+                          <h5 className="font-semibold mb-2">{plan.name}</h5>
+                          <p className="text-lg font-bold mb-2">
+                            ${plan.price.monthly}/mo
+                          </p>
+                          <Button
+                            className="w-full mb-2"
+                            size="sm"
+                            onClick={() => handleUpgrade(key, "monthly")}
+                            disabled={isUpgrading}
+                          >
+                            {isUpgrading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              "Upgrade"
+                            )}
+                          </Button>
+                          <ul className="text-xs space-y-1">
+                            {plan.features.slice(0, 3).map((feature, idx) => (
+                              <li key={idx} className="flex items-center gap-1">
+                                <CheckCircle className="h-3 w-3 text-green-500" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    ))}
                 </div>
               </div>
             ) : (
               <>
-                <Button 
+                <Button
                   onClick={handleManageBilling}
                   disabled={isLoading}
                   className="w-full"
@@ -343,7 +362,8 @@ export default function BillingSettingsCard({
         <CardHeader>
           <CardTitle>Usage This Month</CardTitle>
           <CardDescription>
-            {formatDate(billingData.currentPeriodStart)} - {formatDate(billingData.currentPeriodEnd)}
+            {formatDate(billingData.currentPeriodStart)} -{" "}
+            {formatDate(billingData.currentPeriodEnd)}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -352,15 +372,16 @@ export default function BillingSettingsCard({
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium">Keywords Tracked</span>
                 <span className="text-sm text-muted-foreground">
-                  {billingData.usage.keywordsTracked} / {billingData.usage.keywordsLimit}
+                  {billingData.usage.keywordsTracked} /{" "}
+                  {billingData.usage.keywordsLimit}
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <motion.div 
+                <motion.div
                   className="bg-primary h-2 rounded-full transition-all duration-500"
                   initial={{ width: 0 }}
-                  animate={{ 
-                    width: `${Math.min((billingData.usage.keywordsTracked / billingData.usage.keywordsLimit) * 100, 100)}%` 
+                  animate={{
+                    width: `${Math.min((billingData.usage.keywordsTracked / billingData.usage.keywordsLimit) * 100, 100)}%`,
                   }}
                 />
               </div>
@@ -370,15 +391,16 @@ export default function BillingSettingsCard({
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium">Competitor Analysis</span>
                 <span className="text-sm text-muted-foreground">
-                  {billingData.usage.competitorAnalysis} / {billingData.usage.competitorLimit}
+                  {billingData.usage.competitorAnalysis} /{" "}
+                  {billingData.usage.competitorLimit}
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <motion.div 
+                <motion.div
                   className="bg-primary h-2 rounded-full transition-all duration-500"
                   initial={{ width: 0 }}
-                  animate={{ 
-                    width: `${Math.min((billingData.usage.competitorAnalysis / billingData.usage.competitorLimit) * 100, 100)}%` 
+                  animate={{
+                    width: `${Math.min((billingData.usage.competitorAnalysis / billingData.usage.competitorLimit) * 100, 100)}%`,
                   }}
                 />
               </div>
@@ -405,10 +427,12 @@ export default function BillingSettingsCard({
 
           {/* Usage Warnings */}
           <AnimatePresence>
-            {billingData.usage.keywordsTracked / billingData.usage.keywordsLimit > 0.8 && (
+            {billingData.usage.keywordsTracked /
+              billingData.usage.keywordsLimit >
+              0.8 && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 className="bg-yellow-50 border border-yellow-200 rounded-lg p-3"
               >
@@ -419,8 +443,15 @@ export default function BillingSettingsCard({
                   </span>
                 </div>
                 <p className="text-sm text-yellow-700 mt-1">
-                  You're using {Math.round((billingData.usage.keywordsTracked / billingData.usage.keywordsLimit) * 100)}% of your keyword quota.
-                  {billingData.subscriptionTier !== 'agency' && ' Consider upgrading for unlimited tracking.'}
+                  You're using{" "}
+                  {Math.round(
+                    (billingData.usage.keywordsTracked /
+                      billingData.usage.keywordsLimit) *
+                      100
+                  )}
+                  % of your keyword quota.
+                  {billingData.subscriptionTier !== "agency" &&
+                    " Consider upgrading for unlimited tracking."}
                 </p>
               </motion.div>
             )}
@@ -444,15 +475,17 @@ export default function BillingSettingsCard({
               </div>
               <div className="flex-1">
                 <p className="font-medium">
-                  {billingData.paymentMethod.brand} ending in {billingData.paymentMethod.last4}
+                  {billingData.paymentMethod.brand} ending in{" "}
+                  {billingData.paymentMethod.last4}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Expires {billingData.paymentMethod.expiryMonth}/{billingData.paymentMethod.expiryYear}
+                  Expires {billingData.paymentMethod.expiryMonth}/
+                  {billingData.paymentMethod.expiryYear}
                 </p>
               </div>
             </div>
-            <Button 
-              className="w-full" 
+            <Button
+              className="w-full"
               variant="outline"
               onClick={handleManageBilling}
               disabled={isLoading}
@@ -480,7 +513,10 @@ export default function BillingSettingsCard({
           <CardContent>
             <div className="space-y-4">
               {billingData.invoices.slice(0, 5).map((invoice) => (
-                <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div
+                  key={invoice.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
                   <div className="flex items-center gap-4">
                     <div className="p-2 bg-muted rounded-lg">
                       <DollarSign className="h-4 w-4" />
@@ -497,7 +533,9 @@ export default function BillingSettingsCard({
                       <p className="font-semibold">${invoice.amount}</p>
                       <div className="flex items-center gap-1">
                         <CheckCircle className="h-3 w-3 text-green-500" />
-                        <span className="text-xs text-green-600 capitalize">{invoice.status}</span>
+                        <span className="text-xs text-green-600 capitalize">
+                          {invoice.status}
+                        </span>
                       </div>
                     </div>
                     {invoice.downloadUrl && (
@@ -512,10 +550,10 @@ export default function BillingSettingsCard({
                 </div>
               ))}
             </div>
-            
+
             {billingData.invoices.length > 5 && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full mt-4"
                 onClick={handleManageBilling}
               >
@@ -544,9 +582,9 @@ export default function BillingSettingsCard({
               Contact Billing Support
             </Link>
           </Button>
-          {billingData.subscriptionTier !== 'free' && (
-            <Button 
-              className="w-full justify-start" 
+          {billingData.subscriptionTier !== "free" && (
+            <Button
+              className="w-full justify-start"
               variant="outline"
               onClick={handleManageBilling}
               disabled={isLoading}

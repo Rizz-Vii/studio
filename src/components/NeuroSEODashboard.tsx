@@ -5,7 +5,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -27,8 +27,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
+import { useHydration } from "@/components/HydrationContext";
+import { useIsMobile, useNetworkStatus } from "@/lib/mobile-responsive-utils";
+import LoadingState from "@/components/loading-state";
 import {
   Brain,
   Search,
@@ -43,8 +46,11 @@ import {
   Zap,
   BarChart3,
   Globe,
+  RefreshCw,
+  WifiOff,
 } from "lucide-react";
 import type { NeuroSEOReport, NeuroSEOAnalysisRequest } from "@/lib/neuroseo";
+import { motion } from "framer-motion";
 
 interface NeuroSEODashboardProps {
   className?: string;
@@ -58,6 +64,14 @@ export default function NeuroSEODashboard({
   const [report, setReport] = useState<NeuroSEOReport | null>(null);
   const [usageStats, setUsageStats] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState<number>(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  // Get hydration and device context
+  const hydrated = useHydration();
+  const isMobile = useIsMobile();
+  const networkStatus = useNetworkStatus();
 
   // Form state
   const [urls, setUrls] = useState<string>("");
@@ -68,8 +82,35 @@ export default function NeuroSEODashboard({
   >("comprehensive");
 
   useEffect(() => {
-    loadUsageStats();
-  }, []);
+    if (hydrated) {
+      loadUsageStats();
+    }
+  }, [hydrated, user]);
+
+  // Scroll to results when analysis completes
+  useEffect(() => {
+    if (report && !isAnalyzing && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [report, isAnalyzing]);
+
+  // Simulate loading progress
+  useEffect(() => {
+    if (!isAnalyzing) {
+      setLoadingProgress(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setLoadingProgress((prev) => {
+        // Move faster at the beginning, slower as we approach completion
+        const increment = Math.max(1, 10 - Math.floor(prev / 10));
+        return Math.min(95, prev + increment * Math.random());
+      });
+    }, 800);
+
+    return () => clearInterval(interval);
+  }, [isAnalyzing]);
 
   const loadUsageStats = async () => {
     if (!user) return;
@@ -80,62 +121,169 @@ export default function NeuroSEODashboard({
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        // Add cache control for network efficiency
+        cache: networkStatus.downlink < 5 ? "force-cache" : "default",
       });
 
       if (response.ok) {
         const stats = await response.json();
         setUsageStats(stats);
+      } else {
+        throw new Error(`Failed to load usage stats: ${response.statusText}`);
       }
     } catch (error) {
       console.error("Failed to load usage stats:", error);
+      setError(
+        `Could not load usage statistics: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     }
   };
 
   const runAnalysis = async () => {
-    if (!user) return;
+    if (!user) {
+      setError("You must be logged in to run an analysis");
+      return;
+    }
+
+    if (!networkStatus.online) {
+      setError(
+        "You appear to be offline. Please check your internet connection and try again."
+      );
+      return;
+    }
+
+    // Form validation
+    const urlList = urls.split("\n").filter((url) => url.trim());
+    const keywordList = targetKeywords
+      .split(",")
+      .map((k) => k.trim())
+      .filter((k) => k);
+
+    if (urlList.length === 0) {
+      setError("Please enter at least one URL to analyze");
+      return;
+    }
+
+    if (keywordList.length === 0) {
+      setError("Please enter at least one target keyword");
+      return;
+    }
 
     setIsAnalyzing(true);
     setError(null);
+    setLoadingProgress(5); // Start progress indicator
+
+    // Create AbortController to handle timeouts and cancellations
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2-minute timeout
 
     try {
       const token = await user.getIdToken();
+      setLoadingProgress(10); // Token retrieved
 
       const analysisRequest: Omit<
         NeuroSEOAnalysisRequest,
         "userId" | "userPlan"
       > = {
-        urls: urls.split("\n").filter((url) => url.trim()),
-        targetKeywords: targetKeywords
-          .split(",")
-          .map((k) => k.trim())
-          .filter((k) => k),
+        urls: urlList,
+        targetKeywords: keywordList,
         competitorUrls: competitorUrls
           ? competitorUrls.split("\n").filter((url) => url.trim())
           : undefined,
         analysisType,
       };
 
-      const response = await fetch("/api/neuroseo", {
+      // Adjust request parameters for slow networks
+      const requestOptions: RequestInit = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(analysisRequest),
-      });
+        signal: controller.signal,
+        // Use compression for slow connections
+        keepalive: true,
+      };
+
+      setLoadingProgress(15); // Starting request
+
+      // Create progress indicator for long-running task
+      const progressIndicator = setInterval(() => {
+        setLoadingProgress((prev) =>
+          Math.min(95, prev + Math.random() * 2 + 0.5)
+        );
+      }, 1000);
+
+      const response = await fetch("/api/neuroseo", requestOptions);
+
+      clearInterval(progressIndicator);
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Analysis failed");
+        let errorMessage = "Analysis failed";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = `HTTP Error ${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
+      setLoadingProgress(98); // Almost done
       const analysisReport = await response.json();
+      setLoadingProgress(100); // Complete
+
       setReport(analysisReport);
       loadUsageStats(); // Refresh usage stats
+
+      // Announce completion for screen readers
+      const announcement = document.createElement("div");
+      announcement.setAttribute("aria-live", "polite");
+      announcement.textContent =
+        "Analysis complete. Results are now available.";
+      announcement.className = "sr-only";
+      document.body.appendChild(announcement);
+      setTimeout(() => document.body.removeChild(announcement), 3000);
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Analysis failed");
+      console.error("Analysis error:", error);
+
+      // Clear any running timers
+      clearTimeout(timeoutId);
+
+      // Handle specific error types
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setError(
+          "Analysis request timed out. Please try again or check your network connection."
+        );
+      } else if (!navigator.onLine) {
+        setError(
+          "Your network connection was lost. Please reconnect and try again."
+        );
+      } else if (
+        error instanceof TypeError &&
+        error.message.includes("NetworkError")
+      ) {
+        setError(
+          "Network error occurred. Please check your connection and try again."
+        );
+      } else if (error instanceof Error) {
+        if (error.message.includes("quota")) {
+          setError(
+            "You've reached your usage quota limit. Please upgrade your plan or try again later."
+          );
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError(
+          "Analysis failed. Please try again or contact support if the issue persists."
+        );
+      }
     } finally {
       setIsAnalyzing(false);
+      setLoadingProgress(0);
     }
   };
 

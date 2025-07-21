@@ -260,7 +260,7 @@ export const getVisibleNavGroups = (
       items: group.items.filter((item) => {
         // Check admin access
         if (item.adminOnly && !isAdmin) return false;
-        
+
         // Check tier access
         if (item.requiredTier) {
           if (!userTier) return false;
@@ -269,14 +269,14 @@ export const getVisibleNavGroups = (
           const requiredTierIndex = tierHierarchy.indexOf(item.requiredTier);
           if (userTierIndex < requiredTierIndex) return false;
         }
-        
+
         return true;
       }),
     }))
     .filter((group) => {
       // Filter out groups with no visible items
       if (group.items.length === 0) return false;
-      
+
       // Check group-level tier requirements
       if (group.requiredTier) {
         if (!userTier) return false;
@@ -285,7 +285,7 @@ export const getVisibleNavGroups = (
         const requiredTierIndex = tierHierarchy.indexOf(group.requiredTier);
         if (userTierIndex < requiredTierIndex) return false;
       }
-      
+
       return true;
     });
 };
@@ -297,7 +297,7 @@ export const getVisibleNavItems = (
   return flatNavItems.filter((item) => {
     // Check admin access
     if (item.adminOnly && !isAdmin) return false;
-    
+
     // Check tier access
     if (item.requiredTier) {
       if (!userTier) return false;
@@ -306,7 +306,7 @@ export const getVisibleNavItems = (
       const requiredTierIndex = tierHierarchy.indexOf(item.requiredTier);
       if (userTierIndex < requiredTierIndex) return false;
     }
-    
+
     return true;
   });
 };
@@ -316,7 +316,7 @@ export const findNavItemByHref = (href: string): NavItem | undefined => {
 };
 
 export const getNavGroupByItemHref = (href: string): NavGroup | undefined => {
-  return navGroups.find((group) => 
+  return navGroups.find((group) =>
     group.items.some((item) => item.href === href)
   );
 };
@@ -328,7 +328,7 @@ export const getTierBadgeProps = (tier: string) => {
     agency: { color: "purple", icon: Target, label: "Agency" },
     enterprise: { color: "gold", icon: Rocket, label: "Enterprise" },
   };
-  
+
   return tierConfig[tier as keyof typeof tierConfig] || null;
 };
 
@@ -352,12 +352,12 @@ export const defaultNavState: NavState = {
 // Error boundaries for navigation
 export const handleNavError = (error: Error, context: string) => {
   console.error(`Navigation error in ${context}:`, error);
-  
+
   // Report to error tracking service in production
   if (process.env.NODE_ENV === "production") {
     // Analytics or error tracking service call
   }
-  
+
   return {
     fallback: "dashboard",
     message: "Navigation temporarily unavailable",

@@ -1,24 +1,30 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { 
-  Activity, 
-  Clock, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle, 
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import {
+  Activity,
+  Clock,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
   XCircle,
   Database,
   Zap,
-  RefreshCw
-} from 'lucide-react';
-import { performanceMonitor } from '@/lib/performance-monitor';
-import { aiOptimizer } from '@/lib/ai-optimizer';
+  RefreshCw,
+} from "lucide-react";
+import { performanceMonitor } from "@/lib/performance-monitor";
+import { aiOptimizer } from "@/lib/ai-optimizer";
 
 interface PerformanceStats {
   totalOperations: number;
@@ -27,35 +33,47 @@ interface PerformanceStats {
   p95Duration: number;
   cacheHitRate: number;
   activeOperations: number;
-  healthStatus: 'healthy' | 'degraded' | 'unhealthy';
+  healthStatus: "healthy" | "degraded" | "unhealthy";
   recentErrors: string[];
 }
 
 export function PerformanceDashboard() {
   const [stats, setStats] = useState<PerformanceStats | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'5m' | '1h' | '24h'>('5m');
+  const [selectedTimeRange, setSelectedTimeRange] = useState<
+    "5m" | "1h" | "24h"
+  >("5m");
 
   const refreshStats = async () => {
     setIsRefreshing(true);
-    
+
     try {
       // Get time range in milliseconds
       const timeRangeMs = {
-        '5m': 5 * 60 * 1000,
-        '1h': 60 * 60 * 1000,
-        '24h': 24 * 60 * 60 * 1000
+        "5m": 5 * 60 * 1000,
+        "1h": 60 * 60 * 1000,
+        "24h": 24 * 60 * 60 * 1000,
       }[selectedTimeRange];
 
       // Get performance metrics
-      const aggregates = performanceMonitor.getAggregates(undefined, timeRangeMs);
+      const aggregates = performanceMonitor.getAggregates(
+        undefined,
+        timeRangeMs
+      );
       const healthStatus = performanceMonitor.getHealthStatus();
       const cacheStats = aiOptimizer.getCacheStats();
-      
+
       // Calculate overall cache hit rate
-      const totalCacheOps = Object.values(cacheStats).reduce((sum: number, stat: any) => sum + stat.entries, 0);
-      const totalCacheHits = Object.values(cacheStats).reduce((sum: number, stat: any) => sum + (stat.hitRate * stat.entries / 100), 0);
-      const overallCacheHitRate = totalCacheOps > 0 ? (totalCacheHits / totalCacheOps) * 100 : 0;
+      const totalCacheOps = Object.values(cacheStats).reduce(
+        (sum: number, stat: any) => sum + stat.entries,
+        0
+      );
+      const totalCacheHits = Object.values(cacheStats).reduce(
+        (sum: number, stat: any) => sum + (stat.hitRate * stat.entries) / 100,
+        0
+      );
+      const overallCacheHitRate =
+        totalCacheOps > 0 ? (totalCacheHits / totalCacheOps) * 100 : 0;
 
       setStats({
         totalOperations: aggregates.totalOperations,
@@ -65,10 +83,10 @@ export function PerformanceDashboard() {
         cacheHitRate: overallCacheHitRate,
         activeOperations: 0, // This would come from real-time monitoring
         healthStatus: healthStatus.status,
-        recentErrors: healthStatus.issues
+        recentErrors: healthStatus.issues,
       });
     } catch (error) {
-      console.error('Failed to refresh performance stats:', error);
+      console.error("Failed to refresh performance stats:", error);
     } finally {
       setIsRefreshing(false);
     }
@@ -100,19 +118,27 @@ export function PerformanceDashboard() {
 
   const getHealthStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy': return 'text-green-600 bg-green-50';
-      case 'degraded': return 'text-yellow-600 bg-yellow-50';
-      case 'unhealthy': return 'text-red-600 bg-red-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case "healthy":
+        return "text-green-600 bg-green-50";
+      case "degraded":
+        return "text-yellow-600 bg-yellow-50";
+      case "unhealthy":
+        return "text-red-600 bg-red-50";
+      default:
+        return "text-gray-600 bg-gray-50";
     }
   };
 
   const getHealthStatusIcon = (status: string) => {
     switch (status) {
-      case 'healthy': return <CheckCircle className="h-4 w-4" />;
-      case 'degraded': return <AlertTriangle className="h-4 w-4" />;
-      case 'unhealthy': return <XCircle className="h-4 w-4" />;
-      default: return <Activity className="h-4 w-4" />;
+      case "healthy":
+        return <CheckCircle className="h-4 w-4" />;
+      case "degraded":
+        return <AlertTriangle className="h-4 w-4" />;
+      case "unhealthy":
+        return <XCircle className="h-4 w-4" />;
+      default:
+        return <Activity className="h-4 w-4" />;
     }
   };
 
@@ -121,11 +147,18 @@ export function PerformanceDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Performance Dashboard</h2>
-          <p className="text-muted-foreground">Monitor AI operation performance and health</p>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Performance Dashboard
+          </h2>
+          <p className="text-muted-foreground">
+            Monitor AI operation performance and health
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Tabs value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as any)}>
+          <Tabs
+            value={selectedTimeRange}
+            onValueChange={(value) => setSelectedTimeRange(value as any)}
+          >
             <TabsList>
               <TabsTrigger value="5m">5m</TabsTrigger>
               <TabsTrigger value="1h">1h</TabsTrigger>
@@ -138,7 +171,9 @@ export function PerformanceDashboard() {
             onClick={refreshStats}
             disabled={isRefreshing}
           >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+            />
           </Button>
         </div>
       </div>
@@ -165,7 +200,10 @@ export function PerformanceDashboard() {
           {stats.recentErrors.length > 0 && (
             <div className="mt-4 space-y-2">
               {stats.recentErrors.map((error, index) => (
-                <div key={index} className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                <div
+                  key={index}
+                  className="text-sm text-red-600 bg-red-50 p-2 rounded"
+                >
                   {error}
                 </div>
               ))}
@@ -178,11 +216,15 @@ export function PerformanceDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Operations</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Operations
+            </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalOperations.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {stats.totalOperations.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               Last {selectedTimeRange}
             </p>
@@ -195,18 +237,24 @@ export function PerformanceDashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.successRate.toFixed(1)}%</div>
+            <div className="text-2xl font-bold">
+              {stats.successRate.toFixed(1)}%
+            </div>
             <Progress value={stats.successRate} className="mt-2" />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Avg Response Time
+            </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.averageDuration.toFixed(0)}ms</div>
+            <div className="text-2xl font-bold">
+              {stats.averageDuration.toFixed(0)}ms
+            </div>
             <p className="text-xs text-muted-foreground">
               P95: {stats.p95Duration.toFixed(0)}ms
             </p>
@@ -215,11 +263,15 @@ export function PerformanceDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cache Hit Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Cache Hit Rate
+            </CardTitle>
             <Database className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.cacheHitRate.toFixed(1)}%</div>
+            <div className="text-2xl font-bold">
+              {stats.cacheHitRate.toFixed(1)}%
+            </div>
             <Progress value={stats.cacheHitRate} className="mt-2" />
           </CardContent>
         </Card>
@@ -315,12 +367,17 @@ export function PerformanceDashboard() {
                 <div className="text-center py-8">
                   <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
                   <p className="text-lg font-medium">No errors detected</p>
-                  <p className="text-muted-foreground">System is running smoothly</p>
+                  <p className="text-muted-foreground">
+                    System is running smoothly
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {stats.recentErrors.map((error, index) => (
-                    <div key={index} className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div
+                      key={index}
+                      className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                    >
                       <div className="flex items-start gap-2">
                         <XCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                         <div className="text-sm text-red-700">{error}</div>

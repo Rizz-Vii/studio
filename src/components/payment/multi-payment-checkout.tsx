@@ -12,14 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  CreditCard, 
-  Star,
-  Check,
-  Shield,
-  Zap,
-  Lock
-} from "lucide-react";
+import { CreditCard, Star, Check, Shield, Zap, Lock } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import LoadingScreen from "@/components/ui/loading-screen";
@@ -31,90 +24,103 @@ import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase";
 import { trackPaymentEvents, conversionFunnel } from "@/lib/analytics";
 
-const createCheckoutSession = httpsCallable(functions, 'createCheckoutSession');
-const createPayPalOrder = httpsCallable(functions, 'createPayPalOrder');
+const createCheckoutSession = httpsCallable(functions, "createCheckoutSession");
+const createPayPalOrder = httpsCallable(functions, "createPayPalOrder");
 
 interface CheckoutPageProps {}
 
 const paymentMethods = [
   {
-    id: 'stripe',
-    name: 'Credit Card',
-    description: 'Secure payment with Stripe',
+    id: "stripe",
+    name: "Credit Card",
+    description: "Secure payment with Stripe",
     icon: <CreditCard className="h-5 w-5" />,
-    supported: ['visa', 'mastercard', 'amex', 'discover'],
-    popular: true
+    supported: ["visa", "mastercard", "amex", "discover"],
+    popular: true,
   },
   {
-    id: 'paypal',
-    name: 'PayPal',
-    description: 'Pay with PayPal account',
+    id: "paypal",
+    name: "PayPal",
+    description: "Pay with PayPal account",
     icon: <span className="text-blue-600 font-bold text-sm">PayPal</span>,
-    supported: ['paypal', 'pay_later'],
-    popular: true
-  }
+    supported: ["paypal", "pay_later"],
+    popular: true,
+  },
 ];
 
 export default function MultiPaymentCheckout() {
-  const [selectedMethod, setSelectedMethod] = useState('stripe');
+  const [selectedMethod, setSelectedMethod] = useState("stripe");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading } = useAuth();
 
-  const planId = searchParams?.get('plan') || 'agency';
-  const billingInterval = searchParams?.get('interval') || 'monthly';
-  
+  const planId = searchParams?.get("plan") || "agency";
+  const billingInterval = searchParams?.get("interval") || "monthly";
+
   const plan = STRIPE_PLANS[planId as keyof typeof STRIPE_PLANS];
-  const price = plan?.price[billingInterval as 'monthly' | 'yearly'];
-  const savings = billingInterval === 'yearly' ? (plan?.price.monthly * 12) - plan?.price.yearly : 0;
+  const price = plan?.price[billingInterval as "monthly" | "yearly"];
+  const savings =
+    billingInterval === "yearly"
+      ? plan?.price.monthly * 12 - plan?.price.yearly
+      : 0;
 
   useEffect(() => {
     setIsMounted(true);
-    
+
     // Track checkout page view
     trackPaymentEvents.beginCheckout(planId, price || 0);
-    conversionFunnel.step(2, 'checkout_view', planId);
+    conversionFunnel.step(2, "checkout_view", planId);
   }, [planId, price]);
 
   const handleStripeCheckout = async () => {
     try {
       setIsProcessing(true);
-      
+
       // Track payment method selection
-      trackPaymentEvents.selectPaymentMethod('stripe', planId);
-      conversionFunnel.step(3, 'payment_method_selected', planId, { method: 'stripe' });
-      
+      trackPaymentEvents.selectPaymentMethod("stripe", planId);
+      conversionFunnel.step(3, "payment_method_selected", planId, {
+        method: "stripe",
+      });
+
       const result = await createCheckoutSession({
         userId: user?.uid,
-        priceId: plan?.priceId[billingInterval as 'monthly' | 'yearly'],
+        priceId: plan?.priceId[billingInterval as "monthly" | "yearly"],
         plan: planId,
         interval: billingInterval,
         successUrl: `${window.location.origin}/payment-success?plan=${planId}&amount=${price}&cycle=${billingInterval}`,
-        cancelUrl: `${window.location.origin}/pricing`
+        cancelUrl: `${window.location.origin}/pricing`,
       });
 
       const { sessionId } = result.data as { sessionId: string };
-      
+
       const stripe = await getStripe();
-      if (!stripe) throw new Error('Stripe not loaded');
-      
+      if (!stripe) throw new Error("Stripe not loaded");
+
       // Track checkout initiation
-      conversionFunnel.step(4, 'stripe_redirect', planId);
-      
+      conversionFunnel.step(4, "stripe_redirect", planId);
+
       const { error } = await stripe.redirectToCheckout({ sessionId });
-      
+
       if (error) {
-        console.error('Stripe checkout error:', error);
-        trackPaymentEvents.abandonCheckout(planId, 'stripe_redirect', error.message);
-        toast.error('Payment failed. Please try again.');
+        console.error("Stripe checkout error:", error);
+        trackPaymentEvents.abandonCheckout(
+          planId,
+          "stripe_redirect",
+          error.message
+        );
+        toast.error("Payment failed. Please try again.");
       }
     } catch (error: any) {
-      console.error('Checkout error:', error);
-      trackPaymentEvents.abandonCheckout(planId, 'checkout_session_creation', error.message);
-      toast.error('Failed to process payment. Please try again.');
+      console.error("Checkout error:", error);
+      trackPaymentEvents.abandonCheckout(
+        planId,
+        "checkout_session_creation",
+        error.message
+      );
+      toast.error("Failed to process payment. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -123,18 +129,26 @@ export default function MultiPaymentCheckout() {
   const handlePayPalApprove = async (data: any, actions: any) => {
     try {
       setIsProcessing(true);
-      
+
       // Track successful PayPal payment
-      trackPaymentEvents.purchase(planId, price || 0, data.orderID, 'USD');
-      conversionFunnel.step(5, 'payment_completed', planId, { method: 'paypal' });
-      
+      trackPaymentEvents.purchase(planId, price || 0, data.orderID, "USD");
+      conversionFunnel.step(5, "payment_completed", planId, {
+        method: "paypal",
+      });
+
       // Handle PayPal payment approval
-      router.push(`/payment-success?plan=${planId}&amount=${price}&cycle=${billingInterval}&method=paypal`);
-      toast.success('Payment successful!');
+      router.push(
+        `/payment-success?plan=${planId}&amount=${price}&cycle=${billingInterval}&method=paypal`
+      );
+      toast.success("Payment successful!");
     } catch (error) {
-      console.error('PayPal payment error:', error);
-      trackPaymentEvents.abandonCheckout(planId, 'paypal_approval', 'PayPal payment failed');
-      toast.error('Payment failed. Please try again.');
+      console.error("PayPal payment error:", error);
+      trackPaymentEvents.abandonCheckout(
+        planId,
+        "paypal_approval",
+        "PayPal payment failed"
+      );
+      toast.error("Payment failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -150,7 +164,7 @@ export default function MultiPaymentCheckout() {
   }
 
   if (!plan) {
-    router.push('/pricing');
+    router.push("/pricing");
     return <LoadingScreen fullScreen text="Invalid plan. Redirecting..." />;
   }
 
@@ -163,8 +177,12 @@ export default function MultiPaymentCheckout() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-bold font-headline mb-4">Complete Your Subscription</h1>
-          <p className="text-muted-foreground">Choose your preferred payment method</p>
+          <h1 className="text-3xl font-bold font-headline mb-4">
+            Complete Your Subscription
+          </h1>
+          <p className="text-muted-foreground">
+            Choose your preferred payment method
+          </p>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -192,13 +210,15 @@ export default function MultiPaymentCheckout() {
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">${price}</p>
-                      {billingInterval === 'yearly' && savings > 0 && (
-                        <p className="text-sm text-green-600">Save ${savings}</p>
+                      {billingInterval === "yearly" && savings > 0 && (
+                        <p className="text-sm text-green-600">
+                          Save ${savings}
+                        </p>
                       )}
                     </div>
                   </div>
-                  
-                  {billingInterval === 'yearly' && savings > 0 && (
+
+                  {billingInterval === "yearly" && savings > 0 && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                       <div className="flex items-center gap-2">
                         <Check className="h-4 w-4 text-green-600" />
@@ -233,7 +253,9 @@ export default function MultiPaymentCheckout() {
                     <Shield className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
                       <p className="font-medium">Secure & Protected</p>
-                      <p className="text-blue-600">256-bit SSL encryption • Cancel anytime</p>
+                      <p className="text-blue-600">
+                        256-bit SSL encryption • Cancel anytime
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -265,12 +287,15 @@ export default function MultiPaymentCheckout() {
                       key={method.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-all ${
                         selectedMethod === method.id
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-primary/50'
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
                       }`}
                       onClick={() => {
                         setSelectedMethod(method.id);
-                        trackPaymentEvents.selectPaymentMethod(method.id, planId);
+                        trackPaymentEvents.selectPaymentMethod(
+                          method.id,
+                          planId
+                        );
                       }}
                     >
                       <div className="flex items-center justify-between">
@@ -282,17 +307,23 @@ export default function MultiPaymentCheckout() {
                             <div className="flex items-center gap-2">
                               <h4 className="font-medium">{method.name}</h4>
                               {method.popular && (
-                                <Badge variant="secondary" className="text-xs">Popular</Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  Popular
+                                </Badge>
                               )}
                             </div>
-                            <p className="text-sm text-muted-foreground">{method.description}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {method.description}
+                            </p>
                           </div>
                         </div>
-                        <div className={`w-4 h-4 rounded-full border-2 ${
-                          selectedMethod === method.id
-                            ? 'border-primary bg-primary'
-                            : 'border-border'
-                        }`}>
+                        <div
+                          className={`w-4 h-4 rounded-full border-2 ${
+                            selectedMethod === method.id
+                              ? "border-primary bg-primary"
+                              : "border-border"
+                          }`}
+                        >
                           {selectedMethod === method.id && (
                             <div className="w-full h-full rounded-full bg-white scale-50" />
                           )}
@@ -306,7 +337,7 @@ export default function MultiPaymentCheckout() {
 
                 {/* Payment Processing */}
                 <div className="space-y-4">
-                  {selectedMethod === 'stripe' && (
+                  {selectedMethod === "stripe" && (
                     <div className="space-y-4">
                       <div className="text-center">
                         <p className="text-sm text-muted-foreground mb-4">
@@ -334,13 +365,14 @@ export default function MultiPaymentCheckout() {
                     </div>
                   )}
 
-                  {selectedMethod === 'paypal' && (
+                  {selectedMethod === "paypal" && (
                     <div className="space-y-4">
                       <PayPalScriptProvider
                         options={{
-                          clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+                          clientId:
+                            process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
                           currency: "USD",
-                          intent: "subscription"
+                          intent: "subscription",
                         }}
                       >
                         <PayPalButtons
@@ -348,7 +380,7 @@ export default function MultiPaymentCheckout() {
                             layout: "vertical",
                             color: "blue",
                             shape: "rect",
-                            label: "subscribe"
+                            label: "subscribe",
                           }}
                           createOrder={async () => {
                             try {
@@ -356,19 +388,22 @@ export default function MultiPaymentCheckout() {
                                 userId: user.uid,
                                 plan: planId,
                                 interval: billingInterval,
-                                amount: price
+                                amount: price,
                               });
                               return (result.data as any).orderID;
                             } catch (error) {
-                              console.error('PayPal order creation error:', error);
-                              toast.error('Failed to create PayPal order');
+                              console.error(
+                                "PayPal order creation error:",
+                                error
+                              );
+                              toast.error("Failed to create PayPal order");
                               throw error;
                             }
                           }}
                           onApprove={handlePayPalApprove}
                           onError={(error) => {
-                            console.error('PayPal error:', error);
-                            toast.error('PayPal payment failed');
+                            console.error("PayPal error:", error);
+                            toast.error("PayPal payment failed");
                           }}
                           disabled={isProcessing}
                         />
@@ -379,10 +414,15 @@ export default function MultiPaymentCheckout() {
 
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">
-                    By completing your purchase, you agree to our{' '}
-                    <a href="/terms" className="text-primary hover:underline">Terms of Service</a>
-                    {' '}and{' '}
-                    <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>.
+                    By completing your purchase, you agree to our{" "}
+                    <a href="/terms" className="text-primary hover:underline">
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a href="/privacy" className="text-primary hover:underline">
+                      Privacy Policy
+                    </a>
+                    .
                   </p>
                 </div>
               </CardContent>

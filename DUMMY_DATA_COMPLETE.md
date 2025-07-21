@@ -10,7 +10,7 @@ The RankPilot (Studio) test environment has been successfully populated with com
 
 - **Free Tier**: 2 users (1 regular user, 1 admin)
 - **Starter Tier**: 1 user
-- **Agency Tier**: 1 user  
+- **Agency Tier**: 1 user
 - **Enterprise Tier**: 2 users (1 regular user, 1 admin)
 
 **NeuroSEO™ Analyses: 22 total**
@@ -52,7 +52,7 @@ All test users use the same password: `testPassword123`
   - **Use Case**: Individual blogger wanting basic SEO insights
   - **Limitations**: 1 URL per analysis, 3 keywords max, basic features only
 
-- **Email**: `admin.free@test.com` 
+- **Email**: `admin.free@test.com`
   - **Role**: Admin with free tier limitations
   - **Use Case**: Admin user but with quota restrictions
 
@@ -130,12 +130,12 @@ All test users use the same password: `testPassword123`
 
 ### Tier-Based Limits (Monthly)
 
-| Tier | Reports | Audits | Crawls |
-|------|---------|--------|--------|
-| Free | 3 | 5 | 10 |
-| Starter | 10 | 25 | 50 |
-| Agency | 50 | 100 | 250 |
-| Enterprise | 200 | 500 | 1000 |
+| Tier       | Reports | Audits | Crawls |
+| ---------- | ------- | ------ | ------ |
+| Free       | 3       | 5      | 10     |
+| Starter    | 10      | 25     | 50     |
+| Agency     | 50      | 100    | 250    |
+| Enterprise | 200     | 500    | 1000   |
 
 **Current Usage Status**: All users are within their quota limits with realistic usage patterns.
 
@@ -149,7 +149,7 @@ The following npm scripts are now available for database management:
 # Populate dummy data
 npm run db:populate
 
-# Verify data integrity  
+# Verify data integrity
 npm run db:verify
 
 # Test all use cases
@@ -269,13 +269,13 @@ Use any of the test user accounts listed above with password: `testPassword123`
 
 ## 🎯 Business Use Cases Verified
 
-| Use Case | Test User | Key Features | Status |
-|----------|-----------|--------------|---------|
-| Personal Blogger | <free.user1@test.com> | Basic SEO insights, single URL analysis | ✅ Ready |
-| Small Business | <starter.user1@test.com> | Multi-page analysis, content optimization | ✅ Ready |
-| Marketing Agency | <agency.user1@test.com> | Client management, competitive research | ✅ Ready |
-| Enterprise Corp | <enterprise.user1@test.com> | Advanced AI features, unlimited research | ✅ Ready |
-| System Admin | <admin.enterprise@test.com> | User management, system oversight | ✅ Ready |
+| Use Case         | Test User                   | Key Features                              | Status   |
+| ---------------- | --------------------------- | ----------------------------------------- | -------- |
+| Personal Blogger | <free.user1@test.com>       | Basic SEO insights, single URL analysis   | ✅ Ready |
+| Small Business   | <starter.user1@test.com>    | Multi-page analysis, content optimization | ✅ Ready |
+| Marketing Agency | <agency.user1@test.com>     | Client management, competitive research   | ✅ Ready |
+| Enterprise Corp  | <enterprise.user1@test.com> | Advanced AI features, unlimited research  | ✅ Ready |
+| System Admin     | <admin.enterprise@test.com> | User management, system oversight         | ✅ Ready |
 
 ---
 
@@ -304,6 +304,6 @@ If you encounter any issues during testing:
 **Environment Ready**: ✅ All systems verified and functional  
 **Test Data**: ✅ Comprehensive dummy data populated  
 **User Scenarios**: ✅ All tier use cases tested  
-**Scripts Available**: ✅ Database management tools ready  
+**Scripts Available**: ✅ Database management tools ready
 
 🎉 **The RankPilot test environment is now fully functional and ready for comprehensive testing!**

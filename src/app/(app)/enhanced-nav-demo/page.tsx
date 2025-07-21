@@ -1,13 +1,16 @@
 "use client";
 /**
  * Enhanced Navigation Demo Page
- * 
+ *
  * This page demonstrates the enhanced navigation in action.
  * Use this to test the navigation before integrating it fully.
  */
 
 import React, { useState } from "react";
-import { EnhancedAppNav, EnhancedMobileNav } from "@/components/enhanced-app-nav";
+import {
+  EnhancedAppNav,
+  EnhancedMobileNav,
+} from "@/components/enhanced-app-nav";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +43,8 @@ export default function EnhancedNavigationDemo() {
             </Badge>
           </div>
           <p className="text-muted-foreground text-lg">
-            Experience the new systematically organized navigation with prominent NeuroSEO™ Suite grouping.
+            Experience the new systematically organized navigation with
+            prominent NeuroSEO™ Suite grouping.
           </p>
         </div>
 
@@ -69,7 +73,7 @@ export default function EnhancedNavigationDemo() {
                   ))}
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Options:</label>
                 <div className="flex gap-2">
@@ -103,7 +107,8 @@ export default function EnhancedNavigationDemo() {
                 <p className="text-sm font-medium">Last Clicked:</p>
                 <p className="text-sm text-muted-foreground">
                   {lastClicked.title} → {lastClicked.href}
-                  {lastClicked.requiredTier && ` (${lastClicked.requiredTier}+)`}
+                  {lastClicked.requiredTier &&
+                    ` (${lastClicked.requiredTier}+)`}
                 </p>
               </div>
             )}
@@ -121,14 +126,20 @@ export default function EnhancedNavigationDemo() {
           <TabsContent value="desktop" className="space-y-6">
             <div className="grid lg:grid-cols-4 gap-6">
               {/* Navigation Sidebar */}
-              <div className={`${collapsed ? "lg:col-span-1" : "lg:col-span-1"} space-y-4`}>
+              <div
+                className={`${collapsed ? "lg:col-span-1" : "lg:col-span-1"} space-y-4`}
+              >
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg">Enhanced Navigation</CardTitle>
+                    <CardTitle className="text-lg">
+                      Enhanced Navigation
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <EnhancedAppNav
-                      userTier={selectedTier === "free" ? undefined : selectedTier}
+                      userTier={
+                        selectedTier === "free" ? undefined : selectedTier
+                      }
                       isAdmin={isAdmin}
                       collapsed={collapsed}
                       onItemClickAction={handleNavItemClick}
@@ -151,37 +162,41 @@ export default function EnhancedNavigationDemo() {
                           NeuroSEO™ Suite Prominence
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          AI-powered features are now the primary focus with dedicated grouping and visual badges.
+                          AI-powered features are now the primary focus with
+                          dedicated grouping and visual badges.
                         </p>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <h4 className="font-medium flex items-center gap-2">
                           <Eye className="h-4 w-4" />
                           Logical Organization
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          Related features are systematically grouped together for better user experience.
+                          Related features are systematically grouped together
+                          for better user experience.
                         </p>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <h4 className="font-medium flex items-center gap-2">
                           <Users className="h-4 w-4" />
                           Tier-Based Access
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          Navigation adapts based on user subscription tier, showing only relevant features.
+                          Navigation adapts based on user subscription tier,
+                          showing only relevant features.
                         </p>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <h4 className="font-medium flex items-center gap-2">
                           <Settings className="h-4 w-4" />
                           Responsive Design
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          Mobile-optimized with collapsible groups and touch-friendly interactions.
+                          Mobile-optimized with collapsible groups and
+                          touch-friendly interactions.
                         </p>
                       </div>
                     </div>
@@ -228,7 +243,9 @@ export default function EnhancedNavigationDemo() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">SEO Tools</CardTitle>
-                  <Badge variant="secondary" className="w-fit">Core Features</Badge>
+                  <Badge variant="secondary" className="w-fit">
+                    Core Features
+                  </Badge>
                 </CardHeader>
                 <CardContent className="text-sm space-y-1">
                   <p>• Keyword Tool</p>
@@ -240,8 +257,12 @@ export default function EnhancedNavigationDemo() {
 
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Competitive Intelligence</CardTitle>
-                  <Badge variant="outline" className="w-fit">Advanced</Badge>
+                  <CardTitle className="text-base">
+                    Competitive Intelligence
+                  </CardTitle>
+                  <Badge variant="outline" className="w-fit">
+                    Advanced
+                  </Badge>
                 </CardHeader>
                 <CardContent className="text-sm space-y-1">
                   <p>• Competitors</p>
@@ -253,7 +274,9 @@ export default function EnhancedNavigationDemo() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">Management</CardTitle>
-                  <Badge variant="secondary" className="w-fit">Overview</Badge>
+                  <Badge variant="secondary" className="w-fit">
+                    Overview
+                  </Badge>
                 </CardHeader>
                 <CardContent className="text-sm space-y-1">
                   <p>• Dashboard</p>

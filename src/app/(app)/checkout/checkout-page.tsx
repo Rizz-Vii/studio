@@ -3,29 +3,40 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, CreditCard, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import getStripe, { STRIPE_PLANS, PlanType, BillingInterval } from "@/lib/stripe";
+import getStripe, {
+  STRIPE_PLANS,
+  PlanType,
+  BillingInterval,
+} from "@/lib/stripe";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 
-const createCheckoutSession = httpsCallable(functions, 'createCheckoutSession');
+const createCheckoutSession = httpsCallable(functions, "createCheckoutSession");
 
 export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
-  
+
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const planId = (searchParams?.get('plan') || 'agency') as PlanType;
-  const billingInterval = (searchParams?.get('billing') || 'monthly') as BillingInterval;
+  const planId = (searchParams?.get("plan") || "agency") as PlanType;
+  const billingInterval = (searchParams?.get("billing") ||
+    "monthly") as BillingInterval;
 
   useEffect(() => {
     setMounted(true);
@@ -33,7 +44,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (mounted && !authLoading && !user) {
-      router.push('/login?redirect=/pricing');
+      router.push("/login?redirect=/pricing");
     }
   }, [mounted, authLoading, user, router]);
 
@@ -57,9 +68,7 @@ export default function CheckoutPage() {
         <Card className="max-w-md">
           <CardHeader>
             <CardTitle>Invalid Plan</CardTitle>
-            <CardDescription>
-              The selected plan was not found.
-            </CardDescription>
+            <CardDescription>The selected plan was not found.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild>
@@ -89,11 +98,11 @@ export default function CheckoutPage() {
 
       // Redirect to Stripe Checkout
       const stripe = await getStripe();
-      if (!stripe) throw new Error('Stripe failed to load');
+      if (!stripe) throw new Error("Stripe failed to load");
 
       await stripe.redirectToCheckout({ sessionId });
     } catch (error: any) {
-      console.error('Checkout error:', error);
+      console.error("Checkout error:", error);
       toast({
         variant: "destructive",
         title: "Checkout Failed",
@@ -105,7 +114,10 @@ export default function CheckoutPage() {
   };
 
   const price = plan.price[billingInterval];
-  const yearlyDiscount = billingInterval === 'yearly' ? (plan.price.monthly * 12) - plan.price.yearly : 0;
+  const yearlyDiscount =
+    billingInterval === "yearly"
+      ? plan.price.monthly * 12 - plan.price.yearly
+      : 0;
 
   const features = {
     starter: [
@@ -114,18 +126,18 @@ export default function CheckoutPage() {
       "Basic SEO audit",
       "Content suggestions",
       "Email support",
-      "Monthly reports"
+      "Monthly reports",
     ],
     agency: [
       "500 keyword tracking",
-      "25 competitor analysis", 
+      "25 competitor analysis",
       "Advanced SEO audit",
       "AI-powered content brief",
       "Priority support",
       "Weekly reports",
       "White-label options",
       "API access",
-      "Custom integrations"
+      "Custom integrations",
     ],
     enterprise: [
       "Unlimited keyword tracking",
@@ -138,7 +150,7 @@ export default function CheckoutPage() {
       "Custom API limits",
       "Dedicated account manager",
       "Custom integrations",
-      "Team collaboration tools"
+      "Team collaboration tools",
     ],
     agency: [
       "Everything in Enterprise",
@@ -148,8 +160,8 @@ export default function CheckoutPage() {
       "Custom integrations",
       "Dedicated support team",
       "Custom onboarding",
-      "Advanced team management"
-    ]
+      "Advanced team management",
+    ],
   };
 
   return (
@@ -163,7 +175,9 @@ export default function CheckoutPage() {
               Back to Pricing
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold mb-2">Complete Your Subscription</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            Complete Your Subscription
+          </h1>
           <p className="text-muted-foreground">
             You're subscribing to the {plan.name} plan. Review your order below.
           </p>
@@ -189,12 +203,12 @@ export default function CheckoutPage() {
                 <div className="text-right">
                   <div className="font-bold">${price}</div>
                   <div className="text-sm text-muted-foreground">
-                    /{billingInterval === 'monthly' ? 'month' : 'year'}
+                    /{billingInterval === "monthly" ? "month" : "year"}
                   </div>
                 </div>
               </div>
 
-              {billingInterval === 'yearly' && yearlyDiscount > 0 && (
+              {billingInterval === "yearly" && yearlyDiscount > 0 && (
                 <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-green-800">
@@ -213,12 +227,14 @@ export default function CheckoutPage() {
               <div className="border-t pt-4">
                 <div className="flex items-center justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${price}/{billingInterval === 'monthly' ? 'mo' : 'yr'}</span>
+                  <span>
+                    ${price}/{billingInterval === "monthly" ? "mo" : "yr"}
+                  </span>
                 </div>
               </div>
 
-              <Button 
-                onClick={handleCheckout} 
+              <Button
+                onClick={handleCheckout}
                 disabled={loading}
                 className="w-full"
                 size="lg"
@@ -243,9 +259,7 @@ export default function CheckoutPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 {plan.name} Plan Features
-                <Badge variant="secondary">
-                  Popular
-                </Badge>
+                <Badge variant="secondary">Popular</Badge>
               </CardTitle>
               <CardDescription>
                 Everything included in your subscription.

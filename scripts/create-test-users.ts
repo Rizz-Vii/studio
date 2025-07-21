@@ -1,13 +1,24 @@
 /**
  * Firebase Test User Creation Script
- * 
+ *
  * Creates test users for role-based testing with proper subscription tiers
  * and access permissions in Firebase Authentication and Firestore.
  */
 
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, collection, addDoc } from "firebase/firestore";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  collection,
+  addDoc,
+} from "firebase/firestore";
 import { TEST_USERS } from "../tests/utils/user-management";
 
 // Firebase configuration (using environment variables)
@@ -21,7 +32,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase (avoid duplicate initialization)
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -32,7 +44,7 @@ interface UserProfile {
   role: string;
   subscription: {
     tier: string;
-    status: 'active' | 'inactive' | 'trial';
+    status: "active" | "inactive" | "trial";
     startDate: string;
     endDate?: string;
     features: string[];
@@ -44,66 +56,62 @@ interface UserProfile {
 
 // Feature access configuration for each tier
 const TIER_FEATURES: Record<string, string[]> = {
-  free: [
-    'dashboard_access',
-    'basic_keyword_analysis',
-    'limited_searches'
-  ],
+  free: ["dashboard_access", "basic_keyword_analysis", "limited_searches"],
   starter: [
-    'dashboard_access',
-    'keyword_analysis',
-    'link_analysis', 
-    'serp_analysis',
-    'basic_performance_metrics',
-    'export_pdf'
+    "dashboard_access",
+    "keyword_analysis",
+    "link_analysis",
+    "serp_analysis",
+    "basic_performance_metrics",
+    "export_pdf",
   ],
   agency: [
-    'dashboard_access',
-    'keyword_analysis',
-    'link_analysis',
-    'serp_analysis', 
-    'performance_metrics',
-    'competitor_analysis',
-    'bulk_operations',
-    'export_csv',
-    'export_pdf'
+    "dashboard_access",
+    "keyword_analysis",
+    "link_analysis",
+    "serp_analysis",
+    "performance_metrics",
+    "competitor_analysis",
+    "bulk_operations",
+    "export_csv",
+    "export_pdf",
   ],
   enterprise: [
-    'dashboard_access',
-    'keyword_analysis',
-    'link_analysis',
-    'serp_analysis',
-    'performance_metrics',
-    'competitor_analysis',
-    'bulk_operations',
-    'white_label',
-    'api_access',
-    'export_csv',
-    'export_pdf',
-    'priority_support'
+    "dashboard_access",
+    "keyword_analysis",
+    "link_analysis",
+    "serp_analysis",
+    "performance_metrics",
+    "competitor_analysis",
+    "bulk_operations",
+    "white_label",
+    "api_access",
+    "export_csv",
+    "export_pdf",
+    "priority_support",
   ],
   admin: [
-    'dashboard_access',
-    'keyword_analysis',
-    'link_analysis',
-    'serp_analysis',
-    'performance_metrics',
-    'competitor_analysis',
-    'bulk_operations',
-    'white_label',
-    'api_access',
-    'export_csv',
-    'export_pdf',
-    'priority_support',
-    'admin_panel',
-    'user_management',
-    'system_settings'
-  ]
+    "dashboard_access",
+    "keyword_analysis",
+    "link_analysis",
+    "serp_analysis",
+    "performance_metrics",
+    "competitor_analysis",
+    "bulk_operations",
+    "white_label",
+    "api_access",
+    "export_csv",
+    "export_pdf",
+    "priority_support",
+    "admin_panel",
+    "user_management",
+    "system_settings",
+  ],
 };
 
 async function createTestUser(userKey: string) {
   const user = TEST_USERS[userKey];
-  
+
   if (!user) {
     throw new Error(`User configuration not found for key: ${userKey}`);
   }
@@ -112,9 +120,13 @@ async function createTestUser(userKey: string) {
 
   try {
     // Create user in Firebase Auth
-    const userCredential = await createUserWithEmailAndPassword(auth, user.email, user.password);
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      user.email,
+      user.password
+    );
     const firebaseUser = userCredential.user;
-    
+
     console.log(`✅ Firebase Auth user created: ${firebaseUser.uid}`);
 
     // Create user profile in Firestore
@@ -125,12 +137,12 @@ async function createTestUser(userKey: string) {
       role: user.role,
       subscription: {
         tier: user.role,
-        status: 'active',
+        status: "active",
         startDate: new Date().toISOString(),
-        features: TIER_FEATURES[user.role] || []
+        features: TIER_FEATURES[user.role] || [],
       },
       createdAt: new Date().toISOString(),
-      testUser: true
+      testUser: true,
     };
 
     // Save to Firestore users collection
@@ -141,11 +153,11 @@ async function createTestUser(userKey: string) {
     const subscription = {
       userId: firebaseUser.uid,
       tier: user.role,
-      status: 'active',
+      status: "active",
       startDate: new Date().toISOString(),
       features: TIER_FEATURES[user.role] || [],
       testAccount: true,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     await addDoc(collection(db, "subscriptions"), subscription);
@@ -153,23 +165,26 @@ async function createTestUser(userKey: string) {
 
     // Sign out the created user
     await signOut(auth);
-    
+
     return {
       uid: firebaseUser.uid,
       email: user.email,
       role: user.role,
-      success: true
+      success: true,
     };
-
   } catch (error: any) {
-    if (error.code === 'auth/email-already-in-use') {
+    if (error.code === "auth/email-already-in-use") {
       console.log(`⚠️ User ${user.email} already exists, updating profile...`);
-      
+
       try {
         // Sign in and update existing user
-        const userCredential = await signInWithEmailAndPassword(auth, user.email, user.password);
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          user.email,
+          user.password
+        );
         const firebaseUser = userCredential.user;
-        
+
         // Update Firestore profile
         const userProfile: UserProfile = {
           uid: firebaseUser.uid,
@@ -178,31 +193,36 @@ async function createTestUser(userKey: string) {
           role: user.role,
           subscription: {
             tier: user.role,
-            status: 'active',
+            status: "active",
             startDate: new Date().toISOString(),
-            features: TIER_FEATURES[user.role] || []
+            features: TIER_FEATURES[user.role] || [],
           },
           createdAt: new Date().toISOString(),
-          testUser: true
+          testUser: true,
         };
 
-        await setDoc(doc(db, "users", firebaseUser.uid), userProfile, { merge: true });
+        await setDoc(doc(db, "users", firebaseUser.uid), userProfile, {
+          merge: true,
+        });
         await signOut(auth);
-        
+
         console.log(`✅ Updated existing user: ${user.email}`);
         return {
           uid: firebaseUser.uid,
           email: user.email,
           role: user.role,
-          success: true
+          success: true,
         };
       } catch (updateError) {
-        console.error(`❌ Failed to update existing user ${user.email}:`, updateError);
+        console.error(
+          `❌ Failed to update existing user ${user.email}:`,
+          updateError
+        );
         return {
           email: user.email,
           role: user.role,
           success: false,
-          error: updateError
+          error: updateError,
         };
       }
     } else {
@@ -211,7 +231,7 @@ async function createTestUser(userKey: string) {
         email: user.email,
         role: user.role,
         success: false,
-        error: error
+        error: error,
       };
     }
   }
@@ -219,24 +239,25 @@ async function createTestUser(userKey: string) {
 
 async function createAllTestUsers() {
   console.log(`🚀 Starting Firebase test user creation...`);
-  console.log(`📊 Creating users for roles: ${Object.keys(TEST_USERS).join(", ")}`);
-  
+  console.log(
+    `📊 Creating users for roles: ${Object.keys(TEST_USERS).join(", ")}`
+  );
+
   const results = [];
-  
+
   for (const userKey of Object.keys(TEST_USERS)) {
     try {
       const result = await createTestUser(userKey);
       results.push(result);
-      
+
       // Add delay between user creation to avoid rate limits
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.error(`❌ Failed to process user ${userKey}:`, error);
       results.push({
         role: userKey,
         success: false,
-        error: error
+        error: error,
       });
     }
   }
@@ -244,29 +265,30 @@ async function createAllTestUsers() {
   // Summary
   console.log(`\n📈 Test User Creation Summary:`);
   console.log(`=" ".repeat(50)`);
-  
-  const successful = results.filter(r => r.success);
-  const failed = results.filter(r => !r.success);
-  
+
+  const successful = results.filter((r) => r.success);
+  const failed = results.filter((r) => !r.success);
+
   console.log(`✅ Successfully created/updated: ${successful.length} users`);
-  successful.forEach(user => {
-    const email = 'email' in user ? user.email : 'unknown';
-    const role = 'role' in user ? user.role : 'unknown';
+  successful.forEach((user) => {
+    const email = "email" in user ? user.email : "unknown";
+    const role = "role" in user ? user.role : "unknown";
     console.log(`   - ${email} (${role})`);
   });
-  
+
   if (failed.length > 0) {
     console.log(`❌ Failed: ${failed.length} users`);
-    failed.forEach(user => {
-      const identifier = 'email' in user ? user.email : ('role' in user ? user.role : 'unknown');
-      const errorMsg = user.error?.message || 'Unknown error';
+    failed.forEach((user) => {
+      const identifier =
+        "email" in user ? user.email : "role" in user ? user.role : "unknown";
+      const errorMsg = user.error?.message || "Unknown error";
       console.log(`   - ${identifier}: ${errorMsg}`);
     });
   }
-  
+
   console.log(`\n🎯 Ready for role-based testing!`);
   console.log(`Run: npm run test:role-based`);
-  
+
   return results;
 }
 

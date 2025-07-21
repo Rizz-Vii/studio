@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getUserSubscription, SubscriptionData } from "@/lib/subscription";
 import { STRIPE_PLANS, FREE_PLAN, PlanType } from "@/lib/stripe";
-import { 
-  UserAccess, 
-  SubscriptionTier, 
+import {
+  UserAccess,
+  SubscriptionTier,
   UserRole,
   canAccessFeature,
   getUserLimits,
@@ -12,7 +12,7 @@ import {
   isAtUsageLimit,
   getAccessibleFeatures,
   normalizeUserAccess,
-  TIER_LIMITS
+  TIER_LIMITS,
 } from "@/lib/access-control";
 
 export interface PlanLimits {
@@ -60,7 +60,7 @@ export function useSubscription() {
         const userAccess = normalizeUserAccess({
           role: profile?.role || "user",
           subscriptionTier: subData.tier,
-          subscriptionStatus: subData.status
+          subscriptionStatus: subData.status,
         });
 
         const subscriptionInfo: SubscriptionInfo = {
@@ -70,18 +70,18 @@ export function useSubscription() {
           features: planInfo.features,
           isUnlimited: planInfo.limits.auditsPerMonth === -1,
           userAccess,
-          accessibleFeatures: getAccessibleFeatures(userAccess)
+          accessibleFeatures: getAccessibleFeatures(userAccess),
         };
 
         setSubscription(subscriptionInfo);
       } catch (error) {
         console.error("Error fetching subscription:", error);
-        
+
         // Default to free plan on error
         const defaultUserAccess: UserAccess = {
           role: "user",
-          tier: "free", 
-          status: "free"
+          tier: "free",
+          status: "free",
         };
 
         setSubscription({
@@ -92,7 +92,7 @@ export function useSubscription() {
           features: FREE_PLAN.features,
           isUnlimited: false,
           userAccess: defaultUserAccess,
-          accessibleFeatures: getAccessibleFeatures(defaultUserAccess)
+          accessibleFeatures: getAccessibleFeatures(defaultUserAccess),
         });
       } finally {
         setLoading(false);
@@ -112,7 +112,11 @@ export function useSubscription() {
     currentUsage: number
   ): number => {
     if (!subscription) return 0;
-    return getRemainingUsage(subscription.userAccess.tier, usageType, currentUsage);
+    return getRemainingUsage(
+      subscription.userAccess.tier,
+      usageType,
+      currentUsage
+    );
   };
 
   const isAtLimitCheck = (
@@ -120,7 +124,11 @@ export function useSubscription() {
     currentUsage: number
   ): boolean => {
     if (!subscription) return true;
-    return isAtUsageLimit(subscription.userAccess.tier, usageType, currentUsage);
+    return isAtUsageLimit(
+      subscription.userAccess.tier,
+      usageType,
+      currentUsage
+    );
   };
 
   return {
@@ -150,7 +158,7 @@ export function useSubscription() {
         const userAccess = normalizeUserAccess({
           role: profile?.role || "user",
           subscriptionTier: subData.tier,
-          subscriptionStatus: subData.status
+          subscriptionStatus: subData.status,
         });
 
         const subscriptionInfo: SubscriptionInfo = {
@@ -160,7 +168,7 @@ export function useSubscription() {
           features: planInfo.features,
           isUnlimited: planInfo.limits.auditsPerMonth === -1,
           userAccess,
-          accessibleFeatures: getAccessibleFeatures(userAccess)
+          accessibleFeatures: getAccessibleFeatures(userAccess),
         };
 
         setSubscription(subscriptionInfo);

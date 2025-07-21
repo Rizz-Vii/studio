@@ -1,10 +1,14 @@
 import { test, expect } from "@playwright/test";
-import { UserManager, TEST_USERS, getFeaturesForRole } from "../utils/user-management";
+import {
+  UserManager,
+  TEST_USERS,
+  getFeaturesForRole,
+} from "../utils/user-management";
 import { randomDelay } from "../utils/test-utils";
 
 /**
  * Comprehensive End-to-End Tests for Role-Based Access Control
- * 
+ *
  * Tests each user role's access to features based on their subscription tier:
  * - Free: Basic dashboard and keyword tool
  * - Starter: Includes link analysis, SERP analysis, performance metrics
@@ -36,7 +40,12 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       await userManager.waitForDashboard();
 
       const allowedFeatures = getFeaturesForRole("free");
-      const restrictedFeatures = ["/link-view", "/serp-view", "/performance", "/adminonly"];
+      const restrictedFeatures = [
+        "/link-view",
+        "/serp-view",
+        "/performance",
+        "/adminonly",
+      ];
 
       // Test allowed features
       for (const feature of allowedFeatures) {
@@ -55,20 +64,24 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       }
     });
 
-    test("free user sees upgrade prompts on restricted features", async ({ page }) => {
+    test("free user sees upgrade prompts on restricted features", async ({
+      page,
+    }) => {
       await userManager.loginAs("free");
       await userManager.waitForDashboard();
 
       // Try to access premium feature
       await page.goto("/link-view");
-      
+
       // Check for upgrade prompts
-      const upgradePrompts = page.locator([
-        "text=/upgrade/i",
-        "text=/premium/i",
-        "text=/subscribe/i",
-        "[data-testid*='upgrade']"
-      ].join(", "));
+      const upgradePrompts = page.locator(
+        [
+          "text=/upgrade/i",
+          "text=/premium/i",
+          "text=/subscribe/i",
+          "[data-testid*='upgrade']",
+        ].join(", ")
+      );
 
       const promptCount = await upgradePrompts.count();
       expect(promptCount).toBeGreaterThan(0);
@@ -111,13 +124,19 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       await page.waitForLoadState("domcontentloaded");
 
       // Check that the link analysis form is accessible
-      const linkForm = page.locator('form, [data-testid*="link"], input[type="url"]');
-      const formExists = await linkForm.count() > 0;
+      const linkForm = page.locator(
+        'form, [data-testid*="link"], input[type="url"]'
+      );
+      const formExists = (await linkForm.count()) > 0;
       expect(formExists).toBe(true);
 
       // Test form interaction (if form is present)
-      const urlInput = page.locator('input[type="url"], input[placeholder*="url"], input[placeholder*="link"]').first();
-      if (await urlInput.count() > 0) {
+      const urlInput = page
+        .locator(
+          'input[type="url"], input[placeholder*="url"], input[placeholder*="link"]'
+        )
+        .first();
+      if ((await urlInput.count()) > 0) {
         await urlInput.fill("https://example.com");
         expect(await urlInput.inputValue()).toBe("https://example.com");
       }
@@ -131,14 +150,16 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       await page.waitForLoadState("domcontentloaded");
 
       // Check that SERP analysis is accessible
-      const serpContent = page.locator([
-        'h1:has-text("SERP")',
-        '[data-testid*="serp"]',
-        'text=/search.*results/i',
-        'form'
-      ].join(", "));
+      const serpContent = page.locator(
+        [
+          'h1:has-text("SERP")',
+          '[data-testid*="serp"]',
+          "text=/search.*results/i",
+          "form",
+        ].join(", ")
+      );
 
-      const contentExists = await serpContent.count() > 0;
+      const contentExists = (await serpContent.count()) > 0;
       expect(contentExists).toBe(true);
     });
   });
@@ -151,7 +172,7 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       await userManager.waitForDashboard();
 
       const allowedFeatures = getFeaturesForRole("enterprise");
-      
+
       // Test all allowed features
       for (const feature of allowedFeatures) {
         console.log(`🔍 Testing enterprise user access to: ${feature}`);
@@ -165,20 +186,28 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       expect(hasAdminAccess).toBe(false);
     });
 
-    test("enterprise user can access all starter features plus advanced tools", async ({ page }) => {
+    test("enterprise user can access all starter features plus advanced tools", async ({
+      page,
+    }) => {
       await userManager.loginAs("enterprise");
       await userManager.waitForDashboard();
 
       // Test core features
-      const coreFeatures = ["/dashboard", "/keyword-tool", "/link-view", "/serp-view", "/performance"];
-      
+      const coreFeatures = [
+        "/dashboard",
+        "/keyword-tool",
+        "/link-view",
+        "/serp-view",
+        "/performance",
+      ];
+
       for (const feature of coreFeatures) {
         await page.goto(feature);
         await page.waitForLoadState("domcontentloaded");
-        
+
         const currentUrl = page.url();
         expect(currentUrl).toContain(feature);
-        
+
         // Should not be redirected to login or unauthorized
         expect(currentUrl).not.toContain("/login");
         expect(currentUrl).not.toContain("/unauthorized");
@@ -194,7 +223,7 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       await userManager.waitForDashboard();
 
       const allowedFeatures = getFeaturesForRole("admin");
-      
+
       // Test all allowed features including admin panel
       for (const feature of allowedFeatures) {
         console.log(`🔍 Testing admin user access to: ${feature}`);
@@ -213,14 +242,16 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       await page.waitForLoadState("domcontentloaded");
 
       // Check for admin-specific content
-      const adminContent = page.locator([
-        'h1:has-text("Admin")',
-        '[data-testid*="admin"]',
-        'text=/admin.*panel/i',
-        'text=/user.*management/i'
-      ].join(", "));
+      const adminContent = page.locator(
+        [
+          'h1:has-text("Admin")',
+          '[data-testid*="admin"]',
+          "text=/admin.*panel/i",
+          "text=/user.*management/i",
+        ].join(", ")
+      );
 
-      const adminExists = await adminContent.count() > 0;
+      const adminExists = (await adminContent.count()) > 0;
       expect(adminExists).toBe(true);
 
       // Verify URL is admin panel
@@ -233,14 +264,16 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       await userManager.waitForDashboard();
 
       // Check for admin-specific navigation
-      const adminNav = page.locator([
-        'a[href*="admin"]',
-        'text=/admin.*panel/i',
-        '[data-testid*="admin-nav"]',
-        'nav a:has-text("Admin")'
-      ].join(", "));
+      const adminNav = page.locator(
+        [
+          'a[href*="admin"]',
+          "text=/admin.*panel/i",
+          '[data-testid*="admin-nav"]',
+          'nav a:has-text("Admin")',
+        ].join(", ")
+      );
 
-      const navExists = await adminNav.count() > 0;
+      const navExists = (await adminNav.count()) > 0;
       expect(navExists).toBe(true);
     });
   });
@@ -248,10 +281,10 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
   test.describe("Cross-Role Feature Validation", () => {
     test("keyword tool is accessible to all roles", async ({ page }) => {
       const roles = ["free", "starter", "enterprise", "admin"] as const;
-      
+
       for (const role of roles) {
         console.log(`🔍 Testing keyword tool access for ${role} user`);
-        
+
         await userManager.loginAs(role);
         await userManager.waitForDashboard();
 
@@ -263,12 +296,14 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
       }
     });
 
-    test("dashboard is accessible to all authenticated users", async ({ page }) => {
+    test("dashboard is accessible to all authenticated users", async ({
+      page,
+    }) => {
       const roles = ["free", "starter", "enterprise", "admin"] as const;
-      
+
       for (const role of roles) {
         console.log(`🔍 Testing dashboard access for ${role} user`);
-        
+
         await userManager.loginAs(role);
         await userManager.waitForDashboard();
 
@@ -277,14 +312,13 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
         expect(currentUrl).toContain("/dashboard");
 
         // Check for dashboard content
-        const dashboardContent = page.locator([
-          'h1',
-          '[data-testid*="dashboard"]',
-          'text=/welcome/i',
-          'main'
-        ].join(", "));
+        const dashboardContent = page.locator(
+          ["h1", '[data-testid*="dashboard"]', "text=/welcome/i", "main"].join(
+            ", "
+          )
+        );
 
-        const contentExists = await dashboardContent.count() > 0;
+        const contentExists = (await dashboardContent.count()) > 0;
         expect(contentExists).toBe(true);
 
         await userManager.logout();
@@ -322,7 +356,7 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
         { role: "admin", shouldAccessAll: true },
         { role: "enterprise", shouldAccess: ["free", "starter", "enterprise"] },
         { role: "starter", shouldAccess: ["free", "starter"] },
-        { role: "free", shouldAccess: ["free"] }
+        { role: "free", shouldAccess: ["free"] },
       ];
 
       for (const { role, shouldAccess } of roleHierarchy) {
@@ -334,7 +368,8 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
           for (const tierToTest of shouldAccess) {
             const features = getFeaturesForRole(tierToTest);
             for (const feature of features) {
-              if (feature !== "/adminonly") { // Skip admin-only for non-admin users
+              if (feature !== "/adminonly") {
+                // Skip admin-only for non-admin users
                 const hasAccess = await userManager.hasAccessToFeature(feature);
                 expect(hasAccess).toBe(true);
               }
@@ -372,7 +407,7 @@ test.describe("Role-Based Access Control - Comprehensive E2E", () => {
 
       // Try to access protected resource
       await page.goto("/dashboard");
-      
+
       // Should be redirected to login
       await page.waitForURL("**/login", { timeout: 10000 });
       const currentUrl = page.url();

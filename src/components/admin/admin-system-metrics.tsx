@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Database,
   Server,
   Zap,
@@ -20,7 +20,7 @@ import {
   RefreshCw,
   HardDrive,
   Cpu,
-  Network
+  Network,
 } from "lucide-react";
 import { collection, getCountFromServer } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -46,10 +46,10 @@ export default function AdminSystemMetrics() {
   const fetchSystemMetrics = async () => {
     try {
       setLoading(true);
-      
+
       // Get Firestore document counts
       const usersCount = await getCountFromServer(collection(db, "users"));
-      
+
       // Simulate other metrics (in a real app, these would come from monitoring services)
       const simulatedMetrics: SystemMetrics = {
         firestoreDocuments: usersCount.data().count,
@@ -57,9 +57,9 @@ export default function AdminSystemMetrics() {
         apiCalls: Math.floor(Math.random() * 10000 + 50000),
         errorRate: Math.random() * 2,
         uptime: "99.9%",
-        responseTime: Math.floor(Math.random() * 100 + 50)
+        responseTime: Math.floor(Math.random() * 100 + 50),
       };
-      
+
       setMetrics(simulatedMetrics);
       setLastRefresh(new Date());
     } catch (error) {
@@ -72,12 +72,20 @@ export default function AdminSystemMetrics() {
   const getStatusBadge = (metric: string, value: number) => {
     switch (metric) {
       case "errorRate":
-        if (value < 1) return <Badge className="bg-green-100 text-green-800">Healthy</Badge>;
-        if (value < 3) return <Badge className="bg-yellow-100 text-yellow-800">Warning</Badge>;
+        if (value < 1)
+          return <Badge className="bg-green-100 text-green-800">Healthy</Badge>;
+        if (value < 3)
+          return (
+            <Badge className="bg-yellow-100 text-yellow-800">Warning</Badge>
+          );
         return <Badge className="bg-red-100 text-red-800">Critical</Badge>;
       case "responseTime":
-        if (value < 100) return <Badge className="bg-green-100 text-green-800">Fast</Badge>;
-        if (value < 300) return <Badge className="bg-yellow-100 text-yellow-800">Moderate</Badge>;
+        if (value < 100)
+          return <Badge className="bg-green-100 text-green-800">Fast</Badge>;
+        if (value < 300)
+          return (
+            <Badge className="bg-yellow-100 text-yellow-800">Moderate</Badge>
+          );
         return <Badge className="bg-red-100 text-red-800">Slow</Badge>;
       default:
         return <Badge className="bg-green-100 text-green-800">Healthy</Badge>;
@@ -116,7 +124,9 @@ export default function AdminSystemMetrics() {
           </p>
         </div>
         <Button onClick={fetchSystemMetrics} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw
+            className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>
@@ -127,23 +137,29 @@ export default function AdminSystemMetrics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">System Uptime</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  System Uptime
+                </p>
                 <p className="text-2xl font-bold">{metrics.uptime}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-600">All systems operational</span>
+                  <span className="text-sm text-green-600">
+                    All systems operational
+                  </span>
                 </div>
               </div>
               <Server className="h-8 w-8 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Response Time</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Response Time
+                </p>
                 <p className="text-2xl font-bold">{metrics.responseTime}ms</p>
                 <div className="mt-1">
                   {getStatusBadge("responseTime", metrics.responseTime)}
@@ -153,13 +169,17 @@ export default function AdminSystemMetrics() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Error Rate</p>
-                <p className="text-2xl font-bold">{metrics.errorRate.toFixed(2)}%</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Error Rate
+                </p>
+                <p className="text-2xl font-bold">
+                  {metrics.errorRate.toFixed(2)}%
+                </p>
                 <div className="mt-1">
                   {getStatusBadge("errorRate", metrics.errorRate)}
                 </div>
@@ -185,15 +205,21 @@ export default function AdminSystemMetrics() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Total Documents</span>
-              <span className="text-sm text-muted-foreground">{metrics.firestoreDocuments.toLocaleString()}</span>
+              <span className="text-sm text-muted-foreground">
+                {metrics.firestoreDocuments.toLocaleString()}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Read Operations</span>
-              <span className="text-sm text-muted-foreground">~{Math.floor(metrics.apiCalls * 0.7).toLocaleString()}/day</span>
+              <span className="text-sm text-muted-foreground">
+                ~{Math.floor(metrics.apiCalls * 0.7).toLocaleString()}/day
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Write Operations</span>
-              <span className="text-sm text-muted-foreground">~{Math.floor(metrics.apiCalls * 0.3).toLocaleString()}/day</span>
+              <span className="text-sm text-muted-foreground">
+                ~{Math.floor(metrics.apiCalls * 0.3).toLocaleString()}/day
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Connection Status</span>
@@ -215,7 +241,9 @@ export default function AdminSystemMetrics() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Storage Used</span>
-              <span className="text-sm text-muted-foreground">{metrics.storageUsed}</span>
+              <span className="text-sm text-muted-foreground">
+                {metrics.storageUsed}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Storage Limit</span>
@@ -240,9 +268,7 @@ export default function AdminSystemMetrics() {
             <Cpu className="h-5 w-5" />
             Performance Metrics
           </CardTitle>
-          <CardDescription>
-            Real-time performance indicators
-          </CardDescription>
+          <CardDescription>Real-time performance indicators</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -251,21 +277,27 @@ export default function AdminSystemMetrics() {
                 <Network className="h-6 w-6 text-blue-600" />
               </div>
               <div className="text-2xl font-bold">98.5%</div>
-              <div className="text-sm text-muted-foreground">API Success Rate</div>
+              <div className="text-sm text-muted-foreground">
+                API Success Rate
+              </div>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="flex items-center justify-center mb-2">
                 <Clock className="h-6 w-6 text-green-600" />
               </div>
               <div className="text-2xl font-bold">1.2s</div>
-              <div className="text-sm text-muted-foreground">Avg. Page Load</div>
+              <div className="text-sm text-muted-foreground">
+                Avg. Page Load
+              </div>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="flex items-center justify-center mb-2">
                 <Zap className="h-6 w-6 text-purple-600" />
               </div>
               <div className="text-2xl font-bold">99.2%</div>
-              <div className="text-sm text-muted-foreground">Cache Hit Rate</div>
+              <div className="text-sm text-muted-foreground">
+                Cache Hit Rate
+              </div>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="flex items-center justify-center mb-2">

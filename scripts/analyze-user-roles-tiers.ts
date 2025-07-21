@@ -21,7 +21,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 
 interface UserData {
@@ -42,13 +43,13 @@ async function analyzeUserRolesAndTiers() {
   try {
     const usersCollection = collection(db, "users");
     const snapshot = await getDocs(usersCollection);
-    
+
     const users: UserData[] = [];
     const roleStats: Record<string, number> = {};
     const tierStats: Record<string, number> = {};
     const subscriptionTierStats: Record<string, number> = {};
     const statusStats: Record<string, number> = {};
-    
+
     console.log(`📊 Found ${snapshot.size} users in database\n`);
 
     snapshot.forEach((doc) => {
@@ -66,7 +67,8 @@ async function analyzeUserRolesAndTiers() {
 
       // Count subscription tiers
       const subscriptionTier = userData.subscriptionTier || "none";
-      subscriptionTierStats[subscriptionTier] = (subscriptionTierStats[subscriptionTier] || 0) + 1;
+      subscriptionTierStats[subscriptionTier] =
+        (subscriptionTierStats[subscriptionTier] || 0) + 1;
 
       // Count subscription status
       const status = userData.subscriptionStatus || "none";
@@ -96,48 +98,56 @@ async function analyzeUserRolesAndTiers() {
 
     // Print detailed user information
     console.log("\n👥 DETAILED USER INFORMATION:");
-    console.log("=" .repeat(80));
-    
+    console.log("=".repeat(80));
+
     users.forEach((user, index) => {
       console.log(`\n${index + 1}. User ID: ${user.id}`);
-      console.log(`   Email: ${user.email || 'N/A'}`);
-      console.log(`   Display Name: ${user.displayName || 'N/A'}`);
-      console.log(`   Role: ${user.role || 'N/A'}`);
-      console.log(`   Tier: ${user.tier || 'N/A'}`);
-      console.log(`   Subscription Tier: ${user.subscriptionTier || 'N/A'}`);
-      console.log(`   Subscription Status: ${user.subscriptionStatus || 'N/A'}`);
-      
+      console.log(`   Email: ${user.email || "N/A"}`);
+      console.log(`   Display Name: ${user.displayName || "N/A"}`);
+      console.log(`   Role: ${user.role || "N/A"}`);
+      console.log(`   Tier: ${user.tier || "N/A"}`);
+      console.log(`   Subscription Tier: ${user.subscriptionTier || "N/A"}`);
+      console.log(
+        `   Subscription Status: ${user.subscriptionStatus || "N/A"}`
+      );
+
       // Check for inconsistencies
       const inconsistencies = [];
-      if (user.tier && user.subscriptionTier && user.tier !== user.subscriptionTier) {
-        inconsistencies.push(`tier (${user.tier}) ≠ subscriptionTier (${user.subscriptionTier})`);
+      if (
+        user.tier &&
+        user.subscriptionTier &&
+        user.tier !== user.subscriptionTier
+      ) {
+        inconsistencies.push(
+          `tier (${user.tier}) ≠ subscriptionTier (${user.subscriptionTier})`
+        );
       }
-      
+
       if (inconsistencies.length > 0) {
-        console.log(`   ⚠️  INCONSISTENCIES: ${inconsistencies.join(', ')}`);
+        console.log(`   ⚠️  INCONSISTENCIES: ${inconsistencies.join(", ")}`);
       }
     });
 
     // Identify test users from our TEST_USERS object
     const testUserEmails = [
       "abbas_ali_rizvi@hotmail.com",
-      "admin.user1@test.com", 
+      "admin.user1@test.com",
       "enterprise.user1@test.com",
       "starter.user1@test.com",
-      "free.user1@test.com"
+      "free.user1@test.com",
     ];
 
     console.log("\n🧪 TEST USER ANALYSIS:");
-    console.log("=" .repeat(80));
-    
-    testUserEmails.forEach(email => {
-      const user = users.find(u => u.email === email);
+    console.log("=".repeat(80));
+
+    testUserEmails.forEach((email) => {
+      const user = users.find((u) => u.email === email);
       if (user) {
         console.log(`\n✅ ${email} (ID: ${user.id})`);
-        console.log(`   Role: ${user.role || 'N/A'}`);
-        console.log(`   Tier: ${user.tier || 'N/A'}`);
-        console.log(`   Subscription Tier: ${user.subscriptionTier || 'N/A'}`);
-        console.log(`   Status: ${user.subscriptionStatus || 'N/A'}`);
+        console.log(`   Role: ${user.role || "N/A"}`);
+        console.log(`   Tier: ${user.tier || "N/A"}`);
+        console.log(`   Subscription Tier: ${user.subscriptionTier || "N/A"}`);
+        console.log(`   Status: ${user.subscriptionStatus || "N/A"}`);
       } else {
         console.log(`\n❌ ${email} - NOT FOUND IN DATABASE`);
       }
@@ -145,15 +155,17 @@ async function analyzeUserRolesAndTiers() {
 
     // Check for optimal test configuration
     console.log("\n🎯 RECOMMENDATIONS FOR TESTING:");
-    console.log("=" .repeat(80));
-    
+    console.log("=".repeat(80));
+
     const recommendations = [];
-    
+
     // Check if we have proper tier coverage
-    const requiredTiers = ['free', 'starter', 'agency', 'enterprise'];
-    const availableTiers = Object.keys(subscriptionTierStats).filter(tier => tier !== 'none');
-    
-    requiredTiers.forEach(tier => {
+    const requiredTiers = ["free", "starter", "agency", "enterprise"];
+    const availableTiers = Object.keys(subscriptionTierStats).filter(
+      (tier) => tier !== "none"
+    );
+
+    requiredTiers.forEach((tier) => {
       if (!availableTiers.includes(tier)) {
         recommendations.push(`Create user with subscriptionTier: ${tier}`);
       }
@@ -174,7 +186,6 @@ async function analyzeUserRolesAndTiers() {
     }
 
     console.log("\n✅ Analysis complete!");
-
   } catch (error) {
     console.error("❌ Error analyzing users:", error);
   }

@@ -104,7 +104,7 @@ function Set-DefenderExclusions {
         "playwright.exe"
     )
     
-    if (-not (Test-Administrator)) {
+    if (-not (Administrator)) {
         Write-Host "  ⚠️  Not running as Administrator - cannot configure Defender exclusions" -ForegroundColor Yellow
         Write-Host "  💡 To configure exclusions manually:" -ForegroundColor Cyan
         Write-Host "     1. Open Windows Security > Virus & threat protection" -ForegroundColor White

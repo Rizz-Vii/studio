@@ -1,19 +1,22 @@
 // Script to retrieve all users from Firestore
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import * as dotenv from 'dotenv';
+import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import * as dotenv from "dotenv";
 
 // Load environment variables
-dotenv.config({ path: '.env.test' });
+dotenv.config({ path: ".env.test" });
 
 // Initialize Firebase Admin
 if (!getApps().length) {
-  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(
+    /\\n/g,
+    "\n"
+  );
   const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
-  const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || 'rankpilot-h3jpc';
+  const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || "rankpilot-h3jpc";
 
   if (!privateKey || !clientEmail) {
-    throw new Error('Missing Firebase Admin credentials in .env.test file');
+    throw new Error("Missing Firebase Admin credentials in .env.test file");
   }
 
   initializeApp({
@@ -44,11 +47,11 @@ interface UserData {
 
 export async function getAllUsers() {
   try {
-    console.log('🔍 Retrieving all users from database...');
-    
-    const usersSnapshot = await db.collection('users').get();
+    console.log("🔍 Retrieving all users from database...");
+
+    const usersSnapshot = await db.collection("users").get();
     const users: UserData[] = [];
-    
+
     usersSnapshot.forEach((doc) => {
       const userData = doc.data();
       users.push({
@@ -60,25 +63,28 @@ export async function getAllUsers() {
         nextBillingDate: userData.nextBillingDate?.toDate?.(),
       });
     });
-    
+
     console.log(`📊 Found ${users.length} users in database`);
-    
+
     // Group by subscription tier
-    const usersByTier: Record<string, UserData[]> = users.reduce((acc, user) => {
-      const tier = user.subscriptionTier || 'free';
-      if (!acc[tier]) acc[tier] = [];
-      acc[tier].push(user);
-      return acc;
-    }, {} as Record<string, UserData[]>);
-    
-    console.log('📈 Users by tier:');
+    const usersByTier: Record<string, UserData[]> = users.reduce(
+      (acc, user) => {
+        const tier = user.subscriptionTier || "free";
+        if (!acc[tier]) acc[tier] = [];
+        acc[tier].push(user);
+        return acc;
+      },
+      {} as Record<string, UserData[]>
+    );
+
+    console.log("📈 Users by tier:");
     Object.entries(usersByTier).forEach(([tier, tierUsers]) => {
       console.log(`  ${tier}: ${tierUsers.length} users`);
     });
-    
+
     return { users, usersByTier };
   } catch (error) {
-    console.error('❌ Error retrieving users:', error);
+    console.error("❌ Error retrieving users:", error);
     throw error;
   }
 }
@@ -86,21 +92,21 @@ export async function getAllUsers() {
 if (require.main === module) {
   getAllUsers()
     .then(({ users, usersByTier }) => {
-      console.log('\n📋 User Details:');
+      console.log("\n📋 User Details:");
       users.forEach((user, index) => {
-        console.log(`\n${index + 1}. ${user.email || 'No email'}`);
+        console.log(`\n${index + 1}. ${user.email || "No email"}`);
         console.log(`   ID: ${user.id}`);
-        console.log(`   Tier: ${user.subscriptionTier || 'free'}`);
-        console.log(`   Status: ${user.subscriptionStatus || 'free'}`);
-        console.log(`   Role: ${user.role || 'user'}`);
-        console.log(`   Created: ${user.createdAt || 'Unknown'}`);
-        console.log(`   Last Login: ${user.lastLoginAt || 'Never'}`);
+        console.log(`   Tier: ${user.subscriptionTier || "free"}`);
+        console.log(`   Status: ${user.subscriptionStatus || "free"}`);
+        console.log(`   Role: ${user.role || "user"}`);
+        console.log(`   Created: ${user.createdAt || "Unknown"}`);
+        console.log(`   Last Login: ${user.lastLoginAt || "Never"}`);
       });
-      
+
       process.exit(0);
     })
     .catch((error) => {
-      console.error('💥 Failed to retrieve users:', error);
+      console.error("💥 Failed to retrieve users:", error);
       process.exit(1);
     });
 }

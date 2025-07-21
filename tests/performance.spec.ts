@@ -15,18 +15,20 @@ async function loginUser(page: Page) {
     const loginPage = new LoginPage(page);
     await loginPage.navigateTo();
     console.log("Login page loaded");
-    
+
     // Login with standard test user
     await loginPage.login("abbas_ali_rizvi@hotmail.com", "123456");
-    
+
     // Wait a bit after login to ensure any post-login processing completes
     await randomDelay();
-    
+
     console.log("Login successful, now at dashboard!");
   } catch (error) {
     console.error("Login failed:", error);
     console.log(`Current URL: ${page.url()}`);
-    await page.screenshot({ path: `test-results/login-failure-${Date.now()}.png` });
+    await page.screenshot({
+      path: `test-results/login-failure-${Date.now()}.png`,
+    });
     throw error;
   }
 }
@@ -34,7 +36,7 @@ async function loginUser(page: Page) {
 test.describe("Performance Optimization Features", () => {
   // Increase test timeout for all tests
   test.setTimeout(120000);
-  
+
   test.beforeEach(async ({ page }) => {
     // Increase navigation and action timeouts
     page.setDefaultNavigationTimeout(30000);
@@ -44,10 +46,10 @@ test.describe("Performance Optimization Features", () => {
   test("performance dashboard loads and displays metrics", async ({ page }) => {
     // First login to access protected routes
     await loginUser(page);
-    
+
     await page.goto("/performance");
     await page.waitForLoadState("domcontentloaded");
-    
+
     // Add a short delay instead of waiting for networkidle
     await page.waitForTimeout(2000);
 
@@ -56,18 +58,24 @@ test.describe("Performance Optimization Features", () => {
 
     // Look for performance-related content with enhanced selectors - split into separate locators
     const textIndicators = await page
-      .locator("text=/performance|monitoring|metrics|cache|response.*time|success.*rate/i")
+      .locator(
+        "text=/performance|monitoring|metrics|cache|response.*time|success.*rate/i"
+      )
       .count();
-      
+
     const classIndicators = await page
-      .locator("[class*='metric'], [class*='performance'], [class*='dashboard'], [data-testid*='performance']")
+      .locator(
+        "[class*='metric'], [class*='performance'], [class*='dashboard'], [data-testid*='performance']"
+      )
       .count();
-    
+
     const performanceIndicators = textIndicators + classIndicators;
 
     // Should have at least some performance-related elements
     expect(performanceIndicators).toBeGreaterThan(0);
-    console.log(`Found ${performanceIndicators} performance-related indicators`);
+    console.log(
+      `Found ${performanceIndicators} performance-related indicators`
+    );
 
     await page.screenshot({
       path: "test-results/performance-dashboard-detailed.png",
@@ -78,60 +86,72 @@ test.describe("Performance Optimization Features", () => {
   test("keyword tool with performance monitoring", async ({ page }) => {
     // Login first to access protected route
     await loginUser(page);
-    
+
     // Navigate to the keyword tool after authentication with longer timeout
     await page.goto("/keyword-tool", { timeout: 30000 });
     await page.waitForLoadState("domcontentloaded");
-    
+
     // Add a short delay instead of waiting for networkidle
     await page.waitForTimeout(2000);
 
     // Verify the keyword tool loads
     await expect(page.locator("body")).toBeVisible();
-    
+
     // Wait for any dynamic content to load
     await page.waitForTimeout(2000);
 
     // Check for any interactive elements with expanded selectors
-    const interactiveElements = await page.locator([
-      "input", 
-      "textarea", 
-      "button", 
-      "select", 
-      "[role='button']", 
-      "[role='textbox']",
-      "[contenteditable='true']",
-      "[class*='input']",
-      "[class*='form']"
-    ].join(", ")).count();
-    
+    const interactiveElements = await page
+      .locator(
+        [
+          "input",
+          "textarea",
+          "button",
+          "select",
+          "[role='button']",
+          "[role='textbox']",
+          "[contenteditable='true']",
+          "[class*='input']",
+          "[class*='form']",
+        ].join(", ")
+      )
+      .count();
+
     console.log(`Found ${interactiveElements} interactive elements`);
     expect(interactiveElements).toBeGreaterThan(0);
 
     // Check for performance feedback elements with expanded selectors
     const feedbackElements = await page
-      .locator([
-        "[class*='feedback']", 
-        "[class*='performance']",
-        "[class*='metric']",
-        "[class*='score']",
-        "[class*='indicator']",
-        "[data-testid*='performance']",
-        "[data-testid*='metric']"
-      ].join(", "))
+      .locator(
+        [
+          "[class*='feedback']",
+          "[class*='performance']",
+          "[class*='metric']",
+          "[class*='score']",
+          "[class*='indicator']",
+          "[data-testid*='performance']",
+          "[data-testid*='metric']",
+        ].join(", ")
+      )
       .count();
 
-    const feedbackText = await page.locator("text=/feedback|performance|score|metric/i").count();
+    const feedbackText = await page
+      .locator("text=/feedback|performance|score|metric/i")
+      .count();
     const ratingText = await page.locator("text=/rating|score|grade/i").count();
 
     // Performance feedback might not be visible initially
-    console.log(`Found ${feedbackElements + feedbackText + ratingText} feedback-related elements`);
-    
+    console.log(
+      `Found ${feedbackElements + feedbackText + ratingText} feedback-related elements`
+    );
+
     // Try interacting with the form to trigger performance metrics
     try {
       // Check if we can find any input elements first
-      const inputCount = await page.locator("input[type='text'], input[type='search'], textarea").count();
-      
+      const inputCount = await page
+        .locator("input[type='text'], input[type='search'], textarea")
+        .count();
+
       if (inputCount > 0) {
         // Try to find a valid input with shorter timeout to avoid long waits
         const hasVisibleInput = await page
@@ -139,37 +159,47 @@ test.describe("Performance Optimization Features", () => {
           .first()
           .isVisible({ timeout: 3000 })
           .catch(() => false);
-          
+
         if (hasVisibleInput) {
           // Find and fill a search input
           await page
             .locator("input[type='text'], input[type='search'], textarea")
             .first()
             .fill("seo optimization", { timeout: 5000 });
-            
+
           await page.keyboard.press("Tab");
-          
+
           // Try to find and click a submit/search button
-          const submitButton = page.locator([
-            "button[type='submit']",
-            "button:has-text(/search|analyze|check|run|submit/i)",
-            "[role='button']:has-text(/search|analyze|check/i)"
-          ].join(", ")).first();
-          
-          const hasSubmit = await submitButton.isVisible({ timeout: 3000 }).catch(() => false);
+          const submitButton = page
+            .locator(
+              [
+                "button[type='submit']",
+                "button:has-text(/search|analyze|check|run|submit/i)",
+                "[role='button']:has-text(/search|analyze|check/i)",
+              ].join(", ")
+            )
+            .first();
+
+          const hasSubmit = await submitButton
+            .isVisible({ timeout: 3000 })
+            .catch(() => false);
           if (hasSubmit) {
             await submitButton.click();
-            
+
             // Wait for potential results to load
             await page.waitForTimeout(2000);
-            
+
             // Check again for performance indicators that might appear after submission
             const dynamicMetrics = await page
-              .locator("[class*='metric'], [class*='score'], [class*='performance'], [class*='result']")
+              .locator(
+                "[class*='metric'], [class*='score'], [class*='performance'], [class*='result']"
+              )
               .count();
-              
+
             if (dynamicMetrics > 0) {
-              console.log(`After form submission, found ${dynamicMetrics} performance metrics`);
+              console.log(
+                `After form submission, found ${dynamicMetrics} performance metrics`
+              );
             }
           }
         } else {
@@ -179,7 +209,10 @@ test.describe("Performance Optimization Features", () => {
         console.log("No input elements found, skipping form interaction");
       }
     } catch (e: any) {
-      console.log("Could not fully interact with the keyword tool form:", e.message || String(e));
+      console.log(
+        "Could not fully interact with the keyword tool form:",
+        e.message || String(e)
+      );
       // Continue test execution - this is just an extra check
     }
 
@@ -192,46 +225,54 @@ test.describe("Performance Optimization Features", () => {
   test("mobile navigation components", async ({ page }) => {
     // Login first
     await loginUser(page);
-    
+
     // Test on mobile viewport with additional timeout
     page.setDefaultNavigationTimeout(60000);
     await page.setViewportSize({ width: 375, height: 667 });
-    
+
     // Navigate to dashboard with extended timeout
     await page.goto("/dashboard", { timeout: 60000 });
     await page.waitForLoadState("domcontentloaded");
-    
+
     // Add a short delay instead of waiting for networkidle
     await page.waitForTimeout(2000);
 
     // Look for mobile navigation elements with expanded selectors
     const mobileNavElements = await page
-      .locator([
-        "button[aria-label*='menu']", 
-        "button[aria-label*='nav']",
-        "[class*='mobile']", 
-        "[class*='nav']",
-        "[class*='hamburger']",
-        "header button",
-        "[data-testid*='mobile']"
-      ].join(", "))
+      .locator(
+        [
+          "button[aria-label*='menu']",
+          "button[aria-label*='nav']",
+          "[class*='mobile']",
+          "[class*='nav']",
+          "[class*='hamburger']",
+          "header button",
+          "[data-testid*='mobile']",
+        ].join(", ")
+      )
       .count();
 
     console.log(`Found ${mobileNavElements} mobile navigation elements`);
-    
+
     // Even if we don't find specific mobile elements, the test should pass
     // as long as we can navigate successfully
-    
+
     // Try to find and click a hamburger menu if it exists
-    const hamburgerExists = await page.locator(
-      "button[aria-label*='menu'], [class*='hamburger'], header button"
-    ).count() > 0;
-    
+    const hamburgerExists =
+      (await page
+        .locator(
+          "button[aria-label*='menu'], [class*='hamburger'], header button"
+        )
+        .count()) > 0;
+
     if (hamburgerExists) {
-      await page.locator(
-        "button[aria-label*='menu'], [class*='hamburger'], header button"
-      ).first().click();
-      
+      await page
+        .locator(
+          "button[aria-label*='menu'], [class*='hamburger'], header button"
+        )
+        .first()
+        .click();
+
       // Wait a moment for menu to appear
       await page.waitForTimeout(500);
     }
@@ -239,12 +280,12 @@ test.describe("Performance Optimization Features", () => {
     // Check different pages in mobile view
     await page.goto("/keyword-tool", { timeout: 60000 });
     await page.waitForLoadState("domcontentloaded");
-    
+
     // Add a short delay instead of waiting for networkidle
     await page.waitForTimeout(2000);
-    
+
     await expect(page.locator("body")).toBeVisible();
-    
+
     await page.screenshot({
       path: "test-results/mobile-navigation-test.png",
       fullPage: true,
@@ -254,7 +295,7 @@ test.describe("Performance Optimization Features", () => {
   test("responsive design across breakpoints", async ({ page }) => {
     // Login first to test authenticated pages
     await loginUser(page);
-    
+
     // Define breakpoints covering standard device sizes
     const breakpoints = [
       { width: 320, height: 568, name: "mobile-small" },
@@ -266,50 +307,60 @@ test.describe("Performance Optimization Features", () => {
 
     // Test important pages at each breakpoint
     const pagesToTest = ["/dashboard", "/keyword-tool"];
-    
+
     for (const pagePath of pagesToTest) {
       for (const breakpoint of breakpoints) {
-        console.log(`Testing ${pagePath} at ${breakpoint.name} (${breakpoint.width}x${breakpoint.height})`);
-        
+        console.log(
+          `Testing ${pagePath} at ${breakpoint.name} (${breakpoint.width}x${breakpoint.height})`
+        );
+
         await page.setViewportSize({
           width: breakpoint.width,
           height: breakpoint.height,
         });
-        
+
         await page.goto(pagePath, { timeout: 30000 });
         await page.waitForLoadState("domcontentloaded");
-        
+
         // Add a short delay instead of waiting for networkidle
         await page.waitForTimeout(2000);
 
         // Verify page loads at each breakpoint
         await expect(page.locator("body")).toBeVisible();
-        
+
         // Check for mobile-specific elements on small viewports
         if (breakpoint.width < 768) {
           const mobileElements = await page
-            .locator([
-              "[class*='mobile']",
-              "[class*='hamburger']",
-              "[data-testid*='mobile']",
-              "button[aria-label*='menu']"
-            ].join(", "))
+            .locator(
+              [
+                "[class*='mobile']",
+                "[class*='hamburger']",
+                "[data-testid*='mobile']",
+                "button[aria-label*='menu']",
+              ].join(", ")
+            )
             .count();
-            
-          console.log(`Found ${mobileElements} mobile-specific elements at ${breakpoint.name} breakpoint`);
+
+          console.log(
+            `Found ${mobileElements} mobile-specific elements at ${breakpoint.name} breakpoint`
+          );
         }
-        
+
         // Check for desktop-specific elements on larger viewports
         if (breakpoint.width >= 1024) {
           const desktopElements = await page
-            .locator([
-              "[class*='desktop']", 
-              "[data-testid*='desktop']",
-              "nav:not([class*='mobile'])"
-            ].join(", "))
+            .locator(
+              [
+                "[class*='desktop']",
+                "[data-testid*='desktop']",
+                "nav:not([class*='mobile'])",
+              ].join(", ")
+            )
             .count();
-            
-          console.log(`Found ${desktopElements} desktop-specific elements at ${breakpoint.name} breakpoint`);
+
+          console.log(
+            `Found ${desktopElements} desktop-specific elements at ${breakpoint.name} breakpoint`
+          );
         }
 
         await page.screenshot({
@@ -323,28 +374,32 @@ test.describe("Performance Optimization Features", () => {
   test("loading states and performance feedback", async ({ page }) => {
     // Login first to access protected routes
     await loginUser(page);
-    
+
     await page.goto("/keyword-tool", { timeout: 30000 });
     await page.waitForLoadState("domcontentloaded");
-    
+
     // Add a short delay instead of waiting for networkidle
     await page.waitForTimeout(2000);
 
     // Look for loading state components with expanded selectors
     const loadingElements = await page
-      .locator([
-        "[class*='loading']",
-        "[class*='spinner']",
-        "[class*='progress']",
-        "[aria-busy='true']",
-        "[role='progressbar']",
-        "[data-testid*='loading']",
-        "[data-testid*='spinner']"
-      ].join(", "))
+      .locator(
+        [
+          "[class*='loading']",
+          "[class*='spinner']",
+          "[class*='progress']",
+          "[aria-busy='true']",
+          "[role='progressbar']",
+          "[data-testid*='loading']",
+          "[data-testid*='spinner']",
+        ].join(", ")
+      )
       .count();
 
     const loadingText = await page.locator("text=/loading|load.../i").count();
-    const processingText = await page.locator("text=/processing|analyzing/i").count();
+    const processingText = await page
+      .locator("text=/processing|analyzing/i")
+      .count();
 
     console.log(
       `Found ${loadingElements + loadingText + processingText} loading-related elements`
@@ -354,53 +409,67 @@ test.describe("Performance Optimization Features", () => {
     const inputs = await page.locator("input, textarea").count();
     if (inputs > 0) {
       const firstInput = page.locator("input, textarea").first();
-      await firstInput.click();  // Ensure focus
+      await firstInput.click(); // Ensure focus
       await firstInput.fill("test keyword");
-      await page.keyboard.press("Tab");  // Move focus to potentially trigger validation
+      await page.keyboard.press("Tab"); // Move focus to potentially trigger validation
 
       // Look for submit buttons with expanded selectors
       const submitButtons = await page
-        .locator([
-          "button[type='submit']",
-          "button:has-text('analyze')",
-          "button:has-text('search')",
-          "button:has-text('submit')",
-          "button:has-text('check')",
-          "[role='button']:has-text('analyze')",
-          "[role='button']:has-text('search')"
-        ].join(", "))
-        .count();
-      
-      console.log(`Found ${submitButtons} potential submit buttons`);
-      
-      // If we found a submit button, try clicking it to test loading states
-      if (submitButtons > 0) {
-        try {
-          await page.locator([
-            "button[type='submit']", 
+        .locator(
+          [
+            "button[type='submit']",
             "button:has-text('analyze')",
             "button:has-text('search')",
             "button:has-text('submit')",
-            "button:has-text('check')"
-          ].join(", ")).first().click();
-          
+            "button:has-text('check')",
+            "[role='button']:has-text('analyze')",
+            "[role='button']:has-text('search')",
+          ].join(", ")
+        )
+        .count();
+
+      console.log(`Found ${submitButtons} potential submit buttons`);
+
+      // If we found a submit button, try clicking it to test loading states
+      if (submitButtons > 0) {
+        try {
+          await page
+            .locator(
+              [
+                "button[type='submit']",
+                "button:has-text('analyze')",
+                "button:has-text('search')",
+                "button:has-text('submit')",
+                "button:has-text('check')",
+              ].join(", ")
+            )
+            .first()
+            .click();
+
           // Wait briefly to see if loading states appear
           await page.waitForTimeout(1000);
-          
+
           // Check again for loading indicators that may have appeared
           const dynamicLoadingElements = await page
-            .locator([
-              "[class*='loading']",
-              "[class*='spinner']",
-              "[aria-busy='true']"
-            ].join(", "))
+            .locator(
+              [
+                "[class*='loading']",
+                "[class*='spinner']",
+                "[aria-busy='true']",
+              ].join(", ")
+            )
             .count();
-            
+
           if (dynamicLoadingElements > 0) {
-            console.log(`After interaction, found ${dynamicLoadingElements} loading indicators`);
+            console.log(
+              `After interaction, found ${dynamicLoadingElements} loading indicators`
+            );
           }
         } catch (e: any) {
-          console.log("Could not interact with submit button:", e.message || String(e));
+          console.log(
+            "Could not interact with submit button:",
+            e.message || String(e)
+          );
         }
       }
     }
@@ -414,45 +483,53 @@ test.describe("Performance Optimization Features", () => {
   test("breadcrumb navigation system", async ({ page }) => {
     // Login first to access protected routes
     await loginUser(page);
-    
+
     // Test breadcrumbs on different pages
     const pages = ["/keyword-tool", "/performance", "/dashboard"];
 
     for (const pagePath of pages) {
       await page.goto(pagePath, { timeout: 30000 });
       await page.waitForLoadState("domcontentloaded");
-      
+
       // Add a short delay instead of waiting for networkidle
       await page.waitForTimeout(2000);
 
       // Look for breadcrumb elements with expanded selectors
       const breadcrumbs = await page
-        .locator([
-          "[aria-label*='breadcrumb']",
-          "[class*='breadcrumb']", 
-          "nav ol",
-          "nav ul",
-          "[role='navigation'] ol",
-          "[role='navigation'] ul",
-          "header nav",
-          ".header nav",
-          "[data-testid*='breadcrumb']",
-          "[data-testid*='navigation']"
-        ].join(", "))
+        .locator(
+          [
+            "[aria-label*='breadcrumb']",
+            "[class*='breadcrumb']",
+            "nav ol",
+            "nav ul",
+            "[role='navigation'] ol",
+            "[role='navigation'] ul",
+            "header nav",
+            ".header nav",
+            "[data-testid*='breadcrumb']",
+            "[data-testid*='navigation']",
+          ].join(", ")
+        )
         .count();
 
       console.log(`Found ${breadcrumbs} breadcrumb elements on ${pagePath}`);
 
       // Verify the page loads properly
       await expect(page.locator("body")).toBeVisible();
-      
+
       // Check for page-specific indicators - using first() to avoid strict mode violations
       if (pagePath.includes("keyword")) {
-        await expect(page.locator("text=/keyword|search/i").first()).toBeVisible({ timeout: 10000 });
+        await expect(
+          page.locator("text=/keyword|search/i").first()
+        ).toBeVisible({ timeout: 10000 });
       } else if (pagePath.includes("performance")) {
-        await expect(page.locator("text=/performance|metrics|analytics/i").first()).toBeVisible({ timeout: 10000 });
+        await expect(
+          page.locator("text=/performance|metrics|analytics/i").first()
+        ).toBeVisible({ timeout: 10000 });
       } else if (pagePath.includes("dashboard")) {
-        await expect(page.locator("text=/dashboard|overview|welcome/i").first()).toBeVisible({ timeout: 10000 });
+        await expect(
+          page.locator("text=/dashboard|overview|welcome/i").first()
+        ).toBeVisible({ timeout: 10000 });
       }
     }
 

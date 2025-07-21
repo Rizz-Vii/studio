@@ -28,10 +28,11 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       handlebars: "handlebars/dist/handlebars.min.js",
       "handlebars/runtime": "handlebars/dist/cjs/handlebars.runtime",
-      // Node.js modules that need browser polyfills
+      // Node.js modules that need browser polyfills - only for client-side usage
       buffer: "buffer",
       process: "process/browser",
-      path: "path-browserify",
+      // Remove path aliasing to avoid conflicts with Next.js internal usage
+      // path: "path-browserify", // REMOVED - causes conflicts
       os: "os-browserify/browser",
       crypto: "crypto-browserify",
       stream: "stream-browserify",
@@ -59,7 +60,31 @@ const nextConfig: NextConfig = {
         fs: false,
         path: false,
         crypto: false,
+        net: false,
+        dns: false,
+        child_process: false,
+        tls: false,
+        os: false,
+        url: false,
+        assert: false,
+        constants: false,
+        http: false,
+        https: false,
+        stream: false,
+        util: false,
+        querystring: false,
+        buffer: false,
+        events: false,
       };
+
+      // Specifically handle Firebase packages that might try to access Node.js modules
+      config.externals = config.externals || [];
+      config.externals.push({
+        "firebase-admin": "commonjs firebase-admin",
+        "firebase-admin/app": "commonjs firebase-admin/app",
+        "firebase-admin/auth": "commonjs firebase-admin/auth",
+        "firebase-admin/firestore": "commonjs firebase-admin/firestore",
+      });
     }
 
     // Performance optimizations for production
@@ -131,9 +156,10 @@ const nextConfig: NextConfig = {
       // Enable filesystem cache for faster rebuilds with unique cache names
       let cacheName = "dev-client-cache";
       if (isServer) {
-        cacheName = nextRuntime === "edge" ? "dev-edge-cache" : "dev-server-cache";
+        cacheName =
+          nextRuntime === "edge" ? "dev-edge-cache" : "dev-server-cache";
       }
-      
+
       // Use memory cache for development to avoid filesystem cache issues
       config.cache = {
         type: "memory",
@@ -156,9 +182,10 @@ const nextConfig: NextConfig = {
       // Production optimizations with unique cache names
       let cacheName = "prod-client-cache";
       if (isServer) {
-        cacheName = nextRuntime === "edge" ? "prod-edge-cache" : "prod-server-cache";
+        cacheName =
+          nextRuntime === "edge" ? "prod-edge-cache" : "prod-server-cache";
       }
-      
+
       config.cache = {
         type: "filesystem",
         cacheDirectory: path.resolve(process.cwd(), ".next/cache"),
@@ -177,8 +204,9 @@ const nextConfig: NextConfig = {
     // Enable parallel builds for faster compilation
     webpackBuildWorker: true,
 
-    // Filesystem optimizations for Windows
-    esmExternals: true,
+    // Filesystem optimizations for Windows - reverted for Turbopack compatibility
+    // Note: esmExternals removed as it's not supported by Turbopack
+    // esmExternals: false,
 
     // Enable faster file watching and caching
     workerThreads: true,

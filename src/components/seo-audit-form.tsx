@@ -4,10 +4,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { EnhancedButton } from "@/components/ui/enhanced-button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,18 +16,39 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+  EnhancedCard,
+  EnhancedCardContent,
+  EnhancedCardDescription,
+  EnhancedCardFooter,
+  EnhancedCardHeader,
+  EnhancedCardTitle,
+} from "@/components/ui/enhanced-card";
+import { Gauge, Search } from "lucide-react";
 import type { AuditUrlInput } from "@/ai/flows/seo-audit";
+import { useHydration } from "@/components/HydrationContext";
+import { useIsMobile } from "@/lib/mobile-responsive-utils";
 
 const formSchema = z.object({
-  url: z.string().min(1, { message: "Please enter a valid URL." }),
+  url: z
+    .string()
+    .min(1, { message: "Please enter a valid URL." })
+    .refine(
+      (url) => {
+        const trimmed = url.trim();
+        if (!trimmed) return false;
+        // Basic URL pattern validation
+        const urlPattern =
+          /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
+        const withProtocol = trimmed.startsWith("http")
+          ? trimmed
+          : `https://${trimmed}`;
+        return urlPattern.test(withProtocol);
+      },
+      {
+        message:
+          "Please enter a valid URL (e.g., example.com or https://example.com)",
+      }
+    ),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -40,6 +62,9 @@ export default function SeoAuditForm({
   onSubmit,
   isLoading,
 }: SeoAuditFormProps) {
+  const hydrated = useHydration();
+  const isMobile = useIsMobile();
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { url: "" },
@@ -64,45 +89,86 @@ export default function SeoAuditForm({
   }
 
   return (
-    <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
-      <CardHeader>
-        <CardTitle className="font-headline">Technical SEO Audit</CardTitle>
-        <CardDescription className="font-body">
-          Enter a URL to run a quick technical and content SEO audit.
-        </CardDescription>
-      </CardHeader>
+    <EnhancedCard
+      className="h-full"
+      variant="elevated"
+      animate={true}
+      loading={isLoading}
+    >
+      <EnhancedCardHeader>
+        <EnhancedCardTitle className="font-headline flex items-center gap-2">
+          <Gauge className="h-5 w-5 text-primary" />
+          Technical SEO Audit
+        </EnhancedCardTitle>
+        <EnhancedCardDescription className="font-body">
+          Enter a URL to run a comprehensive technical and content SEO audit.
+          Get detailed insights on performance, accessibility, and SEO best
+          practices.
+        </EnhancedCardDescription>
+      </EnhancedCardHeader>
+
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleFormSubmit)}
-          className="space-y-8"
+          className="space-y-6"
+          aria-busy={isLoading}
+          aria-disabled={isLoading}
         >
-          <CardContent>
+          <EnhancedCardContent>
             <FormField
               control={form.control}
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>URL to Audit</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="example.com"
-                      {...field}
-                      disabled={isLoading}
-                    />
+                    <div className="space-y-2">
+                      <FormLabel
+                        className="font-body text-sm font-medium"
+                        htmlFor="url-input"
+                      >
+                        Website URL to Audit
+                      </FormLabel>
+                      <Input
+                        id="url-input"
+                        placeholder="e.g., example.com or https://www.example.com"
+                        {...field}
+                        className="font-body"
+                        disabled={!hydrated || isLoading}
+                        autoComplete="url"
+                        aria-describedby="url-description url-error"
+                      />
+                      <FormDescription
+                        id="url-description"
+                        className="font-body text-sm text-muted-foreground"
+                      >
+                        Enter the website URL you want to audit. We'll analyze
+                        technical SEO factors, performance, and content
+                        optimization.
+                      </FormDescription>
+                      <FormMessage id="url-error" />
+                    </div>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Run Audit
-            </Button>
-          </CardFooter>
+          </EnhancedCardContent>
+
+          <EnhancedCardFooter>
+            <EnhancedButton
+              type="submit"
+              className="w-full"
+              size={isMobile ? "mobile" : "default"}
+              loading={isLoading}
+              loadingText="Running audit..."
+              leftIcon={!isLoading ? <Search className="h-4 w-4" /> : undefined}
+              disabled={!hydrated || isLoading || !form.watch("url")}
+              variant="gradient"
+            >
+              {isLoading ? "Running SEO Audit..." : "Run Complete Audit"}
+            </EnhancedButton>
+          </EnhancedCardFooter>
         </form>
       </Form>
-    </Card>
+    </EnhancedCard>
   );
 }

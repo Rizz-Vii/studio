@@ -51,40 +51,48 @@ export function DevUserSwitcher() {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 bg-black/80 text-white p-3 rounded-lg text-xs space-y-2 z-50">
-      <div className="font-semibold">Dev Mode - Switch User:</div>
-      <div className="space-y-1">
+    <div className="fixed bottom-4 right-4 bg-background/95 backdrop-blur-sm border border-border text-foreground p-4 rounded-lg shadow-lg text-sm space-y-3 z-[9999] max-w-xs">
+      <div className="font-semibold text-primary flex items-center gap-2">
+        <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+        Dev Mode
+      </div>
+      <div className="space-y-2">
         <button
           onClick={() => handleUserSwitch("free")}
-          className={`block w-full text-left px-2 py-1 rounded ${
+          className={`block w-full text-left px-3 py-2 rounded-md transition-colors ${
             user?.email === "abbas_ali_rizvi@hotmail.com"
-              ? "bg-blue-600"
-              : "hover:bg-gray-600"
+              ? "bg-primary text-primary-foreground"
+              : "hover:bg-muted"
           }`}
         >
-          Free User (Abbas)
+          <div className="font-medium">Free User</div>
+          <div className="text-xs text-muted-foreground">Abbas (Email/Password)</div>
         </button>
         <button
           onClick={() => handleUserSwitch("starter")}
-          className={`block w-full text-left px-2 py-1 rounded ${
+          className={`block w-full text-left px-3 py-2 rounded-md transition-colors ${
             user?.email === "abba7254@gmail.com"
-              ? "bg-blue-600"
-              : "hover:bg-gray-600"
+              ? "bg-primary text-primary-foreground"
+              : "hover:bg-muted"
           }`}
         >
-          Starter User (Abba) - Google
+          <div className="font-medium">Starter User</div>
+          <div className="text-xs text-muted-foreground">Abba (Google Auth)</div>
         </button>
         <button
           onClick={() => handleUserSwitch("logout")}
-          className={`block w-full text-left px-2 py-1 rounded ${
-            !user ? "bg-blue-600" : "hover:bg-gray-600"
+          className={`block w-full text-left px-3 py-2 rounded-md transition-colors ${
+            !user ? "bg-destructive text-destructive-foreground" : "hover:bg-muted"
           }`}
         >
-          Logged Out
+          <div className="font-medium">Logout</div>
+          <div className="text-xs text-muted-foreground">Sign out current user</div>
         </button>
       </div>
       {user && (
-        <div className="text-green-400 text-xs">Current: {user.email}</div>
+        <div className="text-xs text-muted-foreground border-t border-border pt-2">
+          <span className="text-green-600 font-medium">●</span> {user.email}
+        </div>
       )}
     </div>
   );

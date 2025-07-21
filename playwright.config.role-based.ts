@@ -9,7 +9,7 @@ export default defineConfig({
     ["html"],
     ["junit", { outputFile: "test-results/junit.xml" }],
     ["list"],
-    ["json", { outputFile: "test-results/test-results.json" }]
+    ["json", { outputFile: "test-results/test-results.json" }],
   ],
   use: {
     baseURL: process.env.TEST_BASE_URL || "http://localhost:3000",
@@ -29,7 +29,7 @@ export default defineConfig({
   },
   outputDir: "test-results/",
   snapshotDir: "test-snapshots/",
-  
+
   // Role-based worker configuration
   projects: [
     // FREE TIER WORKER - Tests for free users with basic functionality
@@ -43,22 +43,22 @@ export default defineConfig({
         // Custom context for free tier testing
         contextOptions: {
           extraHTTPHeaders: {
-            'X-Test-User-Role': 'free',
-            'X-Test-Worker': 'free-tier'
-          }
-        }
+            "X-Test-User-Role": "free",
+            "X-Test-Worker": "free-tier",
+          },
+        },
       },
       // Sequential execution for free tier tests
       fullyParallel: false,
       // Single worker to ensure sequential flow
       workers: 1,
       metadata: {
-        userRole: 'free',
-        description: 'Tests basic functionality available to free tier users'
-      }
+        userRole: "free",
+        description: "Tests basic functionality available to free tier users",
+      },
     },
 
-    // ENTERPRISE/ADMIN TIER WORKER - Tests for premium users with advanced functionality  
+    // ENTERPRISE/ADMIN TIER WORKER - Tests for premium users with advanced functionality
     {
       name: "enterprise-tier-worker",
       testMatch: "**/role-based/**/*enterprise*.spec.ts",
@@ -69,19 +69,20 @@ export default defineConfig({
         // Custom context for enterprise tier testing
         contextOptions: {
           extraHTTPHeaders: {
-            'X-Test-User-Role': 'enterprise',
-            'X-Test-Worker': 'enterprise-tier'
-          }
-        }
+            "X-Test-User-Role": "enterprise",
+            "X-Test-Worker": "enterprise-tier",
+          },
+        },
       },
       // Sequential execution for enterprise tier tests
       fullyParallel: false,
       // Single worker to ensure sequential flow
       workers: 1,
       metadata: {
-        userRole: 'enterprise',
-        description: 'Tests advanced functionality available to enterprise/admin users'
-      }
+        userRole: "enterprise",
+        description:
+          "Tests advanced functionality available to enterprise/admin users",
+      },
     },
 
     // CROSS-BROWSER TESTING (Secondary priority)
@@ -93,24 +94,24 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
       },
       // Only run if role-based tests pass
-      dependencies: ["free-tier-worker", "enterprise-tier-worker"]
+      dependencies: ["free-tier-worker", "enterprise-tier-worker"],
     },
 
     // MOBILE TESTING (Integrated with role-based testing)
     {
       name: "mobile-free-tier",
-      testMatch: "**/mobile/**/*free*.spec.ts", 
+      testMatch: "**/mobile/**/*free*.spec.ts",
       use: {
         ...devices["iPhone 12"],
         contextOptions: {
           extraHTTPHeaders: {
-            'X-Test-User-Role': 'free',
-            'X-Test-Device': 'mobile'
-          }
-        }
+            "X-Test-User-Role": "free",
+            "X-Test-Device": "mobile",
+          },
+        },
       },
       fullyParallel: false,
-      workers: 1
+      workers: 1,
     },
 
     {
@@ -120,13 +121,13 @@ export default defineConfig({
         ...devices["iPhone 12"],
         contextOptions: {
           extraHTTPHeaders: {
-            'X-Test-User-Role': 'enterprise', 
-            'X-Test-Device': 'mobile'
-          }
-        }
+            "X-Test-User-Role": "enterprise",
+            "X-Test-Device": "mobile",
+          },
+        },
       },
       fullyParallel: false,
-      workers: 1
+      workers: 1,
     },
 
     // VISUAL REGRESSION TESTING
@@ -138,19 +139,19 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
       },
       // Run visual tests after functional tests
-      dependencies: ["free-tier-worker", "enterprise-tier-worker"]
+      dependencies: ["free-tier-worker", "enterprise-tier-worker"],
     },
 
     // API CONTRACT TESTING (Independent)
     {
-      name: "api-testing", 
+      name: "api-testing",
       testMatch: "**/api/**/*.spec.ts",
       use: {
         baseURL: process.env.TEST_BASE_URL || "http://localhost:3000",
         extraHTTPHeaders: {
-          'X-Test-Type': 'api'
-        }
-      }
+          "X-Test-Type": "api",
+        },
+      },
     },
 
     // ACCESSIBILITY TESTING
@@ -161,7 +162,7 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         viewport: { width: 1280, height: 720 },
       },
-      dependencies: ["free-tier-worker"]
+      dependencies: ["free-tier-worker"],
     },
 
     // LEGACY TESTS (Gradual migration)
@@ -172,8 +173,8 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
         viewport: { width: 1280, height: 720 },
         proxy: getProxyConfig(),
-      }
-    }
+      },
+    },
   ],
 
   // Global setup and teardown
@@ -187,8 +188,8 @@ export default defineConfig({
     retries: 3,
     use: {
       trace: "on-first-retry",
-      video: "retain-on-failure"
-    }
+      video: "retain-on-failure",
+    },
   }),
 
   ...(process.env.NODE_ENV === "development" && {
@@ -198,7 +199,7 @@ export default defineConfig({
       command: "npm run dev",
       port: 3000,
       reuseExistingServer: !process.env.CI,
-      timeout: 120000
-    }
-  })
+      timeout: 120000,
+    },
+  }),
 });

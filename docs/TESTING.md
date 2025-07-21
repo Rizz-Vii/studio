@@ -2,7 +2,20 @@
 
 ## Overview
 
-This project uses Playwright for end-to-end testing, visual regression testing, and data extraction. The testing framework includes anti-bot measures and LLM-assisted validation.
+**Last Updated**: July 21, 2025  
+**Status**: ✅ **Recently Refactored**
+
+This project uses Playwright for end-to-end testing, visual regression testing, and data extraction. The testing framework includes anti-bot measures and LLM-assisted validation. The test suite underwent major refactoring in July 2025 for improved maintainability and reliability.
+
+## Recent Updates (July 2025)
+
+### Major Refactoring Completed
+
+- **Quality Tests**: SEO and visual regression tests modernized with Playwright native tools
+- **Integration Tests**: API testing streamlined with improved authentication handling
+- **E2E Tests**: Dashboard tests completely overhauled with data-driven approach
+- **Authentication**: Centralized `loginAndGoToDashboard` helper for consistent login flows
+- **Test Organization**: Structured tests into logical describe blocks for better maintainability
 
 ## Setup
 
@@ -28,6 +41,24 @@ OPENAI_API_KEY=your_openai_key
 
 ## Running Tests
 
+### Refactored Test Structure
+
+The test suite is now organized into logical categories:
+
+```bash
+# Quality Tests (Refactored)
+npx playwright test tests/quality/seo.spec.ts           # SEO validation
+npx playwright test tests/quality/visual-regression.spec.ts  # Visual testing
+
+# Integration Tests (Refactored)
+npx playwright test tests/integration/api.spec.ts      # API testing
+
+# E2E Tests (Major Overhaul)
+npx playwright test tests/e2e/dashboard.spec.ts        # Dashboard functionality
+```
+
+### Standard Test Commands
+
 Run all tests:
 
 ```bash
@@ -44,6 +75,36 @@ Run tests in headed mode:
 
 ```bash
 npx playwright test --headed
+```
+
+### New Test Patterns (July 2025)
+
+#### Data-Driven Navigation Testing
+
+```typescript
+const navigationItems = [
+  { name: "Profile", url: "/profile" },
+  { name: "Performance", url: "/performance" },
+];
+
+for (const item of navigationItems) {
+  test(`should navigate to ${item.name}`, async ({ page }) => {
+    await page.click(`a[href="${item.url}"]`);
+    await expect(page).toHaveURL(item.url);
+  });
+}
+```
+
+#### Centralized Authentication
+
+```typescript
+async function loginAndGoToDashboard(page: Page) {
+  await page.goto("/login");
+  await page.fill("#email", "abbas_ali_rizvi@hotmail.com");
+  await page.fill("#password", "123456");
+  await page.click('button:has-text("Login as Free User (Abbas)")');
+  await page.waitForURL("/dashboard", { timeout: 30000 });
+}
 ```
 
 ## Test Reports
