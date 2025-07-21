@@ -9,7 +9,9 @@ export function HydrationProvider({ children }: { children: React.ReactNode }) {
     setHydrated(true);
   }, []);
   return (
-    <HydrationContext.Provider value={hydrated}>{children}</HydrationContext.Provider>
+    <HydrationContext.Provider value={hydrated}>
+      {children}
+    </HydrationContext.Provider>
   );
 }
 

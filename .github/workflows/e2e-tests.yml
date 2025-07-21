@@ -7,19 +7,19 @@ on:
     branches: [main, master]
 
 env:
-  NODE_VERSION: '18'
-  PLAYWRIGHT_VERSION: '1.37.0'
+  NODE_VERSION: "18"
+  PLAYWRIGHT_VERSION: "1.37.0"
 
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    
+
     env:
       NODE_ENV: test
       # Default value for TEST_BASE_URL
-      TEST_BASE_URL: 'http://localhost:3000'
-    
+      TEST_BASE_URL: "http://localhost:3000"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -28,14 +28,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-      
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      
+
       - name: Check required secrets
         run: |
           if [[ -z "$OPENAI_API_KEY" ]] || [[ -z "$TEST_USER_EMAIL" ]] || [[ -z "$TEST_USER_PASSWORD" ]]; then
@@ -46,7 +46,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      
+
       - name: Run Playwright tests
         run: npx playwright test
         env:
@@ -56,7 +56,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-      
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3

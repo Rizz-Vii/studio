@@ -1,33 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, User, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { navItems, AppLogo, AppName } from "@/constants/nav";
+import { EnhancedMobileNav } from "@/components/enhanced-app-nav";
 import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-
-const drawerVariants = {
-  closed: {
-    x: "-100%",
-    transition: {
-      type: "spring" as const,
-      stiffness: 400,
-      damping: 40,
-    },
-  },
-  open: {
-    x: "0%",
-    transition: {
-      type: "spring" as const,
-      stiffness: 400,
-      damping: 40,
-    },
-  },
-};
+import type { NavItem } from "@/constants/enhanced-nav";
 
 const overlayVariants = {
   closed: {
@@ -44,25 +25,11 @@ const overlayVariants = {
   },
 };
 
-const menuItemVariants = {
-  closed: {
-    x: -20,
-    opacity: 0,
-  },
-  open: (i: number) => ({
-    x: 0,
-    opacity: 1,
-    transition: {
-      delay: 0.1 + i * 0.05,
-    },
-  }),
-};
-
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const pathname = usePathname();
   const { user, role } = useAuth();
+  const { subscription } = useSubscription();
 
   // Handle hydration
   useEffect(() => {
@@ -72,24 +39,24 @@ export default function MobileNav() {
   // Lock body scroll when mobile nav is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     // Cleanup function to restore scroll when component unmounts
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
-  // Filter nav items based on user role
-  const visibleNavItems = navItems.filter(
-    (item) => !item.adminOnly || (user && role === "admin")
-  );
+  const handleNavItemClick = (item: NavItem) => {
+    console.log("Mobile navigation clicked:", item.title);
+    closeMenu();
+  };
 
   // Don't render until mounted to avoid hydration issues
   if (!isMounted) {
@@ -97,7 +64,7 @@ export default function MobileNav() {
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden h-11 w-11 min-h-[44px] min-w-[44px] opacity-0"
+        className="md:hidden h-12 w-12 min-h-[48px] min-w-[48px] opacity-0 mobile-button"
         aria-label="Loading menu"
         disabled
       >
@@ -113,7 +80,7 @@ export default function MobileNav() {
         variant="ghost"
         size="icon"
         onClick={toggleMenu}
-        className="md:hidden h-12 w-12 min-h-[48px] min-w-[48px]"
+        className="md:hidden h-12 w-12 min-h-[48px] min-w-[48px] mobile-button"
         aria-label="Toggle mobile menu"
         aria-expanded={isOpen}
         data-testid="mobile-menu"
@@ -121,7 +88,7 @@ export default function MobileNav() {
         <Menu className="h-6 w-6" />
       </Button>
 
-      {/* Mobile Drawer */}
+      {/* Enhanced Mobile Navigation */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -132,117 +99,61 @@ export default function MobileNav() {
               exit="closed"
               variants={overlayVariants}
               className="fixed inset-0 h-screen w-screen bg-black/90 backdrop-blur-md z-[60] md:hidden"
-              style={{ height: '100dvh' }}
+              style={{ height: "100dvh" }}
               onClick={closeMenu}
             />
 
-            {/* Drawer */}
+            {/* Enhanced Mobile Navigation Component */}
+            <EnhancedMobileNav
+              userTier={subscription?.tier}
+              isAdmin={role === "admin"}
+              onCloseAction={closeMenu}
+              onItemClickAction={handleNavItemClick}
+            />
+
+            {/* User Info Overlay */}
             <motion.div
-              initial="closed"
-              animate="open"
-              exit="closed"
-              variants={drawerVariants}
-              className="fixed left-0 top-0 h-screen w-80 max-w-[60vw] bg-sidebar text-sidebar-foreground z-[70] md:hidden shadow-2xl border-r border-sidebar-border"
-              style={{ height: '100dvh' }}
-              data-testid="drawer"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Mobile navigation menu"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="fixed bottom-4 left-4 right-4 z-[80] md:hidden"
             >
-              <div className="flex flex-col h-full bg-sidebar" style={{ height: '100dvh' }}>
-                {/* Header */}
-                <div className="flex items-center justify-center p-4 border-b border-sidebar-border bg-sidebar shrink-0 min-h-[80px]">
-                  <Link
-                    href="/"
-                    className="flex items-center gap-2"
-                    onClick={closeMenu}
-                  >
-                    <AppLogo className="h-8 w-8 text-primary shrink-0" />
-                    <span className="text-2xl font-headline font-bold text-primary">
-                      {AppName}
+              <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-3 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center shrink-0">
+                    <span className="text-primary-foreground font-medium text-xs">
+                      {user?.email?.[0].toUpperCase() || "U"}
                     </span>
-                  </Link>
-                </div>
-
-                {/* Navigation Items */}
-                <nav className="flex-1 px-2 py-4 bg-sidebar overflow-y-auto overflow-x-hidden">
-                  <div className="flex flex-col gap-1 min-h-0">
-                    {visibleNavItems.map((item, index) => (
-                      <motion.div
-                        key={item.href}
-                        variants={menuItemVariants}
-                        initial="closed"
-                        animate="open"
-                        custom={index}
-                      >
-                        <Link
-                          href={item.href}
-                          onClick={closeMenu}
-                          className={cn(
-                            "flex items-center gap-2 px-3 py-3 rounded-md min-h-[44px]",
-                            "transition-colors duration-200",
-                            "hover:bg-accent hover:text-accent-foreground",
-                            pathname === item.href
-                              ? "bg-accent text-accent-foreground font-medium"
-                              : "text-muted-foreground"
-                          )}
-                        >
-                          <item.icon className="h-5 w-5 shrink-0" />
-                          <span className="whitespace-nowrap">{item.title}</span>
-                        </Link>
-                      </motion.div>
-                    ))}
                   </div>
-                </nav>
-
-                {/* User Actions */}
-                <div className="p-4 border-t border-sidebar-border bg-sidebar shrink-0">
-                  <div className="space-y-3">
-                    {/* User Info */}
-                    <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-sidebar-accent/50">
-                      <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center shrink-0">
-                        <span className="text-primary-foreground font-medium text-sm">
-                          {user?.email?.[0].toUpperCase() || "U"}
-                        </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-sidebar-foreground truncate">
-                          {user?.email}
-                        </p>
-                        <p className="text-xs text-sidebar-foreground/70">
-                          {role === "admin" ? "Administrator" : "User"}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Action Buttons */}
-                    <div className="space-y-2">
-                      <Button 
-                        asChild 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full justify-start h-10 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                        onClick={closeMenu}
-                      >
-                        <Link href="/settings" className="flex items-center gap-3">
-                          <User className="h-4 w-4 shrink-0" />
-                          <span>Settings</span>
-                        </Link>
-                      </Button>
-                      
-                      <Button 
-                        asChild 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full justify-start h-10 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
-                        onClick={closeMenu}
-                      >
-                        <Link href="/logout" className="flex items-center gap-3">
-                          <LogOut className="h-4 w-4 shrink-0" />
-                          <span>Sign Out</span>
-                        </Link>
-                      </Button>
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {user?.email}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {subscription?.tier || "Free"} • {role === "admin" ? "Admin" : "User"}
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      onClick={closeMenu}
+                    >
+                      <Link href="/settings">
+                        <User className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      onClick={closeMenu}
+                    >
+                      <Link href="/logout">
+                        <LogOut className="h-4 w-4" />
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </div>

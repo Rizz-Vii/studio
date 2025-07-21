@@ -83,7 +83,8 @@ export default function NotificationSettingsForm({
       toast({
         variant: "destructive",
         title: "Update Failed",
-        description: "Could not update notification settings. Please try again.",
+        description:
+          "Could not update notification settings. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -102,24 +103,31 @@ export default function NotificationSettingsForm({
         </CardDescription>
       </CardHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(handleFormSubmit)}
+          className="space-y-6"
+        >
           <CardContent className="space-y-6">
             {/* Essential Notifications */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Essential Notifications</h3>
               <p className="text-sm text-muted-foreground">
-                These notifications help keep your account secure and inform you of important changes.
+                These notifications help keep your account secure and inform you
+                of important changes.
               </p>
-              
+
               <FormField
                 control={form.control}
                 name="securityAlerts"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Security Alerts</FormLabel>
+                      <FormLabel className="text-base">
+                        Security Alerts
+                      </FormLabel>
                       <FormDescription>
-                        Notifications about suspicious activity and security changes.
+                        Notifications about suspicious activity and security
+                        changes.
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -139,7 +147,9 @@ export default function NotificationSettingsForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Email Notifications</FormLabel>
+                      <FormLabel className="text-base">
+                        Email Notifications
+                      </FormLabel>
                       <FormDescription>
                         Master switch for all email notifications.
                       </FormDescription>
@@ -169,7 +179,9 @@ export default function NotificationSettingsForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Audit Completions</FormLabel>
+                      <FormLabel className="text-base">
+                        Audit Completions
+                      </FormLabel>
                       <FormDescription>
                         Get notified when your SEO audits are complete.
                       </FormDescription>
@@ -191,7 +203,9 @@ export default function NotificationSettingsForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Keyword Ranking Changes</FormLabel>
+                      <FormLabel className="text-base">
+                        Keyword Ranking Changes
+                      </FormLabel>
                       <FormDescription>
                         Updates when your tracked keywords change rankings.
                       </FormDescription>
@@ -243,7 +257,9 @@ export default function NotificationSettingsForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Weekly SEO Reports</FormLabel>
+                      <FormLabel className="text-base">
+                        Weekly SEO Reports
+                      </FormLabel>
                       <FormDescription>
                         Summary of your SEO activities and progress.
                       </FormDescription>
@@ -265,7 +281,9 @@ export default function NotificationSettingsForm({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Marketing Emails</FormLabel>
+                      <FormLabel className="text-base">
+                        Marketing Emails
+                      </FormLabel>
                       <FormDescription>
                         Product updates, tips, and promotional content.
                       </FormDescription>

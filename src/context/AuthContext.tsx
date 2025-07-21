@@ -47,30 +47,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [role, setRole] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [activities, setActivities] = useState<UserActivity[]>([]);
-  
+
   // Use mock auth in development
   const { user: mockUser } = useMockAuth();
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isDevelopment = process.env.NODE_ENV === "development";
 
   useEffect(() => {
     // Always use Firebase auth, but also listen for mock auth events in development
     const unsubscribe = auth.onAuthStateChanged(handleAuthStateChange);
-    
+
     // In development, also listen for mock auth events
     if (isDevelopment) {
       const handleMockAuthEvent = (event: CustomEvent) => {
         const mockUser = event.detail;
         handleAuthStateChange(mockUser);
       };
-      
-      window.addEventListener('mockUserLogin', handleMockAuthEvent as EventListener);
-      
+
+      window.addEventListener(
+        "mockUserLogin",
+        handleMockAuthEvent as EventListener
+      );
+
       return () => {
         unsubscribe();
-        window.removeEventListener('mockUserLogin', handleMockAuthEvent as EventListener);
+        window.removeEventListener(
+          "mockUserLogin",
+          handleMockAuthEvent as EventListener
+        );
       };
     }
-    
+
     return () => unsubscribe();
   }, [isDevelopment]);
 
@@ -83,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (error) {
         console.error("Error ensuring user subscription:", error);
       }
-      
+
       // Fetch user profile and role
       const userDocRef = doc(db, "users", currentUser.uid);
       const userDocSnap = await getDoc(userDocRef);
@@ -99,7 +105,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Fetch user activities
       try {
-        const activitiesRef = collection(db, "users", currentUser.uid, "activities");
+        const activitiesRef = collection(
+          db,
+          "users",
+          currentUser.uid,
+          "activities"
+        );
         const q = query(activitiesRef, orderBy("timestamp", "desc"), limit(50));
         const querySnapshot = await getDocs(q);
         const fetchedActivities = querySnapshot.docs.map(
@@ -111,7 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         );
         setActivities(fetchedActivities);
       } catch (error) {
-        console.log('Activities not found, setting empty array');
+        console.log("Activities not found, setting empty array");
         setActivities([]);
       }
     } else {

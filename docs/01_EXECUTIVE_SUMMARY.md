@@ -12,6 +12,7 @@ Summarizes the RankPilot project vision, opportunity, solution, and strategic im
 ---
 
 ## Table of Contents
+
 1. [The Opportunity: A Paradigm Shift in Search](#1-the-opportunity-a-paradigm-shift-in-search)
 2. [Our Solution: RankPilot](#2-our-solution-rankpilot)
 3. [Strategic Imperative](#3-strategic-imperative)
@@ -60,13 +61,15 @@ To accelerate towards market launch, the immediate priorities are:
 ---
 
 ## Revision History
-| Version | Date | Author | Description |
-|---------|------|--------|-------------|
+
+| Version | Date       | Author                | Description   |
+| ------- | ---------- | --------------------- | ------------- |
 | 1.0     | 2025-07-09 | Product Strategy Team | Initial draft |
 
 ---
 
 ## Related Documents
+
 - [02_PRODUCT_REQUIREMENTS_DOCUMENT.md](./02_PRODUCT_REQUIREMENTS_DOCUMENT.md)
 - [03_EXECUTION_PLAN.md](./03_EXECUTION_PLAN.md)
 - [04_SCALING_STRATEGY.md](./04_SCALING_STRATEGY.md)
@@ -74,7 +77,7 @@ To accelerate towards market launch, the immediate priorities are:
 
 ---
 
-*© 2025 RankPilot, Inc. All rights reserved.*
+_© 2025 RankPilot, Inc. All rights reserved._
 
 ### 6. Financial Outlook
 

@@ -8,12 +8,12 @@ import LoadingScreen from "@/components/ui/loading-screen";
 import ProfileForm from "@/components/profile-form";
 import SEOActivitiesTimeline from "@/components/profile/seo-activities-timeline";
 import SEOAchievementsBadges from "@/components/profile/seo-achievements-badges";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Activity, Award, TrendingUp } from "lucide-react";
@@ -25,13 +25,13 @@ export default function ProfilePage() {
 
   React.useEffect(() => {
     setMounted(true);
-    
+
     // Redirect billing tab access to settings page
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
-      const tab = searchParams.get('tab');
-      if (tab === 'billing') {
-        router.push('/settings?tab=billing');
+      const tab = searchParams.get("tab");
+      if (tab === "billing") {
+        router.push("/settings?tab=billing");
         return;
       }
     }
@@ -46,8 +46,10 @@ export default function ProfilePage() {
   }
 
   // Get default tab from URL params
-  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const defaultTab = searchParams.get('tab') || 'profile';
+  const searchParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+  );
+  const defaultTab = searchParams.get("tab") || "profile";
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -90,7 +92,11 @@ export default function ProfilePage() {
         </TabsContent>
 
         <TabsContent value="achievements" className="space-y-6">
-          <SEOAchievementsBadges user={user} profile={profile} activities={activities || []} />
+          <SEOAchievementsBadges
+            user={user}
+            profile={profile}
+            activities={activities || []}
+          />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
@@ -102,12 +108,15 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">
-                  {activities?.filter(a => a.type === 'audit').length || 0}
+                  {activities?.filter((a) => a.type === "audit").length || 0}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  This month: {activities?.filter(a => 
-                    a.type === 'audit' && 
-                    new Date(a.timestamp.toDate()).getMonth() === new Date().getMonth()
+                  This month:{" "}
+                  {activities?.filter(
+                    (a) =>
+                      a.type === "audit" &&
+                      new Date(a.timestamp.toDate()).getMonth() ===
+                        new Date().getMonth()
                   ).length || 0}
                 </p>
               </CardContent>
@@ -120,12 +129,16 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">
-                  {activities?.filter(a => a.type === 'keyword-research').length || 0}
+                  {activities?.filter((a) => a.type === "keyword-research")
+                    .length || 0}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  This month: {activities?.filter(a => 
-                    a.type === 'keyword-research' && 
-                    new Date(a.timestamp.toDate()).getMonth() === new Date().getMonth()
+                  This month:{" "}
+                  {activities?.filter(
+                    (a) =>
+                      a.type === "keyword-research" &&
+                      new Date(a.timestamp.toDate()).getMonth() ===
+                        new Date().getMonth()
                   ).length || 0}
                 </p>
               </CardContent>
@@ -138,12 +151,16 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">
-                  {activities?.filter(a => a.type === 'serp-analysis').length || 0}
+                  {activities?.filter((a) => a.type === "serp-analysis")
+                    .length || 0}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  This month: {activities?.filter(a => 
-                    a.type === 'serp-analysis' && 
-                    new Date(a.timestamp.toDate()).getMonth() === new Date().getMonth()
+                  This month:{" "}
+                  {activities?.filter(
+                    (a) =>
+                      a.type === "serp-analysis" &&
+                      new Date(a.timestamp.toDate()).getMonth() ===
+                        new Date().getMonth()
                   ).length || 0}
                 </p>
               </CardContent>

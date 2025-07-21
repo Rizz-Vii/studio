@@ -5,11 +5,16 @@ import * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
 import type { TooltipContentProps, DefaultLegendContentProps } from "recharts"; //
- 
-import { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
+
+import {
+  NameType,
+  ValueType,
+} from "recharts/types/component/DefaultTooltipContent";
 
 // Define an interface for the custom props of ChartTooltipContent
-interface ChartTooltipContentPropsType extends TooltipContentProps<ValueType, NameType> { // Using 'any' for generics for broad compatibility
+interface ChartTooltipContentPropsType
+  extends TooltipContentProps<ValueType, NameType> {
+  // Using 'any' for generics for broad compatibility
   className?: string;
   color?: string;
   hideLabel?: boolean;

@@ -38,8 +38,10 @@ export default function SettingsPage() {
   }, []);
 
   // Get the tab from URL parameters for deep linking
-  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const defaultTab = searchParams.get('tab') || 'account';
+  const searchParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+  );
+  const defaultTab = searchParams.get("tab") || "account";
 
   if (authLoading || !mounted) {
     return <LoadingScreen fullScreen text="Loading settings..." />;
@@ -71,7 +73,10 @@ export default function SettingsPage() {
             <Shield className="h-4 w-4" />
             Security
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
+          <TabsTrigger
+            value="notifications"
+            className="flex items-center gap-2"
+          >
             <Bell className="h-4 w-4" />
             Notifications
           </TabsTrigger>
@@ -112,9 +117,12 @@ export default function SettingsPage() {
               <div className="text-center py-8">
                 <div className="mb-4">
                   <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="text-lg font-semibold mb-2">Complete Billing Management</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Complete Billing Management
+                  </h3>
                   <p className="text-muted-foreground mb-6">
-                    Access your full billing dashboard with subscription details, payment history, and plan management.
+                    Access your full billing dashboard with subscription
+                    details, payment history, and plan management.
                   </p>
                 </div>
                 <Link href="/settings/billing">

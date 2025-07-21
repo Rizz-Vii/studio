@@ -3,7 +3,13 @@
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useSubscription } from "@/hooks/use-subscription";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
@@ -33,9 +39,15 @@ export function UserSubscriptionDebugger() {
         <div>
           <h4 className="font-medium">User Information</h4>
           <div className="text-sm space-y-1 mt-2">
-            <div>Email: <code>{user.email}</code></div>
-            <div>UID: <code>{user.uid}</code></div>
-            <div>Display Name: <code>{user.displayName || "Not set"}</code></div>
+            <div>
+              Email: <code>{user.email}</code>
+            </div>
+            <div>
+              UID: <code>{user.uid}</code>
+            </div>
+            <div>
+              Display Name: <code>{user.displayName || "Not set"}</code>
+            </div>
           </div>
         </div>
 
@@ -46,19 +58,40 @@ export function UserSubscriptionDebugger() {
           <h4 className="font-medium">Profile Data (Firestore)</h4>
           {profile ? (
             <div className="text-sm space-y-1 mt-2">
-              <div>Email: <code>{profile.email}</code></div>
-              <div>Role: <Badge variant="outline">{profile.role}</Badge></div>
-              <div>Subscription Status: <Badge>{profile.subscriptionStatus || "Not set"}</Badge></div>
-              <div>Subscription Tier: <Badge>{profile.subscriptionTier || "Not set"}</Badge></div>
+              <div>
+                Email: <code>{profile.email}</code>
+              </div>
+              <div>
+                Role: <Badge variant="outline">{profile.role}</Badge>
+              </div>
+              <div>
+                Subscription Status:{" "}
+                <Badge>{profile.subscriptionStatus || "Not set"}</Badge>
+              </div>
+              <div>
+                Subscription Tier:{" "}
+                <Badge>{profile.subscriptionTier || "Not set"}</Badge>
+              </div>
               {profile.stripeCustomerId && (
-                <div>Stripe Customer ID: <code>{profile.stripeCustomerId}</code></div>
+                <div>
+                  Stripe Customer ID: <code>{profile.stripeCustomerId}</code>
+                </div>
               )}
               {profile.nextBillingDate && (
-                <div>Next Billing: <code>{new Date(profile.nextBillingDate.seconds * 1000).toLocaleDateString()}</code></div>
+                <div>
+                  Next Billing:{" "}
+                  <code>
+                    {new Date(
+                      profile.nextBillingDate.seconds * 1000
+                    ).toLocaleDateString()}
+                  </code>
+                </div>
               )}
             </div>
           ) : (
-            <div className="text-sm text-muted-foreground mt-2">No profile data found</div>
+            <div className="text-sm text-muted-foreground mt-2">
+              No profile data found
+            </div>
           )}
         </div>
 
@@ -73,20 +106,35 @@ export function UserSubscriptionDebugger() {
             <div className="text-sm text-red-600 mt-2">Error: {error}</div>
           ) : subscription ? (
             <div className="text-sm space-y-1 mt-2">
-              <div>Status: <Badge>{subscription.status}</Badge></div>
-              <div>Tier: <Badge>{subscription.tier}</Badge></div>
+              <div>
+                Status: <Badge>{subscription.status}</Badge>
+              </div>
+              <div>
+                Tier: <Badge>{subscription.tier}</Badge>
+              </div>
               {subscription.customerId && (
-                <div>Customer ID: <code>{subscription.customerId}</code></div>
+                <div>
+                  Customer ID: <code>{subscription.customerId}</code>
+                </div>
               )}
               {subscription.subscriptionId && (
-                <div>Subscription ID: <code>{subscription.subscriptionId}</code></div>
+                <div>
+                  Subscription ID: <code>{subscription.subscriptionId}</code>
+                </div>
               )}
               {subscription.currentPeriodEnd && (
-                <div>Period End: <code>{subscription.currentPeriodEnd.toLocaleDateString()}</code></div>
+                <div>
+                  Period End:{" "}
+                  <code>
+                    {subscription.currentPeriodEnd.toLocaleDateString()}
+                  </code>
+                </div>
               )}
             </div>
           ) : (
-            <div className="text-sm text-muted-foreground mt-2">No subscription data</div>
+            <div className="text-sm text-muted-foreground mt-2">
+              No subscription data
+            </div>
           )}
         </div>
 
@@ -96,17 +144,23 @@ export function UserSubscriptionDebugger() {
         <div>
           <h4 className="font-medium">Raw Data</h4>
           <details className="mt-2">
-            <summary className="text-sm cursor-pointer">Click to expand</summary>
+            <summary className="text-sm cursor-pointer">
+              Click to expand
+            </summary>
             <pre className="text-xs bg-muted p-2 rounded mt-2 overflow-auto">
-              {JSON.stringify({ 
-                user: {
-                  uid: user.uid,
-                  email: user.email,
-                  displayName: user.displayName
+              {JSON.stringify(
+                {
+                  user: {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                  },
+                  profile,
+                  subscription,
                 },
-                profile,
-                subscription 
-              }, null, 2)}
+                null,
+                2
+              )}
             </pre>
           </details>
         </div>

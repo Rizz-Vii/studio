@@ -14,7 +14,7 @@ import {
   CreditCard,
   ArrowRight,
   Receipt,
-  Star
+  Star,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -27,12 +27,12 @@ import confetti from "canvas-confetti";
 export default function PaymentSuccess() {
   const [emailSent, setEmailSent] = useState(false);
   const [invoiceLoading, setInvoiceLoading] = useState(false);
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
-  const plan = searchParams?.get("plan") || "professional";
+  const plan = searchParams?.get("plan") || "agency";
   const amount = searchParams?.get("amount") || "79";
   const cycle = searchParams?.get("cycle") || "monthly";
   const method = searchParams?.get("method") || "stripe";
@@ -44,7 +44,7 @@ export default function PaymentSuccess() {
       confetti({
         particleCount: 100,
         spread: 70,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
       });
     }, 500);
 
@@ -72,10 +72,12 @@ export default function PaymentSuccess() {
           amount: parseFloat(amount),
           paymentMethod: method,
           subscribedAt: new Date(),
-          nextBillingDate: new Date(Date.now() + (cycle === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000),
-          sessionId
+          nextBillingDate: new Date(
+            Date.now() + (cycle === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000
+          ),
+          sessionId,
         },
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
     } catch (error) {
       console.error("Error updating subscription:", error);
@@ -107,11 +109,12 @@ export default function PaymentSuccess() {
 
   const planDetails = {
     starter: { name: "Starter", color: "bg-blue-500" },
-    professional: { name: "Professional", color: "bg-purple-500" },
-    enterprise: { name: "Enterprise", color: "bg-gold-500" }
+    agency: { name: "agency", color: "bg-purple-500" },
+    enterprise: { name: "Enterprise", color: "bg-gold-500" },
   };
 
-  const currentPlan = planDetails[plan as keyof typeof planDetails] || planDetails.professional;
+  const currentPlan =
+    planDetails[plan as keyof typeof planDetails] || planDetails.agency;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-background to-green-50/50 py-8">
@@ -130,7 +133,8 @@ export default function PaymentSuccess() {
             Payment Successful!
           </h1>
           <p className="text-lg text-muted-foreground">
-            Welcome to RankPilot {currentPlan.name}! Your account has been upgraded.
+            Welcome to RankPilot {currentPlan.name}! Your account has been
+            upgraded.
           </p>
         </motion.div>
 
@@ -152,7 +156,9 @@ export default function PaymentSuccess() {
                 <div>
                   <p className="text-sm text-muted-foreground">Plan</p>
                   <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${currentPlan.color}`} />
+                    <div
+                      className={`w-3 h-3 rounded-full ${currentPlan.color}`}
+                    />
                     <span className="font-semibold">{currentPlan.name}</span>
                   </div>
                 </div>
@@ -167,19 +173,23 @@ export default function PaymentSuccess() {
                   </Badge>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Payment Method</p>
+                  <p className="text-sm text-muted-foreground">
+                    Payment Method
+                  </p>
                   <div className="flex items-center gap-2">
                     <CreditCard className="h-4 w-4" />
                     <span className="capitalize">{method}</span>
                   </div>
                 </div>
               </div>
-              
+
               <Separator />
-              
+
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Total Paid</span>
-                <span className="text-xl font-bold text-green-600">${amount}</span>
+                <span className="text-xl font-bold text-green-600">
+                  ${amount}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -199,15 +209,19 @@ export default function PaymentSuccess() {
               <div className="grid gap-3">
                 <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <Mail className={`h-5 w-5 ${emailSent ? 'text-green-600' : 'text-muted-foreground'}`} />
+                    <Mail
+                      className={`h-5 w-5 ${emailSent ? "text-green-600" : "text-muted-foreground"}`}
+                    />
                     <div>
                       <p className="font-medium">Confirmation Email</p>
                       <p className="text-sm text-muted-foreground">
-                        {emailSent ? 'Sent to your email' : 'Sending...'}
+                        {emailSent ? "Sent to your email" : "Sending..."}
                       </p>
                     </div>
                   </div>
-                  {emailSent && <CheckCircle className="h-5 w-5 text-green-600" />}
+                  {emailSent && (
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
@@ -216,7 +230,14 @@ export default function PaymentSuccess() {
                     <div>
                       <p className="font-medium">Next Billing Date</p>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(Date.now() + (cycle === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                        {new Date(
+                          Date.now() +
+                            (cycle === "yearly" ? 365 : 30) *
+                              24 *
+                              60 *
+                              60 *
+                              1000
+                        ).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -229,7 +250,7 @@ export default function PaymentSuccess() {
                   className="w-full justify-start"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  {invoiceLoading ? 'Generating...' : 'Download Invoice'}
+                  {invoiceLoading ? "Generating..." : "Download Invoice"}
                 </Button>
               </div>
             </CardContent>
@@ -250,7 +271,7 @@ export default function PaymentSuccess() {
                 Go to Dashboard
               </Button>
             </Link>
-            
+
             <Link href="/settings?tab=billing">
               <Button variant="outline" className="w-full">
                 Manage Subscription
@@ -284,11 +305,13 @@ export default function PaymentSuccess() {
             </CardHeader>
             <CardContent>
               <div className="grid gap-2">
-                {plan === 'starter' && (
+                {plan === "starter" && (
                   <>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">10 Link Analyses per month</span>
+                      <span className="text-sm">
+                        10 Link Analyses per month
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
@@ -300,11 +323,13 @@ export default function PaymentSuccess() {
                     </div>
                   </>
                 )}
-                {plan === 'professional' && (
+                {plan === "agency" && (
                   <>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-sm">100 Link Analyses per month</span>
+                      <span className="text-sm">
+                        100 Link Analyses per month
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
@@ -320,7 +345,7 @@ export default function PaymentSuccess() {
                     </div>
                   </>
                 )}
-                {plan === 'enterprise' && (
+                {plan === "enterprise" && (
                   <>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />

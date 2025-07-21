@@ -1,18 +1,21 @@
 # 📦 Testing & Scraping Framework
 
 ## Overview
+
 This project uses Playwright for end-to-end testing, visual regression testing, and data extraction. The testing framework includes anti-bot measures and LLM-assisted validation.
 
 ## Setup
 
 1. Install dependencies:
+
 ```bash
 npm install
 npx playwright install
 ```
 
 2. Configure environment variables:
-Create a `.env` file with:
+   Create a `.env` file with:
+
 ```env
 TEST_BASE_URL=https://rankpilot-h3jpc.web.app
 TEST_USER_EMAIL=test@example.com
@@ -26,16 +29,19 @@ OPENAI_API_KEY=your_openai_key
 ## Running Tests
 
 Run all tests:
+
 ```bash
 npx playwright test
 ```
 
 Run specific test file:
+
 ```bash
 npx playwright test tests/auth/auth.spec.ts
 ```
 
 Run tests in headed mode:
+
 ```bash
 npx playwright test --headed
 ```
@@ -43,11 +49,13 @@ npx playwright test --headed
 ## Test Reports
 
 View HTML report:
+
 ```bash
 npx playwright show-report
 ```
 
 Reports include:
+
 - Screenshots of failed tests
 - Trace viewer for debugging
 - Visual comparison results
@@ -56,6 +64,7 @@ Reports include:
 
 Baseline screenshots are stored in `tests/snapshots/`.
 To update baselines:
+
 ```bash
 npx playwright test --update-snapshots
 ```

@@ -36,11 +36,22 @@ const formSchema = z.object({
     .string()
     .min(2, { message: "Display name must be at least 2 characters." }),
   professionalTitle: z.string().optional(),
-  bio: z.string().max(500, { message: "Bio must be 500 characters or less." }).optional(),
+  bio: z
+    .string()
+    .max(500, { message: "Bio must be 500 characters or less." })
+    .optional(),
   primaryKeywords: z.string().optional(),
   specializations: z.string().optional(),
-  website: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
-  linkedIn: z.string().url({ message: "Please enter a valid LinkedIn URL." }).optional().or(z.literal("")),
+  website: z
+    .string()
+    .url({ message: "Please enter a valid URL." })
+    .optional()
+    .or(z.literal("")),
+  linkedIn: z
+    .string()
+    .url({ message: "Please enter a valid LinkedIn URL." })
+    .optional()
+    .or(z.literal("")),
   twitter: z.string().optional(),
 });
 
@@ -100,11 +111,12 @@ export default function ProfileForm({ user, profile }: ProfileFormProps) {
   }
 
   return (
-      <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
+    <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardHeader>
         <CardTitle>SEO Professional Profile</CardTitle>
         <CardDescription>
-          Your professional SEO identity - how others see you in the SEO community.
+          Your professional SEO identity - how others see you in the SEO
+          community.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -171,7 +183,8 @@ export default function ProfileForm({ user, profile }: ProfileFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    A brief description of your SEO background and expertise (max 500 characters)
+                    A brief description of your SEO background and expertise
+                    (max 500 characters)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -192,7 +205,8 @@ export default function ProfileForm({ user, profile }: ProfileFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    Your main areas of SEO expertise and interest (comma-separated)
+                    Your main areas of SEO expertise and interest
+                    (comma-separated)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

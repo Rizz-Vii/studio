@@ -134,9 +134,7 @@ const AuditCharts = ({ items }: { items: AuditUrlOutput["items"] }) => {
               <XAxis dataKey="score" type="number" hide />
               <ChartTooltip
                 cursor={false}
-                content={(props) => (
-                  <ChartTooltipContent {...props}  />
-                )}
+                content={(props) => <ChartTooltipContent {...props} />}
               />
               <Bar dataKey="score" radius={5} />
             </BarChart>
@@ -287,7 +285,7 @@ export default function SeoAuditPage() {
       if (e instanceof TimeoutError) {
         console.warn("SEO audit timed out, using demo data:", e.message);
         // Use demo data as fallback
-        const demoData = getDemoData('seo-audit');
+        const demoData = getDemoData("seo-audit");
         if (demoData) {
           setResults(demoData);
         } else {

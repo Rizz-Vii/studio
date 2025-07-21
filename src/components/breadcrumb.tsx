@@ -48,9 +48,18 @@ export default function Breadcrumb({
   const breadcrumbItems = items || generateBreadcrumbs(pathname || "");
 
   // Add home breadcrumb if requested and not already present
-  const finalItems = showHome && breadcrumbItems[0]?.href !== "/dashboard"
-    ? [{ title: "Dashboard", href: "/dashboard", icon: <Home className="h-4 w-4" />, current: false }, ...breadcrumbItems]
-    : breadcrumbItems;
+  const finalItems =
+    showHome && breadcrumbItems[0]?.href !== "/dashboard"
+      ? [
+          {
+            title: "Dashboard",
+            href: "/dashboard",
+            icon: <Home className="h-4 w-4" />,
+            current: false,
+          },
+          ...breadcrumbItems,
+        ]
+      : breadcrumbItems;
 
   if (finalItems.length === 0) return null;
 
@@ -71,7 +80,7 @@ export default function Breadcrumb({
                   {separator}
                 </span>
               )}
-              
+
               {item.href && !isCurrent ? (
                 <Link
                   href={item.href}
@@ -84,9 +93,7 @@ export default function Breadcrumb({
                   aria-current={isCurrent ? "page" : undefined}
                 >
                   {item.icon && (
-                    <span className="flex-shrink-0 text-xs">
-                      {item.icon}
-                    </span>
+                    <span className="flex-shrink-0 text-xs">{item.icon}</span>
                   )}
                   <span className="truncate">{item.title}</span>
                 </Link>
@@ -103,9 +110,7 @@ export default function Breadcrumb({
                   aria-current={isCurrent ? "page" : undefined}
                 >
                   {item.icon && (
-                    <span className="flex-shrink-0 text-xs">
-                      {item.icon}
-                    </span>
+                    <span className="flex-shrink-0 text-xs">{item.icon}</span>
                   )}
                   <span className="truncate">{item.title}</span>
                 </span>
@@ -129,11 +134,11 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
 
   // Build breadcrumbs from path segments
   let currentPath = "";
-  
+
   segments.forEach((segment, index) => {
     currentPath += `/${segment}`;
     const mapping = routeMappings[currentPath];
-    
+
     if (mapping) {
       breadcrumbs.push({
         title: mapping.title,
@@ -145,9 +150,9 @@ function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
       // Fallback for unmapped routes
       const title = segment
         .split("-")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
-        
+
       breadcrumbs.push({
         title,
         href: currentPath,
@@ -167,15 +172,22 @@ export function MobileBreadcrumb({
 }: Omit<BreadcrumbProps, "separator">) {
   const pathname = usePathname();
   const breadcrumbItems = items || generateBreadcrumbs(pathname || "");
-  
-  // Show only current and parent for mobile
-  const mobileItems = breadcrumbItems.length > 1 
-    ? breadcrumbItems.slice(-2) 
-    : breadcrumbItems;
 
-  const finalItems = showHome && mobileItems[0]?.href !== "/dashboard"
-    ? [{ title: "Dashboard", href: "/dashboard", icon: <Home className="h-4 w-4" />, current: false }]
-    : [];
+  // Show only current and parent for mobile
+  const mobileItems =
+    breadcrumbItems.length > 1 ? breadcrumbItems.slice(-2) : breadcrumbItems;
+
+  const finalItems =
+    showHome && mobileItems[0]?.href !== "/dashboard"
+      ? [
+          {
+            title: "Dashboard",
+            href: "/dashboard",
+            icon: <Home className="h-4 w-4" />,
+            current: false,
+          },
+        ]
+      : [];
 
   const displayItems = [...finalItems, ...mobileItems];
 
@@ -183,7 +195,7 @@ export function MobileBreadcrumb({
 
   return (
     <div className={cn("md:hidden bg-muted/30 px-4 py-2 border-b", className)}>
-      <Breadcrumb 
+      <Breadcrumb
         items={displayItems}
         showHome={false}
         separator={<ChevronRight className="h-3 w-3 text-muted-foreground" />}
@@ -194,12 +206,12 @@ export function MobileBreadcrumb({
 }
 
 // Compact breadcrumb for tool headers
-export function ToolBreadcrumb({ 
-  toolName, 
-  toolIcon 
-}: { 
-  toolName: string; 
-  toolIcon?: ReactNode; 
+export function ToolBreadcrumb({
+  toolName,
+  toolIcon,
+}: {
+  toolName: string;
+  toolIcon?: ReactNode;
 }) {
   return (
     <div className="hidden md:block mb-4">

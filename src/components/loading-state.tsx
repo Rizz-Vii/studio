@@ -117,7 +117,7 @@ export default function LoadingState({
           </div>
 
           <h3 className="text-xl font-semibold mb-2">{title}</h3>
-          
+
           <motion.p
             key={currentMessage}
             initial={{ opacity: 0, y: 10 }}
@@ -166,7 +166,10 @@ export default function LoadingState({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className={cn("flex items-center gap-3 p-4 bg-muted/30 rounded-lg", className)}
+      className={cn(
+        "flex items-center gap-3 p-4 bg-muted/30 rounded-lg",
+        className
+      )}
     >
       <motion.div
         animate={{ rotate: 360 }}
@@ -207,10 +210,8 @@ export default function LoadingState({
           </div>
 
           <h3 className="text-lg font-semibold mb-2">{title}</h3>
-          
-          {subtitle && (
-            <p className="text-muted-foreground mb-4">{subtitle}</p>
-          )}
+
+          {subtitle && <p className="text-muted-foreground mb-4">{subtitle}</p>}
 
           <motion.p
             key={currentMessage}

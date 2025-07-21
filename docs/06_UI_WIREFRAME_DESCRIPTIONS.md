@@ -11,6 +11,7 @@ Provides a textual blueprint for the application's key UI screens, guiding front
 ---
 
 ## Table of Contents
+
 1. [Screen 1: Dashboard (`/dashboard`)](#screen-1-dashboard-dashboard)
 2. [Screen 2: Content Audit Input (`/audit`)](#screen-2-content-audit-input-audit)
 3. [Screen 3: Audit Result Report (`/audit/[id]`)](#screen-3-audit-result-report-auditid)
@@ -89,13 +90,15 @@ Provides a textual blueprint for the application's key UI screens, guiding front
 ---
 
 ## Revision History
-| Version | Date | Author | Description |
-|---------|------|--------|-------------|
+
+| Version | Date       | Author                | Description   |
+| ------- | ---------- | --------------------- | ------------- |
 | 1.0     | 2025-07-09 | Product & Design Team | Initial draft |
 
 ---
 
 ## Related Documents
+
 - [01_EXECUTIVE_SUMMARY.md](./01_EXECUTIVE_SUMMARY.md)
 - [02_PRODUCT_REQUIREMENTS_DOCUMENT.md](./02_PRODUCT_REQUIREMENTS_DOCUMENT.md)
 - [03_EXECUTION_PLAN.md](./03_EXECUTION_PLAN.md)
@@ -103,4 +106,4 @@ Provides a textual blueprint for the application's key UI screens, guiding front
 
 ---
 
-*© 2025 RankPilot, Inc. All rights reserved.*
+_© 2025 RankPilot, Inc. All rights reserved._

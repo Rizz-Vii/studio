@@ -1,7 +1,8 @@
 # Testing Strategy for RankPilot
 
 ## Current Situation
-- Production URL: https://rankpilot-h3jpc.web.app
+
+- Production URL: <https://rankpilot-h3jpc.web.app>
 - Local development: Not currently running
 - Changes: Not yet deployed to production
 
@@ -10,10 +11,12 @@
 ### 1. Local Development Testing (RECOMMENDED)
 
 **Setup:**
+
 1. Start your local dev server: `npm run dev`
 2. Run tests against localhost: `npm run test:local`
 
 **Benefits:**
+
 - Test your actual changes before deployment
 - Faster feedback loop
 - No production impact
@@ -22,10 +25,12 @@
 ### 2. Production Baseline Testing
 
 **Setup:**
+
 - Test current production version to establish baseline
 - Identify what features exist vs what tests expect
 
 **Benefits:**
+
 - Understand current production state
 - Create realistic test expectations
 - Avoid false failures
@@ -33,6 +38,7 @@
 ### 3. Staging Environment (Future)
 
 **Setup:**
+
 - Deploy to Firebase preview channel
 - Test against preview URL
 - Deploy to production if tests pass
@@ -40,6 +46,7 @@
 ## Current Test Status
 
 The tests are failing because they expect features that may not be in production:
+
 - Specific navigation links (Features, Pricing, FAQ)
 - Specific heading text ("SEO Insights")
 - Specific CTA buttons ("Start Free", "Request Demo")

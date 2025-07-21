@@ -86,7 +86,8 @@ export default function PrivacySettingsCard({
     toast({
       variant: "destructive",
       title: "Account Deletion Requested",
-      description: "Your account deletion request has been submitted. This action cannot be undone.",
+      description:
+        "Your account deletion request has been submitted. This action cannot be undone.",
     });
   };
 
@@ -176,9 +177,14 @@ export default function PrivacySettingsCard({
             <div>
               <h4 className="font-medium">Export Your Data</h4>
               <p className="text-sm text-muted-foreground mb-3">
-                Download a copy of all your data including profiles, audits, and activity history.
+                Download a copy of all your data including profiles, audits, and
+                activity history.
               </p>
-              <Button variant="outline" onClick={handleDataExport} className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleDataExport}
+                className="flex items-center gap-2"
+              >
                 <Download className="h-4 w-4" />
                 Request Data Export
               </Button>
@@ -189,10 +195,13 @@ export default function PrivacySettingsCard({
               <p className="text-sm text-muted-foreground mb-3">
                 Permanently delete your account and all associated data.
               </p>
-              
+
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="flex items-center gap-2">
+                  <Button
+                    variant="destructive"
+                    className="flex items-center gap-2"
+                  >
                     <Trash2 className="h-4 w-4" />
                     Delete Account
                   </Button>
@@ -204,11 +213,11 @@ export default function PrivacySettingsCard({
                       Are you absolutely sure?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete your account,
-                      remove all your data from our servers, and cancel any active subscriptions.
-                      
-                      <br /><br />
-                      
+                      This action cannot be undone. This will permanently delete
+                      your account, remove all your data from our servers, and
+                      cancel any active subscriptions.
+                      <br />
+                      <br />
                       <strong>You will lose:</strong>
                       <ul className="list-disc list-inside mt-2 space-y-1">
                         <li>All SEO audit history</li>
@@ -247,29 +256,33 @@ export default function PrivacySettingsCard({
             <div>
               <h4 className="font-medium">Data Encryption</h4>
               <p className="text-sm text-muted-foreground">
-                All data is encrypted in transit and at rest using industry-standard encryption.
+                All data is encrypted in transit and at rest using
+                industry-standard encryption.
               </p>
             </div>
             <div>
               <h4 className="font-medium">Data Location</h4>
               <p className="text-sm text-muted-foreground">
-                Your data is stored securely in Google Cloud Platform data centers.
+                Your data is stored securely in Google Cloud Platform data
+                centers.
               </p>
             </div>
             <div>
               <h4 className="font-medium">Data Retention</h4>
               <p className="text-sm text-muted-foreground">
-                We retain your data only as long as necessary to provide our services.
+                We retain your data only as long as necessary to provide our
+                services.
               </p>
             </div>
             <div>
               <h4 className="font-medium">Third Parties</h4>
               <p className="text-sm text-muted-foreground">
-                We never sell your data to third parties. See our Privacy Policy for details.
+                We never sell your data to third parties. See our Privacy Policy
+                for details.
               </p>
             </div>
           </div>
-          
+
           <div className="pt-4 border-t">
             <Button variant="link" className="p-0 h-auto text-sm">
               Read our Privacy Policy

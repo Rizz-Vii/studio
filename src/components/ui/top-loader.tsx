@@ -19,7 +19,6 @@ export default function TopLoader() {
       }, 2000);
 
       return () => clearTimeout(timer);
-
     }
   }, [pathname, prevPath]);
 

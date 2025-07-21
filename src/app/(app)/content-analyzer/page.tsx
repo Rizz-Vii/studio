@@ -158,7 +158,9 @@ const AnalysisResults = ({
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.readabilitySuggestions.map((suggestion) => (
-                    <li key={`readability-${suggestion.slice(0, 32)}`}>{suggestion}</li>
+                    <li key={`readability-${suggestion.slice(0, 32)}`}>
+                      {suggestion}
+                    </li>
                   ))}
                 </ul>
               </AccordionContent>
@@ -187,7 +189,9 @@ const AnalysisResults = ({
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.keywordSuggestions.map((suggestion) => (
-                    <li key={`keyword-${suggestion.slice(0, 32)}`}>{suggestion}</li>
+                    <li key={`keyword-${suggestion.slice(0, 32)}`}>
+                      {suggestion}
+                    </li>
                   ))}
                 </ul>
               </AccordionContent>
@@ -216,7 +220,9 @@ const AnalysisResults = ({
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
                   {analysisResult.semanticSuggestions.map((suggestion) => (
-                    <li key={`semantic-${suggestion.slice(0, 32)}`}>{suggestion}</li>
+                    <li key={`semantic-${suggestion.slice(0, 32)}`}>
+                      {suggestion}
+                    </li>
                   ))}
                 </ul>
               </AccordionContent>
@@ -283,7 +289,9 @@ export default function ContentAnalyzerPage() {
     } catch (e: any) {
       if (e instanceof TimeoutError) {
         console.warn("Content analysis timed out:", e.message);
-        setError("Content analysis is taking longer than expected. Please try again with shorter content or check back later.");
+        setError(
+          "Content analysis is taking longer than expected. Please try again with shorter content or check back later."
+        );
       } else {
         setError(e.message || "An unexpected error occurred.");
       }

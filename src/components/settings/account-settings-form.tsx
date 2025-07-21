@@ -37,10 +37,7 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "First name is required." })
     .optional(),
-  lastName: z
-    .string()
-    .min(1, { message: "Last name is required." })
-    .optional(),
+  lastName: z.string().min(1, { message: "Last name is required." }).optional(),
   company: z.string().optional(),
   timezone: z.string().optional(),
 });
@@ -66,7 +63,8 @@ export default function AccountSettingsForm({
       firstName: profile?.firstName || "",
       lastName: profile?.lastName || "",
       company: profile?.company || "",
-      timezone: profile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezone:
+        profile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
   });
 
@@ -97,7 +95,8 @@ export default function AccountSettingsForm({
       toast({
         variant: "destructive",
         title: "Update Failed",
-        description: error.message || "Could not update your account. Please try again.",
+        description:
+          error.message || "Could not update your account. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -116,7 +115,10 @@ export default function AccountSettingsForm({
         </CardDescription>
       </CardHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(handleFormSubmit)}
+          className="space-y-6"
+        >
           <CardContent className="space-y-4">
             <Alert>
               <AlertTriangle className="h-4 w-4" />

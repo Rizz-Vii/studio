@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Settings,
   Database,
   Key,
@@ -19,7 +19,7 @@ import {
   Globe,
   Mail,
   Zap,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 
 export default function AdminSettings() {
@@ -110,7 +110,9 @@ export default function AdminSettings() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Status</span>
-                  <Badge className="bg-green-100 text-green-800">Connected</Badge>
+                  <Badge className="bg-green-100 text-green-800">
+                    Connected
+                  </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">API Calls Today</span>
@@ -205,7 +207,9 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium text-sm">AI Content Generation</h4>
-                <p className="text-xs text-muted-foreground">Enable AI-powered content suggestions</p>
+                <p className="text-xs text-muted-foreground">
+                  Enable AI-powered content suggestions
+                </p>
               </div>
               <Badge className="bg-green-100 text-green-800">Enabled</Badge>
             </div>
@@ -213,7 +217,9 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium text-sm">Advanced Analytics</h4>
-                <p className="text-xs text-muted-foreground">Detailed user behavior tracking</p>
+                <p className="text-xs text-muted-foreground">
+                  Detailed user behavior tracking
+                </p>
               </div>
               <Badge className="bg-green-100 text-green-800">Enabled</Badge>
             </div>
@@ -221,7 +227,9 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium text-sm">Real-time Collaboration</h4>
-                <p className="text-xs text-muted-foreground">Multi-user editing features</p>
+                <p className="text-xs text-muted-foreground">
+                  Multi-user editing features
+                </p>
               </div>
               <Badge variant="outline">Beta</Badge>
             </div>
@@ -229,7 +237,9 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium text-sm">White-label Options</h4>
-                <p className="text-xs text-muted-foreground">Custom branding for agencies</p>
+                <p className="text-xs text-muted-foreground">
+                  Custom branding for agencies
+                </p>
               </div>
               <Badge variant="secondary">Coming Soon</Badge>
             </div>
@@ -253,7 +263,9 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium text-sm">System Alerts</h4>
-                <p className="text-xs text-muted-foreground">Critical system errors and downtime</p>
+                <p className="text-xs text-muted-foreground">
+                  Critical system errors and downtime
+                </p>
               </div>
               <Badge className="bg-green-100 text-green-800">Enabled</Badge>
             </div>
@@ -261,7 +273,9 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium text-sm">User Activity Alerts</h4>
-                <p className="text-xs text-muted-foreground">Unusual user behavior patterns</p>
+                <p className="text-xs text-muted-foreground">
+                  Unusual user behavior patterns
+                </p>
               </div>
               <Badge className="bg-green-100 text-green-800">Enabled</Badge>
             </div>
@@ -269,7 +283,9 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium text-sm">Performance Alerts</h4>
-                <p className="text-xs text-muted-foreground">Response time and resource usage</p>
+                <p className="text-xs text-muted-foreground">
+                  Response time and resource usage
+                </p>
               </div>
               <Badge className="bg-green-100 text-green-800">Enabled</Badge>
             </div>
@@ -277,7 +293,9 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between p-3 border rounded-lg">
               <div>
                 <h4 className="font-medium text-sm">Security Alerts</h4>
-                <p className="text-xs text-muted-foreground">Authentication failures and suspicious activity</p>
+                <p className="text-xs text-muted-foreground">
+                  Authentication failures and suspicious activity
+                </p>
               </div>
               <Badge className="bg-green-100 text-green-800">Enabled</Badge>
             </div>

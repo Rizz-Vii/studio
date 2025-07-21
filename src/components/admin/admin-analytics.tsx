@@ -8,19 +8,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   LineChart,
   Line,
   PieChart,
   Pie,
-  Cell
+  Cell,
 } from "recharts";
 import {
   TrendingUp,
@@ -28,7 +28,7 @@ import {
   FileText,
   Users,
   Calendar,
-  Activity
+  Activity,
 } from "lucide-react";
 import { collection, query, orderBy, getDocs, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -54,7 +54,7 @@ export default function AdminAnalytics() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch users
       const usersRef = collection(db, "users");
       const usersSnapshot = await getDocs(usersRef);
@@ -69,7 +69,7 @@ export default function AdminAnalytics() {
         audits: 0,
         keywords: 0,
         serp: 0,
-        competitors: 0
+        competitors: 0,
       };
 
       const thirtyDaysAgo = new Date();
@@ -78,36 +78,36 @@ export default function AdminAnalytics() {
       for (const userDoc of usersSnapshot.docs) {
         const activitiesRef = collection(db, "users", userDoc.id, "activities");
         const activitiesSnapshot = await getDocs(activitiesRef);
-        
+
         let userActiveInLast30Days = false;
-        
-        activitiesSnapshot.docs.forEach(activityDoc => {
+
+        activitiesSnapshot.docs.forEach((activityDoc) => {
           const activity = activityDoc.data();
           const activityDate = activity.timestamp?.toDate();
-          
+
           if (activityDate && activityDate > thirtyDaysAgo) {
             userActiveInLast30Days = true;
           }
-          
+
           // Count by type
           switch (activity.type) {
-            case 'audit':
+            case "audit":
               totalAudits++;
               toolUsage.audits++;
               break;
-            case 'keyword-research':
+            case "keyword-research":
               totalKeywordSearches++;
               toolUsage.keywords++;
               break;
-            case 'serp-analysis':
+            case "serp-analysis":
               toolUsage.serp++;
               break;
-            case 'competitor-analysis':
+            case "competitor-analysis":
               toolUsage.competitors++;
               break;
           }
         });
-        
+
         if (userActiveInLast30Days) {
           activeUsers++;
         }
@@ -119,9 +119,12 @@ export default function AdminAnalytics() {
         const date = new Date();
         date.setMonth(date.getMonth() - i);
         months.push({
-          name: date.toLocaleDateString('en-US', { month: 'short' }),
+          name: date.toLocaleDateString("en-US", { month: "short" }),
           users: Math.floor(totalUsers * (0.6 + Math.random() * 0.4)), // Simulated growth
-          activities: Math.floor((totalAudits + totalKeywordSearches) / 6 * (0.8 + Math.random() * 0.4))
+          activities: Math.floor(
+            ((totalAudits + totalKeywordSearches) / 6) *
+              (0.8 + Math.random() * 0.4)
+          ),
         });
       }
 
@@ -131,17 +134,25 @@ export default function AdminAnalytics() {
         const date = new Date();
         date.setMonth(date.getMonth() - i);
         userGrowth.push({
-          name: date.toLocaleDateString('en-US', { month: 'short' }),
+          name: date.toLocaleDateString("en-US", { month: "short" }),
           newUsers: Math.floor(Math.random() * 20 + 5),
-          totalUsers: Math.floor(totalUsers * (0.3 + (11 - i) * 0.06))
+          totalUsers: Math.floor(totalUsers * (0.3 + (11 - i) * 0.06)),
         });
       }
 
       const toolUsageArray = [
-        { name: 'SEO Audits', value: toolUsage.audits, color: '#8884d8' },
-        { name: 'Keyword Research', value: toolUsage.keywords, color: '#82ca9d' },
-        { name: 'SERP Analysis', value: toolUsage.serp, color: '#ffc658' },
-        { name: 'Competitor Analysis', value: toolUsage.competitors, color: '#ff7c7c' }
+        { name: "SEO Audits", value: toolUsage.audits, color: "#8884d8" },
+        {
+          name: "Keyword Research",
+          value: toolUsage.keywords,
+          color: "#82ca9d",
+        },
+        { name: "SERP Analysis", value: toolUsage.serp, color: "#ffc658" },
+        {
+          name: "Competitor Analysis",
+          value: toolUsage.competitors,
+          color: "#ff7c7c",
+        },
       ];
 
       setAnalytics({
@@ -151,7 +162,7 @@ export default function AdminAnalytics() {
         totalKeywordSearches,
         monthlyActivity: months,
         toolUsage: toolUsageArray,
-        userGrowth
+        userGrowth,
       });
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -189,7 +200,9 @@ export default function AdminAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Users
+                </p>
                 <p className="text-2xl font-bold">{analytics.totalUsers}</p>
                 <p className="text-xs text-green-600">+12% from last month</p>
               </div>
@@ -197,12 +210,14 @@ export default function AdminAnalytics() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Active Users (30d)</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Active Users (30d)
+                </p>
                 <p className="text-2xl font-bold">{analytics.activeUsers}</p>
                 <p className="text-xs text-green-600">+8% from last month</p>
               </div>
@@ -210,12 +225,14 @@ export default function AdminAnalytics() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Audits</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Audits
+                </p>
                 <p className="text-2xl font-bold">{analytics.totalAudits}</p>
                 <p className="text-xs text-green-600">+25% from last month</p>
               </div>
@@ -223,13 +240,17 @@ export default function AdminAnalytics() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Keyword Searches</p>
-                <p className="text-2xl font-bold">{analytics.totalKeywordSearches}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Keyword Searches
+                </p>
+                <p className="text-2xl font-bold">
+                  {analytics.totalKeywordSearches}
+                </p>
                 <p className="text-xs text-green-600">+18% from last month</p>
               </div>
               <Search className="h-8 w-8 text-muted-foreground" />
@@ -243,7 +264,9 @@ export default function AdminAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle>User Growth</CardTitle>
-            <CardDescription>Monthly user registration and total users</CardDescription>
+            <CardDescription>
+              Monthly user registration and total users
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -252,8 +275,18 @@ export default function AdminAnalytics() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="newUsers" stroke="#8884d8" name="New Users" />
-                <Line type="monotone" dataKey="totalUsers" stroke="#82ca9d" name="Total Users" />
+                <Line
+                  type="monotone"
+                  dataKey="newUsers"
+                  stroke="#8884d8"
+                  name="New Users"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="totalUsers"
+                  stroke="#82ca9d"
+                  name="Total Users"
+                />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -263,7 +296,9 @@ export default function AdminAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle>Tool Usage Distribution</CardTitle>
-            <CardDescription>How users are utilizing different SEO tools</CardDescription>
+            <CardDescription>
+              How users are utilizing different SEO tools
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -273,7 +308,9 @@ export default function AdminAnalytics() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                  label={({ name, percent }) =>
+                    `${name} ${((percent || 0) * 100).toFixed(0)}%`
+                  }
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -293,7 +330,9 @@ export default function AdminAnalytics() {
       <Card>
         <CardHeader>
           <CardTitle>Monthly Activity Trends</CardTitle>
-          <CardDescription>User activity and engagement over the last 6 months</CardDescription>
+          <CardDescription>
+            User activity and engagement over the last 6 months
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
@@ -303,7 +342,11 @@ export default function AdminAnalytics() {
               <YAxis />
               <Tooltip />
               <Bar dataKey="users" fill="#8884d8" name="Active Users" />
-              <Bar dataKey="activities" fill="#82ca9d" name="Total Activities" />
+              <Bar
+                dataKey="activities"
+                fill="#82ca9d"
+                name="Total Activities"
+              />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -317,35 +360,42 @@ export default function AdminAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600">
-              {((analytics.activeUsers / analytics.totalUsers) * 100).toFixed(1)}%
+              {((analytics.activeUsers / analytics.totalUsers) * 100).toFixed(
+                1
+              )}
+              %
             </div>
             <p className="text-sm text-muted-foreground">
               Users active in the last 30 days
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Avg. Activities/User</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-blue-600">
-              {((analytics.totalAudits + analytics.totalKeywordSearches) / analytics.totalUsers).toFixed(1)}
+              {(
+                (analytics.totalAudits + analytics.totalKeywordSearches) /
+                analytics.totalUsers
+              ).toFixed(1)}
             </div>
             <p className="text-sm text-muted-foreground">
               Average activities per user
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Top Tool</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-purple-600">
-              {analytics.toolUsage.sort((a, b) => b.value - a.value)[0]?.name || "N/A"}
+              {analytics.toolUsage.sort((a, b) => b.value - a.value)[0]?.name ||
+                "N/A"}
             </div>
             <p className="text-sm text-muted-foreground">
               Most popular SEO tool

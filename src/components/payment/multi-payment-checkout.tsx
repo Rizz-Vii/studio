@@ -64,7 +64,7 @@ export default function MultiPaymentCheckout() {
   const searchParams = useSearchParams();
   const { user, loading } = useAuth();
 
-  const planId = searchParams?.get('plan') || 'professional';
+  const planId = searchParams?.get('plan') || 'agency';
   const billingInterval = searchParams?.get('interval') || 'monthly';
   
   const plan = STRIPE_PLANS[planId as keyof typeof STRIPE_PLANS];

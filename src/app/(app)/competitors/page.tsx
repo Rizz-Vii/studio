@@ -88,11 +88,10 @@ const RankingsChart = ({
       <CardHeader>
         <CardTitle className="font-headline flex items-center gap-2">
           <BarChart3 />
-          Ranking Comparison for &quot;{firstKeywordData.keyword}&quot;
+          Ranking Comparison for "{firstKeywordData.keyword}"
         </CardTitle>
         <CardDescription>
-          Lower bars are better. Ranks of 101 indicate &quot;N/A&quot; or rank
-          &gt; 100.
+          Lower bars are better. Ranks of 101 indicate "N/A" or rank &gt; 100.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -275,7 +274,9 @@ export default function CompetitorsPage() {
     } catch (e: any) {
       if (e instanceof TimeoutError) {
         console.warn("Competitor analysis timed out:", e.message);
-        setError("Competitor analysis is taking longer than expected. Please try again later or with fewer competitors.");
+        setError(
+          "Competitor analysis is taking longer than expected. Please try again later or with fewer competitors."
+        );
       } else {
         setError(e.message || "An unexpected error occurred during analysis.");
       }

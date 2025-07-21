@@ -68,10 +68,7 @@ export default function SiteFooter() {
           </h4>
           <ul className="space-y-1">
             <li>
-              <Link
-                href="/blog/agency-seo-audit"
-                className="hover:underline"
-              >
+              <Link href="/blog/agency-seo-audit" className="hover:underline">
                 How to Do an Agency SEO Audit the Right Way
               </Link>
             </li>

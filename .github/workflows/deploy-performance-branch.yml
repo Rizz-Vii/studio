@@ -1,5 +1,5 @@
 # Performance Branch Testing Deployment Workflow
-# This workflow deploys the performance-optimization-mobile-enhancement branch 
+# This workflow deploys the performance-optimization-mobile-enhancement branch
 # to a dedicated Firebase channel for testing purposes
 
 name: Deploy Performance Branch for Testing
@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       deploy_functions:
-        description: 'Deploy Firebase Functions as well'
+        description: "Deploy Firebase Functions as well"
         required: false
         default: false
         type: boolean
@@ -20,7 +20,7 @@ jobs:
   test_build:
     runs-on: ubuntu-latest
     name: Test Build & Performance Metrics
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,8 +39,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test_build
     name: Deploy to Performance Testing Channel
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -84,8 +84,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -142,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy_preview
     name: Run Performance Tests
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -150,8 +150,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -177,7 +177,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy_preview
     name: Run Mobile UX Tests
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -185,8 +185,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -214,7 +214,7 @@ jobs:
     needs: [test_build, deploy_preview, performance_tests, mobile_tests]
     if: always()
     name: Notify Deployment Status
-    
+
     steps:
       - name: Create deployment summary
         run: |

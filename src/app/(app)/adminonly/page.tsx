@@ -12,7 +12,13 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, Users, BarChart3, Settings, Database } from "lucide-react";
+import {
+  ShieldCheck,
+  Users,
+  BarChart3,
+  Settings,
+  Database,
+} from "lucide-react";
 import AdminUserManagement from "@/components/admin/admin-user-management";
 import AdminSystemMetrics from "@/components/admin/admin-system-metrics";
 import AdminAnalytics from "@/components/admin/admin-analytics";
@@ -53,7 +59,10 @@ export default function AdminOnlyPage() {
             <Users className="h-4 w-4" />
             Users
           </TabsTrigger>
-          <TabsTrigger value="subscriptions" className="flex items-center gap-2">
+          <TabsTrigger
+            value="subscriptions"
+            className="flex items-center gap-2"
+          >
             <Users className="h-4 w-4" />
             Subscriptions
           </TabsTrigger>

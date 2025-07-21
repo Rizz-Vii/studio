@@ -2,7 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -15,7 +21,7 @@ import {
   ArrowRight,
   Receipt,
   Star,
-  Rocket
+  Rocket,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -26,11 +32,19 @@ import { db } from "@/lib/firebase";
 import confetti from "canvas-confetti";
 
 // Simple loading component
-const LoadingScreen = ({ fullScreen, text }: { fullScreen?: boolean; text?: string }) => (
-  <div className={`flex items-center justify-center ${fullScreen ? 'min-h-screen' : 'h-64'}`}>
+const LoadingScreen = ({
+  fullScreen,
+  text,
+}: {
+  fullScreen?: boolean;
+  text?: string;
+}) => (
+  <div
+    className={`flex items-center justify-center ${fullScreen ? "min-h-screen" : "h-64"}`}
+  >
     <div className="text-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-      <p className="text-muted-foreground">{text || 'Loading...'}</p>
+      <p className="text-muted-foreground">{text || "Loading..."}</p>
     </div>
   </div>
 );
@@ -40,12 +54,12 @@ export default function PaymentSuccess() {
   const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
-  const plan = searchParams?.get("plan") || "professional";
+  const plan = searchParams?.get("plan") || "agency";
   const amount = searchParams?.get("amount") || "79";
   const cycle = searchParams?.get("cycle") || "monthly";
   const method = searchParams?.get("method") || "stripe";
@@ -58,8 +72,10 @@ export default function PaymentSuccess() {
     billingCycle: cycle,
     paymentMethod: method,
     transactionId: sessionId || `tx_${Date.now()}`,
-    nextBillingDate: new Date(Date.now() + (cycle === 'monthly' ? 30 : 365) * 24 * 60 * 60 * 1000).toLocaleDateString(),
-    invoiceUrl: `/invoice/${sessionId || 'pending'}`
+    nextBillingDate: new Date(
+      Date.now() + (cycle === "monthly" ? 30 : 365) * 24 * 60 * 60 * 1000
+    ).toLocaleDateString(),
+    invoiceUrl: `/invoice/${sessionId || "pending"}`,
   };
 
   const nextSteps = [
@@ -68,40 +84,40 @@ export default function PaymentSuccess() {
       title: "Complete Your Profile",
       description: "Set up your company information and preferences",
       href: "/settings",
-      priority: "high"
+      priority: "high",
     },
     {
       icon: <Star className="h-5 w-5" />,
       title: "Start Your First Project",
       description: "Create your first SEO project and add keywords",
       href: "/dashboard",
-      priority: "high"
+      priority: "high",
     },
     {
       icon: <Mail className="h-5 w-5" />,
       title: "Connect Your Tools",
       description: "Integrate with Google Analytics, Search Console, and more",
       href: "/integrations",
-      priority: "medium"
+      priority: "medium",
     },
     {
       icon: <Calendar className="h-5 w-5" />,
       title: "Schedule Your First Audit",
       description: "Run a comprehensive SEO audit of your website",
       href: "/seo-audit",
-      priority: "medium"
-    }
+      priority: "medium",
+    },
   ];
 
   const features = [
     "Advanced keyword tracking and ranking monitoring",
-    "Competitor analysis and SERP insights", 
+    "Competitor analysis and SERP insights",
     "AI-powered content brief generation",
     "Comprehensive SEO audit reports",
     "Priority email and chat support",
     "White-label reporting options",
     "API access for custom integrations",
-    "Weekly performance reports"
+    "Weekly performance reports",
   ];
 
   useEffect(() => {
@@ -109,14 +125,14 @@ export default function PaymentSuccess() {
     const timer = setTimeout(() => {
       setIsLoading(false);
       setShowConfetti(true);
-      
+
       // Trigger confetti animation
       confetti({
         particleCount: 100,
         spread: 70,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
       });
-      
+
       // Hide confetti after 3 seconds
       setTimeout(() => setShowConfetti(false), 3000);
     }, 1500);
@@ -135,7 +151,7 @@ export default function PaymentSuccess() {
           {/* Confetti effect will be triggered by the useEffect */}
         </div>
       )}
-      
+
       <div className="max-w-4xl mx-auto px-4 py-16">
         {/* Success Header */}
         <motion.div
@@ -151,14 +167,15 @@ export default function PaymentSuccess() {
           >
             <CheckCircle className="h-10 w-10" />
           </motion.div>
-          
+
           <h1 className="text-4xl font-bold font-headline mb-4">
             Welcome to RankPilot!
           </h1>
           <p className="text-xl text-muted-foreground mb-6">
-            Your payment was successful and your {paymentData.plan} plan is now active.
+            Your payment was successful and your {paymentData.plan} plan is now
+            active.
           </p>
-          
+
           <div className="flex items-center justify-center gap-4">
             <Badge variant="secondary" className="px-4 py-2">
               Transaction ID: {paymentData.transactionId}
@@ -201,7 +218,7 @@ export default function PaymentSuccess() {
                   <span className="text-muted-foreground">Next Billing:</span>
                   <span>{paymentData.nextBillingDate}</span>
                 </div>
-                
+
                 <div className="pt-4 space-y-3">
                   <Button asChild className="w-full">
                     <Link href={paymentData.invoiceUrl}>
@@ -264,7 +281,9 @@ export default function PaymentSuccess() {
         >
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl mb-2">Get Started in 4 Easy Steps</CardTitle>
+              <CardTitle className="text-2xl mb-2">
+                Get Started in 4 Easy Steps
+              </CardTitle>
               <CardDescription>
                 Complete these steps to maximize your SEO success with RankPilot
               </CardDescription>
@@ -278,16 +297,20 @@ export default function PaymentSuccess() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 + index * 0.1 }}
                   >
-                    <Card className={`h-full transition-all duration-300 hover:shadow-lg ${step.priority === 'high' ? 'border-primary/50' : ''}`}>
+                    <Card
+                      className={`h-full transition-all duration-300 hover:shadow-lg ${step.priority === "high" ? "border-primary/50" : ""}`}
+                    >
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
-                          <div className={`p-2 rounded-lg ${step.priority === 'high' ? 'bg-primary/10 text-primary' : 'bg-muted'}`}>
+                          <div
+                            className={`p-2 rounded-lg ${step.priority === "high" ? "bg-primary/10 text-primary" : "bg-muted"}`}
+                          >
                             {step.icon}
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <h3 className="font-semibold">{step.title}</h3>
-                              {step.priority === 'high' && (
+                              {step.priority === "high" && (
                                 <Badge variant="outline" className="text-xs">
                                   Priority
                                 </Badge>
@@ -296,7 +319,13 @@ export default function PaymentSuccess() {
                             <p className="text-sm text-muted-foreground mb-4">
                               {step.description}
                             </p>
-                            <Button asChild size="sm" variant={step.priority === 'high' ? 'default' : 'outline'}>
+                            <Button
+                              asChild
+                              size="sm"
+                              variant={
+                                step.priority === "high" ? "default" : "outline"
+                              }
+                            >
                               <Link href={step.href}>
                                 Get Started
                                 <ArrowRight className="h-3 w-3 ml-1" />
@@ -322,9 +351,12 @@ export default function PaymentSuccess() {
         >
           <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-primary/20">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold mb-4">Ready to Boost Your Rankings?</h2>
+              <h2 className="text-2xl font-bold mb-4">
+                Ready to Boost Your Rankings?
+              </h2>
               <p className="text-muted-foreground mb-6">
-                Jump straight into your dashboard and start tracking your first keywords today.
+                Jump straight into your dashboard and start tracking your first
+                keywords today.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg">
@@ -352,7 +384,8 @@ export default function PaymentSuccess() {
           className="text-center mt-8"
         >
           <p className="text-sm text-muted-foreground">
-            Need help getting started? Our support team is here to help you succeed.{" "}
+            Need help getting started? Our support team is here to help you
+            succeed.{" "}
             <Link href="/contact" className="text-primary hover:underline">
               Contact us anytime
             </Link>

@@ -1,6 +1,7 @@
 # Copilot Instructions for RankPilot (Studio)
 
 ## Project Overview
+
 - **Product:** RankPilot (internal: Studio) is an AI-first SEO SaaS platform.
 - **Frontend:** Next.js (App Router), React, Tailwind CSS, shadcn/ui
 - **Backend:** Firebase Cloud Functions (Node.js), Firestore (NoSQL)
@@ -9,6 +10,7 @@
 - **CI/CD:** GitHub Actions, Firebase Hosting
 
 ## Architecture & Data Flow
+
 - **App Structure:**
   - `/src/app/(app)/` contains feature pages (e.g., link-view, serp-view)
   - `/src/components/` holds all UI and form components
@@ -21,6 +23,7 @@
   - User actions and results may be logged to Firestore
 
 ## Key Patterns & Conventions
+
 - **Hydration & Client State:**
   - Always render form fields; use `isMounted` (set in `useEffect`) to control disabled state, not conditional rendering, to avoid hydration mismatches.
   - Example: `const isFormReady = isMounted && !isLoading;`
@@ -39,6 +42,7 @@
   - Update `/docs/AGILE_PRIORITY_PLAN.md` and `/docs/COMPREHENSIVE_INSTRUCTIONS.md` after significant work.
 
 ## Developer Workflows
+
 - **Build:** `npm run build` (Next.js)
 - **Dev:** `npm run dev` (Next.js, hot reload)
 - **Test:** Playwright for E2E, see `/tests/`
@@ -46,12 +50,14 @@
 - **Backend:** Deploy functions with `firebase deploy --only functions`
 
 ## Integration Pointsg
+
 - **OpenAI:** Used for AI-powered features (see `/ai/flows/`)
 - **Genkit:** Used for advanced AI orchestration
 - **Firestore:** Used for user data, logs, and results
 - **Firebase Auth:** Used for user authentication and access control
 
 ## Project-Specific Guidance
+
 - **Never use hydration checks to conditionally render form fields or results.**
 - **Always update documentation in `/docs/` after major changes.**
 - **Follow the tool selection and memory protocols in `/docs/MCP_INSTRUCTION_MAP.md`.**
@@ -59,6 +65,7 @@
 - **For new features, check `/docs/AGILE_PRIORITY_PLAN.md` for priorities.**
 
 ## Example: Link Analysis Page
+
 - Form: `/src/components/link-analysis-form.tsx` (uses `isMounted` for hydration-safe input)
 - Page: `/src/app/(app)/link-view/page.tsx` (handles state, calls AI, logs to Firestore, displays results)
 - Results: Animated with `framer-motion`, scrolled into view with `useRef`

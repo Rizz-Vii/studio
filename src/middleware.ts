@@ -9,31 +9,32 @@ export function middleware(request: NextRequest) {
   const cspHeader = [
     // Default directives
     "default-src 'self'",
-    // Scripts
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.firebaseapp.com https://*.firebase.com",
+    // Scripts - Added Stripe and additional Firebase domains
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.firebaseapp.com https://*.firebase.com https://js.stripe.com",
     // Styles
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     // Fonts
     "font-src 'self' https://fonts.gstatic.com",
     // Images
     "img-src 'self' data: https:",
-    // Connect (APIs, WebSocket)
-    // --- THIS IS THE CRITICAL CHANGE ---
+    // Connect (APIs, WebSocket) - Updated to include Firebase Analytics and Stripe
     "connect-src 'self' " +
       "https://*.firebaseapp.com https://*.firebase.com https://api.openai.com " +
-      "https://identitytoolkit.googleapis.com " + // Added for general Firebase Auth calls
-      "https://securetoken.googleapis.com " + // Added for auth token fetching (the main missing piece for "auth/network-request-failed")
-      "https://firestore.googleapis.com " + // Added for Firestore backend connections
-      "https://www.googleapis.com " + // General Google APIs that might be used
+      "https://identitytoolkit.googleapis.com " + 
+      "https://securetoken.googleapis.com " +
+      "https://firestore.googleapis.com " +
+      "https://firebase.googleapis.com " + // Added for Firebase Analytics
+      "https://www.googleapis.com " +
+      "https://api.stripe.com " + // Added for Stripe payments
       (process.env.NODE_ENV !== "production"
         ? "http://localhost:* ws://localhost:*"
-        : ""), // IMPORTANT for localhost development!
+        : ""),
     // Media
     "media-src 'none'",
     // Object/Embed
     "object-src 'none'",
-    // Frames (used by Firebase Auth pop-ups/redirects)
-    "frame-src https://*.firebaseapp.com https://*.firebase.com https://accounts.google.com", // Added accounts.google.com for Google Sign-In popups
+    // Frames (used by Firebase Auth pop-ups/redirects and Stripe)
+    "frame-src https://*.firebaseapp.com https://*.firebase.com https://accounts.google.com https://js.stripe.com https://hooks.stripe.com",
     // Worker
     "worker-src 'self' blob:",
   ].join("; ");

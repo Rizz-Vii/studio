@@ -81,7 +81,7 @@ export default function LoginPage() {
     const newErrors = validate();
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // Redirection is handled by the useEffect hook
@@ -208,25 +208,33 @@ export default function LoginPage() {
         </button>
 
         {/* Development Quick Login */}
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === "development" && (
           <div className="border-t pt-4 mt-4">
-            <p className="text-center text-xs text-gray-500 mb-3">Development Mode - Quick Login:</p>
+            <p className="text-center text-xs text-gray-500 mb-3">
+              Development Mode - Quick Login:
+            </p>
             <div className="space-y-2">
               <button
                 onClick={async () => {
                   try {
                     // Use real Firebase authentication
-                    await signInWithEmailAndPassword(auth, 'abbas_ali_rizvi@hotmail.com', '123456');
-                    router.push('/dashboard');
+                    await signInWithEmailAndPassword(
+                      auth,
+                      "abbas_ali_rizvi@hotmail.com",
+                      "123456"
+                    );
+                    router.push("/dashboard");
                   } catch (error) {
-                    console.error('Dev login failed:', error);
-                    setErrors({ form: 'Development login failed. Please check credentials.' });
+                    console.error("Dev login failed:", error);
+                    setErrors({
+                      form: "Development login failed. Please check credentials.",
+                    });
                   }
                 }}
                 disabled={loading}
                 className="w-full py-2 px-4 text-sm bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-lg transition"
               >
-                {loading ? 'Logging in...' : 'Login as Free User (Abbas)'}
+                {loading ? "Logging in..." : "Login as Free User (Abbas)"}
               </button>
               <button
                 onClick={async () => {
@@ -234,20 +242,22 @@ export default function LoginPage() {
                     // Use Google sign-in for starter user
                     const provider = new GoogleAuthProvider();
                     provider.setCustomParameters({
-                      login_hint: 'abba7254@gmail.com',
-                      prompt: 'select_account'
+                      login_hint: "abba7254@gmail.com",
+                      prompt: "select_account",
                     });
                     await signInWithPopup(auth, provider);
-                    router.push('/dashboard');
+                    router.push("/dashboard");
                   } catch (error) {
-                    console.error('Dev login failed:', error);
-                    setErrors({ form: 'Development Google login failed.' });
+                    console.error("Dev login failed:", error);
+                    setErrors({ form: "Development Google login failed." });
                   }
                 }}
                 disabled={loading}
                 className="w-full py-2 px-4 text-sm bg-blue-100 hover:bg-blue-200 disabled:opacity-50 rounded-lg transition"
               >
-                {loading ? 'Logging in...' : 'Login as Starter User (Abba) - Google'}
+                {loading
+                  ? "Logging in..."
+                  : "Login as Starter User (Abba) - Google"}
               </button>
             </div>
           </div>
