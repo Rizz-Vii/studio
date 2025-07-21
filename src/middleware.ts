@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
     // Connect (APIs, WebSocket) - Updated to include Firebase Analytics and Stripe
     "connect-src 'self' " +
       "https://*.firebaseapp.com https://*.firebase.com https://api.openai.com " +
-      "https://identitytoolkit.googleapis.com " + 
+      "https://identitytoolkit.googleapis.com " +
       "https://securetoken.googleapis.com " +
       "https://firestore.googleapis.com " +
       "https://firebase.googleapis.com " + // Added for Firebase Analytics

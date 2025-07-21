@@ -49,23 +49,25 @@ page.setDefaultTimeout(30000); // Longer action timeouts
 async function loginUser(page: Page) {
   try {
     await page.goto("/login");
-    
+
     // Wait for form elements to be available
-    await page.waitForSelector('#email', { timeout: 10000 });
-    await page.waitForSelector('#password', { timeout: 5000 });
-    
+    await page.waitForSelector("#email", { timeout: 10000 });
+    await page.waitForSelector("#password", { timeout: 5000 });
+
     // Fill in credentials
-    await page.fill('#email', "abbas_ali_rizvi@hotmail.com");
-    await page.fill('#password', "123456");
-    
+    await page.fill("#email", "abbas_ali_rizvi@hotmail.com");
+    await page.fill("#password", "123456");
+
     // Use Dev mode quick login button
     await page.click('button:has-text("Login as Free User (Abbas)")');
-    
+
     // Wait for navigation to complete
     await page.waitForURL("/dashboard", { timeout: 30000 });
   } catch (error) {
     console.error("Login failed:", error);
-    await page.screenshot({ path: `test-results/login-failure-${Date.now()}.png` });
+    await page.screenshot({
+      path: `test-results/login-failure-${Date.now()}.png`,
+    });
     throw error;
   }
 }
@@ -125,12 +127,12 @@ async function loginUser(page: Page) {
 
 ## Mobile-Specific Test Coverage
 
-| Feature | Test Type | Test File |
-|---------|-----------|-----------|
-| Touch Targets | Accessibility | performance.spec.ts |
-| Responsive Design | Visual | performance.spec.ts |
-| Mobile Navigation | Functional | performance.spec.ts |
-| Network Handling | Performance | performance.spec.ts |
+| Feature           | Test Type     | Test File           |
+| ----------------- | ------------- | ------------------- |
+| Touch Targets     | Accessibility | performance.spec.ts |
+| Responsive Design | Visual        | performance.spec.ts |
+| Mobile Navigation | Functional    | performance.spec.ts |
+| Network Handling  | Performance   | performance.spec.ts |
 
 ## Future Improvements
 

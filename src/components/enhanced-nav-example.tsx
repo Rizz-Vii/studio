@@ -1,12 +1,15 @@
 /**
  * Enhanced Navigation Integration Example
- * 
+ *
  * This file demonstrates how to integrate the new enhanced navigation
  * into existing components like the sidebar and mobile layouts.
  */
 
 import React from "react";
-import { EnhancedAppNav, EnhancedMobileNav } from "@/components/enhanced-app-nav";
+import {
+  EnhancedAppNav,
+  EnhancedMobileNav,
+} from "@/components/enhanced-app-nav";
 import type { NavItem } from "@/constants/enhanced-nav";
 
 // Example: Integration with existing sidebar
@@ -22,7 +25,7 @@ export function SidebarWithEnhancedNav({
   const handleNavItemClick = (item: NavItem) => {
     // Analytics tracking
     console.log("Navigation clicked:", item.title, item.href);
-    
+
     // Close mobile menu if needed
     // dispatch({ type: "CLOSE_MOBILE_MENU" });
   };
@@ -37,9 +40,7 @@ export function SidebarWithEnhancedNav({
             <span className="font-semibold">RankPilot</span>
           </div>
         )}
-        {collapsed && (
-          <div className="h-8 w-8 bg-primary rounded-lg mx-auto" />
-        )}
+        {collapsed && <div className="h-8 w-8 bg-primary rounded-lg mx-auto" />}
       </div>
 
       {/* Enhanced Navigation */}
@@ -82,11 +83,8 @@ export function MobileNavigationExample({
   return (
     <>
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/50 z-40"
-        onClick={onClose}
-      />
-      
+      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
+
       {/* Enhanced Mobile Navigation */}
       <EnhancedMobileNav
         userTier={userTier}
@@ -108,12 +106,9 @@ export function LayoutNavigationExample() {
       <div className="hidden lg:flex">
         {/* Sidebar */}
         <div className="w-64 border-r bg-muted/10">
-          <SidebarWithEnhancedNav
-            userTier="agency"
-            isAdmin={false}
-          />
+          <SidebarWithEnhancedNav userTier="agency" isAdmin={false} />
         </div>
-        
+
         {/* Main Content */}
         <div className="flex-1">
           <main className="p-6">
@@ -129,7 +124,7 @@ export function LayoutNavigationExample() {
           </main>
         </div>
       </div>
-      
+
       {/* Mobile Layout */}
       <div className="lg:hidden">
         <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -143,7 +138,7 @@ export function LayoutNavigationExample() {
             </div>
           </div>
         </div>
-        
+
         <main className="p-4">
           <h1>Mobile Enhanced Navigation</h1>
           <p>Use the menu button to see the enhanced mobile navigation.</p>
@@ -161,9 +156,9 @@ export const MIGRATION_GUIDE = {
     "3. Update props: onItemClick → onItemClickAction",
     "4. Add userTier and isAdmin props for access control",
     "5. Use collapsed prop for condensed sidebar states",
-    "6. Test tier-based visibility and grouping behavior"
+    "6. Test tier-based visibility and grouping behavior",
   ],
-  
+
   beforeAfter: {
     before: `
 // OLD: Direct nav items usage
@@ -180,9 +175,9 @@ import { EnhancedAppNav } from "@/components/enhanced-app-nav";
   isAdmin={user?.role === "admin"}
   onItemClickAction={(item) => handleNavigation(item)}
 />
-    `
+    `,
   },
-  
+
   features: [
     "✅ NeuroSEO™ Suite highlighted as flagship feature group",
     "✅ Logical grouping: NeuroSEO™, SEO Tools, Competitive Intelligence, Management",
@@ -193,8 +188,8 @@ import { EnhancedAppNav } from "@/components/enhanced-app-nav";
     "✅ Mobile-responsive design",
     "✅ Accessibility features (ARIA labels, keyboard navigation)",
     "✅ Loading states and error handling",
-    "✅ Analytics tracking integration"
-  ]
+    "✅ Analytics tracking integration",
+  ],
 };
 
 export default SidebarWithEnhancedNav;

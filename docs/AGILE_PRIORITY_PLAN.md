@@ -1,3 +1,31 @@
+# RankPilot Agile Priority Plan (2025)
+
+## Top Priorities (Unified Execution Plan)
+
+1. Firestore schema & security rules
+2. Onboarding/auth/user management
+3. MVP pages with dummy data & role-based access
+4. NeuroSEO analysis & logging
+5. Social automation (n8n) & campaign builder
+6. Stripe billing, quota, finance dashboards
+7. Admin/monitoring features
+8. Populate with simulated data
+9. Real integrations (NeuroSEO, n8n, Stripe)
+10. Security, monitoring, error handling
+11. Playwright/CI/CD test coverage
+12. Documentation for all features/flows
+
+## Reference Docs
+
+- Firestore Data Model: https://firebase.google.com/docs/firestore/data-model
+- Firestore Best Practices: https://cloud.google.com/firestore/docs/best-practices
+- Firebase Project Setup: https://firebase.google.com/docs/projects/dev-workflows/general-best-practices
+- Security Checklist: https://firebase.google.com/support/guides/security-checklist
+- User Management: https://firebase.google.com/docs/auth/admin/manage-users
+- Usage Monitoring: https://firebase.google.com/docs/database/usage/monitor-usage
+- n8n Social Automation: https://n8n.io/workflows/3066-automate-multi-platform-social-media-content-creation-with-ai/
+- Stripe SaaS Billing: https://stripe.com/resources/more/saas-subscription-models-101-a-guide-for-getting-started
+
 # RankPilot Agile Priority Plan
 
 ## Current Live Features Assessment

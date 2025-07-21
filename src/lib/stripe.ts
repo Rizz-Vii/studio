@@ -31,11 +31,11 @@ export const STRIPE_PLANS = {
     },
     features: [
       "50 audits/month",
-      "50 keyword tracking", 
+      "50 keyword tracking",
       "5 competitor analysis",
       "Advanced reports",
       "Email support",
-      "PDF export"
+      "PDF export",
     ],
     limits: {
       auditsPerMonth: 50,
@@ -57,12 +57,12 @@ export const STRIPE_PLANS = {
     features: [
       "Unlimited audits",
       "Unlimited keyword tracking",
-      "Unlimited competitor analysis", 
+      "Unlimited competitor analysis",
       "White-label reports",
       "Priority support",
       "API access",
       "Team collaboration",
-      "Advanced integrations"
+      "Advanced integrations",
     ],
     limits: {
       auditsPerMonth: -1, // unlimited
@@ -85,11 +85,11 @@ export const STRIPE_PLANS = {
       "Everything in Agency",
       "Custom integrations",
       "Dedicated account manager",
-      "24/7 phone support", 
+      "24/7 phone support",
       "Custom solutions",
       "Enterprise SLA",
       "Advanced security",
-      "Custom branding"
+      "Custom branding",
     ],
     limits: {
       auditsPerMonth: -1, // unlimited

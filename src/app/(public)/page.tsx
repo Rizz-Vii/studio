@@ -14,7 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import SiteHeader from "@/components/site-header";
 import {
   Card,
   CardContent,
@@ -122,7 +121,6 @@ export default function HomePage() {
   const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <SiteHeader />
       <main className="flex-grow flex flex-col items-center px-4 py-12 text-foreground">
         {/* Hero */}
         <motion.section

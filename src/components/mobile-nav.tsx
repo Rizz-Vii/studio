@@ -36,18 +36,26 @@ export default function MobileNav() {
     setIsMounted(true);
   }, []);
 
-  // Lock body scroll when mobile nav is open
+  // Lock body scroll when mobile nav is open and handle accessibility
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      // Add ARIA attributes for accessibility
+      document.documentElement.setAttribute("data-mobile-nav-open", "true");
+      // Add escape key listener for accessibility
+      const handleEscKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") closeMenu();
+      };
+      document.addEventListener("keydown", handleEscKey);
+      return () => {
+        document.removeEventListener("keydown", handleEscKey);
+        document.body.style.overflow = "unset";
+        document.documentElement.removeAttribute("data-mobile-nav-open");
+      };
     } else {
       document.body.style.overflow = "unset";
+      document.documentElement.removeAttribute("data-mobile-nav-open");
     }
-
-    // Cleanup function to restore scroll when component unmounts
-    return () => {
-      document.body.style.overflow = "unset";
-    };
   }, [isOpen]);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -130,7 +138,8 @@ export default function MobileNav() {
                       {user?.email}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {subscription?.tier || "Free"} • {role === "admin" ? "Admin" : "User"}
+                      {subscription?.tier || "Free"} •{" "}
+                      {role === "admin" ? "Admin" : "User"}
                     </p>
                   </div>
                   <div className="flex gap-1">

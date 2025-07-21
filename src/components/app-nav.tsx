@@ -31,13 +31,13 @@ export default function AppNav() {
   const { subscription } = useSubscription();
 
   const collapsed = !open && !isMobile;
-  
+
   const handleNavItemClick = (item: NavItem) => {
     // Close mobile sidebar when nav item is clicked
     if (isMobile) {
       setOpenMobile(false);
     }
-    
+
     // Track navigation analytics
     console.log("Navigation clicked:", item.title, item.href);
   };

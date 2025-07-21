@@ -30,19 +30,19 @@
   .mobile-full-width {
     width: 100% !important;
   }
-  
+
   .mobile-touch-padding {
     padding: 16px !important;
   }
-  
+
   .mobile-touch-margin {
     margin: 16px !important;
   }
-  
+
   .mobile-stack {
     flex-direction: column !important;
   }
-  
+
   .mobile-centered {
     display: flex !important;
     justify-content: center !important;

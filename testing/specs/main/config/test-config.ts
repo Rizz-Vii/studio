@@ -22,12 +22,12 @@ export interface TestConfig {
 export const defaultConfig: TestConfig = {
   testUsers: {
     standard: {
-      email: process.env.TEST_USER_EMAIL || "test@example.com",
-      password: process.env.TEST_USER_PASSWORD || "testpass123",
+      email: process.env.TEST_USER_EMAIL || "free.user1@test.com",
+      password: process.env.TEST_USER_PASSWORD || "testPassword123",
     },
     admin: {
-      email: process.env.TEST_ADMIN_EMAIL || "admin@example.com",
-      password: process.env.TEST_ADMIN_PASSWORD || "adminpass123",
+      email: process.env.TEST_ADMIN_EMAIL || "admin.enterprise@test.com",
+      password: process.env.TEST_ADMIN_PASSWORD || "testPassword123",
     },
   },
   baseUrl: process.env.TEST_BASE_URL || "http://localhost:3000",

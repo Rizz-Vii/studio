@@ -8,15 +8,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Award, 
-  Star, 
-  Trophy, 
+import {
+  Award,
+  Star,
+  Trophy,
   Target,
   Zap,
   TrendingUp,
   Users,
-  Clock
+  Clock,
 } from "lucide-react";
 import type { User } from "firebase/auth";
 
@@ -48,99 +48,116 @@ interface Achievement {
   requirement: number;
 }
 
-export default function SEOAchievementsBadges({ 
-  user, 
-  profile, 
-  activities 
+export default function SEOAchievementsBadges({
+  user,
+  profile,
+  activities,
 }: SEOAchievementsBadgesProps) {
-  
   // Calculate achievement progress
-  const auditCount = activities.filter(a => a.type === 'audit').length;
-  const keywordCount = activities.filter(a => a.type === 'keyword-research').length;
-  const serpCount = activities.filter(a => a.type === 'serp-analysis').length;
-  const highScoreAudits = activities.filter(a => a.type === 'audit' && a.score && a.score >= 90).length;
-  const daysSinceJoining = user.metadata.creationTime 
-    ? Math.floor((Date.now() - new Date(user.metadata.creationTime).getTime()) / (1000 * 60 * 60 * 24))
+  const auditCount = activities.filter((a) => a.type === "audit").length;
+  const keywordCount = activities.filter(
+    (a) => a.type === "keyword-research"
+  ).length;
+  const serpCount = activities.filter((a) => a.type === "serp-analysis").length;
+  const highScoreAudits = activities.filter(
+    (a) => a.type === "audit" && a.score && a.score >= 90
+  ).length;
+  const daysSinceJoining = user.metadata.creationTime
+    ? Math.floor(
+        (Date.now() - new Date(user.metadata.creationTime).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
     : 0;
 
   const achievements: Achievement[] = [
     {
-      id: 'first-audit',
-      title: 'First Steps',
-      description: 'Completed your first SEO audit',
+      id: "first-audit",
+      title: "First Steps",
+      description: "Completed your first SEO audit",
       icon: <Trophy className="h-5 w-5" />,
       earned: auditCount >= 1,
-      earnedDate: auditCount >= 1 ? activities.find(a => a.type === 'audit')?.timestamp.toDate() : undefined,
+      earnedDate:
+        auditCount >= 1
+          ? activities.find((a) => a.type === "audit")?.timestamp.toDate()
+          : undefined,
       progress: Math.min(auditCount, 1),
       requirement: 1,
     },
     {
-      id: 'audit-master',
-      title: 'Audit Master',
-      description: 'Completed 10 SEO audits',
+      id: "audit-master",
+      title: "Audit Master",
+      description: "Completed 10 SEO audits",
       icon: <Award className="h-5 w-5" />,
       earned: auditCount >= 10,
       progress: Math.min(auditCount, 10),
       requirement: 10,
     },
     {
-      id: 'keyword-researcher',
-      title: 'Keyword Researcher',
-      description: 'Performed 25 keyword research sessions',
+      id: "keyword-researcher",
+      title: "Keyword Researcher",
+      description: "Performed 25 keyword research sessions",
       icon: <Target className="h-5 w-5" />,
       earned: keywordCount >= 25,
       progress: Math.min(keywordCount, 25),
       requirement: 25,
     },
     {
-      id: 'serp-analyzer',
-      title: 'SERP Analyzer',
-      description: 'Analyzed 50 search result pages',
+      id: "serp-analyzer",
+      title: "SERP Analyzer",
+      description: "Analyzed 50 search result pages",
       icon: <TrendingUp className="h-5 w-5" />,
       earned: serpCount >= 50,
       progress: Math.min(serpCount, 50),
       requirement: 50,
     },
     {
-      id: 'high-performer',
-      title: 'High Performer',
-      description: 'Achieved 90%+ audit scores 5 times',
+      id: "high-performer",
+      title: "High Performer",
+      description: "Achieved 90%+ audit scores 5 times",
       icon: <Star className="h-5 w-5" />,
       earned: highScoreAudits >= 5,
       progress: Math.min(highScoreAudits, 5),
       requirement: 5,
     },
     {
-      id: 'power-user',
-      title: 'Power User',
-      description: 'Completed 100 total SEO activities',
+      id: "power-user",
+      title: "Power User",
+      description: "Completed 100 total SEO activities",
       icon: <Zap className="h-5 w-5" />,
       earned: activities.length >= 100,
       progress: Math.min(activities.length, 100),
       requirement: 100,
     },
     {
-      id: 'veteran',
-      title: 'SEO Veteran',
-      description: 'Active member for 90+ days',
+      id: "veteran",
+      title: "SEO Veteran",
+      description: "Active member for 90+ days",
       icon: <Clock className="h-5 w-5" />,
       earned: daysSinceJoining >= 90,
       progress: Math.min(daysSinceJoining, 90),
       requirement: 90,
     },
     {
-      id: 'community-member',
-      title: 'Community Member',
-      description: 'Completed profile with all details',
+      id: "community-member",
+      title: "Community Member",
+      description: "Completed profile with all details",
       icon: <Users className="h-5 w-5" />,
-      earned: !!(profile?.displayName && profile?.bio && profile?.primaryKeywords),
-      progress: [profile?.displayName, profile?.bio, profile?.primaryKeywords].filter(Boolean).length,
+      earned: !!(
+        profile?.displayName &&
+        profile?.bio &&
+        profile?.primaryKeywords
+      ),
+      progress: [
+        profile?.displayName,
+        profile?.bio,
+        profile?.primaryKeywords,
+      ].filter(Boolean).length,
       requirement: 3,
     },
   ];
 
-  const earnedAchievements = achievements.filter(a => a.earned);
-  const unearned = achievements.filter(a => !a.earned);
+  const earnedAchievements = achievements.filter((a) => a.earned);
+  const unearned = achievements.filter((a) => !a.earned);
 
   return (
     <div className="space-y-6">
@@ -168,7 +185,9 @@ export default function SEOAchievementsBadges({
                       {achievement.icon}
                     </div>
                     <div>
-                      <h3 className="font-medium text-sm">{achievement.title}</h3>
+                      <h3 className="font-medium text-sm">
+                        {achievement.title}
+                      </h3>
                       {achievement.earnedDate && (
                         <p className="text-xs text-muted-foreground">
                           Earned {achievement.earnedDate.toLocaleDateString()}
@@ -176,7 +195,9 @@ export default function SEOAchievementsBadges({
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {achievement.description}
+                  </p>
                   <Badge className="mt-2 bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
                     ✓ Completed
                   </Badge>
@@ -219,26 +240,31 @@ export default function SEOAchievementsBadges({
                       {achievement.icon}
                     </div>
                     <div>
-                      <h3 className="font-medium text-sm">{achievement.title}</h3>
-                      <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                      <h3 className="font-medium text-sm">
+                        {achievement.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {achievement.description}
+                      </p>
                     </div>
                   </div>
                   <Badge variant="outline">
                     {achievement.progress}/{achievement.requirement}
                   </Badge>
                 </div>
-                
+
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full transition-all duration-500"
-                    style={{ 
-                      width: `${Math.min((achievement.progress! / achievement.requirement) * 100, 100)}%` 
+                    style={{
+                      width: `${Math.min((achievement.progress! / achievement.requirement) * 100, 100)}%`,
                     }}
                   />
                 </div>
-                
+
                 <p className="text-xs text-muted-foreground mt-2">
-                  {achievement.requirement - achievement.progress!} more to unlock
+                  {achievement.requirement - achievement.progress!} more to
+                  unlock
                 </p>
               </div>
             ))}

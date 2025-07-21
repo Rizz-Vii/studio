@@ -54,9 +54,19 @@ export default function LoadingState({
   useEffect(() => {
     if (!isLoading) return;
 
+    // Announce loading state for screen readers
+    const loadingAnnouncement = document.createElement("div");
+    loadingAnnouncement.setAttribute("aria-live", "polite");
+    loadingAnnouncement.setAttribute("aria-atomic", "true");
+    loadingAnnouncement.classList.add("sr-only");
+    loadingAnnouncement.textContent = `${title}. ${loadingMessages[0]}`;
+    document.body.appendChild(loadingAnnouncement);
+
     // Cycle through loading messages
     const messageInterval = setInterval(() => {
-      setCurrentMessage((prev) => (prev + 1) % loadingMessages.length);
+      const nextMessageIndex = (currentMessage + 1) % loadingMessages.length;
+      setCurrentMessage(nextMessageIndex);
+      loadingAnnouncement.textContent = `${title}. ${loadingMessages[nextMessageIndex]}`;
     }, 2000);
 
     // Cycle through tips
@@ -69,8 +79,15 @@ export default function LoadingState({
     if (progress === undefined) {
       progressInterval = setInterval(() => {
         setDisplayProgress((prev) => {
-          if (prev >= 90) return prev;
-          return prev + Math.random() * 5;
+          const newProgress = prev >= 90 ? prev : prev + Math.random() * 5;
+          // Update loading announcement with progress
+          if (
+            Math.floor(newProgress) % 10 === 0 &&
+            Math.floor(newProgress) !== Math.floor(prev)
+          ) {
+            loadingAnnouncement.textContent = `${Math.floor(newProgress)}% complete. ${loadingMessages[currentMessage]}`;
+          }
+          return newProgress;
         });
       }, 500);
     }
@@ -79,8 +96,9 @@ export default function LoadingState({
       clearInterval(messageInterval);
       clearInterval(tipInterval);
       if (progressInterval) clearInterval(progressInterval);
+      document.body.removeChild(loadingAnnouncement);
     };
-  }, [isLoading, progress, tips.length]);
+  }, [isLoading, progress, tips.length, title, currentMessage]);
 
   useEffect(() => {
     if (progress !== undefined) {

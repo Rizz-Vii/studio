@@ -5,38 +5,78 @@
 **Development Server**: Running at `http://localhost:3000`  
 **Database**: Populated with comprehensive dummy data  
 **Users**: 6 test accounts across all tiers  
-**Analyses**: 22 NeuroSEO™ analyses ready for testing  
+**Analyses**: 22 NeuroSEO™ analyses ready for testing
 
 ---
 
 ## 🧪 Step-by-Step Testing Protocol
+
+### Automated Test Structure
+
+RankPilot uses a structured test orchestration system. Each tier has a standardized test pattern:
+
+```typescript
+// Standard test structure for all role-based tests
+import { test, expect } from "@playwright/test";
+import { TestOrchestrator } from "../utils/test-orchestrator";
+import { tierUserFlows } from "../flows/role-based-flows"; // tier = free, starter, agency, etc.
+
+test.describe("Tier User Tests", () => {
+  let orchestrator: TestOrchestrator;
+
+  test.beforeEach(async ({ page }) => {
+    orchestrator = new TestOrchestrator(page);
+    page.setDefaultNavigationTimeout(30000);
+    page.setDefaultTimeout(20000);
+  });
+
+  test("Tier User - Feature Access", async ({ page }) => {
+    // Find specific flow from predefined flows
+    const featureFlow = tierUserFlows.find((flow) =>
+      flow.name.includes("FeatureName")
+    );
+    await orchestrator.executeFlow(featureFlow);
+
+    // Verify tier-specific elements
+    await expect(page.locator('[data-testid="feature-results"]')).toBeVisible();
+  });
+
+  test("Tier User - Access Restrictions", async ({ page }) => {
+    await orchestrator.userManager.loginAs("tierName"); // free, starter, agency, enterprise, admin
+    await page.goto("/restricted-feature");
+    await expect(
+      page.locator("text=/upgrade|premium|subscribe/i")
+    ).toBeVisible();
+  });
+});
+```
 
 ### Phase 1: Basic Authentication & Dashboard Access
 
 1. **Open your browser** and navigate to: `http://localhost:3000`
 
 2. **Test Login for Each Tier**:
-   
+
    **Free Tier User:**
    - Email: `free.user1@test.com`
    - Password: `testPassword123`
    - Expected: Basic dashboard with limited features
-   
+
    **Starter Tier User:**
-   - Email: `starter.user1@test.com`  
+   - Email: `starter.user1@test.com`
    - Password: `testPassword123`
    - Expected: Enhanced dashboard with content features
-   
+
    **Agency Tier User:**
    - Email: `agency.user1@test.com`
    - Password: `testPassword123`
    - Expected: Full dashboard with competitive analysis
-   
+
    **Enterprise User:**
    - Email: `enterprise.user1@test.com`
    - Password: `testPassword123`
    - Expected: Premium dashboard with all features
-   
+
    **Enterprise Admin:**
    - Email: `admin.enterprise@test.com`
    - Password: `testPassword123`
@@ -58,25 +98,25 @@ For each user tier, verify:
    - [ ] Click through to view detailed results
 
 3. **Tier-Specific Features**
-   
+
    **Free Tier Should See:**
    - [ ] Basic analysis history (2 analyses)
    - [ ] Single URL limitation messages
    - [ ] Simple insights and tasks
    - [ ] Upgrade prompts for advanced features
-   
+
    **Starter Tier Should See:**
    - [ ] Content-focused analyses (3 analyses)
    - [ ] Multi-URL support (2-3 URLs)
    - [ ] Content optimization suggestions
    - [ ] Moderate quota usage
-   
+
    **Agency Tier Should See:**
    - [ ] Comprehensive analyses (5 analyses)
    - [ ] Full competitive positioning
    - [ ] Client management capabilities
    - [ ] High quota allowances
-   
+
    **Enterprise Tier Should See:**
    - [ ] All premium features
    - [ ] Advanced AI visibility tracking
@@ -257,7 +297,7 @@ npm run db:setup
 **Phase 3: Quota System** ☐  
 **Phase 4: Analysis Details** ☐  
 **Phase 5: Admin Features** ☐  
-**Phase 6: Performance** ☐  
+**Phase 6: Performance** ☐
 
 **Overall System Status**: ☐ Ready for Production
 

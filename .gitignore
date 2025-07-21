@@ -1,5 +1,6 @@
 # =================================
 # RankPilot (Studio) - .gitignore
+# Optimized for Next.js 15, Firebase, Playwright Testing
 # =================================
 
 # Node.js Dependencies
@@ -18,63 +19,91 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Next.js Build Output
-# -------------------
+# Next.js Build Output & Cache
+# ----------------------------
 .next/
 out/
 build/
 dist/
 .vercel/
+.turbo/
+.swc/
 
 # TypeScript Build
 # ---------------
 *.tsbuildinfo
 next-env.d.ts
 *.d.ts.map
+tsconfig.tsbuildinfo
 
-# Testing & Coverage
-# -----------------
-coverage/
-.nyc_output/
+# Testing & QA (Playwright)
+# -------------------------
 test-results/
 playwright-report/
 test-snapshots/
-TEST_RESULTS_SUMMARY.md
+testing/results/
+testing/reports/
+coverage/
+.nyc_output/
 *.spec.js.map
 *.test.js.map
 
-# Playwright Debug Files
-# ---------------------
-pglite-debug.log
+# Test Debug Files
+# ---------------
 debug-*.png
-test-results-*.json
+error-*.png
+connectivity-*.png
+basic-health-check.png
+body-visibility-debug.png
+test-failed-*.png
 
-# Firebase & Cloud
-# ----------------
+# Firebase & Cloud Services
+# -------------------------
 .firebase/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
 firebase-functions-debug.log
 .storage/
-.firebaserc
+
+# Firebase Functions
+# -----------------
+functions/lib/
+functions/node_modules/
+functions/.tsbuildinfo
+functions/coverage/
 
 # Genkit AI Framework
 # ------------------
 .genkit/
 genkit-debug.log
+ai-flows-debug.log
 
-# Environment Variables
-# --------------------
+# Environment Variables & Secrets
+# -------------------------------
 .env
 .env.*
 !.env.example
 !.env.test.example
 .env.backup
+.env.development.local
+.env.production.local
 
-# Development Tools
-# ----------------
-.vscode/
+# Security Files
+# -------------
+*.pem
+*.p12
+*.key
+*.crt
+*.cert
+secrets/
+.secrets/
+service-account-*.json
+
+# Development Tools & IDEs
+# ------------------------
+.vscode/settings.json
+.vscode/launch.json
 .idea/
 .cursor/
 .idx/
@@ -95,23 +124,25 @@ ehthumbs.db
 Thumbs.db
 Desktop.ini
 
-# Logs & Debug
-# ------------
+# Logs & Debug Files
+# -----------------
 *.log
 *.log.*
 logs/
 debug.log
 error.log
 combined.log
+emfile-debug.log
 
-# Cache & Temporary
-# ----------------
+# Cache & Temporary Files
+# ----------------------
 .cache/
 .tmp/
 .temp/
 *.tmp
 *.temp
 .modified
+.eslintcache
 
 # AI & ML Cache
 # -------------
@@ -119,28 +150,61 @@ combined.log
 .ai-cache/
 *.ai-cache
 model-cache/
-
-# Security & Secrets
-# -----------------
-*.pem
-*.p12
-*.key
-*.crt
-*.cert
-secrets/
-.secrets/
+neuroseo-cache/
 
 # Performance & Monitoring
 # ------------------------
 performance-*.json
 metrics-*.json
 trace-*.json
+lighthouse-*.json
 
-# Firebase Functions
-# -----------------
-functions/lib/
-functions/node_modules/
-functions/.tsbuildinfo
-functions/.env
-functions/.env.*
-functions/firebase-debug.log
+# Windows Optimization Files
+# --------------------------
+pagefile.sys
+hiberfil.sys
+
+# Project-Specific Exclusions
+# ---------------------------
+# Temporary markdown files
+*_TEMP.md
+*_BACKUP.md
+*_OLD.md
+
+# Build artifacts
+*.map
+*.js.map
+*.css.map
+
+# Documentation build
+docs/build/
+docs/.docusaurus/
+
+# Storybook build
+storybook-static/
+
+# Bundle analyzer
+.bundle-analyzer/
+bundle-report.html
+
+# Mobile app builds (if applicable)
+*.ipa
+*.apk
+*.aab
+
+# Database dumps
+*.sql
+*.db
+*.sqlite
+
+# Backup files
+*.bak
+*.backup
+
+# Large media files (add specific extensions as needed)
+*.mov
+*.mp4
+*.avi
+*.mkv
+
+# End of optimized .gitignore

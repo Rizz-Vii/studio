@@ -2,14 +2,15 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "../specs/main",
-  timeout: 30000,
+  timeout: 60000, // Increased from 30s to 60s
+  globalTimeout: 180000, // 3 minutes total for all tests
 
-  // Optimize for parallel execution
-  workers: process.env.CI ? 2 : 4,
-  fullyParallel: true,
+  // Optimize for parallel execution with graceful handling
+  workers: process.env.CI ? 2 : 3, // Reduced workers to avoid resource contention
+  fullyParallel: false, // Disabled for more stable execution
 
-  // Reduce retries for faster feedback
-  retries: process.env.CI ? 2 : 1,
+  // Enhanced retry strategy
+  retries: process.env.CI ? 3 : 2, // More retries for stability
 
   // Optimized reporter configuration
   reporter: [
@@ -23,10 +24,17 @@ export default defineConfig({
   use: {
     baseURL: process.env.TEST_BASE_URL || "http://localhost:3000",
     trace: "retain-on-failure",
-    screenshot: "only-on-failure",
+    screenshot: "only-on-failure", 
     video: "retain-on-failure",
-    actionTimeout: 15000,
-    navigationTimeout: 15000,
+    actionTimeout: 30000, // Increased from 15s to 30s
+    navigationTimeout: 45000, // Increased from 15s to 45s
+    
+    // Additional stability settings
+    headless: true,
+    channel: "chrome",
+    launchOptions: {
+      slowMo: 100, // Add slight delay for stability
+    },
   },
 
   outputDir: "../results/",

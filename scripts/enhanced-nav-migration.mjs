@@ -2,13 +2,13 @@
 
 /**
  * Enhanced Navigation Migration Script
- * 
+ *
  * This script helps migrate from the old flat navigation structure
  * to the new enhanced grouped navigation system.
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 // Enhanced navigation implementation guide
 const IMPLEMENTATION_GUIDE = `
@@ -159,25 +159,29 @@ with the NeuroSEO™ Suite taking center stage as the flagship AI-powered offeri
 `;
 
 function createImplementationReport() {
-  const reportPath = path.join(__dirname, '..', 'ENHANCED_NAVIGATION_IMPLEMENTATION.md');
-  
-  console.log('📝 Creating implementation report...');
+  const reportPath = path.join(
+    __dirname,
+    "..",
+    "ENHANCED_NAVIGATION_IMPLEMENTATION.md"
+  );
+
+  console.log("📝 Creating implementation report...");
   fs.writeFileSync(reportPath, IMPLEMENTATION_GUIDE);
   console.log(`✅ Implementation report created: ${reportPath}`);
 }
 
 function checkEnhancedNavFiles() {
   const filesToCheck = [
-    'src/constants/enhanced-nav.ts',
-    'src/components/enhanced-app-nav.tsx',
-    'src/components/ui/collapsible.tsx',
-    'src/components/enhanced-nav-example.tsx'
+    "src/constants/enhanced-nav.ts",
+    "src/components/enhanced-app-nav.tsx",
+    "src/components/ui/collapsible.tsx",
+    "src/components/enhanced-nav-example.tsx",
   ];
-  
-  console.log('🔍 Checking enhanced navigation files...');
-  
+
+  console.log("🔍 Checking enhanced navigation files...");
+
   for (const file of filesToCheck) {
-    const filePath = path.join(__dirname, '..', file);
+    const filePath = path.join(__dirname, "..", file);
     if (fs.existsSync(filePath)) {
       const stats = fs.statSync(filePath);
       console.log(`✅ ${file} (${(stats.size / 1024).toFixed(1)}KB)`);
@@ -188,30 +192,34 @@ function checkEnhancedNavFiles() {
 }
 
 function main() {
-  console.log('🚀 Enhanced Navigation Migration Tool\n');
-  
+  console.log("🚀 Enhanced Navigation Migration Tool\n");
+
   // Check if enhanced navigation files exist
   checkEnhancedNavFiles();
-  
-  console.log('\n📋 Migration Status:');
-  console.log('✅ Enhanced navigation constants created');
-  console.log('✅ Enhanced navigation component created');
-  console.log('✅ Collapsible UI component created');
-  console.log('✅ Integration examples provided');
-  console.log('✅ TypeScript types properly configured');
-  
+
+  console.log("\n📋 Migration Status:");
+  console.log("✅ Enhanced navigation constants created");
+  console.log("✅ Enhanced navigation component created");
+  console.log("✅ Collapsible UI component created");
+  console.log("✅ Integration examples provided");
+  console.log("✅ TypeScript types properly configured");
+
   // Create implementation report
   createImplementationReport();
-  
-  console.log('\n🎯 Next Steps:');
-  console.log('1. Review the implementation report: ENHANCED_NAVIGATION_IMPLEMENTATION.md');
-  console.log('2. Update your sidebar component to use EnhancedAppNav');
+
+  console.log("\n🎯 Next Steps:");
+  console.log(
+    "1. Review the implementation report: ENHANCED_NAVIGATION_IMPLEMENTATION.md"
+  );
+  console.log("2. Update your sidebar component to use EnhancedAppNav");
   console.log('3. Update FeatureGate to support "enterprise" tier');
-  console.log('4. Test the navigation in development mode');
-  console.log('5. Deploy and validate the enhanced user experience');
-  
-  console.log('\n✨ Enhanced Navigation Successfully Implemented!');
-  console.log('The NeuroSEO™ Suite is now prominently featured and systematically organized.');
+  console.log("4. Test the navigation in development mode");
+  console.log("5. Deploy and validate the enhanced user experience");
+
+  console.log("\n✨ Enhanced Navigation Successfully Implemented!");
+  console.log(
+    "The NeuroSEO™ Suite is now prominently featured and systematically organized."
+  );
 }
 
 if (require.main === module) {

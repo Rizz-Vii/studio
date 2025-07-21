@@ -43,17 +43,66 @@ This file serves as a persistent instruction set for GitHub Copilot and any auto
 
 ## VI. Tooling & Ecosystem
 
-- Firebase, Google Cloud Platform, OpenAI API, Playwright, Next.js, Stripe.
+- **Development Environment**: VS Code, Node.js v20, npm, PowerShell (Windows-optimized).
+- **Cloud Services**: Firebase (Auth, Firestore, Functions, Hosting), Google Cloud Platform (Secret Manager, Monitoring).
+- **AI Infrastructure**: OpenAI API (GPT-4o), Genkit AI flows, custom NeuroSEO™ engines.
+- **Testing Tools**: Playwright for E2E testing, Jest for unit testing.
+- **Performance**: Lighthouse, Core Web Vitals, custom monitoring scripts.
+- **Frontend Libraries**: Next.js, React, Tailwind CSS, shadcn/ui, framer-motion, Recharts.
+- **Backend Services**: Firebase Cloud Functions, Firestore, Task Queues.
+- **Payment Processing**: Stripe API, PayPal integration with webhook handling.
+- **SEO Analysis**: Custom NeuroSEO™ Suite with 6 specialized engines.
+- **Deployment**: GitHub Actions, Firebase Hosting, automated CI/CD pipeline.
+- **Monitoring**: Error tracking, performance monitoring, usage analytics.
 
 ## VII. Actionable Protocols & Conventions
 
-- Always render form fields; use `isMounted` for disabled state.
-- Use `react-hook-form` with Zod, normalize URLs, ensure accessibility.
-- Animate results with `framer-motion`, scroll with `useRef`/`useEffect`.
-- Import AI flows from `/ai/flows/`, log actions/results to Firestore.
-- Check and update `/docs/SECURITY_ROTATION.md`, `/docs/PROJECT_STATUS_AND_NEXT_STEPS.md`, `/docs/AGILE_PRIORITY_PLAN.md`, `/docs/COMPREHENSIVE_INSTRUCTIONS.md` after major changes.
-- Never commit secrets; follow rotation and audit protocols.
-- Adhere to `/docs/MCP_INSTRUCTION_MAP.md` for tool selection.
+### Development Protocols
+
+- Always render form fields; use `useHydration()` hook for disabled state: `disabled={!hydrated || isLoading}`.
+- Use `react-hook-form` with Zod validation for all form submissions.
+- Normalize URLs with `normalizeUrl()` before processing or storage.
+- Ensure all UI elements meet WCAG accessibility standards (minimum 48px touch targets).
+- Animate results with `framer-motion`, implement scroll behavior with `useRef`/`useEffect`.
+- Import AI flows from `/ai/flows/`, log all actions and results to Firestore.
+- Implement tier-based feature gates using the `<FeatureGate>` component with appropriate tier requirements.
+- Follow the Enhanced Navigation System for new features with proper tier visibility settings.
+
+### Documentation Protocols
+
+- Update `/docs/PROJECT_STATUS_AND_NEXT_STEPS.md` after completing major features or releases.
+- Document new features in `/docs/AGILE_PRIORITY_PLAN.md` for proper prioritization.
+- Maintain and update `/docs/COMPREHENSIVE_INSTRUCTIONS.md` for architectural knowledge.
+- Review `/docs/MOBILE_ENHANCEMENT_CHECKLIST.md` for mobile optimization requirements.
+- Document API changes in appropriate documentation files with examples.
+- Follow the patterns in `/docs/MCP_INSTRUCTION_MAP.md` for tool selection decisions.
+
+### Security Protocols
+
+- Never commit secrets; use environment variables and Google Secret Manager.
+- Check and update `/docs/SECURITY_ROTATION.md` after security-related changes.
+- Follow the secret rotation schedule and audit protocols defined in security documentation.
+- Implement proper authentication and authorization checks on all API endpoints.
+- Use tier-based security rules in Firestore for data access control.
+- Follow GDPR/CCPA compliance requirements for user data handling.
+
+### Performance Protocols
+
+- Use Windows-specific optimizations with `npm run optimize-windows` for development.
+- Monitor file handle usage with `npm run emfile:check` to prevent EMFILE errors.
+- Use `cross-env NODE_OPTIONS='--max-old-space-size=3072'` for memory management.
+- Implement network-aware fetching for mobile optimization.
+- Follow Core Web Vitals standards: LCP < 2.5s, CLS < 0.1.
+- Use the responsive utilities from `src/lib/mobile-responsive-utils.ts` for mobile optimization.
+
+### Testing Protocols
+
+- Run comprehensive role-based tests with `npm run test:role-based` before major changes.
+- Use the Windows-optimized test runner: `.\scripts\run-role-based-tests.ps1`.
+- Test across all 5 user tiers using the predefined test accounts.
+- Run performance tests with `npm run test:performance` to validate Core Web Vitals.
+- Ensure mobile compatibility with `npm run test:mobile` for viewport testing.
+- Verify accessibility standards with `npm run test:accessibility` for WCAG compliance.
 
 ---
 

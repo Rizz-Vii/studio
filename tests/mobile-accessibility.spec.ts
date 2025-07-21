@@ -27,10 +27,10 @@ test.describe("Mobile Accessibility and Navigation", () => {
 
       // Set mobile viewport
       await page.setViewportSize({ width, height });
-      
+
       // Login first
       await loginUser(page);
-      
+
       // Navigate to dashboard
       await page.goto("/dashboard", { waitUntil: "networkidle" });
 
