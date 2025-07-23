@@ -1,5 +1,5 @@
 ---
-mode: execute
+mode: agent
 ---
 
 # Run RankPilot Pre-Launch Validation
