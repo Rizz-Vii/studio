@@ -2,7 +2,7 @@
 # This workflow deploys the performance-optimization-mobile-enhancement branch
 # to a dedicated Firebase channel for testing purposes
 
-name: Deploy Performance Branch for Testing
+name: Deploy Performance Branch for Testing - Fixed
 
 on:
   push:
