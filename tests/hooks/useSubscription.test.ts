@@ -32,7 +32,7 @@ jest.mock("firebase/firestore", () => ({
   collection: jest.fn(),
   query: jest.fn(),
   where: jest.fn(),
-  onSnapshot: (query, callback) => mockOnSnapshot(query, callback),
+  onSnapshot: (query: any, callback: any) => mockOnSnapshot(query, callback),
 }));
 
 describe("useSubscription Hook", () => {

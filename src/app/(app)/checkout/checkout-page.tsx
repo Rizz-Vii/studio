@@ -152,7 +152,7 @@ export default function CheckoutPage() {
       "Custom integrations",
       "Team collaboration tools",
     ],
-    agency: [
+    admin: [
       "Everything in Enterprise",
       "Unlimited everything",
       "Complete white labeling",

@@ -299,9 +299,7 @@ test.describe("Subscription Tier System Tests", () => {
       await page.waitForLoadState("domcontentloaded");
 
       // Verify tier display is correct
-      await expect(
-        page.locator(`text=${user}`, { exact: false })
-      ).toBeVisible();
+      await expect(page.locator(`text=${user}`)).toBeVisible();
 
       // Verify subscription details
       await expect(

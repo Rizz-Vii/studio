@@ -499,7 +499,7 @@ test.describe("Dashboard E2E Tests", () => {
 
       // Check if search query is reflected in the content
       const pageContent = await page.textContent("body");
-      expect(pageContent.toLowerCase()).toContain("seo");
+      expect(pageContent?.toLowerCase()).toContain("seo");
 
       // Go back to dashboard
       await page.goto("/dashboard");

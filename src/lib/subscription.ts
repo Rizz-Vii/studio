@@ -102,6 +102,14 @@ export function getSubscriptionLimits(tier: PlanType | "free") {
       prioritySupport: true,
       apiAccess: true,
     },
+    enterprise: {
+      auditsPerMonth: -1, // Unlimited
+      keywordTracking: -1, // Unlimited
+      competitorAnalysis: -1, // Unlimited
+      exportData: true,
+      prioritySupport: true,
+      apiAccess: true,
+    },
   };
 
   return limits[tier] || limits.free;

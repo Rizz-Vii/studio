@@ -73,8 +73,6 @@ export default function KeywordToolForm({
     <EnhancedCard
       className="h-full"
       variant="elevated"
-      animate={true}
-      loading={isLoading}
     >
       <EnhancedCardHeader>
         <EnhancedCardTitle className="font-headline flex items-center gap-2">
