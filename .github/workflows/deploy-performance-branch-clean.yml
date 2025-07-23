@@ -1,8 +1,6 @@
----
 # Performance Branch Testing Deployment Workflow
 # This workflow deploys the performance-optimization-mobile-enhancement branch
 # to a dedicated Firebase channel for testing purposes
-# Enhanced with research-based best practices and error handling
 
 name: Deploy Performance Branch for Testing
 
@@ -18,11 +16,10 @@ on:
         default: false
         type: boolean
 
-# Environment settings for performance testing
 env:
   NODE_VERSION: "20"
   FIREBASE_PROJECT_ID: "rankpilot-h3jpc"
-  FIREBASE_TOOLS_VERSION: "13.31.2"  # Pinned version for stability
+  FIREBASE_TOOLS_VERSION: "13.31.2"
 
 jobs:
   test_build:
@@ -35,7 +32,7 @@ jobs:
 
       - name: Show git status with ignored files
         run: |
-          echo "## 📋 Git Status with Ignored Files" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔧 Git Status with Ignored Files" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Current repository status:" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY

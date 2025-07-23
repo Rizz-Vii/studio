@@ -23,7 +23,7 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL: process.env.TEST_BASE_URL || "http://localhost:3000",
+    baseURL: process.env.TEST_BASE_URL || "https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app",
     
     // Extended timeouts for slow environments
     actionTimeout: 45000, // 45 seconds
