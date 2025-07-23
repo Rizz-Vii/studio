@@ -30,7 +30,9 @@ export const defaultConfig: TestConfig = {
       password: process.env.TEST_ADMIN_PASSWORD || "adminpass123",
     },
   },
-  baseUrl: process.env.TEST_BASE_URL || "http://localhost:3000",
+  baseUrl:
+    process.env.TEST_BASE_URL ||
+    "https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app",
   timeouts: {
     defaultNavigationTimeout: 30000,
     defaultActionTimeout: 10000,

@@ -10,7 +10,9 @@ const config: PlaywrightTestConfig = {
     ["junit", { outputFile: "test-results/junit.xml" }],
   ],
   use: {
-    baseURL: process.env.TEST_BASE_URL || "http://localhost:3000",
+    baseURL:
+      process.env.TEST_BASE_URL ||
+      "https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
