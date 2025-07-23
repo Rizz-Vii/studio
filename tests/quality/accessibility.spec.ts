@@ -120,8 +120,24 @@ test.describe("Comprehensive Accessibility Tests", () => {
       );
       if (previousElement) {
         // A simple check: y position should generally not decrease, and x should increase or reset
-        const prevBox = await previousElement.boundingBox();
-        const activeBox = await activeElement.boundingBox();
+        const prevBox = await previousElement.evaluate((el: Element) => {
+          const rect = el.getBoundingClientRect();
+          return {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+          };
+        });
+        const activeBox = await activeElement.evaluate((el: Element) => {
+          const rect = el.getBoundingClientRect();
+          return {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+          };
+        });
         if (prevBox && activeBox) {
           const yPositionIncreasedOrSame = activeBox.y >= prevBox.y;
           const xPositionIncreased = activeBox.x > prevBox.x;

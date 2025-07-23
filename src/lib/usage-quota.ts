@@ -334,6 +334,15 @@ export class UsageQuotaManager {
         "white-label",
         "api-access",
       ],
+      enterprise: [
+        "basic-audit",
+        "basic-keywords",
+        "full-audit",
+        "competitor-analysis",
+        "reports",
+        "white-label",
+        "api-access",
+      ],
     };
 
     const planFeatures = featureMatrix[quota.plan] || featureMatrix["free"];

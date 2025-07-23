@@ -561,8 +561,8 @@ export default function TutorialsPage() {
                   Access to{" "}
                   {tier === "enterprise"
                     ? "all"
-                    : tier === "professional"
-                      ? "professional and free"
+                    : tier === "agency"
+                      ? "agency and free"
                       : "free"}{" "}
                   tutorials
                 </p>

@@ -21,7 +21,7 @@ test.beforeAll(async ({ request }) => {
 });
 
 // Helper to create authenticated requests
-const createAuthenticatedRequest = (request) => {
+const createAuthenticatedRequest = (request: any) => {
   return {
     get: (url: string) =>
       request.get(url, { headers: { Authorization: `Bearer ${authToken}` } }),
@@ -90,7 +90,7 @@ test.describe("Authenticated API Endpoints", () => {
       expect(difficultyResponse.ok()).toBeTruthy();
       const difficultyData = await difficultyResponse.json();
       expect(difficultyData.results).toHaveLength(2);
-      expect(difficultyData.results[0].difficulty).toBeTypeOf("number");
+      expect(typeof difficultyData.results[0].difficulty).toBe("number");
     });
   });
 
@@ -106,7 +106,7 @@ test.describe("Authenticated API Endpoints", () => {
       expect(analyzeResponse.ok()).toBeTruthy();
       const analyzeData = await analyzeResponse.json();
       expect(analyzeData.analysis).toBeDefined();
-      expect(analyzeData.analysis.contentScore).toBeTypeOf("number");
+      expect(typeof analyzeData.analysis.contentScore).toBe("number");
 
       // Test recommendations
       const recsResponse = await api.post(

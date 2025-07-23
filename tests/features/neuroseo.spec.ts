@@ -383,7 +383,7 @@ test.describe("NeuroSEO Suite Tests", () => {
 
     // Enable performance measurement
     await page.evaluate(() => {
-      window.performanceMetrics = {
+      (window as any).performanceMetrics = {
         loadStart: Date.now(),
       };
     });
@@ -400,7 +400,7 @@ test.describe("NeuroSEO Suite Tests", () => {
 
     // Measure rendering time
     const renderTime = await page.evaluate(() => {
-      return Date.now() - window.performanceMetrics.loadStart;
+      return Date.now() - (window as any).performanceMetrics.loadStart;
     });
 
     console.log(`NeuroSEO render time: ${renderTime}ms`);

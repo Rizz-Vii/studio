@@ -1,11 +1,11 @@
 import { TestFlow } from "../utils/test-orchestrator";
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
 // Common steps that can be reused across test flows
 export const CommonSteps = {
   navigateToDashboard: () => ({
     name: "Navigate to Dashboard",
-    action: async (page) => {
+    action: async (page: Page) => {
       await page.goto("/dashboard");
       await page.waitForSelector("h1, h2");
     },
@@ -13,7 +13,7 @@ export const CommonSteps = {
 
   verifyPageLoad: (pageName: string, path: string) => ({
     name: `Navigate to ${pageName}`,
-    action: async (page) => {
+    action: async (page: Page) => {
       await page.goto(path);
       await page.waitForLoadState("domcontentloaded");
     },
@@ -21,7 +21,7 @@ export const CommonSteps = {
 
   takeScreenshot: (name: string) => ({
     name: `Take screenshot - ${name}`,
-    action: async (page) => {
+    action: async (page: Page) => {
       await page.screenshot({ path: `test-results/${name}-${Date.now()}.png` });
     },
     skipOnFailure: true,

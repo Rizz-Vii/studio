@@ -93,7 +93,7 @@ test.describe("Agency Tier User Tests", () => {
     await orchestrator.userManager.loginAs("agency");
 
     // Resize viewport to mobile size
-    await context.setViewportSize({ width: 390, height: 844 }); // iPhone 12 dimensions
+    await page.setViewportSize({ width: 390, height: 844 }); // iPhone 12 dimensions
 
     // Navigate to dashboard
     await page.goto("/dashboard");

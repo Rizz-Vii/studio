@@ -112,7 +112,7 @@ export function TutorialSummary({ className = "" }: TutorialSummaryProps) {
         ...professionalTutorials,
         ...enterpriseTutorials,
       ].slice(0, 4);
-    } else if (tier === "professional") {
+    } else if (tier === "agency") {
       return [...baseTutorials, ...professionalTutorials].slice(0, 4);
     }
 
