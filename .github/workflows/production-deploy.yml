@@ -97,15 +97,6 @@ jobs:
           echo "## ✅ Production Deployment Approved" >> $GITHUB_STEP_SUMMARY
           echo "All validation checks passed. Ready for production deployment." >> $GITHUB_STEP_SUMMARY
 
-      - name: 💾 Upload Production Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-build-${{ steps.hash.outputs.value }}
-          path: |
-            .next/
-            !.next/cache/
-          retention-days: 30
-
   # Job 2: Deploy to Production
   production_deploy:
     runs-on: ubuntu-latest
@@ -119,20 +110,22 @@ jobs:
         with:
           ref: master
 
-      - name: 💾 Download Production Build
-        uses: actions/download-artifact@v4
-        with:
-          name: production-build-${{ needs.production_build.outputs.build_hash }}
-          path: .next/
-
-      - name: 🟢 Setup Node.js
+      - name: � Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
-      - name: 📦 Install Dependencies
+      - name: � Install Dependencies
         run: npm ci --prefer-offline --no-audit
+
+      - name: 🏗️ Production Build
+        run: |
+          echo "## 🏗️ Production Build for Deployment" >> $GITHUB_STEP_SUMMARY
+          NODE_ENV=production npm run build
+          echo "✅ Production build completed for deployment" >> $GITHUB_STEP_SUMMARY
+        env:
+          NODE_OPTIONS: "--max-old-space-size=3072"
 
       - name: 🔥 Deploy to Production
         uses: FirebaseExtended/action-hosting-deploy@v0
