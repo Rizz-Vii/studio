@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useSubscription } from "@/hooks/use-subscription";
+import { useSubscription } from "@/hooks/useSubscription";
 import {
   Card,
   CardContent,
@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function UserSubscriptionDebugger() {
   const { user, profile } = useAuth();
-  const { subscription, loading, error } = useSubscription();
+  const { subscription, loading } = useSubscription();
 
   if (!user) {
     return (
@@ -102,8 +102,6 @@ export function UserSubscriptionDebugger() {
           <h4 className="font-medium">Subscription Hook Data</h4>
           {loading ? (
             <div className="text-sm text-muted-foreground mt-2">Loading...</div>
-          ) : error ? (
-            <div className="text-sm text-red-600 mt-2">Error: {error}</div>
           ) : subscription ? (
             <div className="text-sm space-y-1 mt-2">
               <div>

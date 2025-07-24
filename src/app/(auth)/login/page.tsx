@@ -10,6 +10,7 @@ import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { Eye, EyeOff } from "lucide-react";
 import LoadingScreen from "@/components/ui/loading-screen";
@@ -45,6 +46,8 @@ const GoogleIcon = () => (
 );
 
 export default function LoginPage() {
+  // Auth guard - redirect authenticated users away from login page
+  const { shouldRender } = useAuthGuard();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -57,15 +60,21 @@ export default function LoginPage() {
 
   const { user, loading, role } = useAuth();
 
+  // Improved redirection logic
   useEffect(() => {
-    if (!loading && user) {
-      if (role === "admin") {
-        router.push("/adminonly");
-      } else if (role === "user") {
-        router.push("/dashboard");
-      }
+    if (!loading && user && shouldRender) {
+      const redirectPath = role === "admin" ? "/adminonly" : "/dashboard";
+      router.push(redirectPath);
     }
-  }, [user, loading, role, router]);
+  }, [user, loading, role, router, shouldRender]);
+
+  if (loading) {
+    return <LoadingScreen fullScreen text="Verifying your credentials..." />;
+  }
+
+  if (!shouldRender) {
+    return <LoadingScreen fullScreen text="Redirecting..." />;
+  }
 
   function validate() {
     const newErrors: typeof errors = {};
@@ -83,8 +92,12 @@ export default function LoginPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Redirection is handled by the useEffect hook
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      // Redirection is handled by the useEffect hook after auth state updates
     } catch (error: any) {
       setErrors({ form: error?.message || "Login failed. Please try again." });
     }
@@ -106,7 +119,7 @@ export default function LoginPage() {
           createdAt: serverTimestamp(),
         });
       }
-      // Redirection is handled by the useEffect hook
+      // Redirection is handled by the useEffect hook after auth state updates
     } catch (error: any) {
       setErrors({
         form: error?.message || "Google sign-in failed. Please try again.",
@@ -223,7 +236,7 @@ export default function LoginPage() {
                       "abbas_ali_rizvi@hotmail.com",
                       "123456"
                     );
-                    router.push("/dashboard");
+                    // Redirection handled by useEffect
                   } catch (error) {
                     console.error("Dev login failed:", error);
                     setErrors({
@@ -246,7 +259,7 @@ export default function LoginPage() {
                       prompt: "select_account",
                     });
                     await signInWithPopup(auth, provider);
-                    router.push("/dashboard");
+                    // Redirection handled by useEffect
                   } catch (error) {
                     console.error("Dev login failed:", error);
                     setErrors({ form: "Development Google login failed." });

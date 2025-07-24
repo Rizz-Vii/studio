@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   Card,
@@ -113,7 +113,7 @@ function BillingPage() {
                 <ul className="grid md:grid-cols-2 gap-1">
                   {subscription?.features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-success-foreground" />
                       {feature}
                     </li>
                   ))}
@@ -294,7 +294,7 @@ function BillingPage() {
                     <Crown className="w-5 h-5 text-yellow-500" />
                   )}
                   {plan.tier === "starter" && (
-                    <Zap className="w-5 h-5 text-blue-500" />
+                    <Zap className="w-5 h-5 text-primary" />
                   )}
                   <CardTitle className="capitalize">{plan.name}</CardTitle>
                 </div>
@@ -313,7 +313,7 @@ function BillingPage() {
                 <ul className="space-y-2 mb-6">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-success-foreground" />
                       {feature}
                     </li>
                   ))}
@@ -425,3 +425,4 @@ function BillingPage() {
 }
 
 export default BillingPage;
+

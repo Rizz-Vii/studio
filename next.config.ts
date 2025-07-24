@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
   webpack: (config, { isServer }) => {
     // Handle Handlebars
     config.resolve.alias.handlebars = "handlebars/dist/handlebars.min.js";
-    
+
     // Ignore specific Node.js only modules in browser
     if (!isServer) {
       config.resolve.fallback = {
@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
         crypto: false, // Add other Node.js built-ins that might be used
       };
     }
-    
+
     return config;
   },
 
@@ -89,6 +89,11 @@ const nextConfig: NextConfig = {
           {
             key: "Referrer-Policy",
             value: "origin-when-cross-origin",
+          },
+          {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://*.firebaseapp.com https://*.firebase.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.firebaseapp.com https://*.firebase.com https://www.google-analytics.com;",
           },
         ],
       },

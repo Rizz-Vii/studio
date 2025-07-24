@@ -4,14 +4,16 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Eye, EyeOff } from "lucide-react";
 import LoadingScreen from "@/components/ui/loading-screen";
 
 export default function RegisterPage() {
+  // Auth guard - redirect authenticated users away from register page
+  const { shouldRender } = useAuthGuard();
   const router = useRouter();
   const { user, loading } = useAuth();
   const [email, setEmail] = useState("");
@@ -34,7 +36,9 @@ export default function RegisterPage() {
     return <LoadingScreen fullScreen text="Setting up your account..." />;
   }
 
-  if (user) return null;
+  if (!shouldRender) {
+    return <LoadingScreen fullScreen text="Redirecting..." />;
+  }
 
   function validate() {
     const newErrors: typeof errors = {};
@@ -65,11 +69,8 @@ export default function RegisterPage() {
         email.trim(),
         password.trim()
       );
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        email: userCredential.user.email,
-        role: "user",
-        createdAt: new Date(),
-      });
+      // User document will be created by ensureUserSubscription in AuthContext
+      // This ensures consistent subscription structure across all auth methods
       router.push("/dashboard");
     } catch (error: any) {
       setErrors({
@@ -79,11 +80,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className=" inset-0 flex items-center justify-center bg-gray-100">
+    <div className="inset-0 flex items-center justify-center bg-gray-100">
       <form
         onSubmit={handleRegister}
-        className="w-full max-w-md p-8 space-y-6 rounded-1xl shadow-xl border bg-white"
-        style={{ marginTop: "-4rem" }} // Pull form up visually
+        className="w-full max-w-md p-8 space-y-6 rounded-1xl shadow-xl border bg-white -mt-16"
       >
         <h2 className="text-2xl font-bold text-center text-gray-800 underline mb-2">
           Register

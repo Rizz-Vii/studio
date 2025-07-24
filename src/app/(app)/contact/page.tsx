@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
@@ -184,10 +184,10 @@ export default function ContactPage() {
                       <Input
                         id="name"
                         {...register("name")}
-                        className={errors.name ? "border-red-500" : ""}
+                        className={errors.name ? "border-destructive" : ""}
                       />
                       {errors.name && (
-                        <p className="text-sm text-red-500 mt-1">
+                        <p className="text-sm text-destructive-foreground mt-1">
                           {errors.name.message}
                         </p>
                       )}
@@ -198,10 +198,10 @@ export default function ContactPage() {
                         id="email"
                         type="email"
                         {...register("email")}
-                        className={errors.email ? "border-red-500" : ""}
+                        className={errors.email ? "border-destructive" : ""}
                       />
                       {errors.email && (
-                        <p className="text-sm text-red-500 mt-1">
+                        <p className="text-sm text-destructive-foreground mt-1">
                           {errors.email.message}
                         </p>
                       )}
@@ -213,7 +213,7 @@ export default function ContactPage() {
                     <select
                       id="category"
                       {...register("category")}
-                      className={`w-full rounded-md border border-input bg-background px-3 py-2 text-sm ${errors.category ? "border-red-500" : ""}`}
+                      className={`w-full rounded-md border border-input bg-background px-3 py-2 text-sm ${errors.category ? "border-destructive" : ""}`}
                     >
                       <option value="">Select a category</option>
                       {supportCategories.map((category) => (
@@ -223,7 +223,7 @@ export default function ContactPage() {
                       ))}
                     </select>
                     {errors.category && (
-                      <p className="text-sm text-red-500 mt-1">
+                      <p className="text-sm text-destructive-foreground mt-1">
                         {errors.category.message}
                       </p>
                     )}
@@ -234,10 +234,10 @@ export default function ContactPage() {
                     <Input
                       id="subject"
                       {...register("subject")}
-                      className={errors.subject ? "border-red-500" : ""}
+                      className={errors.subject ? "border-destructive" : ""}
                     />
                     {errors.subject && (
-                      <p className="text-sm text-red-500 mt-1">
+                      <p className="text-sm text-destructive-foreground mt-1">
                         {errors.subject.message}
                       </p>
                     )}
@@ -249,11 +249,11 @@ export default function ContactPage() {
                       id="message"
                       rows={5}
                       {...register("message")}
-                      className={errors.message ? "border-red-500" : ""}
+                      className={errors.message ? "border-destructive" : ""}
                       placeholder="Please describe your issue or question in detail..."
                     />
                     {errors.message && (
-                      <p className="text-sm text-red-500 mt-1">
+                      <p className="text-sm text-destructive-foreground mt-1">
                         {errors.message.message}
                       </p>
                     )}
@@ -342,7 +342,7 @@ export default function ContactPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <CheckCircle className="h-5 w-5 text-success-foreground" />
                   Service Status
                 </CardTitle>
               </CardHeader>
@@ -450,3 +450,4 @@ export default function ContactPage() {
     </div>
   );
 }
+

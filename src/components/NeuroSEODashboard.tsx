@@ -337,51 +337,73 @@ export default function NeuroSEODashboard({
             Analyze your content with our comprehensive NeuroSEO™ engine
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="urls">Target URLs *</Label>
+              <Label htmlFor="urls" className="text-sm font-medium mb-2 block">
+                Target URLs *
+              </Label>
               <Textarea
                 id="urls"
                 placeholder="https://example.com/page1&#10;https://example.com/page2"
                 value={urls}
                 onChange={(e) => setUrls(e.target.value)}
-                rows={3}
+                rows={4}
+                className="min-h-[100px] resize-y"
               />
-              <p className="text-xs text-gray-500 mt-1">One URL per line</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                One URL per line
+              </p>
             </div>
 
             <div>
-              <Label htmlFor="competitors">Competitor URLs</Label>
+              <Label
+                htmlFor="competitors"
+                className="text-sm font-medium mb-2 block"
+              >
+                Competitor URLs
+              </Label>
               <Textarea
                 id="competitors"
                 placeholder="https://competitor1.com&#10;https://competitor2.com"
                 value={competitorUrls}
                 onChange={(e) => setCompetitorUrls(e.target.value)}
-                rows={3}
+                rows={4}
+                className="min-h-[100px] resize-y"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-2">
                 Optional: One URL per line
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="keywords">Target Keywords *</Label>
+              <Label
+                htmlFor="keywords"
+                className="text-sm font-medium mb-2 block"
+              >
+                Target Keywords *
+              </Label>
               <Input
                 id="keywords"
                 placeholder="SEO, content optimization, digital marketing"
                 value={targetKeywords}
                 onChange={(e) => setTargetKeywords(e.target.value)}
+                className="h-11"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-2">
                 Comma-separated keywords
               </p>
             </div>
 
             <div>
-              <Label htmlFor="analysisType">Analysis Type</Label>
+              <Label
+                htmlFor="analysisType"
+                className="text-sm font-medium mb-2 block"
+              >
+                Analysis Type
+              </Label>
               <Select
                 value={analysisType}
                 onValueChange={(value: any) => setAnalysisType(value)}

@@ -11,7 +11,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useSubscription } from "@/hooks/use-subscription";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/context/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -47,7 +47,7 @@ interface UsageLimit {
 
 export function UsageAnalytics() {
   const { user } = useAuth();
-  const { subscription, getLimits, isActive, isPremium } = useSubscription();
+  const { subscription, loading: subscriptionLoading } = useSubscription();
   const [usage, setUsage] = useState<UsageData>({
     projects: 0,
     keywords: 0,
@@ -57,6 +57,17 @@ export function UsageAnalytics() {
     users: 1,
   });
   const [loading, setLoading] = useState(true);
+
+  // Helper functions to derive missing properties
+  const isActive = subscription?.status === "active";
+  const isPremium = subscription?.tier !== "free";
+  const getLimits = () =>
+    subscription?.planLimits || {
+      auditsPerMonth: 3,
+      keywords: 50,
+      reports: 1,
+      competitors: 1,
+    };
 
   useEffect(() => {
     if (user) {
@@ -103,10 +114,10 @@ export function UsageAnalytics() {
     {
       name: "Keywords",
       current: usage.keywords || 0,
-      limit: limits.keywordTracking,
+      limit: limits.keywords,
       icon: <Zap className="w-4 h-4" />,
       color:
-        (usage.keywords || 0) >= limits.keywordTracking * 0.8
+        (usage.keywords || 0) >= limits.keywords * 0.8
           ? "text-red-500"
           : "text-green-500",
     },
@@ -123,10 +134,10 @@ export function UsageAnalytics() {
     {
       name: "Team Members",
       current: usage.users || 0,
-      limit: limits.competitorAnalysis,
+      limit: limits.competitors,
       icon: <Users className="w-4 h-4" />,
       color:
-        (usage.users || 0) >= limits.competitorAnalysis * 0.8
+        (usage.users || 0) >= limits.competitors * 0.8
           ? "text-red-500"
           : "text-orange-500",
     },
@@ -340,9 +351,9 @@ export function UsageAnalytics() {
                     <div className="text-xs text-muted-foreground">
                       {[
                         `${limits.auditsPerMonth === -1 ? "Unlimited" : limits.auditsPerMonth} audits/month`,
-                        `${limits.keywordTracking === -1 ? "Unlimited" : limits.keywordTracking} keywords`,
-                        limits.exportData ? "Data export" : "No export",
-                        limits.apiAccess ? "API access" : "No API",
+                        `${limits.keywords === -1 ? "Unlimited" : limits.keywords} keywords`,
+                        `${limits.reports === -1 ? "Unlimited" : limits.reports} reports`,
+                        `${limits.competitors === -1 ? "Unlimited" : limits.competitors} competitors`,
                       ].join(", ")}
                     </div>
                   </div>
@@ -350,7 +361,7 @@ export function UsageAnalytics() {
                 <div className="flex justify-between text-sm">
                   <span>Support Level</span>
                   <span className="font-medium capitalize">
-                    {limits.prioritySupport ? "Priority" : "Standard"}
+                    {isPremium ? "Priority" : "Standard"}
                   </span>
                 </div>
               </div>

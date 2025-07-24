@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Rocket, Search, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { AuthAwareHero } from "@/components/auth-aware-homepage";
 import {
   Dialog,
   DialogContent,
@@ -96,24 +97,24 @@ const features: {
 }[] = [
   {
     title: "Site Audit",
-    desc: "Crawl your site broken links, indexability, page speed, meta issues, and more.",
+    desc: "Enterprise-grade crawling with NeuroSEO™ intelligence—scan 100+ technical SEO factors, JavaScript rendering, and Core Web Vitals in real-time.",
     icon: Search,
     detailedDescription:
-      "Our comprehensive Site Audit tool crawls every page of your website to identify technical SEO issues that could be harming your rankings. We check for over 100 common problems, including broken links, slow page load times, missing or duplicate meta tags, and crawlability errors. Get a prioritized list of issues with clear, actionable recommendations to improve your site's health.",
+      "Our NeuroSEO™ powered Site Audit engine performs comprehensive technical SEO analysis using advanced crawling algorithms. We identify critical issues across 100+ factors including JavaScript rendering, Core Web Vitals, schema markup, internal linking architecture, and mobile responsiveness. Get actionable insights with prioritized recommendations backed by machine learning pattern recognition.",
   },
   {
     title: "Keyword Intelligence",
-    desc: "Track keywords, visibility scores, and keyword gaps with real-time updates.",
+    desc: "AI-driven semantic analysis revealing high-value opportunities with search intent mapping, SERP feature tracking, and competitive gap analysis.",
     icon: TrendingUp,
     detailedDescription:
-      "Discover high-potential keywords your customers are searching for. Our AI-powered tool provides thousands of suggestions, including long-tail variations and questions. Track your ranking positions in real-time, monitor your overall search visibility, and identify valuable keyword gaps between you and your competitors to inform your content strategy.",
+      "Leverage our advanced NLP models to uncover semantic keyword relationships and search intent patterns. Our AI analyzes SERP features, competitor content gaps, and search volume trends to identify high-conversion opportunities. Track rankings across multiple search engines with real-time visibility scoring and automated reporting for enterprise accounts.",
   },
   {
     title: "Competitor Tracking",
-    desc: "Benchmark your SEO progress against your top rivals with historical trend graphs.",
+    desc: "Advanced competitive intelligence with AI-powered content analysis, backlink monitoring, and strategic positioning insights for market dominance.",
     icon: Rocket,
     detailedDescription:
-      "Stay ahead of the competition by tracking their every move. Monitor your competitors' keyword rankings, see their top-performing content, and analyze their backlink profiles. Our side-by-side comparisons and historical data trends help you identify opportunities to outrank them and capture more market share.",
+      "Monitor competitor strategies with enterprise-level intelligence gathering. Our AI analyzes competitor content performance, backlink acquisition patterns, and SERP positioning changes. Get strategic insights into their technical implementations, content gaps, and emerging opportunities to maintain competitive advantage in your market vertical.",
   },
 ];
 
@@ -121,32 +122,12 @@ export default function HomePage() {
   const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <main className="flex-grow flex flex-col items-center px-4 py-12 text-foreground">
+      <main
+        id="main-content"
+        className="flex-grow flex flex-col items-center px-4 py-12 text-foreground"
+      >
         {/* Hero */}
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={fadeIn}
-          custom={0}
-          className="max-w-6xl w-full text-center pt-12"
-        >
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            SEO Insights{" "}
-            <span className="text-primary">Supercharged by AI</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8">
-            Unlock technical, content, and off-page SEO intelligence. Analyze,
-            optimize, and outrank — all from one smart platform.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg">
-              <Link href="/register">Start Free</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/register">Request Demo</Link>
-            </Button>
-          </div>
-        </motion.section>
+        <AuthAwareHero />
 
         {/* Feature Highlights with animated icons */}
         <section
@@ -168,16 +149,7 @@ export default function HomePage() {
                   <Card className="h-full">
                     <CardHeader className="flex flex-row items-center gap-1">
                       <CardTitle className="text-xl">{item.title}</CardTitle>
-                      <div
-                        style={{
-                          width: 100,
-                          height: 48,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          overflow: "visible",
-                        }}
-                      >
+                      <div className="w-[100px] h-12 flex items-center justify-center overflow-visible">
                         <motion.span
                           variants={iconAnimations[item.title]}
                           initial="initial"
@@ -213,11 +185,12 @@ export default function HomePage() {
         {/* Screenshot */}
         <section className="mt-20 w-full max-w-6xl text-center">
           <h2 className="text-3xl md:text-4xl font-semibold mb-4">
-            Your SEO Command Center
+            Enterprise SEO Command Center
           </h2>
-          <p className="text-muted-foreground mb-6">
-            All your SEO tools — crawler, analyzer, optimizer — in one clean,
-            intuitive dashboard designed to turn data into action.
+          <p className="text-muted-foreground mb-6 max-w-3xl mx-auto">
+            Unified dashboard powered by NeuroSEO™ Suite—real-time crawling
+            analysis, AI-driven insights, and comprehensive reporting. Built for
+            SEO professionals who demand precision and scalability.
           </p>
           <Card className="rounded-xl overflow-hidden">
             <Image
@@ -237,12 +210,30 @@ export default function HomePage() {
           id="about"
           className="mt-24 w-full max-w-4xl text-center"
         >
-          <h2 className="text-3xl font-bold mb-6">About RankPilot</h2>
-          <p className="text-muted-foreground mb-6">
-            RankPilot is built to give SEO professionals a single dashboard that
-            replaces half a dozen tools. From crawling and content scoring to
-            tracking and reporting — it's all here, powered by AI.
-          </p>
+          <h2 className="text-3xl font-bold mb-6">The NeuroSEO™ Advantage</h2>
+          <div className="grid md:grid-cols-2 gap-8 text-left">
+            <Card className="p-6">
+              <h3 className="text-xl font-semibold mb-4">
+                Enterprise Architecture
+              </h3>
+              <p className="text-muted-foreground">
+                Built on Firebase Cloud Functions with global CDN distribution.
+                Our NeuroSEO™ Suite processes millions of data points using
+                advanced machine learning models, delivering insights that
+                traditional SEO tools simply cannot match.
+              </p>
+            </Card>
+            <Card className="p-6">
+              <h3 className="text-xl font-semibold mb-4">AI-First Approach</h3>
+              <p className="text-muted-foreground">
+                Six specialized AI engines work in orchestration:
+                NeuralCrawler™, SemanticMap™, AI Visibility Engine,
+                TrustBlock™, RewriteGen™, and our central Orchestrator. Each
+                engine optimized for specific SEO challenges at enterprise
+                scale.
+              </p>
+            </Card>
+          </div>
         </motion.section>
 
         {/* CTA */}
@@ -254,13 +245,14 @@ export default function HomePage() {
           className="mt-32 max-w-4xl w-full bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-10 text-primary-foreground text-center shadow-xl hover:shadow-2xl transition-shadow duration-300"
         >
           <h4 className="text-3xl font-bold mb-4">
-            Start Ranking Better — Today
+            Accelerate Your SEO Performance Today
           </h4>
           <p className="text-lg mb-6 opacity-90">
-            Sign up free. No credit card needed. Get results from day one.
+            Join leading agencies using NeuroSEO™ intelligence.
+            Enterprise-grade insights, professional results, proven ROI.
           </p>
           <Button size="lg" variant="secondary" asChild>
-            <Link href="/register">Get Started for Free</Link>
+            <Link href="/register">Start Free Enterprise Trial</Link>
           </Button>
         </motion.section>
 
@@ -389,11 +381,9 @@ function PricingCard({
   features: string[];
 }) {
   return (
-    <Card className="rounded-xl flex flex-col text-center">
+    <Card className="h-full">
       <CardHeader>
-        <CardTitle as="h4" className="text-lg">
-          {title}
-        </CardTitle>
+        <CardTitle className="text-xl">{title}</CardTitle>
         <p className="text-2xl font-semibold">{price}</p>
       </CardHeader>
       <CardContent className="flex-grow">

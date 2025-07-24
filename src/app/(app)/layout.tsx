@@ -1,4 +1,4 @@
-// src/app/(app)/layout.tsx
+﻿// src/app/(app)/layout.tsx
 "use client";
 
 import {
@@ -95,7 +95,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                           <Crown className="h-3 w-3 text-purple-500" />
                         )}
                         {subscription?.tier === "starter" && (
-                          <Zap className="h-3 w-3 text-blue-500" />
+                          <Zap className="h-3 w-3 text-primary" />
                         )}
                         <span className="text-xs font-medium capitalize text-sidebar-foreground/90">
                           {subscription?.planName || "Free"}
@@ -167,3 +167,4 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </HydrationProvider>
   );
 }
+

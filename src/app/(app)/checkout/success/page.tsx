@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -53,7 +53,7 @@ export default function CheckoutSuccessPage() {
               className="mx-auto mb-6"
             >
               <div className="relative">
-                <CheckCircle className="h-20 w-20 text-green-500 mx-auto" />
+                <CheckCircle className="h-20 w-20 text-success-foreground mx-auto" />
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -82,25 +82,25 @@ export default function CheckoutSuccessPage() {
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  <CheckCircle className="h-5 w-5 text-success-foreground flex-shrink-0" />
                   <span className="text-sm">
                     Access to advanced SEO audit tools
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  <CheckCircle className="h-5 w-5 text-success-foreground flex-shrink-0" />
                   <span className="text-sm">
                     AI-powered keyword research and content optimization
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  <CheckCircle className="h-5 w-5 text-success-foreground flex-shrink-0" />
                   <span className="text-sm">
                     Competitor analysis and SERP tracking
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  <CheckCircle className="h-5 w-5 text-success-foreground flex-shrink-0" />
                   <span className="text-sm">
                     Priority support and weekly reports
                   </span>
@@ -141,3 +141,4 @@ export default function CheckoutSuccessPage() {
     </div>
   );
 }
+

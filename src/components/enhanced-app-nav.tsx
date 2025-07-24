@@ -21,6 +21,12 @@ import {
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -116,73 +122,102 @@ export function EnhancedAppNav({
           transition={{ delay: index * 0.05 }}
           className="relative"
         >
-          <Link
-            href={item.href}
-            onClick={() => handleItemClick(item, groupId)}
-            className={cn(
-              "tool-link group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
-              "hover:bg-accent hover:text-accent-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              "min-h-[48px] touch-manipulation", // WCAG touch target size
-              {
-                "bg-accent text-accent-foreground shadow-sm": isActive,
-                "text-muted-foreground hover:text-foreground": !isActive,
-                "justify-center px-2": collapsed,
-                "opacity-50 cursor-not-allowed pointer-events-none":
-                  item.disabled,
-              },
-              className
-            )}
-            aria-current={isActive ? "page" : undefined}
-            aria-label={`${item.title}${item.description ? `. ${item.description}` : ""}${item.requiredTier ? `. Requires ${item.requiredTier} plan` : ""}`}
-            title={collapsed ? item.title : item.description}
-            tabIndex={item.disabled ? -1 : undefined}
-          >
-            {/* Icon */}
-            <Icon
-              className={cn("h-4 w-4 shrink-0 transition-colors", {
-                "text-primary": isActive,
-                "group-hover:text-primary": !isActive,
-              })}
-              aria-hidden="true"
-            />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href={item.href}
+                  onClick={() => handleItemClick(item, groupId)}
+                  className={cn(
+                    "tool-link group flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm font-medium transition-all duration-200",
+                    "hover:bg-accent hover:text-accent-foreground w-full min-w-0",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    "min-h-[44px] touch-manipulation", // WCAG touch target size
+                    {
+                      "bg-accent text-accent-foreground shadow-sm": isActive,
+                      "text-muted-foreground hover:text-foreground": !isActive,
+                      "justify-center px-2": collapsed,
+                      "opacity-50 cursor-not-allowed pointer-events-none":
+                        item.disabled,
+                    },
+                    className
+                  )}
+                  aria-current={isActive ? "page" : undefined}
+                  aria-label={`${item.title}${item.description ? `. ${item.description}` : ""}${item.requiredTier ? `. Requires ${item.requiredTier} plan` : ""}`}
+                  title={collapsed ? item.title : item.description}
+                  tabIndex={item.disabled ? -1 : undefined}
+                >
+                  {/* Icon */}
+                  <Icon
+                    className={cn("h-4 w-4 shrink-0 transition-colors", {
+                      "text-primary": isActive,
+                      "group-hover:text-primary": !isActive,
+                    })}
+                    aria-hidden="true"
+                  />
 
-            {/* Title and Badge */}
-            {!collapsed && (
-              <>
-                <span className="truncate">{item.title}</span>
-                {item.badge && (
-                  <Badge
-                    variant={isActive ? "default" : "secondary"}
-                    className="ml-auto h-5 px-1.5 text-xs"
-                    aria-label={`${item.badge} feature`}
-                  >
-                    {item.badge}
-                  </Badge>
-                )}
-                {item.requiredTier && (
-                  <Badge
-                    variant="outline"
-                    className="ml-auto h-5 px-1.5 text-xs"
-                    aria-label={`Requires ${item.requiredTier} plan`}
-                  >
-                    {item.requiredTier}
-                  </Badge>
-                )}
-              </>
-            )}
+                  {/* Title and Badge */}
+                  {!collapsed && (
+                    <>
+                      <span className="flex-1 text-left text-sm leading-tight">
+                        {item.title}
+                      </span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {item.badge && (
+                          <Badge
+                            variant={isActive ? "default" : "secondary"}
+                            className="h-4 px-1.5 text-xs"
+                            aria-label={`${item.badge} feature`}
+                          >
+                            {item.badge}
+                          </Badge>
+                        )}
+                        {item.requiredTier && (
+                          <Badge
+                            variant="outline"
+                            className="h-4 px-1.5 text-xs"
+                            aria-label={`Requires ${item.requiredTier} plan`}
+                          >
+                            {item.requiredTier}
+                          </Badge>
+                        )}
+                      </div>
+                    </>
+                  )}
 
-            {/* Active indicator */}
-            {isActive && (
-              <motion.div
-                layoutId="activeNavItem"
-                className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-lg"
-                initial={false}
-                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                aria-hidden="true"
-              />
-            )}
-          </Link>
+                  {/* Active indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeNavItem"
+                      className="absolute inset-y-0 left-0 w-1 bg-primary rounded-r-lg"
+                      initial={false}
+                      transition={{
+                        type: "spring",
+                        bounce: 0.2,
+                        duration: 0.6,
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
+                </Link>
+              </TooltipTrigger>
+              {!collapsed && (
+                <TooltipContent side="right" className="max-w-xs">
+                  <div className="space-y-1">
+                    <p className="font-medium">{item.title}</p>
+                    {item.description && (
+                      <p className="text-xs opacity-75">{item.description}</p>
+                    )}
+                    {item.requiredTier && (
+                      <p className="text-xs text-muted-foreground">
+                        Requires {item.requiredTier} plan
+                      </p>
+                    )}
+                  </div>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </motion.li>
       );
     },
@@ -203,7 +238,7 @@ export function EnhancedAppNav({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
-          className="space-y-1"
+          className="space-y-2"
         >
           <Collapsible
             open={isExpanded}
@@ -213,7 +248,7 @@ export function EnhancedAppNav({
               <Button
                 variant="ghost"
                 className={cn(
-                  "w-full justify-between p-2 h-auto font-medium text-sm min-h-[48px]",
+                  "w-full justify-between p-2 h-auto font-medium text-sm min-h-[44px]",
                   "hover:bg-accent hover:text-accent-foreground",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   "touch-manipulation", // Better touch handling
@@ -232,7 +267,7 @@ export function EnhancedAppNav({
                 }
                 aria-label={`${group.title} navigation group. ${group.items.length} items${group.collapsible ? ". Click to expand or collapse" : ""}.`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <GroupIcon
                     className={cn("h-4 w-4 shrink-0", {
                       "text-primary": isActive,
@@ -240,7 +275,7 @@ export function EnhancedAppNav({
                   />
                   {!collapsed && (
                     <>
-                      <span className="truncate">{group.title}</span>
+                      <span className="truncate text-sm">{group.title}</span>
                       {group.badge && (
                         <Badge
                           variant={isActive ? "default" : "secondary"}
@@ -266,7 +301,7 @@ export function EnhancedAppNav({
             <AnimatePresence>
               {!collapsed && (
                 <CollapsibleContent
-                  className="space-y-1"
+                  className="space-y-2"
                   id={`nav-group-${group.id}-content`}
                 >
                   <motion.ul
@@ -274,7 +309,7 @@ export function EnhancedAppNav({
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="ml-4 space-y-1 border-l border-border pl-3"
+                    className="ml-2 space-y-2 border-l border-border pl-2.5"
                     role="list"
                     aria-label={`${group.title} navigation items`}
                   >
@@ -357,7 +392,7 @@ export function EnhancedAppNav({
 
   return (
     <nav
-      className={cn("space-y-2", className)}
+      className={cn("space-y-3 min-w-fit max-w-xs", className)}
       role="navigation"
       aria-label="Main navigation"
     >

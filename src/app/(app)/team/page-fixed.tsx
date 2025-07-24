@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -218,11 +218,11 @@ export default function TeamManagementPage() {
   const getStatusIcon = (status: TeamMember["status"]) => {
     switch (status) {
       case "active":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-success-foreground" />;
       case "pending":
         return <Clock className="h-4 w-4 text-yellow-500" />;
       case "inactive":
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
+        return <AlertCircle className="h-4 w-4 text-destructive-foreground" />;
     }
   };
 
@@ -544,7 +544,7 @@ export default function TeamManagementPage() {
                           key={permission}
                           className="flex items-center gap-2 text-xs"
                         >
-                          <CheckCircle className="h-3 w-3 text-green-500" />
+                          <CheckCircle className="h-3 w-3 text-success-foreground" />
                           <span className="capitalize">
                             {permission.replace("_", " ")}
                           </span>
@@ -561,3 +561,4 @@ export default function TeamManagementPage() {
     </FeatureGate>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -574,7 +574,7 @@ export default function WhiteLabelPage() {
                         >
                           {reportSettings.headerText || "SEO Analysis Report"}
                         </h1>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {reportSettings.contactInfo ||
                             "Your contact information"}
                         </p>
@@ -627,13 +627,13 @@ export default function WhiteLabelPage() {
                       </div>
                     </div>
 
-                    <div className="border-t pt-4 text-center text-sm text-gray-600">
+                    <div className="border-t pt-4 text-center text-sm text-muted-foreground">
                       {reportSettings.customFooter ||
                         "© 2024 Your Company. All rights reserved."}
                     </div>
 
                     {reportSettings.disclaimerText && (
-                      <div className="text-xs text-gray-500 text-center border-t pt-2">
+                      <div className="text-xs text-muted-foreground text-center border-t pt-2">
                         {reportSettings.disclaimerText}
                       </div>
                     )}
@@ -660,3 +660,4 @@ export default function WhiteLabelPage() {
     </FeatureGate>
   );
 }
+

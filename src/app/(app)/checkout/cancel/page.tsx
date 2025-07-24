@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,7 @@ export default function CheckoutCancelPage() {
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="mx-auto mb-6"
             >
-              <XCircle className="h-20 w-20 text-red-500 mx-auto" />
+              <XCircle className="h-20 w-20 text-destructive-foreground mx-auto" />
             </motion.div>
 
             <CardTitle className="text-3xl font-bold text-red-700 mb-4">
@@ -134,3 +134,4 @@ export default function CheckoutCancelPage() {
     </div>
   );
 }
+
