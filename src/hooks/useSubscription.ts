@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { getUserSubscription, SubscriptionData } from "@/lib/subscription";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { SubscriptionData } from "@/lib/subscription";
 import { STRIPE_PLANS, FREE_PLAN, PlanType } from "@/lib/stripe";
 import {
   UserAccess,
@@ -47,7 +49,20 @@ export function useSubscription() {
       }
 
       try {
-        const subData = await getUserSubscription(user.uid);
+        // Inline subscription fetch to avoid import issues
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+
+        const subData: SubscriptionData = userData
+          ? {
+              status: userData.subscriptionStatus || "free",
+              tier: userData.subscriptionTier || "free",
+              customerId: userData.stripeCustomerId,
+              subscriptionId: userData.stripeSubscriptionId,
+              currentPeriodEnd: userData.nextBillingDate?.toDate(),
+              cancelAtPeriodEnd: userData.cancelAtPeriodEnd || false,
+            }
+          : { status: "free", tier: "free" };
 
         let planInfo;
         if (subData.tier === "free") {
@@ -145,7 +160,20 @@ export function useSubscription() {
       setLoading(true);
 
       try {
-        const subData = await getUserSubscription(user.uid);
+        // Inline subscription fetch to avoid import issues
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+
+        const subData: SubscriptionData = userData
+          ? {
+              status: userData.subscriptionStatus || "free",
+              tier: userData.subscriptionTier || "free",
+              customerId: userData.stripeCustomerId,
+              subscriptionId: userData.stripeSubscriptionId,
+              currentPeriodEnd: userData.nextBillingDate?.toDate(),
+              cancelAtPeriodEnd: userData.cancelAtPeriodEnd || false,
+            }
+          : { status: "free", tier: "free" };
 
         let planInfo;
         if (subData.tier === "free") {

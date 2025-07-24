@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -269,7 +269,7 @@ export default function CheckoutPage() {
               <div className="space-y-3">
                 {features[planId].map((feature, index) => (
                   <div key={index} className="flex items-center gap-3">
-                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <Check className="h-4 w-4 text-success-foreground flex-shrink-0" />
                     <span className="text-sm">{feature}</span>
                   </div>
                 ))}
@@ -282,15 +282,15 @@ export default function CheckoutPage() {
         <div className="mt-12 text-center">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Check className="h-4 w-4 text-green-500" />
+              <Check className="h-4 w-4 text-success-foreground" />
               256-bit SSL encryption
             </div>
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Check className="h-4 w-4 text-green-500" />
+              <Check className="h-4 w-4 text-success-foreground" />
               Cancel anytime
             </div>
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Check className="h-4 w-4 text-green-500" />
+              <Check className="h-4 w-4 text-success-foreground" />
               24/7 customer support
             </div>
           </div>
@@ -299,3 +299,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+

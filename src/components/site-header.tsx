@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { ContextAwareLogo } from "@/components/context-aware-logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const navigationItems = [
-  { href: "/#features", label: "Features", external: false },
+  { href: "/features", label: "Features", external: false },
   { href: "/#pricing", label: "Pricing", external: false },
   { href: "/#faq", label: "FAQ", external: false },
   { href: "/docs", label: "Documentation", external: false },
@@ -74,6 +75,14 @@ export default function SiteHeader() {
 
   return (
     <>
+      {/* Skip to main content for screen readers */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 z-[100] bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium"
+      >
+        Skip to main content
+      </a>
+
       <motion.header
         className={cn(
           "sticky top-0 w-full z-50 transition-all duration-300",
@@ -87,18 +96,7 @@ export default function SiteHeader() {
       >
         <div className="container flex h-16 max-w-7xl items-center justify-between px-4 mx-auto">
           {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
-            aria-label={`${AppName} home page`}
-          >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <AppLogo className="h-8 w-8 text-primary" aria-hidden="true" />
-            </motion.div>
-            <span className="text-2xl font-bold font-headline text-primary">
-              {AppName}
-            </span>
-          </Link>
+          <ContextAwareLogo />
 
           {/* Desktop Navigation */}
           <nav
@@ -118,7 +116,7 @@ export default function SiteHeader() {
           </nav>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-4">
             {!hydrated ? (
               // Loading skeleton
               <div className="flex items-center space-x-2">
@@ -161,14 +159,22 @@ export default function SiteHeader() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <>
-                <EnhancedButton variant="ghost" asChild>
-                  <Link href="/login">Login</Link>
-                </EnhancedButton>
-                <EnhancedButton asChild>
-                  <Link href="/register">Sign Up</Link>
-                </EnhancedButton>
-              </>
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/demo"
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Live Demo
+                </Link>
+                <div className="flex items-center gap-2">
+                  <EnhancedButton variant="ghost" asChild>
+                    <Link href="/login">Login</Link>
+                  </EnhancedButton>
+                  <EnhancedButton asChild>
+                    <Link href="/register">Start Free Trial</Link>
+                  </EnhancedButton>
+                </div>
+              </div>
             )}
           </div>
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -345,7 +345,7 @@ export default function BillingPage() {
                         <div className="text-right">
                           <p className="font-semibold">${invoice.amount}</p>
                           <div className="flex items-center gap-1">
-                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            <CheckCircle className="h-3 w-3 text-success-foreground" />
                             <span className="text-xs text-green-600">Paid</span>
                           </div>
                         </div>
@@ -490,3 +490,4 @@ export default function BillingPage() {
     </div>
   );
 }
+

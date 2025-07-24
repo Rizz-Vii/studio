@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -262,7 +262,7 @@ export default function PaymentSuccess() {
                       transition={{ delay: 0.5 + index * 0.1 }}
                       className="flex items-center gap-3"
                     >
-                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-success-foreground flex-shrink-0" />
                       <span className="text-sm">{feature}</span>
                     </motion.div>
                   ))}
@@ -395,3 +395,4 @@ export default function PaymentSuccess() {
     </div>
   );
 }
+

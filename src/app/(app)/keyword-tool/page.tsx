@@ -1,4 +1,4 @@
-// src/app/(app)/keyword-tool/page.tsx
+﻿// src/app/(app)/keyword-tool/page.tsx
 "use client";
 import { useState, useRef, useEffect } from "react";
 import KeywordToolForm from "@/components/keyword-tool-form";
@@ -100,7 +100,7 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
               <div key={index} className="p-3 bg-gray-50 rounded-lg">
                 <div className="flex justify-between items-start mb-2">
                   <span className="font-medium text-sm">{keyword.keyword}</span>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground">
                     {keyword.searchVolume.toLocaleString()}/mo
                   </div>
                 </div>
@@ -114,7 +114,7 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
                       )}
                     />
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {keyword.difficulty}% difficulty
                   </span>
                 </div>
@@ -347,3 +347,4 @@ export default function KeywordToolPage() {
     </div>
   );
 }
+

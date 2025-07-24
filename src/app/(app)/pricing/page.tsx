@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
@@ -314,7 +314,7 @@ export default function PricingPage() {
                   <div className="space-y-3">
                     {plan.features.map((feature, idx) => (
                       <div key={idx} className="flex items-center gap-3">
-                        <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <Check className="h-4 w-4 text-success-foreground flex-shrink-0" />
                         <span className="text-sm">{feature}</span>
                       </div>
                     ))}
@@ -511,3 +511,4 @@ export default function PricingPage() {
     </div>
   );
 }
+
