@@ -19,7 +19,7 @@ import {
   collection,
   addDoc,
 } from "firebase/firestore";
-import { TEST_USERS } from "../tests/utils/user-management";
+import { TEST_USERS } from "../testing/utils/enhanced-auth";
 
 // Firebase configuration (using environment variables)
 const firebaseConfig = {
@@ -110,7 +110,7 @@ const TIER_FEATURES: Record<string, string[]> = {
 };
 
 async function createTestUser(userKey: string) {
-  const user = TEST_USERS[userKey];
+  const user = TEST_USERS[userKey as keyof typeof TEST_USERS];
 
   if (!user) {
     throw new Error(`User configuration not found for key: ${userKey}`);
@@ -134,12 +134,12 @@ async function createTestUser(userKey: string) {
       uid: firebaseUser.uid,
       email: user.email,
       displayName: user.displayName,
-      role: user.role,
+      role: user.tier,
       subscription: {
-        tier: user.role,
+        tier: user.tier,
         status: "active",
         startDate: new Date().toISOString(),
-        features: TIER_FEATURES[user.role] || [],
+        features: TIER_FEATURES[user.tier] || [],
       },
       createdAt: new Date().toISOString(),
       testUser: true,
@@ -152,10 +152,10 @@ async function createTestUser(userKey: string) {
     // Create subscription record
     const subscription = {
       userId: firebaseUser.uid,
-      tier: user.role,
+      tier: user.tier,
       status: "active",
       startDate: new Date().toISOString(),
-      features: TIER_FEATURES[user.role] || [],
+      features: TIER_FEATURES[user.tier] || [],
       testAccount: true,
       createdAt: new Date().toISOString(),
     };
@@ -169,7 +169,7 @@ async function createTestUser(userKey: string) {
     return {
       uid: firebaseUser.uid,
       email: user.email,
-      role: user.role,
+      role: user.tier,
       success: true,
     };
   } catch (error: any) {
@@ -190,12 +190,12 @@ async function createTestUser(userKey: string) {
           uid: firebaseUser.uid,
           email: user.email,
           displayName: user.displayName,
-          role: user.role,
+          role: user.tier,
           subscription: {
-            tier: user.role,
+            tier: user.tier,
             status: "active",
             startDate: new Date().toISOString(),
-            features: TIER_FEATURES[user.role] || [],
+            features: TIER_FEATURES[user.tier] || [],
           },
           createdAt: new Date().toISOString(),
           testUser: true,
@@ -210,7 +210,7 @@ async function createTestUser(userKey: string) {
         return {
           uid: firebaseUser.uid,
           email: user.email,
-          role: user.role,
+          role: user.tier,
           success: true,
         };
       } catch (updateError) {
@@ -220,7 +220,7 @@ async function createTestUser(userKey: string) {
         );
         return {
           email: user.email,
-          role: user.role,
+          role: user.tier,
           success: false,
           error: updateError,
         };
@@ -229,7 +229,7 @@ async function createTestUser(userKey: string) {
       console.error(`❌ Failed to create user ${user.email}:`, error);
       return {
         email: user.email,
-        role: user.role,
+        role: user.tier,
         success: false,
         error: error,
       };

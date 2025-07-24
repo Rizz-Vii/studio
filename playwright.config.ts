@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { getProxyConfig } from "./tests/utils/proxy";
+import { getProxyConfig } from "./testing/specs/main/utils/proxy";
 
 export default defineConfig({
   testDir: "./tests",
