@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks";
+import { renderHook, act } from "@testing-library/react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/context/AuthContext";
 
