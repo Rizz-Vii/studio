@@ -151,6 +151,7 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=3072"
 
       - name: 🔥 Deploy to Firebase Channel
+        id: firebase_deploy
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -179,13 +180,21 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
 
       - name: 🩺 Health Check
+        id: health_check
         run: |
           echo "## 🩺 Post-Deployment Health Check" >> $GITHUB_STEP_SUMMARY
           sleep 15
-          PREVIEW_URL="https://${{ env.FIREBASE_PROJECT_ID }}--${{ needs.build_and_test.outputs.channel_id }}-$(echo ${{ github.sha }} | cut -c1-8).web.app"
-          echo "🌐 Preview URL: $PREVIEW_URL" >> $GITHUB_STEP_SUMMARY
-          # Basic health check
-          curl -I "$PREVIEW_URL" && echo "✅ Site is accessible" >> $GITHUB_STEP_SUMMARY || echo "⚠️ Site not immediately accessible (may need more time)" >> $GITHUB_STEP_SUMMARY
+
+          # Use Firebase's actual deployment URL from output
+          PREVIEW_URL="${{ steps.firebase_deploy.outputs.details_url }}"
+          echo "🌐 Testing URL: $PREVIEW_URL" >> $GITHUB_STEP_SUMMARY
+
+          # Health check with proper status handling
+          if curl -f -s "$PREVIEW_URL" > /dev/null; then
+            echo "✅ Site is accessible and responding" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Site may still be initializing (Firebase deployment successful)" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: 💬 Comment on PR
         if: github.event_name == 'pull_request'
@@ -222,8 +231,9 @@ jobs:
           echo "🎯 Running Lighthouse audit for performance branch..." >> $GITHUB_STEP_SUMMARY
           # Install Lighthouse
           npm install -g lighthouse
-          # Run Lighthouse audit
-          PREVIEW_URL="https://${{ env.FIREBASE_PROJECT_ID }}--${{ needs.build_and_test.outputs.channel_id }}-$(echo ${{ github.sha }} | cut -c1-8).web.app"
+          # Use Firebase's actual deployment URL (need to get from deploy job output)
+          PREVIEW_URL="https://${{ env.FIREBASE_PROJECT_ID }}--${{ needs.build_and_test.outputs.channel_id }}.web.app"
+          echo "🌐 Auditing URL: $PREVIEW_URL" >> $GITHUB_STEP_SUMMARY
           lighthouse "$PREVIEW_URL" \
             --output=json \
             --output-path=./lighthouse-results.json \
