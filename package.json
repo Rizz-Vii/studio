@@ -91,7 +91,8 @@
     "test:role-based:enterprise": "cross-env NODE_OPTIONS='--max-old-space-size=2048' playwright test --config=playwright.config.role-based.ts --project=enterprise-tier-worker",
     "test:role-based:compatibility": "cross-env NODE_OPTIONS='--max-old-space-size=2048' playwright test --config=playwright.config.role-based.ts --project=firefox-compatibility",
     "test:role-based:windows": "powershell -ExecutionPolicy Bypass -File scripts/run-role-based-tests.ps1",
-    "analyze": "cross-env ANALYZE=true npm run build"
+    "analyze": "cross-env ANALYZE=true npm run build",
+    "test:safe": "jest --runInBand --detectLeaks --forceExit"
   },
   "dependencies": {
     "@genkit-ai/firebase": "^1.14.0",
@@ -169,6 +170,7 @@
     "@opentelemetry/winston-transport": "^0.14.0",
     "@playwright/test": "^1.54.0",
     "@types/firebase": "^2.4.32",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.19.8",
     "@types/node-fetch": "^2.6.12",
     "@types/react": "^18.3.12",
@@ -183,6 +185,7 @@
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.3.3",
     "firebase-tools": "^13.35.0",
+    "jest-environment-jsdom": "^30.0.5",
     "markdownlint-cli2": "^0.18.1",
     "node-fetch": "^2.7.0",
     "openai": "^5.8.4",
