@@ -1,8 +1,0 @@
-﻿{
-  "testEnvironment": "jsdom",
-  "maxWorkers": 1,
-  "detectOpenHandles": true,
-  "detectLeaks": true,
-  "clearMocks": true,
-  "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
-}

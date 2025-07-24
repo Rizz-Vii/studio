@@ -130,6 +130,6 @@ export default defineConfig({
   },
 
   /* Global setup and teardown */
-  globalSetup: require.resolve("./tests/utils/global-setup.ts"),
-  globalTeardown: require.resolve("./tests/utils/global-teardown.ts"),
+  globalSetup: require.resolve("./testing/specs/main/global-setup.ts"),
+  globalTeardown: require.resolve("./testing/specs/main/global-teardown.ts"),
 });

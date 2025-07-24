@@ -1,10 +1,9 @@
 import * as admin from "firebase-admin";
 import type { ServiceAccount } from "firebase-admin";
 import * as dotenv from "dotenv";
-import config from "../../test.config";
 
 // Load environment variables
-dotenv.config({ path: ".env.test" });
+dotenv.config({ path: ".env.local" });
 
 const serviceAccount: ServiceAccount = {
   projectId: process.env.FIREBASE_ADMIN_PROJECT_ID as string,
