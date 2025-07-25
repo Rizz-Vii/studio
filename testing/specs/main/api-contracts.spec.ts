@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { SerpViewPage } from "../pages/serp-view-page";
+import { SerpViewPage } from "./pages/serp-view-page";
 
 test.describe("SERP Analysis Network Tests", () => {
   let serpPage: SerpViewPage;

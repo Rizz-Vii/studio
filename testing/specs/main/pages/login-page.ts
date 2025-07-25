@@ -30,6 +30,15 @@ export class LoginPage {
     await this.page.waitForURL("/dashboard");
   }
 
+  async attemptLogin(email: string, password: string) {
+    await this.emailInput.fill(email);
+    await randomDelay();
+    await this.passwordInput.fill(password);
+    await randomDelay();
+    await this.loginButton.click();
+    // Don't wait for URL change - let the test handle expectations
+  }
+
   async expectError(message: string) {
     await expect(this.errorMessage).toBeVisible();
     await expect(this.errorMessage).toContainText(message);
