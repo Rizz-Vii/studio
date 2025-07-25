@@ -6,6 +6,7 @@
 
 "use client";
 
+import "./integration-example.css";
 import React, { useEffect, useState } from "react";
 import { useProgressiveOnboarding } from "./progressive-onboarding";
 import {
@@ -139,10 +140,8 @@ export const UXEnhancedComponent: React.FC<UXEnhancedComponentProps> = ({
             </div>
             <div className="w-full bg-blue-200 rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${onboarding.completionPercentage}%` as string,
-                }}
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300 progress-bar"
+                data-progress={onboarding.completionPercentage}
               />
             </div>
           </div>

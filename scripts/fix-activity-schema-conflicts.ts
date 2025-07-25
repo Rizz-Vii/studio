@@ -13,10 +13,10 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "../src/lib/firebase";
 
 // Activity Type Mapping: Current Storage → Standard Analytics Names
-const ACTIVITY_TYPE_MIGRATION_MAP = {
+const ACTIVITY_TYPE_MIGRATION_MAP: Record<string, string> = {
   // Current stored names → Expected analytics names
   "SEO Audit": "audit",
   "Keyword Search": "keyword-research",
@@ -62,13 +62,10 @@ export async function fixActivitySchemaConflicts(): Promise<void> {
       for (const activityDoc of activitiesSnapshot.docs) {
         totalActivitiesScanned++;
         const activityData = activityDoc.data();
-        const currentType = activityData.type;
+        const currentType = activityData.type as string;
 
         // Check if this activity type needs migration
-        const newType =
-          ACTIVITY_TYPE_MIGRATION_MAP[
-            currentType as keyof typeof ACTIVITY_TYPE_MIGRATION_MAP
-          ];
+        const newType = ACTIVITY_TYPE_MIGRATION_MAP[currentType];
 
         if (newType && newType !== currentType) {
           conflictingActivities++;

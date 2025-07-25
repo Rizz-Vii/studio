@@ -1,5 +1,6 @@
 "use client";
 
+import "./seo-achievements-badges.css";
 import {
   Card,
   CardContent,
@@ -256,9 +257,10 @@ export default function SEOAchievementsBadges({
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="bg-primary h-2 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min((achievement.progress! / achievement.requirement) * 100, 100)}%`,
-                    }}
+                    data-progress={Math.min(
+                      (achievement.progress! / achievement.requirement) * 100,
+                      100
+                    )}
                   />
                 </div>
 

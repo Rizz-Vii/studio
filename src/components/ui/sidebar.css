@@ -1,0 +1,19 @@
+/* Sidebar component styles */
+
+/* CSS custom properties for sidebar dimensions */
+.sidebar-wrapper {
+  --sidebar-width: 18rem;
+  --sidebar-width-icon: 4rem;
+  --sidebar-width-mobile: 20rem;
+}
+
+/* Mobile sidebar styles */
+.sidebar-mobile {
+  --sidebar-width: var(--sidebar-width-mobile);
+}
+
+/* Sidebar provider wrapper */
+.sidebar-provider-wrapper {
+  --sidebar-width: 18rem;
+  --sidebar-width-icon: 4rem;
+}

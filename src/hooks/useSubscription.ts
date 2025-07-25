@@ -67,13 +67,13 @@ export function useSubscription() {
         let planInfo;
         if (subData.tier === "free") {
           planInfo = FREE_PLAN;
-        } else if (subData.tier === "admin") {
+        } else if (subData.tier === ("admin" as any)) {
           // Admin users get enterprise-level features but with admin tier label
           planInfo = {
             ...STRIPE_PLANS.enterprise,
             name: "Admin",
           };
-        } else {
+        } else if (subData.tier && subData.tier in STRIPE_PLANS) {
           planInfo = STRIPE_PLANS[subData.tier as PlanType];
         }
 
@@ -189,8 +189,13 @@ export function useSubscription() {
         let planInfo;
         if (subData.tier === "free") {
           planInfo = FREE_PLAN;
-        } else {
+        } else if (subData.tier && subData.tier in STRIPE_PLANS) {
           planInfo = STRIPE_PLANS[subData.tier as PlanType];
+        }
+
+        // Fallback to FREE_PLAN if planInfo is still undefined
+        if (!planInfo) {
+          planInfo = FREE_PLAN;
         }
 
         // Create user access object from profile and subscription data

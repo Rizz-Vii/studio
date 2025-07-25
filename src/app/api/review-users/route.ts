@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase/index";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 
 // Expected quotas for each tier
 function getExpectedQuotasForTier(tier: string) {
-  const quotaMap = {
+  const quotaMap: Record<string, any> = {
     free: { monthlyAnalyses: 3, keywordTracking: 10, competitorTracking: 3 },
     starter: {
       monthlyAnalyses: 20,
@@ -47,7 +47,7 @@ export async function GET() {
         const activityData = activityDoc.data();
         activities.push({
           id: activityDoc.id,
-          type: activityData.type,
+          type: activityData.type || "unknown",
           timestamp: activityData.timestamp,
           data: activityData,
         });
@@ -63,7 +63,7 @@ export async function GET() {
         const keywordData = keywordDoc.data();
         keywords.push({
           id: keywordDoc.id,
-          keyword: keywordData.keyword,
+          keyword: keywordData.keyword || "",
           data: keywordData,
         });
       }
@@ -78,7 +78,7 @@ export async function GET() {
         const compData = compDoc.data();
         competitors.push({
           id: compDoc.id,
-          domain: compData.domain,
+          domain: compData.domain || "",
           data: compData,
         });
       }
@@ -93,7 +93,7 @@ export async function GET() {
         const contentData = contentDoc.data();
         contentAnalyses.push({
           id: contentDoc.id,
-          url: contentData.url,
+          url: contentData.url || "",
           data: contentData,
         });
       }
@@ -108,7 +108,7 @@ export async function GET() {
         const achData = achDoc.data();
         achievements.push({
           id: achDoc.id,
-          type: achData.type,
+          type: achData.type || "",
           data: achData,
         });
       }
@@ -127,9 +127,12 @@ export async function GET() {
       const actualQuotas = userData.quotas || {};
 
       Object.keys(expectedQuotas).forEach((quotaKey) => {
-        if (actualQuotas[quotaKey] !== expectedQuotas[quotaKey]) {
+        const actualValue = actualQuotas[quotaKey as keyof typeof actualQuotas];
+        const expectedValue =
+          expectedQuotas[quotaKey as keyof typeof expectedQuotas];
+        if (actualValue !== expectedValue) {
           tierInconsistencies.push(
-            `Quota mismatch: ${quotaKey} expected ${expectedQuotas[quotaKey]}, got ${actualQuotas[quotaKey]}`
+            `Quota mismatch: ${quotaKey} expected ${expectedValue}, got ${actualValue}`
           );
         }
       });
@@ -207,11 +210,11 @@ export async function GET() {
     // Generate summary statistics
     const summary = {
       totalUsers: userAnalysis.length,
-      subscriptionTiers: {},
+      subscriptionTiers: {} as Record<string, number>,
       tierConsistency: {
         consistent: 0,
         inconsistent: 0,
-        commonIssues: {},
+        commonIssues: {} as Record<string, number>,
       },
       roleAnalysis: {
         usersWithRole: 0,
@@ -220,12 +223,12 @@ export async function GET() {
         usersWithQuotas: 0,
       },
       totalActivities: 0,
-      activityTypes: new Set(),
+      activityTypes: new Set<string>(),
       totalKeywords: 0,
       totalCompetitors: 0,
       totalContentAnalyses: 0,
       totalAchievements: 0,
-      achievementTypes: new Set(),
+      achievementTypes: new Set<string>(),
     };
 
     userAnalysis.forEach((user) => {
@@ -279,10 +282,12 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error reviewing user data:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
       {
         success: false,
-        error: error.message,
+        error: errorMessage,
       },
       { status: 500 }
     );

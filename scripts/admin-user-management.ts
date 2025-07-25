@@ -11,7 +11,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-// import { auth, db } from "../src/lib/firebase";
+import { db } from "../src/lib/firebase";
 
 interface UserProfile {
   uid: string;
