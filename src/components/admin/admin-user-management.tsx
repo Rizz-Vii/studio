@@ -214,7 +214,9 @@ export default function AdminUserManagement() {
   const getSubscriptionBadge = (status?: string, tier?: string) => {
     if (status === "active") {
       return (
-        <Badge className="bg-green-100 text-green-800">{tier || "Pro"}</Badge>
+        <Badge className="bg-green-100 text-green-800">
+          {tier || "Enterprise"}
+        </Badge>
       );
     }
     return <Badge variant="outline">Free</Badge>;

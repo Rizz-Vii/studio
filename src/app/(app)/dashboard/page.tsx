@@ -44,6 +44,7 @@ import { dummyDashboardData } from "@/lib/dummy-data";
 import { useEffect, useState } from "react";
 import ToolGrid from "@/components/tool-grid";
 import { useIsMobile } from "@/hooks/use-mobile";
+import styles from "./dashboard.module.css";
 
 // ----- CHART CONFIGS -----
 
@@ -64,6 +65,19 @@ const pieChartConfig = {
   Social: { label: "Social", color: "hsl(var(--chart-4))" },
 } satisfies ChartConfig;
 
+// ----- UTILITY FUNCTIONS -----
+
+const getChartColorClass = (colorValue: string): string => {
+  const colorMap: { [key: string]: string } = {
+    "hsl(var(--chart-1))": styles.legendDotChart1,
+    "hsl(var(--chart-2))": styles.legendDotChart2,
+    "hsl(var(--chart-3))": styles.legendDotChart3,
+    "hsl(var(--chart-4))": styles.legendDotChart4,
+    "hsl(var(--chart-5))": styles.legendDotChart5,
+  };
+  return colorMap[colorValue] || styles.legendDotChart1;
+};
+
 // ----- REUSABLE COMPONENTS -----
 
 const DashboardMetricCard: React.FC<{
@@ -72,7 +86,7 @@ const DashboardMetricCard: React.FC<{
   change?: number;
   icon: React.ElementType;
 }> = ({ title, value, change, icon: Icon }) => (
-  <Card>
+  <Card className={styles.metricCard}>
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium font-body">{title}</CardTitle>
       <Icon className="h-4 w-4 text-muted-foreground" />
@@ -290,15 +304,14 @@ const TrafficSourcesChart = () => (
             </Pie>
             <Legend
               content={({ payload }) => (
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4">
+                <div className={styles.legendContainer}>
                   {payload?.map((entry) => (
                     <div
                       key={`legend-${entry.value}`}
-                      className="flex items-center gap-1.5 text-xs"
+                      className={styles.legendItem}
                     >
                       <div
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: entry.color }}
+                        className={`${styles.legendDot} ${getChartColorClass(entry.color || "")}`}
                       />
                       <span>{entry.value}</span>
                     </div>
@@ -353,7 +366,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className={styles.dashboardContainer}>
       <motion.div
         initial="hidden"
         animate="visible"
@@ -369,7 +382,7 @@ export default function DashboardPage() {
       </motion.div>
 
       <motion.div
-        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+        className={styles.metricsGrid}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -409,21 +422,21 @@ export default function DashboardPage() {
       </motion.div>
 
       <motion.div
-        className="grid gap-6 md:grid-cols-1 lg:grid-cols-5"
+        className={styles.chartsGridLarge}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <motion.div className="lg:col-span-3" variants={itemVariants}>
+        <motion.div className={styles.chartLargeSpan} variants={itemVariants}>
           <SeoScoreTrendChart />
         </motion.div>
-        <motion.div className="lg:col-span-2" variants={itemVariants}>
+        <motion.div className={styles.chartMediumSpan} variants={itemVariants}>
           <TrafficSourcesChart />
         </motion.div>
       </motion.div>
 
       <motion.div
-        className="grid gap-6 md:grid-cols-1 lg:grid-cols-2"
+        className={styles.chartsGridMedium}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -437,7 +450,7 @@ export default function DashboardPage() {
       </motion.div>
 
       <motion.div
-        className="grid gap-6 md:grid-cols-1 lg:grid-cols-2"
+        className={styles.chartsGridMedium}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -452,7 +465,12 @@ export default function DashboardPage() {
 
       {/* Mobile Tool Grid */}
       {isMobile && (
-        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          className={styles.mobileToolGrid}
+        >
           <Card>
             <CardHeader>
               <CardTitle className="font-headline">SEO Tools</CardTitle>

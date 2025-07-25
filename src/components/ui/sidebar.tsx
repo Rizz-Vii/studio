@@ -1,6 +1,5 @@
 "use client";
 
-import "./sidebar.css";
 import React, {
   ReactNode,
   CSSProperties,
@@ -28,6 +27,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import "./sidebar.css";
 
 // --- Constants ---
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
@@ -69,6 +69,7 @@ type SidebarProviderProps = React.ComponentProps<"div"> & {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  // Remove style prop to prevent inline styles
 };
 
 const SidebarProvider = forwardRef<HTMLDivElement, SidebarProviderProps>(
@@ -78,7 +79,6 @@ const SidebarProvider = forwardRef<HTMLDivElement, SidebarProviderProps>(
       open: openProp,
       onOpenChange: setOpenProp,
       className,
-      style,
       children,
       ...props
     },
@@ -193,10 +193,7 @@ const SidebarProvider = forwardRef<HTMLDivElement, SidebarProviderProps>(
       <SidebarContext.Provider value={contextValue}>
         <TooltipProvider delayDuration={0}>
           <div
-            className={cn(
-              "group/sidebar-wrapper sidebar-provider-wrapper",
-              className
-            )}
+            className={cn("group/sidebar-wrapper sidebar-wrapper", className)}
             ref={ref as any} // Cast ref to any
             {...props}
           >
@@ -251,7 +248,10 @@ const Sidebar = forwardRef<
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
-          className="w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden sidebar-mobile"
+          className={cn(
+            "w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
+            "sidebar-sheet-content-mobile"
+          )}
           side={side}
           ref={ref as any} // Cast ref to any
         >
