@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { PublicMobileSidebar } from "@/components/unified-mobile-sidebar";
 
 const navigationItems = [
   { href: "/features", label: "Features", external: false },
@@ -34,7 +35,6 @@ export default function SiteHeader() {
   const { user } = useAuth();
   const hydrated = useHydration();
   const isMobile = useIsMobile();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const handleLogout = async () => {
@@ -54,24 +54,6 @@ export default function SiteHeader() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, []);
-
-  // Handle mobile menu body scroll lock
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [mobileMenuOpen]);
 
   return (
     <>
@@ -178,123 +160,10 @@ export default function SiteHeader() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <EnhancedButton
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </EnhancedButton>
+          {/* Unified Mobile Sidebar */}
+          <PublicMobileSidebar className="md:hidden" />
         </div>
       </motion.header>
-
-      {/* Mobile Navigation */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            {/* Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-
-            {/* Mobile Menu */}
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed right-0 top-16 bottom-0 w-80 max-w-[80vw] bg-background border-l border-border z-50 md:hidden"
-            >
-              <nav
-                className="flex flex-col p-6 space-y-4"
-                role="navigation"
-                aria-label="Mobile navigation"
-              >
-                {/* Navigation Links */}
-                <div className="space-y-2">
-                  {navigationItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center p-3 text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground rounded-md transition-colors min-h-[48px]"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Auth Section */}
-                {hydrated && (
-                  <div className="pt-6 border-t border-border space-y-3">
-                    {user ? (
-                      <>
-                        <EnhancedButton fullWidth asChild>
-                          <Link
-                            href="/dashboard"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Dashboard
-                          </Link>
-                        </EnhancedButton>
-                        <EnhancedButton fullWidth asChild>
-                          <Link
-                            href="/profile"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Profile
-                          </Link>
-                        </EnhancedButton>
-                        <EnhancedButton
-                          fullWidth
-                          variant="outline"
-                          onClick={() => {
-                            handleLogout();
-                            setMobileMenuOpen(false);
-                          }}
-                        >
-                          Sign Out
-                        </EnhancedButton>
-                      </>
-                    ) : (
-                      <>
-                        <EnhancedButton fullWidth variant="outline" asChild>
-                          <Link
-                            href="/login"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Login
-                          </Link>
-                        </EnhancedButton>
-                        <EnhancedButton fullWidth asChild>
-                          <Link
-                            href="/register"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            Sign Up
-                          </Link>
-                        </EnhancedButton>
-                      </>
-                    )}
-                  </div>
-                )}
-              </nav>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }

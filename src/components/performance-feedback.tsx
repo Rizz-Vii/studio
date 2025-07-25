@@ -153,6 +153,7 @@ export function PerformanceFeedback({
             key={star}
             type="button"
             onClick={() => setRating(star)}
+            aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
             className={`p-1 rounded transition-colors ${
               star <= rating
                 ? "text-yellow-500 hover:text-yellow-600"
@@ -172,7 +173,7 @@ export function PerformanceFeedback({
         variant="outline"
         size="sm"
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-4 right-4 z-50"
+        className="fixed bottom-36 right-4 z-50"
       >
         <MessageSquare className="h-4 w-4 mr-2" />
         Feedback
@@ -186,7 +187,7 @@ export function PerformanceFeedback({
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="fixed bottom-4 right-4 z-50 w-96"
+        className="fixed bottom-36 right-4 z-50 w-96"
       >
         <Card className="shadow-lg border-2">
           <CardHeader className="pb-3">
@@ -199,6 +200,7 @@ export function PerformanceFeedback({
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsVisible(false)}
+                aria-label="Close feedback form"
               >
                 <X className="h-4 w-4" />
               </Button>
