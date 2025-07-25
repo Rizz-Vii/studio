@@ -1,7 +1,7 @@
 // src/app/(app)/content-analyzer/page.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ContentAnalyzerForm from "@/components/content-analyzer-form";
 import type {
   AnalyzeContentInput,
@@ -45,12 +45,40 @@ import { Progress } from "@/components/ui/progress";
 import LoadingScreen from "@/components/ui/loading-screen";
 import { cn } from "@/lib/utils";
 import { withTimeout, TimeoutError } from "@/lib/timeout";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
+import { ACTIVITY_TYPES, TOOL_NAMES } from "@/lib/activity-types";
 
 const getProgressColor = (score: number) => {
   if (score > 85) return "bg-success";
   if (score > 60) return "bg-warning";
   return "bg-destructive";
 };
+
+// Enhanced Progress Component with Custom Indicator Support
+const ColoredProgress = React.forwardRef<
+  React.ElementRef<typeof ProgressPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & {
+    indicatorClassName?: string;
+  }
+>(({ className, value, indicatorClassName, ...props }, ref) => (
+  <ProgressPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+      className
+    )}
+    {...props}
+  >
+    <ProgressPrimitive.Indicator
+      className={cn(
+        "h-full w-full flex-1 transition-all",
+        indicatorClassName || "bg-primary"
+      )}
+      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+    />
+  </ProgressPrimitive.Root>
+));
+ColoredProgress.displayName = "ColoredProgress";
 
 const AnalysisResults = ({
   analysisResult,
@@ -145,7 +173,7 @@ const AnalysisResults = ({
                     <span className="text-sm font-semibold">
                       {analysisResult.readabilityScore}/100
                     </span>
-                    <Progress
+                    <ColoredProgress
                       value={analysisResult.readabilityScore}
                       className="w-32"
                       indicatorClassName={getProgressColor(
@@ -176,7 +204,7 @@ const AnalysisResults = ({
                     <span className="text-sm font-semibold">
                       {analysisResult.keywordScore}/100
                     </span>
-                    <Progress
+                    <ColoredProgress
                       value={analysisResult.keywordScore}
                       className="w-32"
                       indicatorClassName={getProgressColor(
@@ -207,7 +235,7 @@ const AnalysisResults = ({
                     <span className="text-sm font-semibold">
                       {analysisResult.semanticScore}/100
                     </span>
-                    <Progress
+                    <ColoredProgress
                       value={analysisResult.semanticScore}
                       className="w-32"
                       indicatorClassName={getProgressColor(
@@ -273,8 +301,8 @@ export default function ContentAnalyzerPage() {
           "activities"
         );
         await addDoc(userActivitiesRef, {
-          type: "Content Analysis",
-          tool: "Content Analyzer",
+          type: ACTIVITY_TYPES.CONTENT_ANALYSIS,
+          tool: TOOL_NAMES.CONTENT_ANALYZER,
           timestamp: serverTimestamp(),
           details: {
             targetKeywords: values.targetKeywords,

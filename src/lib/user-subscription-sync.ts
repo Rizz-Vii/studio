@@ -1,6 +1,23 @@
 ﻿import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+// Define expected quotas for each tier (ensures consistency with cleanup API)
+const TIER_QUOTAS = {
+  free: { monthlyAnalyses: 3, keywordTracking: 10, competitorTracking: 3 },
+  starter: { monthlyAnalyses: 20, keywordTracking: 50, competitorTracking: 10 },
+  professional: {
+    monthlyAnalyses: 100,
+    keywordTracking: 200,
+    competitorTracking: 25,
+  },
+  enterprise: {
+    monthlyAnalyses: 500,
+    keywordTracking: 1000,
+    competitorTracking: 100,
+  },
+  admin: { monthlyAnalyses: -1, keywordTracking: -1, competitorTracking: -1 }, // unlimited
+};
+
 interface UserSubscriptionSetup {
   email: string;
   tier: "starter" | "professional" | "enterprise";
@@ -89,6 +106,7 @@ async function createUserSubscription(
     subscriptionStatus: isFreeTier ? "free" : "active",
     subscriptionTier: isFreeTier ? "free" : setup.tier,
     role: "user",
+    quotas: TIER_QUOTAS[isFreeTier ? "free" : setup.tier], // ✅ Ensure quotas are set
     displayName: extractDisplayName(setup.email),
     ...(setup.testMode &&
       !isFreeTier && {
@@ -133,6 +151,7 @@ async function createDefaultUser(userId: string, email: string): Promise<void> {
     subscriptionStatus: "free",
     subscriptionTier: "free",
     role: "user",
+    quotas: TIER_QUOTAS.free, // ✅ Ensure quotas are set for free users
     displayName: extractDisplayName(email),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
