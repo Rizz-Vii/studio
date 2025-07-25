@@ -50,6 +50,30 @@ All scripts should be executed from the project root directory:
 
 #### consolidate-documentation.ps1
 
+- **Purpose**: Automated consolidation of scattered documentation files into comprehensive guides
+- **Features**: Automated TOC generation, cross-reference linking, backup creation
+- **Usage**: `.\pilotScripts\documentation\consolidate-documentation.ps1`
+- **Status**: Under maintenance (PowerShell syntax fix needed)
+- **Created**: July 2025
+
+### Cloud Development Scripts
+
+#### GitHub Codespace Setup (Automated)
+
+- **Purpose**: Rapid cloud development environment deployment for performance-constrained machines
+- **Features**: 4-core VM, pre-configured Node.js, VS Code integration, port forwarding
+- **Commands**: 
+
+  ```powershell
+  gh codespace create --repo Rizz-Vii/studio --branch feature/performance-optimization-mobile-enhancement --machine standardLinux32gb
+  gh codespace code --codespace [codespace-id]
+  ```
+
+- **Benefits**: Eliminates local performance issues, maintains full GitHub Copilot integration
+- **Implemented**: July 26, 2025
+
+#### consolidate-documentation.ps1
+
 - **Purpose**: Automates the entire documentation consolidation process
 - **Features**: Content merging, TOC generation, backup creation, source cleanup
 - **Safety Features**: Dry-run mode, backup creation, rollback capabilities
