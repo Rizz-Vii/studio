@@ -106,7 +106,7 @@ export default function MobileNav() {
               animate="open"
               exit="closed"
               variants={overlayVariants}
-              className="fixed inset-0 h-screen w-screen bg-black/90 backdrop-blur-md z-[60] md:hidden"
+              className="fixed inset-0 h-screen w-screen bg-black/90 backdrop-blur-md z-[55] md:hidden"
               style={{ height: "100dvh" }}
               onClick={closeMenu}
             />

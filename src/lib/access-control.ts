@@ -178,6 +178,12 @@ export const FEATURE_ACCESS: Record<string, FeatureConfig> = {
     requiresAdmin: true,
     description: "System analytics and monitoring",
   },
+
+  // Team Management Features
+  team_management: {
+    requiredTier: "enterprise",
+    description: "Team member management and collaboration",
+  },
 } as const;
 
 // =============================================================================

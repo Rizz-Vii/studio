@@ -1,0 +1,124 @@
+/* Dashboard component styles */
+
+.legendDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+/* Dynamic color classes for chart legend dots */
+.legendDotChart1 {
+  background-color: hsl(var(--chart-1));
+}
+
+.legendDotChart2 {
+  background-color: hsl(var(--chart-2));
+}
+
+.legendDotChart3 {
+  background-color: hsl(var(--chart-3));
+}
+
+.legendDotChart4 {
+  background-color: hsl(var(--chart-4));
+}
+
+.legendDotChart5 {
+  background-color: hsl(var(--chart-5));
+}
+
+/* Legend container */
+.legendContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 1rem;
+  margin-top: 1rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+}
+
+/* Additional dashboard-specific styles */
+.dashboardContainer {
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.metricsGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .metricsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.chartsGridLarge {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .chartsGridLarge {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.chartsGridMedium {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .chartsGridMedium {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.chartLargeSpan {
+  grid-column: span 3;
+}
+
+.chartMediumSpan {
+  grid-column: span 2;
+}
+
+/* Mobile-specific styles */
+.mobileToolGrid {
+  margin-top: 2rem;
+}
+
+/* Animation and transition improvements */
+.metricCard {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.metricCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .metricCard:hover {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  }
+}

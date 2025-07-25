@@ -23,6 +23,8 @@ import {
   Zap,
   BarChart3,
   Map,
+  MessageCircle,
+  FolderOpen,
 } from "lucide-react";
 
 export interface NavItem {
@@ -50,14 +52,15 @@ export interface NavGroup {
   defaultExpanded?: boolean;
 }
 
-// Enhanced NeuroSEO™ Suite Navigation
+// Enhanced NeuroSEO™ Suite Navigation - Sales Optimized
 export const neuroSEOItems: NavItem[] = [
   {
-    title: "NeuroSEO™ Dashboard",
+    title: "NeuroSEO™",
     href: "/neuroseo",
     icon: Brain,
-    description: "AI-powered content analysis dashboard",
+    description: "AI-powered content analysis dashboard (Free demo)",
     badge: "AI",
+    // Free tier - demo access
   },
   {
     title: "NeuralCrawler™",
@@ -74,18 +77,18 @@ export const neuroSEOItems: NavItem[] = [
     requiredTier: "starter",
   },
   {
-    title: "AI Visibility Engine",
-    href: "/neuroseo/ai-visibility",
-    icon: Eye,
-    description: "LLM citation tracking and optimization",
-    requiredTier: "agency",
-  },
-  {
     title: "TrustBlock™",
     href: "/neuroseo/trust-block",
     icon: Fingerprint,
     description: "E-A-T optimization and content authenticity",
     requiredTier: "starter",
+  },
+  {
+    title: "AI Visibility Engine",
+    href: "/neuroseo/ai-visibility",
+    icon: Eye,
+    description: "LLM citation tracking and optimization",
+    requiredTier: "agency",
   },
   {
     title: "RewriteGen™",
@@ -96,25 +99,28 @@ export const neuroSEOItems: NavItem[] = [
   },
 ];
 
-// SEO Tools Navigation
+// SEO Tools Navigation - Sales Optimized
 export const seoToolsItems: NavItem[] = [
   {
     title: "Keyword Tool",
     href: "/keyword-tool",
     icon: KeyRound,
-    description: "AI-driven keyword research and analysis",
+    description: "AI-driven keyword research and analysis (Free)",
+    // Free tier - basic keyword research
   },
   {
     title: "Content Analyzer",
     href: "/content-analyzer",
     icon: ScanText,
     description: "Content optimization and readability analysis",
+    requiredTier: "starter",
   },
   {
     title: "SEO Audit",
     href: "/seo-audit",
     icon: ListChecks,
     description: "Comprehensive technical SEO analysis",
+    requiredTier: "starter",
   },
   {
     title: "Content Brief",
@@ -125,14 +131,14 @@ export const seoToolsItems: NavItem[] = [
   },
 ];
 
-// Competitive Intelligence Navigation
+// Competitive Intelligence Navigation - Sales Optimized
 export const competitiveItems: NavItem[] = [
   {
     title: "Competitors",
     href: "/competitors",
     icon: Users,
     description: "Competitor analysis and benchmarking",
-    requiredTier: "starter",
+    requiredTier: "agency",
     feature: "competitor-analysis",
   },
   {
@@ -140,30 +146,76 @@ export const competitiveItems: NavItem[] = [
     href: "/serp-view",
     icon: TrendingUp,
     description: "Search engine results page visualization",
-    requiredTier: "starter",
+    requiredTier: "agency",
   },
   {
     title: "Link View",
     href: "/link-view",
     icon: Link,
     description: "Backlink analysis and link building opportunities",
-    requiredTier: "starter",
+    requiredTier: "agency",
   },
 ];
 
-// Management Navigation
+// Team Collaboration Navigation - Sales Optimized
+export const teamCollaborationItems: NavItem[] = [
+  {
+    title: "Team Chat",
+    href: "/team/chat",
+    icon: MessageCircle,
+    description: "Real-time team communication",
+    requiredTier: "agency",
+    feature: "team_management",
+  },
+  {
+    title: "Team Dashboard",
+    href: "/team",
+    icon: Users,
+    description: "Team overview and member management",
+    requiredTier: "enterprise",
+    feature: "team_management",
+  },
+  {
+    title: "Team Projects",
+    href: "/team/projects",
+    icon: FolderOpen,
+    description: "Collaborative project management",
+    requiredTier: "enterprise",
+    feature: "team_management",
+  },
+  {
+    title: "Team Reports",
+    href: "/team/reports",
+    icon: BarChart3,
+    description: "Team performance analytics",
+    requiredTier: "enterprise",
+    feature: "team_management",
+  },
+  {
+    title: "Team Settings",
+    href: "/team/settings",
+    icon: Users,
+    description: "Team configuration and member management",
+    requiredTier: "agency",
+    feature: "team_management",
+  },
+];
+
+// Management Navigation - Sales Optimized
 export const managementItems: NavItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    description: "Overview of your SEO performance",
+    description: "Overview of your SEO performance (Free)",
+    // Free tier - basic dashboard
   },
   {
     title: "Insights",
     href: "/insights",
     icon: Lightbulb,
     description: "AI-powered actionable insights",
+    requiredTier: "starter",
   },
   {
     title: "Performance",
@@ -174,19 +226,14 @@ export const managementItems: NavItem[] = [
   },
 ];
 
-// User & Settings Navigation
+// User Navigation - Profile only (no Settings duplication)
 export const userItems: NavItem[] = [
   {
     title: "Profile",
     href: "/profile",
     icon: User,
     description: "User profile and account settings",
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-    description: "Application settings and preferences",
+    // Free tier - basic profile
   },
   {
     title: "Admin",
@@ -194,6 +241,17 @@ export const userItems: NavItem[] = [
     icon: Shield,
     description: "Administrative controls and user management",
     adminOnly: true,
+  },
+];
+
+// Standalone Settings (bottom of sidebar)
+export const standaloneItems: NavItem[] = [
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings,
+    description: "Application settings and preferences",
+    // Free tier - basic settings
   },
 ];
 
@@ -229,6 +287,17 @@ export const navGroups: NavGroup[] = [
     collapsible: true,
   },
   {
+    title: "Team Collaboration",
+    icon: Users,
+    id: "team-collaboration",
+    description: "Team management and collaboration tools",
+    badge: "Agency+",
+    items: teamCollaborationItems,
+    requiredTier: "agency",
+    defaultExpanded: false,
+    collapsible: true,
+  },
+  {
     title: "Management",
     icon: LayoutDashboard,
     id: "management",
@@ -237,16 +306,21 @@ export const navGroups: NavGroup[] = [
     defaultExpanded: false,
     collapsible: true,
   },
+  // NOTE: Removed "Account & Settings" group - Profile now standalone, Settings at bottom
 ];
 
-// Flat navigation items for backward compatibility and mobile
+// Standalone navigation items (appear at bottom of sidebar)
+export const standaloneNavItems: NavItem[] = standaloneItems;
+
+// Flat navigation items for backward compatibility and mobile (FIXED: Remove duplication)
 export const flatNavItems: NavItem[] = [
   ...managementItems.slice(0, 2), // Dashboard, Insights
   ...neuroSEOItems.slice(0, 1), // NeuroSEO Dashboard
   ...seoToolsItems, // All SEO tools
   ...competitiveItems, // Competitive tools
+  ...teamCollaborationItems, // Team collaboration tools
   ...managementItems.slice(2), // Performance
-  ...userItems, // Profile, Settings, Admin
+  // NOTE: userItems are now only in Account & Settings group to prevent duplication
 ];
 
 // Helper functions
@@ -264,7 +338,13 @@ export const getVisibleNavGroups = (
         // Check tier access
         if (item.requiredTier) {
           if (!userTier) return false;
-          const tierHierarchy = ["starter", "agency", "enterprise"];
+          const tierHierarchy = [
+            "free",
+            "starter",
+            "agency",
+            "enterprise",
+            "admin",
+          ];
           const userTierIndex = tierHierarchy.indexOf(userTier);
           const requiredTierIndex = tierHierarchy.indexOf(item.requiredTier);
           if (userTierIndex < requiredTierIndex) return false;
@@ -280,7 +360,13 @@ export const getVisibleNavGroups = (
       // Check group-level tier requirements
       if (group.requiredTier) {
         if (!userTier) return false;
-        const tierHierarchy = ["starter", "agency", "enterprise"];
+        const tierHierarchy = [
+          "free",
+          "starter",
+          "agency",
+          "enterprise",
+          "admin",
+        ];
         const userTierIndex = tierHierarchy.indexOf(userTier);
         const requiredTierIndex = tierHierarchy.indexOf(group.requiredTier);
         if (userTierIndex < requiredTierIndex) return false;
@@ -301,7 +387,13 @@ export const getVisibleNavItems = (
     // Check tier access
     if (item.requiredTier) {
       if (!userTier) return false;
-      const tierHierarchy = ["starter", "agency", "enterprise"];
+      const tierHierarchy = [
+        "free",
+        "starter",
+        "agency",
+        "enterprise",
+        "admin",
+      ];
       const userTierIndex = tierHierarchy.indexOf(userTier);
       const requiredTierIndex = tierHierarchy.indexOf(item.requiredTier);
       if (userTierIndex < requiredTierIndex) return false;
@@ -344,7 +436,7 @@ export interface NavState {
 }
 
 export const defaultNavState: NavState = {
-  expandedGroups: new Set(["neuroseo", "seo-tools"]),
+  expandedGroups: new Set(["neuroseo", "seo-tools", "user-settings"]),
   activeGroup: undefined,
   activeItem: undefined,
 };

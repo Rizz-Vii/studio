@@ -51,6 +51,9 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  MessageCircle,
+  FolderOpen,
+  BarChart3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { TutorialAccess } from "@/components/tutorials/TutorialAccess";
@@ -352,6 +355,60 @@ export default function TeamManagementPage() {
           </div>
         </div>
 
+        {/* Team Collaboration Quick Access */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card
+            className="hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => (window.location.href = "/team/chat")}
+          >
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900">
+                <MessageCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Team Chat</h3>
+                <p className="text-sm text-muted-foreground">
+                  Real-time communication
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => (window.location.href = "/team/projects")}
+          >
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="rounded-full bg-green-100 p-3 dark:bg-green-900">
+                <FolderOpen className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Team Projects</h3>
+                <p className="text-sm text-muted-foreground">
+                  Collaborative workspace
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => (window.location.href = "/team/reports")}
+          >
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="rounded-full bg-purple-100 p-3 dark:bg-purple-900">
+                <BarChart3 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Team Reports</h3>
+                <p className="text-sm text-muted-foreground">
+                  Performance analytics
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Team Stats */}
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
@@ -561,4 +618,3 @@ export default function TeamManagementPage() {
     </FeatureGate>
   );
 }
-

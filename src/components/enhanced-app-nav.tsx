@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import {
   navGroups,
   getVisibleNavGroups,
+  standaloneNavItems,
   defaultNavState,
   type NavState,
   type NavGroup,
@@ -429,7 +430,7 @@ export function EnhancedMobileNav({
       animate={{ y: 0 }}
       exit={{ y: "100%" }}
       transition={{ type: "spring", damping: 30, stiffness: 300 }}
-      className="fixed inset-x-0 bottom-0 z-50 rounded-t-xl border-t bg-background p-4 shadow-lg"
+      className="fixed inset-x-0 bottom-0 z-[60] rounded-t-xl border-t bg-background p-4 shadow-lg"
     >
       <div className="mx-auto h-1 w-10 rounded-full bg-muted-foreground/20 mb-4" />
       <div className="max-h-[60vh] overflow-y-auto">
