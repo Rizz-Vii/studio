@@ -124,31 +124,31 @@ export async function POST() {
 
         if (result.success) {
             console.log("✅ MIGRATION COMPLETED SUCCESSFULLY!");
-            console.log(\`  Total activities scanned: \${result.totalScanned}\`);
-      console.log(\`  Activities updated: \${result.updated}\`);
-      
-      if (result.migrations.length > 0) {
-        console.log("🔄 Migration details:");
-        result.migrations.forEach(m => {
-          console.log(\`  \${m.currentType} → \${m.newType}\`);
-        });
-      }
-    } else {
-      throw new Error(result.error);
+            console.log(`  Total activities scanned: ${result.totalScanned}`);
+            console.log(`  Activities updated: ${result.updated}`);
+
+            if (result.migrations.length > 0) {
+                console.log("🔄 Migration details:");
+                result.migrations.forEach(m => {
+                    console.log(`  ${m.currentType} → ${m.newType}`);
+                });
+            }
+        } else {
+            throw new Error(result.error);
+        }
+
+        // Cleanup
+        fs.unlinkSync(apiPath);
+        console.log("🧹 Cleaned up temporary files");
+
+    } catch (error) {
+        console.error("❌ Migration failed:", error.message);
+        process.exit(1);
     }
-    
-    // Cleanup
-    fs.unlinkSync(apiPath);
-    console.log("🧹 Cleaned up temporary files");
-    
-  } catch (error) {
-    console.error("❌ Migration failed:", error.message);
-    process.exit(1);
-  }
 }
 
 if (require.main === module) {
-  runDatabaseMigration();
+    runDatabaseMigration();
 }
 
 module.exports = { runDatabaseMigration };

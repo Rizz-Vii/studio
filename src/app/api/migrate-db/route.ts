@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase/index";
 import { collection, getDocs, doc, writeBatch } from "firebase/firestore";
 
-const ACTIVITY_TYPE_MIGRATION_MAP = {
+const ACTIVITY_TYPE_MIGRATION_MAP: Record<string, string> = {
   "SEO Audit": "audit",
   "Keyword Search": "keyword-research",
   "SERP View": "serp-analysis",
@@ -29,7 +29,7 @@ export async function POST() {
       for (const activityDoc of activitiesSnapshot.docs) {
         totalActivitiesScanned++;
         const activityData = activityDoc.data();
-        const currentType = activityData.type;
+        const currentType = activityData.type as string;
         const newType = ACTIVITY_TYPE_MIGRATION_MAP[currentType];
 
         if (newType && newType !== currentType) {
@@ -71,6 +71,8 @@ export async function POST() {
       migrations: activitiesToUpdate,
     });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown migration error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

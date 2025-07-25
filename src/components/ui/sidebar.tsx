@@ -1,5 +1,6 @@
 "use client";
 
+import "./sidebar.css";
 import React, {
   ReactNode,
   CSSProperties,
@@ -192,15 +193,8 @@ const SidebarProvider = forwardRef<HTMLDivElement, SidebarProviderProps>(
       <SidebarContext.Provider value={contextValue}>
         <TooltipProvider delayDuration={0}>
           <div
-            style={
-              {
-                "--sidebar-width": SIDEBAR_WIDTH,
-                "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
-                ...style,
-              } as React.CSSProperties // Keep this cast as it's common for CSS variables
-            }
             className={cn(
-              "group/sidebar-wrapper", // Removed flex layout from here
+              "group/sidebar-wrapper sidebar-provider-wrapper",
               className
             )}
             ref={ref as any} // Cast ref to any
@@ -257,12 +251,7 @@ const Sidebar = forwardRef<
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
-          className="w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
-          style={
-            {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
+          className="w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden sidebar-mobile"
           side={side}
           ref={ref as any} // Cast ref to any
         >
@@ -410,10 +399,10 @@ const SidebarMenu = forwardRef<HTMLUListElement, SidebarMenuProps>(
 SidebarMenu.displayName = "SidebarMenu";
 
 const SidebarMenuItem = motion.create(
-  forwardRef<HTMLLIElement, React.ComponentPropsWithoutRef<"li">>( // Use ComponentPropsWithoutRef
+  forwardRef<HTMLLIElement, React.ComponentPropsWithoutRef<"li">>(
     ({ className, ...props }, ref) => (
       <li
-        ref={ref as any} // Cast ref to any
+        ref={ref}
         data-sidebar="menu-item"
         className={cn("group/menu-item relative", className)}
         {...props}

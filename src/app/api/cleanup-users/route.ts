@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase/index";
 import {
   collection,
@@ -8,8 +8,38 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+// Define types for better type safety
+interface UserQuotas {
+  monthlyAnalyses: number;
+  keywordTracking: number;
+  competitorTracking: number;
+  used?: {
+    monthlyAnalyses: number;
+    keywordTracking: number;
+    competitorTracking: number;
+  };
+  resetDate?: Date;
+  lastUpdated?: Date;
+}
+
+interface UserData {
+  email?: string;
+  subscriptionTier?: string;
+  quotas?: UserQuotas;
+  role?: string;
+  plan?: string;
+  planType?: string;
+  dataCleanupDate?: Date;
+  cleanupVersion?: string;
+  isTestUser?: boolean;
+  [key: string]: any; // Allow additional properties
+}
+
+type TierType = "free" | "starter" | "agency" | "enterprise" | "admin";
+type RoleType = "free" | "starter" | "agency" | "enterprise" | "admin" | "user";
+
 // Define expected quotas for each tier
-const TIER_QUOTAS = {
+const TIER_QUOTAS: Record<TierType, UserQuotas> = {
   free: { monthlyAnalyses: 3, keywordTracking: 10, competitorTracking: 3 },
   starter: { monthlyAnalyses: 20, keywordTracking: 50, competitorTracking: 10 },
   agency: {
@@ -26,7 +56,7 @@ const TIER_QUOTAS = {
 };
 
 // Role-to-tier mapping for cleanup
-const ROLE_TO_TIER_MAP = {
+const ROLE_TO_TIER_MAP: Record<RoleType, TierType> = {
   free: "free",
   starter: "starter",
   agency: "agency",
@@ -34,6 +64,16 @@ const ROLE_TO_TIER_MAP = {
   admin: "admin",
   user: "free", // default user role maps to free tier
 };
+
+interface CleanupResults {
+  totalUsers: number;
+  quotasFixed: number;
+  tiersFixed: number;
+  rolesFixed: number;
+  testUsersIdentified: number;
+  productionUsers: number;
+  errors: string[];
+}
 
 // Test user patterns to identify
 const TEST_USER_PATTERNS = [
@@ -49,12 +89,12 @@ const TEST_USER_PATTERNS = [
   "free.",
 ];
 
-export async function POST() {
+export async function POST(): Promise<NextResponse> {
   try {
     console.log("🚨 Starting comprehensive user data cleanup...");
 
     const usersSnapshot = await getDocs(collection(db, "users"));
-    const cleanupResults = {
+    const cleanupResults: CleanupResults = {
       totalUsers: usersSnapshot.docs.length,
       quotasFixed: 0,
       tiersFixed: 0,
@@ -69,7 +109,7 @@ export async function POST() {
 
     for (const userDoc of usersSnapshot.docs) {
       const userId = userDoc.id;
-      const userData = userDoc.data();
+      const userData = userDoc.data() as UserData;
       const userRef = doc(db, "users", userId);
 
       // Identify if this is a test user
@@ -83,15 +123,15 @@ export async function POST() {
         cleanupResults.productionUsers++;
       }
 
-      const updates = {};
+      const updates: Partial<UserData> = {};
       let needsUpdate = false;
 
       // 1. Fix empty/null subscription tiers
       let subscriptionTier = userData.subscriptionTier;
       if (!subscriptionTier || subscriptionTier.trim() === "") {
         // If user has a role, map it to tier
-        if (userData.role && ROLE_TO_TIER_MAP[userData.role]) {
-          subscriptionTier = ROLE_TO_TIER_MAP[userData.role];
+        if (userData.role && userData.role in ROLE_TO_TIER_MAP) {
+          subscriptionTier = ROLE_TO_TIER_MAP[userData.role as RoleType];
         } else {
           subscriptionTier = "free"; // default
         }
@@ -102,8 +142,8 @@ export async function POST() {
 
       // 2. Initialize missing quotas based on tier
       if (!userData.quotas) {
-        const expectedQuotas =
-          TIER_QUOTAS[subscriptionTier] || TIER_QUOTAS.free;
+        const tierKey = subscriptionTier as TierType;
+        const expectedQuotas = TIER_QUOTAS[tierKey] || TIER_QUOTAS.free;
         updates.quotas = {
           ...expectedQuotas,
           used: {
@@ -118,16 +158,21 @@ export async function POST() {
         needsUpdate = true;
       } else {
         // Update existing quotas to match tier if they don't match
-        const expectedQuotas =
-          TIER_QUOTAS[subscriptionTier] || TIER_QUOTAS.free;
+        const tierKey = subscriptionTier as TierType;
+        const expectedQuotas = TIER_QUOTAS[tierKey] || TIER_QUOTAS.free;
         const currentQuotas = userData.quotas;
 
         let quotasNeedUpdate = false;
         const updatedQuotas = { ...currentQuotas };
 
         Object.keys(expectedQuotas).forEach((quotaKey) => {
-          if (currentQuotas[quotaKey] !== expectedQuotas[quotaKey]) {
-            updatedQuotas[quotaKey] = expectedQuotas[quotaKey];
+          const key = quotaKey as keyof UserQuotas;
+          if (
+            currentQuotas[key] !== expectedQuotas[key] &&
+            typeof currentQuotas[key] === "number" &&
+            typeof expectedQuotas[key] === "number"
+          ) {
+            (updatedQuotas as any)[key] = expectedQuotas[key];
             quotasNeedUpdate = true;
           }
         });
@@ -207,10 +252,12 @@ export async function POST() {
     });
   } catch (error) {
     console.error("Error during user cleanup:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
       {
         success: false,
-        error: error.message,
+        error: errorMessage,
         recommendation: "Review Firebase security rules and retry cleanup",
       },
       { status: 500 }
