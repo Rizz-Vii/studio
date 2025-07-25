@@ -13,7 +13,7 @@ export function TierDebugInfo() {
   }
 
   return (
-    <div className="fixed bottom-20 right-4 bg-background border border-border rounded-lg p-4 text-xs space-y-2 z-50 max-w-xs">
+    <div className="fixed bottom-4 right-4 bg-background border border-border rounded-lg p-4 text-xs space-y-2 z-50 max-w-xs">
       <div className="font-semibold text-green-600">Debug: Tier Detection</div>
       <div>User: {user?.email}</div>
       <div>Role: {role}</div>
