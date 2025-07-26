@@ -1,7 +1,8 @@
 import { Page } from "@playwright/test";
-import { type TestUser } from "../config/test-config";
+import { type UnifiedTestUser, type UserTier, UNIFIED_TEST_USERS } from "../../../config/unified-test-users";
 
 export type UserType = "standard" | "admin";
+export type TestUser = UnifiedTestUser; // Backward compatibility alias
 
 export async function login(page: Page, user: TestUser | UserType) {
   // Navigate to login page
@@ -10,22 +11,19 @@ export async function login(page: Page, user: TestUser | UserType) {
   // Get credentials based on input type
   const credentials =
     typeof user === "string"
-      ? {
-          email:
-            process.env[`TEST_${user.toUpperCase()}_EMAIL`] ||
-            `${user}@example.com`,
-          password:
-            process.env[`TEST_${user.toUpperCase()}_PASSWORD`] ||
-            `${user}pass123`,
-        }
+      ? user === "standard"
+        ? UNIFIED_TEST_USERS.starter
+        : user === "admin"
+          ? UNIFIED_TEST_USERS.admin
+          : UNIFIED_TEST_USERS.starter
       : user;
 
   // Fill in login form
   await page.getByLabel(/email/i).fill(credentials.email);
   await page.getByLabel(/password/i).fill(credentials.password);
 
-  // Submit form
-  await page.getByRole("button", { name: /login/i }).click();
+  // Submit form - use more specific selector to avoid ambiguity
+  await page.getByRole("button", { name: "Login", exact: true }).click();
 
   // Wait for navigation to complete and dashboard to be visible
   await Promise.all([

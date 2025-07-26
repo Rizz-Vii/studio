@@ -1,60 +1,22 @@
 import { Page, expect } from "@playwright/test";
 import { GracefulTestUtils } from "./graceful-test-utils";
+import {
+  UNIFIED_TEST_USERS,
+  DEV_USER,
+  type UnifiedTestUser,
+  type UserTier,
+  resolveTestUser
+} from "../config/unified-test-users";
 
 /**
- * Enhanced Authentication Utilities - Centralized login management
- * Based on RankPilot testing strategy documentation
+ * Enhanced Authentication Utilities - Unified Test User Management
+ * Resolves conflicts between different test user configurations
  */
 
-export type UserTier = 'free' | 'starter' | 'agency' | 'enterprise' | 'admin';
+export type { UserTier, UnifiedTestUser };
 
-export interface TestUser {
-  email: string;
-  password: string;
-  tier: UserTier;
-  displayName: string;
-}
-
-export const TEST_USERS: Record<UserTier, TestUser> = {
-  free: {
-    email: "abbas_ali_rizvi@hotmail.com",
-    password: "123456",
-    tier: "free",
-    displayName: "Abbas Ali (Free)"
-  },
-  starter: {
-    email: "starter@rankpilot.com", 
-    password: "starter123",
-    tier: "starter",
-    displayName: "Starter User"
-  },
-  agency: {
-    email: "enterprise@rankpilot.com",
-    password: "enterprise123", 
-    tier: "agency",
-    displayName: "Agency User (Enterprise)"
-  },
-  enterprise: {
-    email: "enterprise@rankpilot.com",
-    password: "enterprise123",
-    tier: "enterprise", 
-    displayName: "Enterprise User"
-  },
-  admin: {
-    email: "admin@rankpilot.com",
-    password: "admin123",
-    tier: "admin",
-    displayName: "Admin User"
-  }
-};
-
-// Fallback user for development
-export const DEV_USER = {
-  email: "abbas_ali_rizvi@hotmail.com",
-  password: "123456", 
-  tier: "free" as UserTier,
-  displayName: "Abbas (Dev)"
-};
+// Export unified test users for backward compatibility
+export const TEST_USERS = UNIFIED_TEST_USERS;
 
 export class EnhancedAuth {
   private gracefulUtils: GracefulTestUtils;
@@ -64,61 +26,58 @@ export class EnhancedAuth {
   }
 
   /**
-   * Enhanced login with graceful error handling and tier-based routing
+   * Enhanced login with unified test users and enhanced auth service integration
    */
-  async loginAndGoToDashboard(user?: TestUser | UserTier): Promise<void> {
-    const targetUser = this.resolveUser(user);
-    
+  async loginAndGoToDashboard(user?: UnifiedTestUser | UserTier): Promise<void> {
+    const targetUser = resolveTestUser(user);
+
     try {
       console.log(`🔐 Logging in as ${targetUser.displayName} (${targetUser.tier})`);
-      
+
       // Navigate to login page gracefully
       await this.gracefulUtils.navigateGracefully("/login", {
         waitStrategy: 'domcontentloaded',
         timeout: 60000
       });
 
-      // Check if we need to wait for body to be visible (fix for display: none issue)
+      // Wait for body to be visible before interacting
       await this.waitForBodyVisible();
 
-      // Wait for login form elements
-      await this.gracefulUtils.waitForElementGracefully("#email", {
-        timeout: 30000,
-        state: 'visible'
+      // Wait for login form elements and fill them
+      const emailInput = await this.gracefulUtils.waitForElementGracefully('#email', {
+        timeout: 30000
+      });
+      const passwordInput = await this.gracefulUtils.waitForElementGracefully('#password', {
+        timeout: 30000
       });
 
-      await this.gracefulUtils.waitForElementGracefully("#password", {
-        timeout: 10000,
-        state: 'visible' 
-      });
-
-      // Fill credentials with graceful error handling
-      await this.page.fill("#email", targetUser.email);
-      await this.page.fill("#password", targetUser.password);
-
-      // Try dev mode login first if available
-      const devLoginButton = this.page.locator('button:has-text("Login as Free User (Abbas)")');
-      if (await devLoginButton.isVisible({ timeout: 5000 })) {
-        console.log("🚀 Using dev mode quick login");
-        await devLoginButton.click();
+      // Fill in login form
+      if (emailInput && passwordInput) {
+        await emailInput.fill(targetUser.email);
+        await passwordInput.fill(targetUser.password);
       } else {
-        // Use standard login button
-        const loginButton = this.page.locator('[data-testid="login-button"]')
-          .or(this.page.locator('button[type="submit"]'))
-          .or(this.page.locator('button:has-text("Login")'))
-          .or(this.page.locator('button:has-text("Sign In")'));
-          
-        await loginButton.click();
+        throw new Error("Email or password input not found");
       }
 
-      // Wait for navigation to dashboard with enhanced timeout
-      await this.page.waitForURL("**/dashboard", { 
-        timeout: 60000,
+      // Find and click the main login button using test ID
+      const loginButton = this.page.locator('[data-testid="login-button"]');
+      await loginButton.click();
+
+      // Wait for navigation to expected path
+      const expectedPath = targetUser.tier === 'admin' ? '**/adminonly' : '**/dashboard';
+
+      // Wait for navigation with enhanced timeout for Firebase auth
+      await this.page.waitForURL(expectedPath, {
+        timeout: 90000,
         waitUntil: 'domcontentloaded'
       });
 
-      // Verify dashboard loaded successfully
-      await this.gracefulUtils.waitForElementGracefully('[data-testid="dashboard-content"]', {
+      // Verify page loaded successfully (dashboard or admin panel)
+      const contentSelector = targetUser.tier === 'admin'
+        ? '[data-testid="admin-content"], [data-testid="dashboard-content"], main, .main-content'
+        : '[data-testid="dashboard-content"], main, .main-content';
+
+      await this.gracefulUtils.waitForElementGracefully(contentSelector, {
         timeout: 30000
       });
 
@@ -127,13 +86,13 @@ export class EnhancedAuth {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error(`❌ Login failed for ${targetUser.displayName}:`, errorMessage);
-      
+
       // Capture debug screenshot
       await this.page.screenshot({
         path: `test-results/login-failure-${targetUser.tier}-${Date.now()}.png`,
         fullPage: true
       });
-      
+
       throw new Error(`Authentication failed for ${targetUser.tier} user: ${errorMessage}`);
     }
   }
@@ -141,27 +100,22 @@ export class EnhancedAuth {
   /**
    * Login without navigation - just handle auth
    */
-  async loginOnly(user?: TestUser | UserTier): Promise<void> {
-    const targetUser = this.resolveUser(user);
-    
+  async loginOnly(user?: UnifiedTestUser | UserTier): Promise<void> {
+    const targetUser = resolveTestUser(user);
+
     console.log(`🔐 Logging in as ${targetUser.displayName} (${targetUser.tier})`);
-    
+
     await this.gracefulUtils.navigateGracefully("/login");
     await this.waitForBodyVisible();
-    
+
+    // Fill login form directly
     await this.page.fill("#email", targetUser.email);
     await this.page.fill("#password", targetUser.password);
-    
-    const devLoginButton = this.page.locator('button:has-text("Login as Free User (Abbas)")');
-    if (await devLoginButton.isVisible({ timeout: 5000 })) {
-      await devLoginButton.click();
-    } else {
-      const loginButton = this.page.locator('[data-testid="login-button"]')
-        .or(this.page.locator('button[type="submit"]'))
-        .or(this.page.locator('button:has-text("Login")'));
-      await loginButton.click();
-    }
-    
+
+    // Click the main login button using test ID
+    const loginButton = this.page.locator('[data-testid="login-button"]');
+    await loginButton.click();
+
     // Wait for auth to complete (not navigation)
     await this.page.waitForTimeout(3000);
   }
@@ -174,7 +128,7 @@ export class EnhancedAuth {
       // Check for common authenticated indicators
       const authIndicators = [
         '[data-testid="user-menu"]',
-        '[data-testid="logout-button"]', 
+        '[data-testid="logout-button"]',
         'text=Dashboard',
         'text=Profile',
         '.user-avatar'
@@ -194,14 +148,14 @@ export class EnhancedAuth {
   /**
    * Navigate to a protected route with authentication check
    */
-  async navigateToProtectedRoute(route: string, user?: TestUser | UserTier): Promise<void> {
+  async navigateToProtectedRoute(route: string, user?: UnifiedTestUser | UserTier): Promise<void> {
     console.log(`🛡️ Navigating to protected route: ${route}`);
-    
+
     // Check if already authenticated
     if (!(await this.isAuthenticated())) {
       await this.loginAndGoToDashboard(user);
     }
-    
+
     // Navigate to the target route
     await this.gracefulUtils.navigateGracefully(route);
   }
@@ -212,10 +166,10 @@ export class EnhancedAuth {
   private async waitForBodyVisible(): Promise<void> {
     try {
       console.log("🔍 Checking body visibility...");
-      
+
       // Wait for body to exist
       await this.page.waitForSelector('body', { timeout: 30000 });
-      
+
       // Check if body has display: none and wait for it to become visible
       await this.page.waitForFunction(
         () => {
@@ -225,7 +179,7 @@ export class EnhancedAuth {
         },
         { timeout: 30000 }
       );
-      
+
       console.log("✅ Body is now visible");
     } catch (error) {
       console.log("⚠️ Body visibility check failed, continuing anyway");
@@ -237,18 +191,10 @@ export class EnhancedAuth {
   }
 
   /**
-   * Resolve user input to TestUser object
+   * Resolve user input to UnifiedTestUser object
    */
-  private resolveUser(user?: TestUser | UserTier): TestUser {
-    if (!user) {
-      return DEV_USER;
-    }
-    
-    if (typeof user === 'string') {
-      return TEST_USERS[user] || DEV_USER;
-    }
-    
-    return user;
+  private resolveUser(user?: UnifiedTestUser | UserTier): UnifiedTestUser {
+    return resolveTestUser(user);
   }
 
   /**
@@ -257,7 +203,7 @@ export class EnhancedAuth {
   async logout(): Promise<void> {
     try {
       console.log("🚪 Logging out...");
-      
+
       // Try multiple logout methods
       const logoutSelectors = [
         '[data-testid="logout-button"]',
@@ -277,7 +223,7 @@ export class EnhancedAuth {
       // Wait for redirect to login or home page
       await this.page.waitForURL(/\/(login|$)/, { timeout: 10000 });
       console.log("✅ Successfully logged out");
-      
+
     } catch (error) {
       console.log("⚠️ Logout may have failed, continuing...");
     }
@@ -288,8 +234,8 @@ export class EnhancedAuth {
  * Convenience function for backwards compatibility
  */
 export async function loginAndGoToDashboard(
-  page: Page, 
-  user?: TestUser | UserTier
+  page: Page,
+  user?: UnifiedTestUser | UserTier
 ): Promise<void> {
   const auth = new EnhancedAuth(page);
   await auth.loginAndGoToDashboard(user);

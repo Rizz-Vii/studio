@@ -1,5 +1,5 @@
 import { Page, expect } from "@playwright/test";
-import { EnhancedAuth, UserTier, TestUser, TEST_USERS } from "./enhanced-auth";
+import { EnhancedAuth, UserTier, UnifiedTestUser, TEST_USERS } from "./enhanced-auth";
 import { GracefulTestUtils } from "./graceful-test-utils";
 
 /**
@@ -50,7 +50,7 @@ export class UserManager {
   /**
    * Get current user info
    */
-  getCurrentUser(tier: UserTier): TestUser {
+  getCurrentUser(tier: UserTier): UnifiedTestUser {
     return TEST_USERS[tier];
   }
 
@@ -60,7 +60,7 @@ export class UserManager {
   async verifyAccess(route: string, expectedAccess: boolean = true): Promise<void> {
     try {
       await this.gracefulUtils.navigateGracefully(route);
-      
+
       if (expectedAccess) {
         // Should have access - verify no upgrade prompts
         const upgradePrompts = [
@@ -106,7 +106,7 @@ export class TestOrchestrator {
   constructor(private page: Page) {
     this.userManager = new UserManager(page);
     this.gracefulUtils = new GracefulTestUtils(page);
-    
+
     // Set enhanced timeouts for orchestrated tests
     page.setDefaultNavigationTimeout(60000);
     page.setDefaultTimeout(30000);
@@ -136,7 +136,7 @@ export class TestOrchestrator {
           console.log(`⚠️ Optional step failed, continuing...`);
           continue;
         }
-        
+
         const errorMessage = error instanceof Error ? error.message : String(error);
         await this.page.screenshot({
           path: `test-results/flow-failure-${flow.name}-step-${i + 1}-${Date.now()}.png`
@@ -146,7 +146,7 @@ export class TestOrchestrator {
     }
 
     console.log(`✅ Flow completed successfully: ${flow.name}`);
-    
+
     // Verify expected outcome if specified
     if (flow.expectedOutcome) {
       await this.verifyOutcome(flow.expectedOutcome);
@@ -210,7 +210,7 @@ export class TestOrchestrator {
    */
   private async verifyOutcome(outcome: string): Promise<void> {
     console.log(`🎯 Verifying outcome: ${outcome}`);
-    
+
     // Common outcome patterns
     if (outcome.includes('dashboard')) {
       await expect(this.page).toHaveURL(/.*dashboard.*/);
@@ -235,12 +235,12 @@ export class TestOrchestrator {
    * Run tier-specific feature test
    */
   async testTierAccess(
-    tier: UserTier, 
-    featureRoute: string, 
+    tier: UserTier,
+    featureRoute: string,
     shouldHaveAccess: boolean = true
   ): Promise<void> {
     console.log(`🔒 Testing ${tier} tier access to ${featureRoute}`);
-    
+
     await this.userManager.loginAs(tier);
     await this.userManager.verifyAccess(featureRoute, shouldHaveAccess);
   }
@@ -288,14 +288,14 @@ export class TestOrchestrator {
 
     for (const viewport of viewports) {
       console.log(`📐 Testing ${viewport.name} (${viewport.width}x${viewport.height})`);
-      
+
       await this.page.setViewportSize(viewport);
       await this.gracefulUtils.navigateGracefully('/');
-      
+
       // Test touch targets (minimum 48px)
       const buttons = this.page.locator('button, a, [role="button"]');
       const buttonCount = await buttons.count();
-      
+
       for (let i = 0; i < Math.min(buttonCount, 10); i++) {
         const button = buttons.nth(i);
         if (await button.isVisible({ timeout: 2000 })) {
@@ -306,7 +306,7 @@ export class TestOrchestrator {
           }
         }
       }
-      
+
       console.log(`✅ ${viewport.name} mobile performance validated`);
     }
 
@@ -331,7 +331,7 @@ export const commonFlows: UserFlow[] = [
     expectedOutcome: "dashboard"
   },
   {
-    name: "NeuroSEO Access Test", 
+    name: "NeuroSEO Access Test",
     description: "Test access to NeuroSEO features",
     requiredTier: "agency",
     steps: [
@@ -342,7 +342,7 @@ export const commonFlows: UserFlow[] = [
   },
   {
     name: "Feature Restriction Test",
-    description: "Verify tier restrictions work correctly", 
+    description: "Verify tier restrictions work correctly",
     requiredTier: "free",
     steps: [
       { action: 'navigate', target: '/enterprise-features' },

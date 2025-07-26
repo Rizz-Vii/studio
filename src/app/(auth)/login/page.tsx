@@ -12,10 +12,9 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { EnhancedAuthService } from "@/lib/services/enhanced-auth.service";
 import { Eye, EyeOff } from "lucide-react";
 import LoadingScreen from "@/components/ui/loading-screen";
-
-// Google logo SVG
 const GoogleIcon = () => (
   <svg
     className="mr-2 h-4 w-4"
@@ -97,6 +96,14 @@ export default function LoginPage() {
         email,
         password
       );
+      
+      // Update login tracking with enhanced auth service
+      try {
+        await EnhancedAuthService.updateLoginTracking(userCredential.user.uid);
+      } catch (trackingError) {
+        console.warn("Login tracking update failed:", trackingError);
+      }
+      
       // Redirection is handled by the useEffect hook after auth state updates
     } catch (error: any) {
       setErrors({ form: error?.message || "Login failed. Please try again." });
@@ -189,6 +196,7 @@ export default function LoginPage() {
           )}
           <button
             type="submit"
+            data-testid="login-button"
             className="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 transition"
             disabled={loading}
           >
@@ -219,62 +227,6 @@ export default function LoginPage() {
           <GoogleIcon />
           Sign in with Google
         </button>
-
-        {/* Development Quick Login */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="border-t pt-4 mt-4">
-            <p className="text-center text-xs text-gray-500 mb-3">
-              Development Mode - Quick Login:
-            </p>
-            <div className="space-y-2">
-              <button
-                onClick={async () => {
-                  try {
-                    // Use real Firebase authentication
-                    await signInWithEmailAndPassword(
-                      auth,
-                      "abbas_ali_rizvi@hotmail.com",
-                      "123456"
-                    );
-                    // Redirection handled by useEffect
-                  } catch (error) {
-                    console.error("Dev login failed:", error);
-                    setErrors({
-                      form: "Development login failed. Please check credentials.",
-                    });
-                  }
-                }}
-                disabled={loading}
-                className="w-full py-2 px-4 text-sm bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-lg transition"
-              >
-                {loading ? "Logging in..." : "Login as Free User (Abbas)"}
-              </button>
-              <button
-                onClick={async () => {
-                  try {
-                    // Use Google sign-in for starter user
-                    const provider = new GoogleAuthProvider();
-                    provider.setCustomParameters({
-                      login_hint: "abba7254@gmail.com",
-                      prompt: "select_account",
-                    });
-                    await signInWithPopup(auth, provider);
-                    // Redirection handled by useEffect
-                  } catch (error) {
-                    console.error("Dev login failed:", error);
-                    setErrors({ form: "Development Google login failed." });
-                  }
-                }}
-                disabled={loading}
-                className="w-full py-2 px-4 text-sm bg-blue-100 hover:bg-blue-200 disabled:opacity-50 rounded-lg transition"
-              >
-                {loading
-                  ? "Logging in..."
-                  : "Login as Starter User (Abba) - Google"}
-              </button>
-            </div>
-          </div>
-        )}
 
         <p className="text-center text-sm text-gray-600">
           Don't have an account?{" "}

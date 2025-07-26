@@ -336,11 +336,23 @@ export function validateUserAccess(userAccess: any): userAccess is UserAccess {
  * Normalize user data from database
  */
 export function normalizeUserAccess(dbUser: any): UserAccess {
-  return {
-    role: (dbUser.role === "admin" ? "admin" : "user") as UserRole,
-    tier: (TIER_HIERARCHY.includes(dbUser.subscriptionTier)
+  // Handle admin tier mapping - admin tier gets enterprise features with admin role
+  let mappedTier: SubscriptionTier;
+  let mappedRole: UserRole;
+
+  if (dbUser.subscriptionTier === "admin" || dbUser.tier === "admin") {
+    mappedTier = "enterprise"; // Admin gets enterprise-level features
+    mappedRole = "admin"; // But with admin role for special permissions
+  } else {
+    mappedRole = (dbUser.role === "admin" ? "admin" : "user") as UserRole;
+    mappedTier = (TIER_HIERARCHY.includes(dbUser.subscriptionTier)
       ? dbUser.subscriptionTier
-      : "free") as SubscriptionTier,
+      : "free") as SubscriptionTier;
+  }
+
+  return {
+    role: mappedRole,
+    tier: mappedTier,
     status: dbUser.subscriptionStatus || "free",
   };
 }
