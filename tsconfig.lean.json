@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "incremental": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "strict": false, // Less strict for faster builds
+    "allowJs": true,
+    "noImplicitAny": false, // Skip implicit any checks
+    "noFallthroughCasesInSwitch": false, // Skip exhaustiveness checks
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": false,
+    "allowUnreachableCode": true, // Skip unreachable code analysis
+    "allowUnusedLabels": true, // Skip unused label checks
+    "noImplicitReturns": false, // Skip implicit return checks
+    "noUnusedLocals": false, // Skip unused locals check
+    "noUnusedParameters": false // Skip unused parameters check
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
+}

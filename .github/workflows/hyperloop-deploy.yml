@@ -1,0 +1,99 @@
+name: Development Hyperloop CI/CD
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+      - '!master'
+      - '!production'
+  workflow_dispatch:
+
+jobs:
+  instant-deploy:
+    name: Instant Preview Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for branch comparison
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Setup Firebase CLI
+        run: npm install -g firebase-tools
+      
+      - name: Get branch name
+        id: branch-name
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+      
+      - name: Determine changed files
+        id: changed-files
+        run: |
+          git diff --name-only origin/main...HEAD > changed_files.txt
+          echo "Changed files:"
+          cat changed_files.txt
+      
+      - name: Lean build
+        run: npm run build:lean
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+      
+      - name: Deploy to Firebase preview channel
+        id: deploy-firebase
+        run: |
+          BRANCH_NAME="${{ steps.branch-name.outputs.branch }}"
+          SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9-]//g' | cut -c 1-20)
+          CHANNEL_ID="lean-${SAFE_BRANCH_NAME}"
+          
+          echo "Deploying to channel: $CHANNEL_ID"
+          
+          DEPLOY_OUTPUT=$(firebase hosting:channel:deploy $CHANNEL_ID \
+            --project rankpilot-h3jpc \
+            --expires 1d \
+            --json)
+          
+          echo "Firebase deploy output:"
+          echo "$DEPLOY_OUTPUT"
+          
+          URL=$(echo "$DEPLOY_OUTPUT" | grep -o '"url": "[^"]*"' | cut -d'"' -f4)
+          echo "preview_url=$URL" >> $GITHUB_OUTPUT
+      
+      - name: Comment on commit with preview URL
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { sha } = context;
+            const previewUrl = '${{ steps.deploy-firebase.outputs.preview_url }}';
+            
+            if (previewUrl) {
+              await github.rest.repos.createCommitComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: sha,
+                body: `## 🚀 Development Hyperloop
+                
+                **Instant preview:** [View deployment](${previewUrl})
+                
+                This is a lean deployment optimized for speed. Some features may be limited compared to the full CI/CD pipeline.
+                
+                *Preview expires in 24 hours.*`
+              });
+            } else {
+              core.setFailed('Failed to get preview URL');
+            }

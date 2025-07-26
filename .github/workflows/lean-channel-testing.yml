@@ -1,0 +1,168 @@
+name: Lean Channel Testing
+
+on:
+  workflow_run:
+    workflows: ["Development Hyperloop CI/CD"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Firebase channel to test against (leave empty for latest)'
+        required: false
+        type: string
+      test_suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'critical'
+        type: choice
+        options:
+          - critical
+          - mobile
+          - accessibility
+          - performance
+          - all
+
+jobs:
+  test-lean-channel:
+    name: Test Lean Channel
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Setup Firebase CLI
+        run: npm install -g firebase-tools
+      
+      - name: Get branch name (from workflow_run)
+        if: ${{ github.event_name == 'workflow_run' }}
+        id: branch-name-run
+        run: |
+          # Extract the branch name from the source workflow
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+      
+      - name: Get latest channel URL
+        id: get-channel
+        run: |
+          if [[ "${{ github.event.inputs.channel }}" != "" ]]; then
+            # Use manually specified channel
+            CHANNEL="${{ github.event.inputs.channel }}"
+          elif [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            # Use branch name from triggering workflow
+            BRANCH="${{ steps.branch-name-run.outputs.branch }}"
+            SAFE_BRANCH_NAME=$(echo "$BRANCH" | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9-]//g' | cut -c 1-20)
+            CHANNEL="lean-${SAFE_BRANCH_NAME}"
+          else
+            # Get the most recently created channel starting with lean-
+            CHANNEL=$(firebase hosting:channel:list --project rankpilot-h3jpc --json | grep -o '"name":"lean-[^"]*' | head -1 | cut -d'"' -f4)
+          fi
+          
+          echo "Using channel: $CHANNEL"
+          echo "channel=$CHANNEL" >> $GITHUB_OUTPUT
+          
+          # Get channel URL
+          URL=$(firebase hosting:channel:open $CHANNEL --project rankpilot-h3jpc --no-localhost --json | grep -o '"url": "[^"]*"' | cut -d'"' -f4)
+          echo "channel_url=$URL" >> $GITHUB_OUTPUT
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      
+      - name: Determine test suite
+        id: test-suite
+        run: |
+          if [[ "${{ github.event.inputs.test_suite }}" != "" ]]; then
+            TEST_SUITE="${{ github.event.inputs.test_suite }}"
+          else
+            TEST_SUITE="critical"
+          fi
+          
+          echo "Running test suite: $TEST_SUITE"
+          echo "suite=$TEST_SUITE" >> $GITHUB_OUTPUT
+      
+      - name: Run tests against channel
+        env:
+          TEST_URL: ${{ steps.get-channel.outputs.channel_url }}
+          NODE_OPTIONS: '--max-old-space-size=4096'
+        run: |
+          case "${{ steps.test-suite.outputs.suite }}" in
+            critical)
+              npm run test:critical -- --project=chromium --base-url=$TEST_URL
+              ;;
+            mobile)
+              npm run test:mobile -- --project=chromium --base-url=$TEST_URL
+              ;;
+            accessibility)
+              npm run test:accessibility -- --project=chromium --base-url=$TEST_URL
+              ;;
+            performance)
+              npm run test:performance -- --project=chromium --base-url=$TEST_URL
+              ;;
+            all)
+              npm run test:critical -- --project=chromium --base-url=$TEST_URL
+              npm run test:mobile -- --project=chromium --base-url=$TEST_URL
+              npm run test:accessibility -- --project=chromium --base-url=$TEST_URL
+              ;;
+            *)
+              npm run test:critical -- --project=chromium --base-url=$TEST_URL
+              ;;
+          esac
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-${{ steps.test-suite.outputs.suite }}
+          path: test-results/
+          retention-days: 7
+      
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## 🧪 Lean Channel Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Channel:** \`${{ steps.get-channel.outputs.channel }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** ${{ steps.get-channel.outputs.channel_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Suite:** \`${{ steps.test-suite.outputs.suite }}\`" >> $GITHUB_STEP_SUMMARY
+          
+          if [ $? -eq 0 ]; then
+            echo "**Status:** ✅ Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ❌ Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: Add commit comment with test results
+        if: always() && github.event_name == 'workflow_run'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { conclusion } = process.env.GITHUB_JOB_STATUS === '0' ? 'success' : 'failure';
+            const testSuite = '${{ steps.test-suite.outputs.suite }}';
+            const channelUrl = '${{ steps.get-channel.outputs.channel_url }}';
+            const status = conclusion === 'success' ? '✅ Passed' : '❌ Failed';
+            
+            await github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: '${{ github.event.workflow_run.head_sha }}',
+              body: `## 🧪 Lean Channel Test Results
+              
+              **Channel:** \`${{ steps.get-channel.outputs.channel }}\`
+              **URL:** ${channelUrl}
+              **Test Suite:** \`${testSuite}\`
+              **Status:** ${status}
+              
+              [View detailed results](${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+            });

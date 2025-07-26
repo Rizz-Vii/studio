@@ -1,0 +1,126 @@
+name: 🚀 Development Hyperloop - Instant Lean Deploy
+
+on:
+  push:
+    branches:
+      - feature/*
+      - bugfix/*
+      - hotfix/*
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+    inputs:
+      skipBuild:
+        description: 'Skip build process'
+        type: boolean
+        required: false
+        default: false
+
+env:
+  NODE_VERSION: '20.x'
+  FIREBASE_PROJECT_ID: 'rankpilot-h3jpc'
+  NODE_OPTIONS: '--max-old-space-size=4096'
+
+jobs:
+  instant-deploy:
+    name: 🏎️ Instant Lean Deployment
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Needed to get changed files
+      
+      - name: 🔍 Determine Changed Files
+        id: changed-files
+        run: |
+          git diff --name-only HEAD^ HEAD > changed_files.txt
+          echo "Changed files:"
+          cat changed_files.txt
+          echo "COUNT=$(cat changed_files.txt | wc -l)" >> $GITHUB_OUTPUT
+          echo "HAS_SRC=$(grep -q "src/\|components/\|pages/\|styles/\|lib/\|app/" changed_files.txt && echo "true" || echo "false")" >> $GITHUB_OUTPUT
+      
+      - name: 🟢 Setup Node.js
+        if: steps.changed-files.outputs.HAS_SRC == 'true' && inputs.skipBuild != true
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        if: steps.changed-files.outputs.HAS_SRC == 'true' && inputs.skipBuild != true
+        run: |
+          npm ci --prefer-offline
+          echo "✅ Dependencies installed for lean build"
+      
+      - name: 🚀 Lean Build
+        if: steps.changed-files.outputs.HAS_SRC == 'true' && inputs.skipBuild != true
+        run: |
+          echo "🏗️ Running lean build..."
+          export LEAN_MODE=true
+          export SKIP_TYPE_CHECK=true
+          npm run build -- --no-lint
+          echo "✅ Lean build completed"
+      
+      - name: 🔑 Set up Firebase
+        uses: FirebaseExtended/github-actions/setup-firebase@v1.3.1
+      
+      - name: 🌿 Get Channel ID
+        id: branch-name
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          echo "Branch: $BRANCH_NAME"
+          
+          # Use existing channel for stability
+          CHANNEL_ID="lean-branch-testing"
+          
+          echo "CHANNEL_ID=$CHANNEL_ID" >> $GITHUB_OUTPUT
+          echo "Channel ID: $CHANNEL_ID (Using stable channel)"
+      
+      - name: 🚀 Deploy to Lean Channel
+        id: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RANKPILOT_H3JPC }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          channelId: ${{ steps.branch-name.outputs.CHANNEL_ID }}
+          expires: 1d
+      
+      - name: 📊 Deployment Summary
+        run: |
+          echo "🚀 DEVELOPMENT HYPERLOOP ACTIVE"
+          echo "==============================="
+          echo "📋 Channel ID: ${{ steps.branch-name.outputs.CHANNEL_ID }}"
+          echo "🔗 URL: ${{ steps.deploy.outputs.details_url }}"
+          echo "⏰ Expires: In 24 hours"
+          echo "🌿 Branch: ${GITHUB_REF#refs/heads/}"
+          echo ""
+          echo "✨ Development Hyperloop deployment complete!"
+          
+          # Generate QR code URL for mobile testing
+          QR_URL="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${{ steps.deploy.outputs.details_url }}"
+          echo "📱 Mobile Testing QR Code: $QR_URL"
+          
+          # Save deployment info for the test workflow
+          echo "DEPLOY_URL=${{ steps.deploy.outputs.details_url }}" >> $GITHUB_ENV
+          echo "CHANNEL_ID=${{ steps.branch-name.outputs.CHANNEL_ID }}" >> $GITHUB_ENV
+      
+      - name: 🧪 Trigger Tests
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: hyperloop-test-trigger
+          client-payload: '{"channel_id": "${{ steps.branch-name.outputs.CHANNEL_ID }}", "url": "${{ steps.deploy.outputs.details_url }}", "branch": "${{ github.ref }}"}'
+      
+      - name: 📢 Notify Team (if configured)
+        if: env.SLACK_WEBHOOK
+        continue-on-error: true
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{
+            "text": "🚀 *New Development Hyperloop Deployment*\n• *Channel:* ${{ steps.branch-name.outputs.CHANNEL_ID }}\n• *URL:* ${{ steps.deploy.outputs.details_url }}\n• *Branch:* ${GITHUB_REF#refs/heads/}\n• *Expires:* In 24 hours"
+          }' ${{ env.SLACK_WEBHOOK }}
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}

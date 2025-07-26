@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "rankpilot-h3jpc"
-  }
+  },
+  "targets": {
+    "rankpilot-h3jpc": {
+      "hosting": {
+        "rankpilot": [
+          "rankpilot-h3jpc"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

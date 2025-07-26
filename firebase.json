@@ -16,11 +16,18 @@
       "firebase-debug.*.log",
       "*.local"
     ],
-    "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run build"
+    ]
   },
   "hosting": {
-    "source": ".",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "target": "rankpilot",
+    "public": ".next",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "frameworksBackend": {
       "region": "australia-southeast2",
       "secrets": [

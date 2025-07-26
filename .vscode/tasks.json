@@ -6,6 +6,81 @@
 			"type": "shell",
 			"command": "npm run dev-no-turbopack",
 			"isBackground": true
+		},
+		{
+			"label": "🚀 Development Hyperloop",
+			"type": "shell",
+			"command": "npm run hyperloop:dev",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "🚀 Instant Deploy",
+			"type": "shell",
+			"command": "npm run deploy:instant",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "⚡ Instant Deploy (Skip Build)",
+			"type": "shell",
+			"command": "npm run deploy:instant-skip-build",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true
+			}
+		},
+		{
+			"label": "🔄 Hyperloop (Push & Deploy)",
+			"type": "shell",
+			"command": "npm run hyperloop",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"showReuseMessage": false,
+				"clear": true
+			}
+		},
+		{
+			"label": "📱 Open Lean URL in Browser",
+			"type": "shell",
+			"command": "firebase hosting:channel:open $(firebase hosting:channel:list --project rankpilot-h3jpc --json | grep -o '\"name\":\"lean-[^\"]*' | head -1 | cut -d'\"' -f4)",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "never"
+			}
+		},
+		{
+			"label": "🧪 Test Against Lean Channel",
+			"type": "shell",
+			"command": "npm run test:lean",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
 		}
 	]
 }
