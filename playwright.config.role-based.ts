@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import { getProxyConfig } from "./testing/specs/main/utils/proxy";
 
 export default defineConfig({
-  testDir: "./tests",
+  testDir: "./testing/specs/main",
   timeout: 60000, // Increased timeout for complex flows
   retries: process.env.CI ? 2 : 1,
   reporter: [
@@ -178,8 +178,8 @@ export default defineConfig({
   ],
 
   // Global setup and teardown
-  globalSetup: "./tests/global-setup.ts",
-  globalTeardown: "./tests/global-teardown.ts",
+  globalSetup: "./testing/specs/main/global-setup.ts",
+  globalTeardown: "./testing/specs/main/global-teardown.ts",
 
   // Environment-specific configurations
   ...(process.env.CI && {

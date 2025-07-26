@@ -12,12 +12,12 @@ test.describe("Authentication - Comprehensive Suite", () => {
 
       await page.goto("/login", { waitUntil: "networkidle" });
 
-      // Check form elements exist and are accessible
-      const emailField = page.getByRole("textbox", { name: /email/i });
-      const passwordField = page.getByLabel(/password/i);
-      const submitButton = page
+      // Check form elements exist and are accessible - Use specific selectors to avoid strict mode violations
+      const emailField = page.locator('form').getByRole("textbox", { name: /email/i }).first();
+      const passwordField = page.locator('form').getByLabel(/password/i).first();
+      const submitButton = page.locator('form')
         .getByRole("button", { name: /^login$/i })
-        .or(page.getByRole("button", { name: /^sign in$/i }));
+        .or(page.locator('form').getByRole("button", { name: /^sign in$/i }));
 
       await expect(emailField).toBeVisible();
       await expect(passwordField).toBeVisible();
@@ -35,11 +35,11 @@ test.describe("Authentication - Comprehensive Suite", () => {
 
       await page.goto("/login", { waitUntil: "networkidle" });
 
-      const emailField = page.getByRole("textbox", { name: /email/i });
-      const passwordField = page.getByLabel(/password/i);
-      const submitButton = page
+      const emailField = page.locator('form').getByRole("textbox", { name: /email/i }).first();
+      const passwordField = page.locator('form').getByLabel(/password/i).first();
+      const submitButton = page.locator('form')
         .getByRole("button", { name: /^login$/i })
-        .or(page.getByRole("button", { name: /^sign in$/i }));
+        .or(page.locator('form').getByRole("button", { name: /^sign in$/i }));
 
       // Test empty form submission
       await submitButton.click();
@@ -100,10 +100,10 @@ test.describe("Authentication - Comprehensive Suite", () => {
 
       await page.goto("/register", { waitUntil: "networkidle" });
 
-      // Check basic form elements
-      const emailField = page.getByRole("textbox", { name: /email/i });
-      const passwordField = page.getByLabel(/password/i).first();
-      const submitButton = page.getByRole("button", {
+      // Check basic form elements - Use specific selectors to avoid strict mode violations
+      const emailField = page.locator('form').getByRole("textbox", { name: /email/i }).first();
+      const passwordField = page.locator('form').getByLabel(/password/i).first();
+      const submitButton = page.locator('form').getByRole("button", {
         name: /register|sign up/i,
       });
 
@@ -159,16 +159,8 @@ test.describe("Authentication - Comprehensive Suite", () => {
         await page.waitForLoadState("networkidle");
         await expect(page).toHaveURL(/register/);
 
-        // Navigate back to login
-        const loginLink = page
-          .getByRole("link", { name: /login|sign in/i })
-          .or(page.locator('a[href*="login"]'))
-          .or(
-            page
-              .locator("text=/already.*account/i")
-              .locator("..")
-              .getByRole("link")
-          );
+        // Navigate back to login - Use more specific selector to avoid Terms & Conditions link
+        const loginLink = page.locator('a[href="/login"]').first();
 
         if ((await loginLink.count()) > 0) {
           await loginLink.click();
@@ -208,9 +200,9 @@ test.describe("Authentication - Comprehensive Suite", () => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto("/login", { waitUntil: "networkidle" });
 
-      const emailField = page.getByRole("textbox", { name: /email/i });
-      const passwordField = page.getByLabel(/password/i);
-      const submitButton = page.getByRole("button", { name: /login|sign in/i });
+      const emailField = page.locator('form').getByRole("textbox", { name: /email/i }).first();
+      const passwordField = page.locator('form').getByLabel(/password/i).first();
+      const submitButton = page.locator('form').getByRole("button", { name: /login|sign in/i });
 
       // Check elements are still accessible on mobile
       await expect(emailField).toBeVisible();
@@ -231,9 +223,9 @@ test.describe("Authentication - Comprehensive Suite", () => {
 
       await page.goto("/login", { waitUntil: "networkidle" });
 
-      // Check for proper labels
-      const emailField = page.getByRole("textbox", { name: /email/i });
-      const passwordField = page.getByLabel(/password/i);
+      // Check for proper labels - Use specific selectors to avoid strict mode violations
+      const emailField = page.locator('form').getByRole("textbox", { name: /email/i }).first();
+      const passwordField = page.locator('form').getByLabel(/password/i).first();
 
       await expect(emailField).toBeVisible();
       await expect(passwordField).toBeVisible();
