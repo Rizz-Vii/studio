@@ -1,0 +1,75 @@
+```mermaid
+graph TD
+    A[🔄 Push to feature/performance-*] --> B[🎯 7-Stage Enterprise Pipeline]
+    
+    B --> C[📈 Stage 1: Performance Feature Validation<br/>⏱️ 5-7 minutes]
+    C --> D[📊 Stage 2: Core Web Vitals Testing<br/>⏱️ 8-12 minutes]
+    C --> E[📱 Stage 3: Mobile Optimization<br/>⏱️ 3-5 minutes]
+    D --> F[🧪 Stage 4: Enhanced Testing Suite<br/>⏱️ 10-15 minutes]
+    E --> F
+    C --> G[🔒 Stage 5: Security & Performance Audit<br/>⏱️ 3-5 minutes]
+    F --> H[✅ Stage 6: Merge Readiness Check<br/>⏱️ 2-3 minutes]
+    G --> H
+    H --> I[🔄 Stage 7: Auto-Merge & Deploy<br/>⏱️ 3-5 minutes]
+    
+    %% Stage 1 Details
+    C --> C1[📦 Bundle Analysis<br/>ANALYZE=true]
+    C --> C2[🔍 TypeScript & ESLint<br/>Code quality validation]
+    C --> C3[🧠 Memory Allocation<br/>6144MB for AI components]
+    
+    %% Stage 2 Details  
+    D --> D1[🌐 Lighthouse CI<br/>90% threshold enforcement]
+    D --> D2[📱 Mobile Performance<br/>Device emulation testing]
+    D --> D3[❌ Auto-fail if < 90%<br/>Quality gate protection]
+    
+    %% Stage 3 Details
+    E --> E1[🎯 48px Touch Targets<br/>WCAG compliance]
+    E --> E2[♿ WCAG 2.1 AA<br/>Accessibility validation]
+    E --> E3[📐 Responsive Design<br/>Viewport testing]
+    
+    %% Stage 4 Details
+    F --> F1[🔥 Critical Path Tests<br/>Essential functionality]
+    F --> F2[🧠 High-Memory Tests<br/>AI component validation]
+    F --> F3[🚀 Warmed Cache Tests<br/>Production simulation]
+    
+    %% Stage 5 Details
+    G --> G1[🛡️ Performance Security<br/>Configuration audit]
+    G --> G2[🔐 Environment Validation<br/>Secrets verification]
+    G --> G3[🔍 Security Config Check<br/>Best practices enforcement]
+    
+    %% Stage 6 Details
+    H --> H1[🏗️ Final Build Validation<br/>Production readiness]
+    H --> H2[📊 Performance Metrics<br/>Comprehensive report]
+    H --> H3[✅ Quality Gate Summary<br/>Pass/fail determination]
+    
+    %% Stage 7 Details
+    I --> I1[🌐 Preview Channel Deploy<br/>Live testing environment]
+    I --> I2[🔄 Auto-Merge Trigger<br/>preDeploy promotion]
+    I --> I3[🎯 Production Pipeline<br/>Final deployment stage]
+    
+    %% Failure Points
+    D3 -.->|Performance < 90%| FAIL1[❌ Performance Failure]
+    E2 -.->|WCAG Non-Compliance| FAIL2[❌ Accessibility Failure]
+    F3 -.->|Test Failures| FAIL3[❌ Test Suite Failure]
+    G3 -.->|Security Issues| FAIL4[❌ Security Failure]
+    H3 -.->|Quality Gate Fail| FAIL5[❌ Readiness Failure]
+    
+    %% Success Path
+    I3 --> SUCCESS[🎉 Stage 2: preDeploy Pipeline<br/>🔗 Live: https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app/]
+    
+    %% Parallel Execution Indicators
+    D -.->|Parallel| E
+    E -.->|Parallel| G
+    
+    %% Styling
+    classDef stage fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000
+    classDef detail fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px,color:#000
+    classDef success fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef failure fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
+    classDef timing fill:#fff3e0,stroke:#f57c00,stroke-width:1px,color:#000
+    
+    class B,C,D,E,F,G,H,I stage
+    class C1,C2,C3,D1,D2,D3,E1,E2,E3,F1,F2,F3,G1,G2,G3,H1,H2,H3,I1,I2,I3 detail
+    class SUCCESS success
+    class FAIL1,FAIL2,FAIL3,FAIL4,FAIL5 failure
+```

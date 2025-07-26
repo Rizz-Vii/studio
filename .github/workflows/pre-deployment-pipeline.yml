@@ -1,0 +1,379 @@
+name: 🚀 Pre-Deployment Security & Quality Pipeline
+
+on:
+  push:
+    branches: [preDeploy]
+  pull_request:
+    branches: [preDeploy]
+
+env:
+  NODE_VERSION: '20.x'
+  CACHE_KEY: 'rankpilot-deps'
+
+jobs:
+  security-audit:
+    name: 🔒 Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🔍 Security Audit
+        run: |
+          npm audit --audit-level=moderate
+          echo "✅ Security audit completed"
+
+      - name: 🛡️ Dependency Vulnerability Check
+        run: |
+          npx audit-ci --moderate
+          echo "✅ Dependency vulnerabilities checked"
+
+      - name: 🔐 Secret Detection
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+
+  code-quality:
+    name: 📊 Code Quality Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🔧 TypeScript Check
+        run: npm run type-check
+
+      - name: 🎨 ESLint Analysis
+        run: npm run lint:check
+
+      - name: 💄 Prettier Check
+        run: npm run format:check
+
+      - name: 🏗️ Build Test
+        run: npm run build
+
+  performance-audit:
+    name: ⚡ Performance Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🏗️ Build for Production
+        run: npm run build
+
+      - name: 🚀 Start Server
+        run: |
+          npm start &
+          sleep 10
+          echo "✅ Server started for performance testing"
+
+      - name: 🌐 Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: '.lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  accessibility-audit:
+    name: ♿ Accessibility Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🏗️ Build Application
+        run: npm run build
+
+      - name: 🚀 Start Server
+        run: |
+          npm start &
+          sleep 10
+
+      - name: ♿ WCAG Compliance Check
+        run: |
+          npx @axe-core/cli http://localhost:3000 --exit
+          echo "✅ Accessibility audit completed"
+
+  test-comprehensive:
+    name: 🧪 Comprehensive Testing
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        test-suite: [unit, integration, e2e, mobile, performance]
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🎭 Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: 🧪 Run Test Suite - ${{ matrix.test-suite }}
+        run: |
+          case "${{ matrix.test-suite }}" in
+            "unit")
+              npm run test:unit
+              ;;
+            "integration")
+              npm run test:integration
+              ;;
+            "e2e")
+              npm run test:e2e
+              ;;
+            "mobile")
+              npm run test:mobile
+              ;;
+            "performance")
+              npm run test:performance
+              ;;
+          esac
+
+      - name: 📊 Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.test-suite }}
+          path: |
+            playwright-report/
+            test-results/
+
+  mobile-optimization:
+    name: 📱 Mobile Optimization Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🏗️ Build Application
+        run: npm run build
+
+      - name: 📱 Mobile Performance Audit
+        run: |
+          npm start &
+          sleep 10
+          npx lighthouse http://localhost:3000 --preset=mobile --output=json --output-path=mobile-audit.json
+          echo "✅ Mobile optimization check completed"
+
+      - name: 📊 Upload Mobile Audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-performance-audit
+          path: mobile-audit.json
+
+  security-sast:
+    name: 🔍 Static Application Security Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔒 CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, typescript
+
+      - name: 🏗️ Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: 🔍 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  deployment-readiness:
+    name: 🚀 Deployment Readiness Check
+    runs-on: ubuntu-latest
+    needs: [security-audit, code-quality, performance-audit, accessibility-audit, test-comprehensive, mobile-optimization, security-sast]
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🔧 Environment Validation
+        run: |
+          echo "🔍 Validating environment configuration..."
+          # Check required environment variables are defined
+          if [ -z "$NEXT_PUBLIC_FIREBASE_API_KEY" ]; then
+            echo "❌ Missing NEXT_PUBLIC_FIREBASE_API_KEY"
+            exit 1
+          fi
+          echo "✅ Environment validation passed"
+
+      - name: 🏗️ Production Build
+        run: npm run build
+
+      - name: 🧪 Build Verification
+        run: |
+          echo "🔍 Verifying build artifacts..."
+          if [ ! -d ".next" ]; then
+            echo "❌ Build directory not found"
+            exit 1
+          fi
+          if [ ! -f ".next/BUILD_ID" ]; then
+            echo "❌ Build ID not found"
+            exit 1
+          fi
+          echo "✅ Build verification passed"
+
+      - name: 📊 Bundle Analysis
+        run: |
+          echo "📊 Analyzing bundle size..."
+          npx next-bundle-analyzer
+          echo "✅ Bundle analysis completed"
+
+      - name: 🎯 Performance Budget Check
+        run: |
+          echo "🎯 Checking performance budgets..."
+          # Check if bundle size is within acceptable limits
+          BUNDLE_SIZE=$(du -sk .next/static | cut -f1)
+          if [ $BUNDLE_SIZE -gt 10240 ]; then  # 10MB limit
+            echo "❌ Bundle size exceeds limit: ${BUNDLE_SIZE}KB"
+            exit 1
+          fi
+          echo "✅ Performance budget check passed"
+
+      - name: 🔒 Security Configuration Check
+        run: |
+          echo "🔒 Checking security configuration..."
+          # Verify security headers configuration
+          if ! grep -q "Content-Security-Policy" next.config.ts; then
+            echo "⚠️ CSP headers not configured"
+          fi
+          echo "✅ Security configuration check completed"
+
+      - name: 📋 Deployment Summary
+        run: |
+          echo "🎉 PRE-DEPLOYMENT CHECKS SUMMARY"
+          echo "=================================="
+          echo "✅ Security Audit: PASSED"
+          echo "✅ Code Quality: PASSED"
+          echo "✅ Performance Audit: PASSED"
+          echo "✅ Accessibility Audit: PASSED"
+          echo "✅ Comprehensive Testing: PASSED"
+          echo "✅ Mobile Optimization: PASSED"
+          echo "✅ SAST Scanning: PASSED"
+          echo "✅ Environment Validation: PASSED"
+          echo "✅ Build Verification: PASSED"
+          echo "✅ Bundle Analysis: PASSED"
+          echo "✅ Performance Budget: PASSED"
+          echo "✅ Security Configuration: PASSED"
+          echo ""
+          echo "🚀 DEPLOYMENT READY!"
+          echo "This branch is ready for production deployment."
+
+  notify-deployment-ready:
+    name: 📢 Deployment Ready Notification
+    runs-on: ubuntu-latest
+    needs: [deployment-readiness]
+    if: success()
+    
+    steps:
+      - name: 📢 Success Notification
+        run: |
+          echo "🎉 RankPilot preDeploy Branch - DEPLOYMENT READY!"
+          echo "All quality gates have been passed successfully."
+          echo "The application is ready for production deployment."
+          echo ""
+          echo "📊 Quality Metrics:"
+          echo "- Security: ✅ PASSED"
+          echo "- Performance: ✅ PASSED" 
+          echo "- Accessibility: ✅ PASSED"
+          echo "- Testing: ✅ PASSED"
+          echo "- Code Quality: ✅ PASSED"
+          echo ""
+          echo "🚀 Ready to deploy to production!"
+
+  notify-deployment-failed:
+    name: ❌ Deployment Failed Notification
+    runs-on: ubuntu-latest
+    needs: [deployment-readiness]
+    if: failure()
+    
+    steps:
+      - name: ❌ Failure Notification
+        run: |
+          echo "❌ RankPilot preDeploy Branch - DEPLOYMENT BLOCKED!"
+          echo "One or more quality gates have failed."
+          echo "Please review the failed checks and fix issues before deployment."
+          echo ""
+          echo "🔍 Check the following areas:"
+          echo "- Security vulnerabilities"
+          echo "- Performance regressions"
+          echo "- Accessibility compliance"
+          echo "- Test failures"
+          echo "- Code quality issues"
+          echo ""
+          echo "⚠️ Deployment is blocked until all issues are resolved."

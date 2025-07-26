@@ -1,53 +1,104 @@
-# Performance Branch Testing Workflow
+# 🚀 RankPilot GitHub Actions Workflows
 
-This GitHub Actions workflow provides automated testing and deployment for the `feature/performance-optimization-mobile-enhancement` branch.
+## 📋 **Active Workflow Overview**
 
-## 🚀 **Automatic Triggers**
+### **🎯 Feature/Performance Development Pipeline**
+**File:** `feature-performance-ci-cd.yml`
+**Purpose:** Comprehensive CI/CD for performance optimization features
 
-The workflow runs automatically when:
+**Triggers:**
+- Push to `feature/performance-optimization-mobile-enhancement`
+- Push to any `feature/performance-*` branches
+- Pull requests to `master` or `preDeploy`
 
-- You push commits to the `feature/performance-optimization-mobile-enhancement` branch
-- You can also trigger it manually via GitHub Actions UI
+**Execution:** 7-stage validation with Core Web Vitals testing
 
-## 🎯 **What It Does**
+---
 
-### 1. **Test Build**
+### **🔄 Performance Auto-Deployment**
+**File:** `performance-auto-deploy.yml`
+**Purpose:** Automatic deployment to preDeploy after successful validation
 
-- Runs TypeScript type checking
-- Executes ESLint for code quality
-- Builds the Next.js application
-- Analyzes bundle size for performance insights
+**Triggers:**
+- Successful completion of Feature/Performance CI/CD Pipeline
 
-### 2. **Deploy Preview**
+**Execution:** Fast-forward merge with deployment tagging
 
-- Creates a dedicated Firebase Hosting channel: `performance-testing`
-- Deploys your branch to a unique URL (expires in 7 days)
-- Optionally deploys Firebase Functions (manual trigger only)
+---
 
-### 3. **Performance Tests**
+### **🛡️ Pre-Deployment Security & Quality Pipeline**
+**File:** `pre-deployment-pipeline.yml`
+**Purpose:** Enterprise-grade quality validation before production
 
-- Runs Playwright tests focused on performance metrics
-- Tests mobile responsiveness and UX
-- Generates test reports and screenshots
+**Triggers:**
+- Push to `preDeploy` branch
+- Pull requests to `preDeploy`
 
-### 4. **Results Summary**
+**Execution:** 8-stage comprehensive validation (security, performance, accessibility)
 
-- Creates a comprehensive deployment summary
-- Shows test results and deployment status
-- Provides links to preview URLs and test artifacts
+---
 
-## 📱 **Preview URLs**
+### **🏭 Production Deployment**
+**File:** `production-deploy.yml`
+**Purpose:** Production deployment to rankpilot-h3jpc.web.app
 
-Your deployed branch will be available at:
+**Triggers:**
+- Push to `master` branch
+- Manual workflow dispatch
+
+**Execution:** Firebase deployment with health checks
+
+## 🔄 **Complete Development Flow**
 
 ```
-https://rankpilot-h3jpc--performance-testing-[UNIQUE-ID].web.app
+1. Feature Development (feature/performance-*)
+   ↓ (30-47 minutes)
+2. Auto-Deploy to preDeploy
+   ↓ (5-6 minutes)  
+3. Pre-Deployment Validation
+   ↓ (48-70 minutes)
+4. Production Deployment
+   ↓ (18-30 minutes)
 ```
 
-## 🧪 **Running Performance Tests Locally**
+**Total Time:** ~1.7-2.5 hours from feature to production
 
+## 📊 **Quality Standards**
+
+- **Performance:** 90% Lighthouse score minimum
+- **Accessibility:** WCAG 2.1 AA compliance
+- **Security:** Zero critical vulnerabilities
+- **Core Web Vitals:** LCP ≤2.5s, CLS ≤0.1
+- **Mobile:** 48px touch targets, responsive design
+
+## 🚀 **Getting Started**
+
+### **Performance Feature Development:**
 ```bash
-# Run performance-focused tests
+# Work on performance branch
+git checkout feature/performance-optimization-mobile-enhancement
+git push origin feature/performance-optimization-mobile-enhancement
+# → Triggers comprehensive CI/CD validation
+```
+
+### **Manual Production Deployment:**
+```bash
+# Trigger via GitHub Actions UI
+# or push to master after preDeploy validation
+git checkout master
+git merge preDeploy
+git push origin master
+```
+
+## 📈 **Monitoring & Reports**
+
+All workflows generate comprehensive reports including:
+- Performance metrics and Core Web Vitals
+- Security audit results
+- Test coverage and accessibility compliance
+- Deployment status and health checks
+
+View reports in GitHub Actions → Workflow runs → Artifacts
 npm run test:performance
 
 # Run mobile-specific tests

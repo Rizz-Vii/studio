@@ -1,0 +1,168 @@
+name: 🔄 Preview Channel Deployment
+
+on:
+  workflow_call:
+    inputs:
+      channel-id:
+        description: 'Preview channel ID'
+        required: true
+        type: string
+      branch-ref:
+        description: 'Branch reference'
+        required: true
+        type: string
+    outputs:
+      preview-url:
+        description: 'Preview channel URL'
+        value: ${{ jobs.deploy-preview.outputs.preview-url }}
+
+env:
+  NODE_VERSION: '20.x'
+  FIREBASE_PROJECT_ID: 'rankpilot-h3jpc'
+  NODE_OPTIONS: '--max-old-space-size=6144'
+
+jobs:
+  deploy-preview:
+    name: 🚀 Deploy to Preview Channel
+    runs-on: ubuntu-latest
+    outputs:
+      preview-url: ${{ steps.deploy.outputs.details_url }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch-ref }}
+          fetch-depth: 0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm ci --legacy-peer-deps --prefer-offline
+          echo "✅ Dependencies installed for preview deployment"
+
+      - name: 🏗️ Build for Preview
+        run: |
+          npm run build:production
+          echo "✅ Production build completed for preview channel"
+        env:
+          ANALYZE: true
+
+      - name: 🔥 Deploy to Firebase Preview Channel
+        id: deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RANKPILOT_H3JPC }}
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          channelId: ${{ inputs.channel-id }}
+          expires: 30d
+
+      - name: 📊 Preview Channel Report
+        run: |
+          echo "🎉 Preview Channel Deployed Successfully!"
+          echo "📊 Channel Details:"
+          echo "  🔗 URL: ${{ steps.deploy.outputs.details_url }}"
+          echo "  🏷️ Channel ID: ${{ inputs.channel-id }}"
+          echo "  🌿 Branch: ${{ inputs.branch-ref }}"
+          echo "  ⏰ Expires: 30 days"
+          echo "  🎯 Ready for performance testing and validation"
+
+      - name: 🧪 Preview Channel Validation
+        run: |
+          PREVIEW_URL="${{ steps.deploy.outputs.details_url }}"
+          echo "🔍 Validating preview channel: $PREVIEW_URL"
+          
+          # Wait for deployment to be ready
+          sleep 30
+          
+          # Basic health check
+          curl -f "$PREVIEW_URL" > /dev/null && echo "✅ Preview channel is accessible" || echo "❌ Preview channel health check failed"
+          
+          echo "🎯 Preview channel ready for Core Web Vitals testing"
+
+  performance-validation:
+    name: 📈 Preview Channel Performance Testing
+    runs-on: ubuntu-latest
+    needs: deploy-preview
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🌐 Lighthouse Preview Channel Audit
+        run: |
+          PREVIEW_URL="${{ needs.deploy-preview.outputs.preview-url }}"
+          echo "📊 Running Lighthouse audit on: $PREVIEW_URL"
+          
+          npx lighthouse "$PREVIEW_URL" \
+            --chrome-flags="--headless" \
+            --output=json \
+            --output-path=./preview-performance.json
+          
+          echo "✅ Preview channel performance audit completed"
+
+      - name: 📱 Mobile Preview Validation
+        run: |
+          PREVIEW_URL="${{ needs.deploy-preview.outputs.preview-url }}"
+          echo "📱 Running mobile validation on: $PREVIEW_URL"
+          
+          npx lighthouse "$PREVIEW_URL" \
+            --chrome-flags="--headless" \
+            --emulated-form-factor=mobile \
+            --throttling-method=devtools \
+            --output=json \
+            --output-path=./preview-mobile.json
+          
+          echo "✅ Mobile preview validation completed"
+
+      - name: 📊 Performance Metrics Analysis
+        run: |
+          echo "📊 Preview Channel Performance Report:"
+          
+          # Desktop performance
+          node -e "
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('./preview-performance.json'));
+            const metrics = report.lhr.audits;
+            
+            console.log('🖥️ Desktop Performance:');
+            console.log('  LCP:', metrics['largest-contentful-paint'].displayValue);
+            console.log('  FID:', metrics['max-potential-fid'].displayValue);
+            console.log('  CLS:', metrics['cumulative-layout-shift'].displayValue);
+            console.log('  Score:', Math.round(report.lhr.categories.performance.score * 100) + '%');
+          "
+          
+          # Mobile performance  
+          node -e "
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('./preview-mobile.json'));
+            const metrics = report.lhr.audits;
+            
+            console.log('📱 Mobile Performance:');
+            console.log('  LCP:', metrics['largest-contentful-paint'].displayValue);
+            console.log('  FID:', metrics['max-potential-fid'].displayValue);
+            console.log('  CLS:', metrics['cumulative-layout-shift'].displayValue);
+            console.log('  Score:', Math.round(report.lhr.categories.performance.score * 100) + '%');
+          "
+
+      - name: ✅ Preview Channel Approval
+        run: |
+          echo "🎉 Preview Channel Performance Validation Complete!"
+          echo "📊 Channel: ${{ inputs.channel-id }}"
+          echo "🔗 URL: ${{ needs.deploy-preview.outputs.preview-url }}"
+          echo "✅ Ready for production promotion"

@@ -1,0 +1,106 @@
+```mermaid
+flowchart TD
+    START([🔄 Push to feature/performance-*]) --> TRIGGER{🎯 CI/CD Pipeline Triggered}
+    
+    %% Stage 1: Performance Feature Validation
+    TRIGGER --> S1[📈 Stage 1: Performance Feature Validation<br/>⏱️ 5-7 minutes<br/>🧠 Memory: 6144MB]
+    
+    S1 --> S1A[📦 Install Dependencies<br/>--legacy-peer-deps --prefer-offline]
+    S1A --> S1B[🔍 Performance Linting<br/>ESLint + TypeScript validation]
+    S1B --> S1C[🏗️ Build with Monitoring<br/>ANALYZE=true bundle analysis]
+    S1C --> S1D[📊 Bundle Size Analysis<br/>Webpack bundle analyzer]
+    
+    %% Parallel Execution Block
+    S1D --> PARALLEL{🔄 Parallel Execution}
+    
+    %% Stage 2: Core Web Vitals Testing
+    PARALLEL --> S2[📊 Stage 2: Core Web Vitals Testing<br/>⏱️ 8-12 minutes<br/>🎯 90% Threshold]
+    S2 --> S2A[🏗️ Production Build<br/>Performance optimized]
+    S2A --> S2B[🚀 Start Dev Server<br/>localhost:3000 + 15s warmup]
+    S2B --> S2C[🌐 Lighthouse CI Audit<br/>90% threshold enforcement]
+    S2C --> S2D[📱 Mobile Performance Testing<br/>Device emulation]
+    S2D --> S2E[📊 Metrics Analysis<br/>LCP/FID/CLS validation]
+    S2E --> S2F{❌ Score < 90%?}
+    S2F -->|Yes| FAIL2[❌ Performance Failure<br/>Pipeline Terminated]
+    S2F -->|No| S2_PASS[✅ Core Web Vitals Pass]
+    
+    %% Stage 3: Mobile Optimization Testing
+    PARALLEL --> S3[📱 Stage 3: Mobile Optimization<br/>⏱️ 3-5 minutes<br/>🎯 WCAG 2.1 AA]
+    S3 --> S3A[🏗️ Mobile Build<br/>Responsive compilation]
+    S3A --> S3B[📱 Mobile-Specific Tests<br/>Touch interaction validation]
+    S3B --> S3C[🎯 Touch Target Check<br/>48px minimum validation]
+    S3C --> S3D[♿ Accessibility Tests<br/>WCAG 2.1 AA compliance]
+    S3D --> S3E{🚫 WCAG Fail?}
+    S3E -->|Yes| FAIL3[❌ Accessibility Failure<br/>Pipeline Terminated]
+    S3E -->|No| S3_PASS[✅ Mobile Optimization Pass]
+    
+    %% Stage 5: Security & Performance Audit (Parallel)
+    PARALLEL --> S5[🔒 Stage 5: Security Audit<br/>⏱️ 3-5 minutes<br/>🛡️ Performance Security]
+    S5 --> S5A[🔍 npm Security Audit<br/>Moderate+ vulnerabilities]
+    S5A --> S5B[🛡️ Performance Security Check<br/>Configuration validation]
+    S5B --> S5C[🔐 Environment Validation<br/>Secrets and configs]
+    S5C --> S5D{🚨 Security Issues?}
+    S5D -->|Yes| FAIL5[❌ Security Failure<br/>Pipeline Terminated]
+    S5D -->|No| S5_PASS[✅ Security Audit Pass]
+    
+    %% Stage 4: Enhanced Testing Suite
+    S2_PASS --> S4[🧪 Stage 4: Enhanced Testing<br/>⏱️ 10-15 minutes<br/>🔄 Matrix Strategy]
+    S3_PASS --> S4
+    
+    S4 --> S4A[🔥 Critical Path Tests<br/>Essential functionality]
+    S4 --> S4B[🧠 High-Memory Tests<br/>6144MB AI components]
+    S4 --> S4C[🚀 Warmed Cache Tests<br/>Production simulation]
+    
+    S4A --> S4_SYNC[⚡ Matrix Sync Point]
+    S4B --> S4_SYNC
+    S4C --> S4_SYNC
+    
+    S4_SYNC --> S4D{🧪 Any Test Failures?}
+    S4D -->|Yes| FAIL4[❌ Test Suite Failure<br/>Pipeline Terminated]
+    S4D -->|No| S4_PASS[✅ Enhanced Testing Pass]
+    
+    %% Stage 6: Merge Readiness Check
+    S4_PASS --> S6[✅ Stage 6: Merge Readiness<br/>⏱️ 2-3 minutes<br/>🎯 Quality Gates]
+    S5_PASS --> S6
+    
+    S6 --> S6A[🏗️ Final Build Validation<br/>Production build test]
+    S6A --> S6B[📊 Performance Metrics Report<br/>Comprehensive summary]
+    S6B --> S6C[✅ Quality Gate Summary<br/>All stages validation]
+    S6C --> S6D{🚫 Quality Gate Fail?}
+    S6D -->|Yes| FAIL6[❌ Readiness Failure<br/>Pipeline Terminated]
+    S6D -->|No| S6_PASS[✅ Merge Readiness Pass]
+    
+    %% Stage 7: Auto-Merge & Deploy
+    S6_PASS --> S7[🔄 Stage 7: Auto-Deploy<br/>⏱️ 3-5 minutes<br/>🌐 Live Channel]
+    
+    S7 --> S7A[🌐 Preview Channel Deploy<br/>performance-testing channel]
+    S7A --> S7B[📊 Live Channel Testing<br/>Real Firebase validation]
+    S7B --> S7C[🔄 Auto-Merge to preDeploy<br/>Fast-forward merge]
+    S7C --> S7D[📢 Success Notification<br/>Pipeline completion]
+    
+    S7D --> SUCCESS[🎉 Pipeline Success!<br/>🔗 Live: rankpilot-h3jpc--performance-testing-mw0cwov5.web.app<br/>➡️ Triggers Stage 2: preDeploy Pipeline]
+    
+    %% Failure Collection
+    FAIL2 --> STOP[🛑 Pipeline Stopped<br/>Review & Fix Required]
+    FAIL3 --> STOP
+    FAIL4 --> STOP
+    FAIL5 --> STOP
+    FAIL6 --> STOP
+    
+    %% Styling
+    classDef stage fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef parallel fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef task fill:#fff8e1,stroke:#f57c00,stroke-width:1px,color:#000
+    classDef decision fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#000
+    classDef success fill:#e8f5e8,stroke:#388e3c,stroke-width:3px,color:#000
+    classDef failure fill:#ffebee,stroke:#d32f2f,stroke-width:3px,color:#000
+    classDef stop fill:#fce4ec,stroke:#ad1457,stroke-width:2px,color:#000
+    
+    class S1,S2,S3,S4,S5,S6,S7 stage
+    class PARALLEL parallel
+    class S1A,S1B,S1C,S1D,S2A,S2B,S2C,S2D,S2E,S3A,S3B,S3C,S3D,S4A,S4B,S4C,S5A,S5B,S5C,S6A,S6B,S6C,S7A,S7B,S7C,S7D,S2_PASS,S3_PASS,S4_PASS,S5_PASS,S6_PASS,S4_SYNC task
+    class S2F,S3E,S4D,S5D,S6D,TRIGGER decision
+    class SUCCESS success
+    class FAIL2,FAIL3,FAIL4,FAIL5,FAIL6 failure
+    class STOP stop
+```
