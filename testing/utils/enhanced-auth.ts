@@ -17,32 +17,32 @@ export interface TestUser {
 
 export const TEST_USERS: Record<UserTier, TestUser> = {
   free: {
-    email: "free.user1@test.com",
+    email: "abbas_ali_rizvi@hotmail.com",
     password: "123456",
     tier: "free",
-    displayName: "Free User"
+    displayName: "Abbas Ali (Free)"
   },
   starter: {
-    email: "starter.user1@test.com", 
-    password: "123456",
+    email: "starter@rankpilot.com", 
+    password: "starter123",
     tier: "starter",
     displayName: "Starter User"
   },
   agency: {
-    email: "agency.user1@test.com",
-    password: "123456", 
+    email: "enterprise@rankpilot.com",
+    password: "enterprise123", 
     tier: "agency",
-    displayName: "Agency User"
+    displayName: "Agency User (Enterprise)"
   },
   enterprise: {
-    email: "enterprise.user1@test.com",
-    password: "123456",
+    email: "enterprise@rankpilot.com",
+    password: "enterprise123",
     tier: "enterprise", 
     displayName: "Enterprise User"
   },
   admin: {
-    email: "admin.enterprise@test.com",
-    password: "123456",
+    email: "admin@rankpilot.com",
+    password: "admin123",
     tier: "admin",
     displayName: "Admin User"
   }
