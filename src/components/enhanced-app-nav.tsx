@@ -299,7 +299,7 @@ export function EnhancedAppNav({
               </Button>
             </CollapsibleTrigger>
 
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
               {!collapsed && (
                 <CollapsibleContent
                   className="space-y-2"
@@ -397,7 +397,7 @@ export function EnhancedAppNav({
       role="navigation"
       aria-label="Main navigation"
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence initial={false}>
         {visibleGroups.map((group, index) => renderNavGroup(group, index))}
       </AnimatePresence>
     </nav>

@@ -5,6 +5,9 @@ export default defineConfig({
   testDir: "./testing/specs/main",
   timeout: 60000, // Increased timeout for complex flows
   retries: process.env.CI ? 2 : 1,
+  // Global worker limit to prevent server crashes
+  workers: 1, // Force single worker for server stability
+  fullyParallel: false, // Ensure sequential execution
   reporter: [
     ["html"],
     ["junit", { outputFile: "test-results/junit.xml" }],
@@ -168,12 +171,23 @@ export default defineConfig({
     // LEGACY TESTS (Gradual migration)
     {
       name: "legacy-tests",
-      testMatch: ["**/performance.spec.ts", "**/auth/*.spec.ts"],
+      testMatch: [
+        "**/performance.spec.ts",
+        "**/auth/*.spec.ts",
+        "**/auth-consolidated.spec.ts",
+        "**/mobile-nav-consolidated.spec.ts",
+        "**/features/**/*.spec.ts",
+        "**/public-pages-e2e.spec.ts"
+      ],
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1280, height: 720 },
         proxy: getProxyConfig(),
       },
+      // Sequential execution to prevent server crashes
+      fullyParallel: false,
+      // Single worker to ensure server stability
+      workers: 1,
     },
   ],
 
@@ -183,8 +197,8 @@ export default defineConfig({
 
   // Environment-specific configurations
   ...(process.env.CI && {
-    // CI-specific settings
-    workers: 2, // Limit workers in CI
+    // CI-specific settings - FORCE SINGLE WORKER FOR STABILITY
+    workers: 1, // Fixed: was 2, causing server crashes
     retries: 3,
     use: {
       trace: "on-first-retry",
@@ -193,10 +207,10 @@ export default defineConfig({
   }),
 
   ...(process.env.NODE_ENV === "development" && {
-    // Development-specific settings
-    workers: 2,
+    // Development-specific settings - FORCE SINGLE WORKER FOR STABILITY
+    workers: 1, // Fixed: was 2, causing server crashes
     webServer: {
-      command: "npm run dev",
+      command: "npm run dev-no-turbopack", // Use stable dev server
       port: 3000,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,

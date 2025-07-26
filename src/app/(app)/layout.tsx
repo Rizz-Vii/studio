@@ -27,7 +27,6 @@ import { LogOut, User, Crown, Zap, Settings } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import { DevUserSwitcher } from "@/components/dev/DevUserSwitcher";
-import { TierDebugInfo } from "@/components/debug/TierDebugInfo";
 import { AppMobileSidebar } from "@/components/unified-mobile-sidebar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -179,7 +178,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <GlobalLoadingIndicator />
         <TopLoader />
         <DevUserSwitcher />
-        <TierDebugInfo />
       </SidebarProvider>
     </HydrationProvider>
   );

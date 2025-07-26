@@ -21,10 +21,6 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
-    function getUserRole(uid) {
-      return get(/databases/$(database)/documents/users/$(uid)).data.role;
-    }
-
     // By default, deny all reads and writes
     match /{document=**} {
       allow read, write: if false;

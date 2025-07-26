@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useSubscription } from "@/hooks/useSubscription";
 import LoadingScreen from "@/components/ui/loading-screen";
@@ -92,6 +93,7 @@ const PERMISSIONS = {
 export default function TeamManagementPage() {
   const { user, loading: authLoading } = useAuth();
   const { subscription, canUseFeature } = useSubscription();
+  const router = useRouter();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
@@ -359,7 +361,7 @@ export default function TeamManagementPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card
             className="hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => (window.location.href = "/team/chat")}
+            onClick={() => router.push("/team/chat")}
           >
             <CardContent className="flex items-center gap-4 p-6">
               <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900">
@@ -376,7 +378,7 @@ export default function TeamManagementPage() {
 
           <Card
             className="hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => (window.location.href = "/team/projects")}
+            onClick={() => router.push("/team/projects")}
           >
             <CardContent className="flex items-center gap-4 p-6">
               <div className="rounded-full bg-green-100 p-3 dark:bg-green-900">
@@ -393,7 +395,7 @@ export default function TeamManagementPage() {
 
           <Card
             className="hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => (window.location.href = "/team/reports")}
+            onClick={() => router.push("/team/reports")}
           >
             <CardContent className="flex items-center gap-4 p-6">
               <div className="rounded-full bg-purple-100 p-3 dark:bg-purple-900">
