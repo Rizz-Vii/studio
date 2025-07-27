@@ -40,13 +40,20 @@ export const healthCheck = onCall(httpsOptions, async (request) => {
 });
 
 // Export AI-powered functions
-// Temporarily disabled for deployment testing
-// export * from "./api/keyword-suggestions";
-// export * from "./api/audit";
-// export * from "./api/analyze-content";
+export * from "./api/production-keyword-suggestions";
+
+// Export performance monitoring functions
+export {
+  performanceDashboard,
+  realtimeMetrics,
+  functionMetrics,
+  abTestManagement,
+  healthCheck as performanceHealthCheck
+} from "./api/performance-dashboard-functions";
 
 // Export Stripe payment functions
 export * from "./stripe-webhook";
 
-// Export email functions
-export * from "./email";
+// Export email functions (selective export to avoid deployment conflicts)
+export { sendPaymentReceipt, sendWelcomeEmailFunction } from "./email";
+// Note: sendBillingReminder temporarily disabled due to deployment type conflict
