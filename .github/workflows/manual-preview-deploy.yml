@@ -1,4 +1,4 @@
-name: 🔄 Preview Channel Deployment
+name: 🎯 Manual Stage - On-Demand Preview Deployment
 
 on:
   workflow_call:

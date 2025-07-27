@@ -1,8 +1,8 @@
-name: 🧪 Development Hyperloop - Lean Channel Tests
+name: 🧪 Preview Stage - Validation & Testing
 
 on:
   workflow_run:
-    workflows: ["🚀 Development Hyperloop - Instant Lean Deploy"]
+    workflows: ["🏗️ Workshop Stage - Instant Preview Deploy"]
     types:
       - completed
   repository_dispatch:

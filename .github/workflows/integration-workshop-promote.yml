@@ -1,4 +1,4 @@
-name: 🔄 Workshop Auto-Merge Pipeline
+name: 🔄 Integration Stage - Workshop Promoteame: � Integration Stage - Workshop to Deployment Promotion
 
 on:
   workflow_run:

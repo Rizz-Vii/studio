@@ -1,4 +1,4 @@
-name: 🚀 Deployment-Ready Auto-Staging Pipeline
+name: � Integration Stage - Deployment to Staging Promotion
 
 on:
   workflow_run:
