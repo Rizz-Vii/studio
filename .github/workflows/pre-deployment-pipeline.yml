@@ -2,9 +2,9 @@ name: 🚀 Pre-Deployment Security & Quality Pipeline
 
 on:
   push:
-    branches: [preDeploy]
+    branches: [staging]
   pull_request:
-    branches: [preDeploy]
+    branches: [staging]
 
 env:
   NODE_VERSION: '20.x'

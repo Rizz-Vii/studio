@@ -3,9 +3,7 @@ name: 🚀 Development Hyperloop - Instant Lean Deploy
 on:
   push:
     branches:
-      - feature/*
-      - bugfix/*
-      - hotfix/*
+      - workshop/*
     paths-ignore:
       - '**.md'
       - 'docs/**'

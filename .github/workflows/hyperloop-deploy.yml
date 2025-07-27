@@ -3,10 +3,9 @@ name: Development Hyperloop CI/CD
 on:
   push:
     branches:
-      - '**'
-      - '!main'
+      - 'workshop/**'
       - '!master'
-      - '!production'
+      - '!staging'
   workflow_dispatch:
 
 jobs:

@@ -3,12 +3,12 @@ name: 🚀 Feature/Performance Branch CI/CD Pipeline
 on:
   push:
     branches: 
-      - feature/performance-optimization-mobile-enhancement
-      - feature/performance-*
+      - workshop/performance
+      - workshop/*
   pull_request:
     branches: 
       - master
-      - preDeploy
+      - staging
     types: [opened, synchronize, reopened]
 
 env:
