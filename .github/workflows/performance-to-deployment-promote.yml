@@ -1,0 +1,106 @@
+name: 🎯 Main Hub - Performance to Deployment-Ready Promotion
+
+on:
+  workflow_run:
+    workflows: 
+      - "⚡ Dev Stage - Performance Optimization"
+    types: [completed]
+    branches: 
+      - workshop/performance
+
+env:
+  NODE_VERSION: '20.x'
+  FIREBASE_PROJECT_ID: 'rankpilot-h3jpc'
+
+jobs:
+  comprehensive-integration-testing:
+    name: 🧪 Comprehensive Integration Testing
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    
+    steps:
+      - name: 📥 Checkout Performance (Main Hub)
+        uses: actions/checkout@v4
+        with:
+          ref: workshop/performance
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: |
+          npm ci --legacy-peer-deps
+          echo "✅ Dependencies installed for comprehensive testing"
+
+      - name: 🏗️ Build Integration
+        run: |
+          npm run build
+          echo "✅ Build successful - all integrations working"
+
+      - name: 🧪 Run Full Test Suite
+        run: |
+          npm run test:critical
+          npm run test:role-based
+          npm run test:performance
+          npm run test:mobile
+          echo "✅ All comprehensive tests passed"
+
+      - name: 🛡️ Security & Quality Validation
+        run: |
+          npm run lint
+          npm run type-check
+          echo "✅ Security and quality validation passed"
+
+      - name: 📊 Integration Test Report
+        run: |
+          echo "🎯 COMPREHENSIVE INTEGRATION TESTING COMPLETE"
+          echo "✅ All workshop integrations validated"
+          echo "✅ Performance optimization confirmed"
+          echo "✅ Security and quality standards met"
+          echo "🚀 Ready for deployment-ready promotion"
+
+  auto-promote-to-deployment-ready:
+    name: 🚀 Auto-Promote to Deployment-Ready
+    runs-on: ubuntu-latest
+    needs: comprehensive-integration-testing
+    if: success()
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔄 Promote to Deployment-Ready
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          # Checkout deployment-ready
+          git checkout workshop/deployment-ready
+          git pull origin workshop/deployment-ready
+          
+          # Merge performance (main hub) with all integrations
+          echo "🚀 Promoting workshop/performance (MAIN HUB) → workshop/deployment-ready"
+          git merge origin/workshop/performance --no-ff -m "🚀 Auto-promote: performance (MAIN HUB) → deployment-ready
+
+          ✅ Comprehensive integration testing PASSED
+          ✅ All workshop features successfully integrated
+          ✅ Performance optimization validated
+          ✅ Security and quality standards confirmed
+          🎯 DEPLOYMENT-READY: Final validation before staging"
+          
+          # Push to trigger final deployment validation
+          git push origin workshop/deployment-ready
+
+      - name: 📊 Report Promotion Success
+        run: |
+          echo "🎯 PROMOTION SUCCESSFUL: performance (MAIN HUB) → deployment-ready"
+          echo "✅ All integrations validated and consolidated"
+          echo "🚀 Triggering final deployment validation tests"

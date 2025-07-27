@@ -1,7 +1,8 @@
-# 🚀 Production Deployment Workflow
-# Deploys master branch to production environment
-# Triggered on push to master or manual dispatch
-name: "🏭 Production Deployment"
+# 🚀 Production Deployment Workflow (Live Production)
+# Final step: staging → master (Manual PR approval required)
+# Deploys master branch to live production environment
+# Triggered ONLY on push to master (after manual PR approval from staging)
+name: "🏭 Production Stage - Live Production Deployment"
 
 on:
   push:
