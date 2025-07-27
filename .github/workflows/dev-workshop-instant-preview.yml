@@ -62,9 +62,6 @@ jobs:
           npm run build -- --no-lint
           echo "✅ Lean build completed"
       
-      - name: 🔑 Set up Firebase
-        uses: w9jds/setup-firebase@main
-      
       - name: 🌿 Get Channel ID
         id: branch-name
         run: |
