@@ -1,40 +1,77 @@
-# 🚀 RankPilot GitHub Actions Workflows
+# 🚀 RankPilot GitHub Actions Workflows - CONSOLIDATED
 
-## 📋 **Active Workflow Overview**
+## 📋 **Streamlined Workflow Overview (8 Total)**
 
-### **🎯 Feature/Performance Development Pipeline**
-**File:** `feature-performance-ci-cd.yml`
-**Purpose:** Comprehensive CI/CD for performance optimization features
+### **🎯 Performance Pipeline - Consolidated**
+**File:** `performance-pipeline.yml`
+**Purpose:** Complete performance CI/CD with auto-deployment to staging
 
 **Triggers:**
-- Push to `feature/performance-optimization-mobile-enhancement`
-- Push to any `feature/performance-*` branches
-- Pull requests to `master` or `preDeploy`
+- Push to `workshop/performance` or `workshop/*` branches
+- Pull requests to `master` or `staging`
+- Workflow completion from instant deploy
 
-**Execution:** 7-stage validation with Core Web Vitals testing
+**Execution:** 3-stage validation (feature validation → auto-deploy → staging test)
 
 ---
 
-### **🔄 Performance Auto-Deployment**
-**File:** `performance-auto-deploy.yml`
-**Purpose:** Automatic deployment to preDeploy after successful validation
+### **� Development Hyperloop - Instant Deploy**
+**File:** `instant-lean-deploy.yml`  
+**Purpose:** Instant preview deployment for workshop branches
 
 **Triggers:**
-- Successful completion of Feature/Performance CI/CD Pipeline
+- Push to `workshop/*` branches (excluding docs)
+- Manual workflow dispatch
 
-**Execution:** Fast-forward merge with deployment tagging
+**Execution:** Fast lean deployment with performance optimization
 
 ---
 
-### **🛡️ Pre-Deployment Security & Quality Pipeline**
-**File:** `pre-deployment-pipeline.yml`
-**Purpose:** Enterprise-grade quality validation before production
+### **🧪 Lean Channel Testing**
+**File:** `lean-channel-tests.yml`
+**Purpose:** Automated testing on deployed preview channels
 
 **Triggers:**
-- Push to `preDeploy` branch
-- Pull requests to `preDeploy`
+- Completion of instant deploy workflow
+- Manual dispatch with channel specification
 
-**Execution:** 8-stage comprehensive validation (security, performance, accessibility)
+**Execution:** Critical test suite on preview environment
+
+---
+
+### **🔄 Workshop Auto-Merge Pipeline**
+**File:** `workshop-auto-merge.yml`
+**Purpose:** Auto-merge successful workshop branches to deployment-ready
+
+**Triggers:**
+- Completion of workshop workflows
+- Success status from hyperloop and performance workflows
+
+**Execution:** Intelligent auto-merge with comprehensive validation
+
+---
+
+### **🎯 Deployment-Ready Auto-Staging**
+**File:** `deployment-ready-auto-staging.yml`
+**Purpose:** Auto-merge deployment-ready to staging after tests
+
+**Triggers:**
+- Successful completion of deployment-ready validation
+- Comprehensive test suite completion
+
+**Execution:** Auto-promotion to staging with detailed commit messages
+
+---
+
+### **🚨 Staging Success PR Alert**
+**File:** `staging-success-pr-alert.yml`
+**Purpose:** GitHub issue alerts when staging validation completes
+
+**Triggers:**
+- Successful pre-deployment pipeline completion
+- Staging validation success
+
+**Execution:** Release notes generation and GitHub issue creation
 
 ---
 
