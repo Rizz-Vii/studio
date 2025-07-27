@@ -1,0 +1,82 @@
+name: 🚀 Deployment-Ready Auto-Staging Pipeline
+
+on:
+  workflow_run:
+    workflows: 
+      - "Development Hyperloop CI/CD"
+      - "🚀 Feature/Performance Branch CI/CD Pipeline"
+    types: [completed]
+    branches: [workshop/deployment-ready]
+
+env:
+  NODE_VERSION: '20.x'
+  FIREBASE_PROJECT_ID: 'rankpilot-h3jpc'
+
+jobs:
+  auto-merge-to-staging:
+    name: 🎯 Auto-Merge to Staging
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' && 
+      github.event.workflow_run.head_branch == 'workshop/deployment-ready'
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🔍 Get Deployment-Ready Info
+        id: deployment-info
+        run: |
+          echo "source_sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+          echo "workflow_name=${{ github.event.workflow_run.name }}" >> $GITHUB_OUTPUT
+          
+          # Get the latest merged branches from commit messages
+          git checkout workshop/deployment-ready
+          MERGED_BRANCHES=$(git log --oneline -10 --grep="Auto-merge:" | head -5)
+          echo "merged_summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$MERGED_BRANCHES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: 🔄 Auto-Merge to Staging
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          # Checkout staging
+          git checkout staging
+          git pull origin staging
+          
+          # Merge deployment-ready
+          echo "🔄 Merging workshop/deployment-ready into staging"
+          git merge origin/workshop/deployment-ready --no-ff -m "🎯 Auto-merge: deployment-ready → staging
+
+          ✅ All comprehensive tests passed
+          ✅ Deployment readiness validated
+          📦 SHA: ${{ steps.deployment-info.outputs.source_sha }}
+          
+          📋 Recent merges included:
+          ${{ steps.deployment-info.outputs.merged_summary }}
+          
+          🤖 Auto-merged for final pre-live validation"
+          
+          # Push to trigger staging workflow
+          git push origin staging
+      
+      - name: 📊 Report Staging Merge
+        run: |
+          echo "✅ Successfully auto-merged workshop/deployment-ready → staging"
+          echo "🚀 Triggering final pre-live tests and validation"
+
+  trigger-final-validation:
+    name: 🔒 Trigger Final Pre-Live Validation
+    runs-on: ubuntu-latest
+    needs: auto-merge-to-staging
+    
+    steps:
+      - name: 🔔 Notify Final Testing Started
+        run: |
+          echo "🔒 Final pre-live validation pipeline triggered for staging"
+          echo "📋 This will run production-level security and quality tests"

@@ -1,0 +1,75 @@
+name: 🔄 Workshop Auto-Merge Pipeline
+
+on:
+  workflow_run:
+    workflows: 
+      - "Development Hyperloop CI/CD"
+      - "🚀 Development Hyperloop - Instant Lean Deploy"
+      - "🚀 Feature/Performance Branch CI/CD Pipeline"
+    types: [completed]
+    branches: 
+      - workshop/*
+      - '!workshop/deployment-ready'
+
+env:
+  NODE_VERSION: '20.x'
+  FIREBASE_PROJECT_ID: 'rankpilot-h3jpc'
+
+jobs:
+  auto-merge-to-deployment-ready:
+    name: 🎯 Auto-Merge to Deployment-Ready
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' && 
+      github.event.workflow_run.head_branch != 'workshop/deployment-ready'
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🔍 Get Source Branch Info
+        id: branch-info
+        run: |
+          echo "source_branch=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_OUTPUT
+          echo "source_sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+          echo "workflow_name=${{ github.event.workflow_run.name }}" >> $GITHUB_OUTPUT
+      
+      - name: 🔄 Auto-Merge to Deployment-Ready
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          
+          # Checkout deployment-ready
+          git checkout workshop/deployment-ready
+          git pull origin workshop/deployment-ready
+          
+          # Merge the successful branch
+          echo "🔄 Merging ${{ steps.branch-info.outputs.source_branch }} into workshop/deployment-ready"
+          git merge origin/${{ steps.branch-info.outputs.source_branch }} --no-ff -m "🚀 Auto-merge: ${{ steps.branch-info.outputs.source_branch }} → deployment-ready
+
+          ✅ Source workflow: ${{ steps.branch-info.outputs.workflow_name }}
+          ✅ All lean tests + hyperloop deployment successful
+          📦 SHA: ${{ steps.branch-info.outputs.source_sha }}
+          🤖 Auto-merged for comprehensive testing"
+          
+          # Push to trigger deployment-ready workflow
+          git push origin workshop/deployment-ready
+      
+      - name: 📊 Report Auto-Merge
+        run: |
+          echo "✅ Successfully auto-merged ${{ steps.branch-info.outputs.source_branch }} → workshop/deployment-ready"
+          echo "🚀 Triggering comprehensive tests and deployment readiness validation"
+
+  trigger-comprehensive-tests:
+    name: 🧪 Trigger Comprehensive Testing
+    runs-on: ubuntu-latest
+    needs: auto-merge-to-deployment-ready
+    
+    steps:
+      - name: 🔔 Notify Comprehensive Testing Started
+        run: |
+          echo "🧪 Comprehensive testing pipeline triggered for workshop/deployment-ready"
+          echo "📋 This will validate deployment readiness with full test suite"
