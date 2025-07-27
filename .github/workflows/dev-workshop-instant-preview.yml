@@ -83,6 +83,8 @@ jobs:
           projectId: ${{ env.FIREBASE_PROJECT_ID }}
           channelId: ${{ steps.branch-name.outputs.CHANNEL_ID }}
           expires: 1d
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
       
       - name: 📊 Deployment Summary
         run: |
