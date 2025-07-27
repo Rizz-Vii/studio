@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase-admin/app";
-import { onCall, HttpsOptions } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
+import { HttpsOptions, onCall } from "firebase-functions/v2/https";
 
 // Initialize Firebase Admin SDK first
 initializeApp();
@@ -20,9 +20,9 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 // Health check function to confirm functions are working correctly
-export const healthCheck = onCall(httpsOptions, async (request) => {
+export const systemHealthCheck = onCall(httpsOptions, async (request) => {
   try {
-    logger.info("Health check function called", {
+    logger.info("System health check function called", {
       auth: request.auth ? "authenticated" : "unauthenticated",
       timestamp: new Date().toISOString(),
     });
@@ -32,23 +32,22 @@ export const healthCheck = onCall(httpsOptions, async (request) => {
       timestamp: new Date().toISOString(),
       runtime: "Node.js v" + process.version,
       region: httpsOptions.region,
+      service: "Firebase Functions v2"
     };
   } catch (error) {
-    logger.error("Health check function failed:", error);
-    throw new Error("Health check failed");
+    logger.error("System health check function failed:", error);
+    throw new Error("System health check failed");
   }
 });
 
 // Export AI-powered functions
+export * from "./api/analyze-content";
+export * from "./api/audit";
 export * from "./api/production-keyword-suggestions";
 
 // Export performance monitoring functions
 export {
-  performanceDashboard,
-  realtimeMetrics,
-  functionMetrics,
-  abTestManagement,
-  healthCheck as performanceHealthCheck
+  abTestManagement, functionMetrics, performanceDashboard, healthCheck as performanceHealthCheck, realtimeMetrics
 } from "./api/performance-dashboard-functions";
 
 // Export Stripe payment functions

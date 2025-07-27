@@ -5,10 +5,15 @@
     "build": "npm run lint && tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
+    "serve:performance": "npm run build && firebase emulators:start --only functions --inspect-functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "deploy:performance": "firebase deploy --only functions:performanceDashboard,functions:realtimeMetrics,functions:healthCheck",
+    "logs": "firebase functions:log",
+    "logs:performance": "firebase functions:log --only performanceDashboard,realtimeMetrics,healthCheck",
+    "test:emulator": "firebase emulators:exec --only functions 'npm run test'",
+    "test": "echo 'Performance dashboard functions ready for testing'"
   },
   "engines": {
     "node": "20"

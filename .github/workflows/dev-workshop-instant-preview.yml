@@ -63,7 +63,7 @@ jobs:
           echo "✅ Lean build completed"
       
       - name: 🔑 Set up Firebase
-        uses: FirebaseExtended/github-actions/setup-firebase@v1.3.1
+        uses: w9jds/setup-firebase@main
       
       - name: 🌿 Get Channel ID
         id: branch-name

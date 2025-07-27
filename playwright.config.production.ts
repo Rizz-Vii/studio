@@ -25,15 +25,47 @@ export default defineConfig({
     projects: [
         {
             name: "production-chrome",
-            use: { ...devices["Desktop Chrome"] },
+            use: {
+                ...devices["Desktop Chrome"],
+                launchOptions: {
+                    args: [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--max_old_space_size=2048', // Safe for production
+                        '--memory-pressure-off',
+                    ],
+                    env: {
+                        NODE_OPTIONS: '--max-old-space-size=2048',
+                    }
+                },
+            },
         },
         {
             name: "production-firefox",
-            use: { ...devices["Desktop Firefox"] },
+            use: {
+                ...devices["Desktop Firefox"],
+                launchOptions: {
+                    env: {
+                        NODE_OPTIONS: '--max-old-space-size=2048',
+                    }
+                },
+            },
         },
         {
             name: "production-mobile",
-            use: { ...devices["iPhone 13"] },
+            use: {
+                ...devices["iPhone 13"],
+                launchOptions: {
+                    args: [
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--max_old_space_size=1536', // Conservative for mobile
+                    ],
+                    env: {
+                        NODE_OPTIONS: '--max-old-space-size=1536',
+                    }
+                },
+            },
         },
     ],
 
