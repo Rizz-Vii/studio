@@ -38,7 +38,8 @@ jobs:
           echo "Changed files:"
           cat changed_files.txt
           echo "COUNT=$(cat changed_files.txt | wc -l)" >> $GITHUB_OUTPUT
-          echo "HAS_SRC=$(grep -q "src/\|components/\|pages/\|styles/\|lib/\|app/" changed_files.txt && echo "true" || echo "false")" >> $GITHUB_OUTPUT
+          # Always deploy for workflow changes
+          echo "HAS_SRC=true" >> $GITHUB_OUTPUT
       
       - name: 🟢 Setup Node.js
         if: steps.changed-files.outputs.HAS_SRC == 'true' && inputs.skipBuild != true
