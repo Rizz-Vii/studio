@@ -1,12 +1,12 @@
 # Performance Branch Testing Workflow
 
-This GitHub Actions workflow provides automated testing and deployment for the `feature/performance-optimization-mobile-enhancement` branch.
+This GitHub Actions workflow provides automated testing and deployment for the `workshop/performance` branch.
 
 ## 🚀 **Automatic Triggers**
 
 The workflow runs automatically when:
 
-- You push commits to the `feature/performance-optimization-mobile-enhancement` branch
+- You push commits to the `workshop/performance` branch  
 - You can also trigger it manually via GitHub Actions UI
 
 ## 🎯 **What It Does**
