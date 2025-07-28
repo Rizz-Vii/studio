@@ -1,40 +1,68 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   // Get response
   const response = NextResponse.next();
 
-  // Add security headers
+  // Add security headers - Enhanced with complete domain coverage
   const cspHeader = [
     // Default directives
     "default-src 'self'",
-    // Scripts - Added Stripe and additional Firebase domains
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.firebaseapp.com https://*.firebase.com https://js.stripe.com",
+    // Scripts - Complete coverage for all third-party services
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
+    "https://apis.google.com " +
+    "https://*.firebaseapp.com " +
+    "https://*.firebase.com " +
+    "https://js.stripe.com " +
+    "https://*.paypal.com " +
+    "https://www.paypal.com " +
+    "https://www.google.com " +
+    "https://www.gstatic.com " +
+    "https://www.googletagmanager.com " +
+    "https://www.google-analytics.com",
     // Styles
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     // Fonts
     "font-src 'self' https://fonts.gstatic.com",
     // Images
     "img-src 'self' data: https:",
-    // Connect (APIs, WebSocket) - Updated to include Firebase Analytics and Stripe
+    // Connect (APIs, WebSocket) - Complete Firebase and third-party coverage
     "connect-src 'self' " +
-      "https://*.firebaseapp.com https://*.firebase.com https://api.openai.com " +
-      "https://identitytoolkit.googleapis.com " +
-      "https://securetoken.googleapis.com " +
-      "https://firestore.googleapis.com " +
-      "https://firebase.googleapis.com " + // Added for Firebase Analytics
-      "https://www.googleapis.com " +
-      "https://api.stripe.com " + // Added for Stripe payments
-      (process.env.NODE_ENV !== "production"
-        ? "http://localhost:* ws://localhost:*"
-        : ""),
+    "https://*.firebaseapp.com " +
+    "https://*.firebase.com " +
+    "https://api.openai.com " +
+    "https://identitytoolkit.googleapis.com " +
+    "https://securetoken.googleapis.com " +
+    "https://firestore.googleapis.com " +
+    "https://firebase.googleapis.com " +
+    "https://firebaseinstallations.googleapis.com " +
+    "https://firebaseremoteconfig.googleapis.com " +
+    "https://firebaseappcheck.googleapis.com " +
+    "https://content-firebaseappdistribution.googleapis.com " +
+    "https://*.googleapis.com " +
+    "https://www.google-analytics.com " +
+    "https://api.stripe.com " +
+    "https://*.paypal.com " +
+    "https://www.paypal.com " +
+    "https://*.cloudfunctions.net " +
+    (process.env.NODE_ENV !== "production"
+      ? "http://localhost:* ws://localhost:*"
+      : ""),
     // Media
     "media-src 'none'",
     // Object/Embed
     "object-src 'none'",
-    // Frames (used by Firebase Auth pop-ups/redirects and Stripe)
-    "frame-src https://*.firebaseapp.com https://*.firebase.com https://accounts.google.com https://js.stripe.com https://hooks.stripe.com",
+    // Frames (used by Firebase Auth pop-ups/redirects, Stripe, and PayPal)
+    "frame-src 'self' " +
+    "https://*.firebaseapp.com " +
+    "https://*.firebase.com " +
+    "https://accounts.google.com " +
+    "https://js.stripe.com " +
+    "https://*.stripe.com " +
+    "https://hooks.stripe.com " +
+    "https://*.paypal.com " +
+    "https://www.google.com",
     // Worker
     "worker-src 'self' blob:",
   ].join("; ");
