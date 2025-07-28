@@ -12,7 +12,9 @@ async function globalSetup(config: FullConfig) {
   const page = await context.newPage();
 
   try {
-    console.log("🌐 Warming up the development server...");
+    // Use TEST_BASE_URL if available, otherwise fall back to localhost
+    const baseUrl = process.env.TEST_BASE_URL || "http://localhost:3000";
+    console.log(`🌐 Warming up the server at ${baseUrl}...`);
 
     // Wait for the server to be ready and warm up key pages
     const maxRetries = 10;
@@ -25,13 +27,13 @@ async function globalSetup(config: FullConfig) {
         );
 
         // Try to load the homepage to warm up Next.js
-        const response = await page.goto("http://localhost:3000", {
+        const response = await page.goto(baseUrl, {
           waitUntil: "networkidle",
           timeout: 30000,
         });
 
         if (response?.ok()) {
-          console.log("✅ Development server is ready!");
+          console.log("✅ Server is ready!");
 
           // Pre-compile critical pages to speed up tests
           const pagesToWarm = ["/", "/login", "/dashboard"];
@@ -40,7 +42,7 @@ async function globalSetup(config: FullConfig) {
           for (const path of pagesToWarm) {
             try {
               console.log(`   - Warming ${path}...`);
-              await page.goto(`http://localhost:3000${path}`, {
+              await page.goto(`${baseUrl}${path}`, {
                 waitUntil: "domcontentloaded",
                 timeout: 15000,
               });
@@ -64,7 +66,7 @@ async function globalSetup(config: FullConfig) {
     }
 
     if (retries >= maxRetries) {
-      throw new Error("Development server failed to start properly");
+      throw new Error("Server failed to start properly");
     }
   } finally {
     await context.close();
