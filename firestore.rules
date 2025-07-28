@@ -132,5 +132,41 @@ service cloud.firestore {
       allow update: if isAuthenticated() && 
                        (resource.data.userId == request.auth.uid || isAdmin());
     }
+
+    // Projects Collection - FIXED MISSING RULES
+    match /projects/{projectId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Backlinks Collection - FIXED MISSING RULES  
+    match /backlinks/{backlinkId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Domain Authority Collection - FIXED MISSING RULES
+    match /domainAuthority/{domainId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
   }
 }

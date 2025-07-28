@@ -65,7 +65,7 @@ jobs:
 
       - name: 🏗️ Build with Performance Monitoring
         run: |
-          npm run build
+          npm run build:dev
           echo "✅ Performance-optimized build completed"
 
       - name: 🚀 Deploy to Performance Testing Channel
@@ -77,6 +77,7 @@ jobs:
           projectId: ${{ env.FIREBASE_PROJECT_ID }}
           channelId: performance-testing
           expires: 30d
+          entryPoint: '.'
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
           NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}
