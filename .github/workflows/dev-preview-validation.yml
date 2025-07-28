@@ -2,11 +2,9 @@ name: 🧪 Preview Stage - Validation & Testing
 
 on:
   workflow_run:
-    workflows: ["🏗️ Workshop Stage - Instant Preview Deploy"]
+    workflows: ["🚀 Dev Stage - Workshop Instant Preview"]
     types:
       - completed
-  repository_dispatch:
-    types: [hyperloop-test-trigger]
   workflow_dispatch:
     inputs:
       channelId:
@@ -18,12 +16,16 @@ env:
   NODE_VERSION: '20.x'
   FIREBASE_PROJECT_ID: 'rankpilot-h3jpc'
   NODE_OPTIONS: '--max-old-space-size=3072'
+  # Centralized Environment URLs
+  LEAN_URL: 'https://rankpilot-h3jpc--lean-branch-testing-o2qips67.web.app'
+  PERFORMANCE_URL: 'https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app'
+  PRODUCTION_URL: 'https://rankpilot-h3jpc.web.app'
 
 jobs:
   test-lean-channel:
     name: 🧪 Validate Lean Channel
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     
     steps:
       - name: 📥 Checkout Code
@@ -44,51 +46,74 @@ jobs:
       - name: 🔑 Set up Firebase
         uses: FirebaseExtended/github-actions/setup-firebase@v1.3.1
       
-      - name: 🔍 Get Lean Channel URL
-        id: channel-url
+      - name: 🎯 Determine Test Environment URL
+        id: test-env
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.channelId }}" ]; then
-            CHANNEL_ID="${{ inputs.channelId }}"
-          elif [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            CHANNEL_ID="${{ github.event.client_payload.channel_id }}"
-            echo "Using channel from dispatch event: $CHANNEL_ID"
-            echo "DEPLOY_URL=${{ github.event.client_payload.url }}" >> $GITHUB_OUTPUT
+          # Determine which URL to use based on branch and context
+          if [[ "${{ github.ref }}" == *"performance"* ]] || [[ "${{ github.event.workflow_run.head_branch }}" == *"performance"* ]]; then
+            TEST_URL="${{ env.PERFORMANCE_URL }}"
+            ENV_TYPE="performance"
+            echo "🎯 Using Performance URL for testing"
           else
-            # Get most recent lean channel
-            CHANNEL_JSON=$(firebase hosting:channel:list --project ${{ env.FIREBASE_PROJECT_ID }} --json)
-            CHANNEL_ID=$(echo "$CHANNEL_JSON" | grep -o '"name":"lean-[^"]*' | head -1 | cut -d'"' -f4)
+            TEST_URL="${{ env.LEAN_URL }}"
+            ENV_TYPE="lean"
+            echo "🎯 Using Lean URL for testing"
           fi
           
-          if [ -z "$CHANNEL_ID" ]; then
-            echo "❌ No lean channel found"
-            exit 1
+          # Manual override support
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.channelId }}" ]; then
+            TEST_URL="https://${{ inputs.channelId }}---${{ env.FIREBASE_PROJECT_ID }}.web.app"
+            ENV_TYPE="custom"
+            echo "🎯 Using Custom URL: ${{ inputs.channelId }}"
           fi
           
-          # Get URL for the channel
-          CHANNEL_URL=$(firebase hosting:channel:open $CHANNEL_ID --project ${{ env.FIREBASE_PROJECT_ID }} --json | grep -o '"url":"[^"]*' | cut -d'"' -f4)
-          echo "CHANNEL_URL=$CHANNEL_URL" >> $GITHUB_OUTPUT
-          echo "CHANNEL_ID=$CHANNEL_ID" >> $GITHUB_OUTPUT
-          echo "Testing against channel: $CHANNEL_ID ($CHANNEL_URL)"
+          echo "TEST_URL=$TEST_URL" >> $GITHUB_OUTPUT
+          echo "ENV_TYPE=$ENV_TYPE" >> $GITHUB_OUTPUT
+          echo "📋 Environment: $ENV_TYPE"
+          echo "🔗 Test URL: $TEST_URL"
       
       - name: 🌐 Basic Smoke Tests
         run: |
-          echo "Running basic smoke test against ${{ steps.channel-url.outputs.CHANNEL_URL }}"
-          curl -f "${{ steps.channel-url.outputs.CHANNEL_URL }}" > /dev/null && \
-            echo "✅ Channel is accessible" || \
-            { echo "❌ Channel health check failed"; exit 1; }
+          echo "Running basic smoke test against ${{ steps.test-env.outputs.TEST_URL }}"
+          curl -f "${{ steps.test-env.outputs.TEST_URL }}" > /dev/null && \
+            echo "✅ Environment is accessible" || \
+            { echo "❌ Environment health check failed"; exit 1; }
       
-      - name: 🧪 Run Critical Tests
+      - name: 🧪 Run Environment-Specific Tests
         env:
-          TEST_BASE_URL: ${{ steps.channel-url.outputs.CHANNEL_URL }}
+          TEST_BASE_URL: ${{ steps.test-env.outputs.TEST_URL }}
+          ENV_TYPE: ${{ steps.test-env.outputs.ENV_TYPE }}
         run: |
-          echo "Running critical tests against ${{ steps.channel-url.outputs.CHANNEL_URL }}"
-          npx playwright test -c playwright.config.lean.ts --grep critical
+          echo "Running $ENV_TYPE environment tests against ${{ steps.test-env.outputs.TEST_URL }}"
+          
+          if [ "$ENV_TYPE" == "performance" ]; then
+            echo "🚀 Running Performance Test Suite"
+            npm run test:performance-critical
+          else
+            echo "⚡ Running Lean Test Suite"
+            npm run test:lean-critical
+          fi
+          
+      - name: 📱 Run Mobile Tests
+        env:
+          TEST_BASE_URL: ${{ steps.test-env.outputs.TEST_URL }}
+          ENV_TYPE: ${{ steps.test-env.outputs.ENV_TYPE }}
+        run: |
+          echo "Running mobile tests against ${{ steps.test-env.outputs.TEST_URL }}"
+          
+          if [ "$ENV_TYPE" == "performance" ]; then
+            echo "📱 Running Performance Mobile Tests"
+            npm run test:performance-mobile
+          else
+            echo "📱 Running Lean Mobile Tests"
+            npm run test:lean-mobile
+          fi
       
       - name: 📝 Save Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lean-test-results
+          name: test-results-${{ steps.test-env.outputs.ENV_TYPE }}
           path: |
             playwright-report/
             test-results/
@@ -96,10 +121,10 @@ jobs:
       
       - name: 📊 Test Summary
         run: |
-          echo "🧪 LEAN CHANNEL TESTS COMPLETE"
-          echo "============================="
-          echo "📋 Channel ID: ${{ steps.channel-url.outputs.CHANNEL_ID }}"
-          echo "🔗 URL: ${{ steps.channel-url.outputs.CHANNEL_URL }}"
+          echo "🧪 ${{ steps.test-env.outputs.ENV_TYPE }} ENVIRONMENT TESTS COMPLETE"
+          echo "==============================================="
+          echo "🌍 Environment: ${{ steps.test-env.outputs.ENV_TYPE }}"
+          echo "🔗 URL: ${{ steps.test-env.outputs.TEST_URL }}"
           echo "🌿 Branch: ${GITHUB_REF#refs/heads/}"
           echo ""
           echo "✅ Critical tests completed"

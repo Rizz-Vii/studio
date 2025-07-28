@@ -1,17 +1,12 @@
 name: ⚡ Dev Stage - Performance Optimization
 
 on:
-  push:
-    branches: 
-      - workshop/performance
-      - workshop/*
   pull_request:
     branches: 
-      - master
       - staging
     types: [opened, synchronize, reopened]
   workflow_run:
-    workflows: ["🚀 Development Hyperloop - Instant Lean Deploy"]
+    workflows: ["🧪 Preview Stage - Validation & Testing"]
     types:
       - completed
     branches:
@@ -22,6 +17,10 @@ env:
   CACHE_KEY: 'rankpilot-performance-deps'
   NODE_OPTIONS: '--max-old-space-size=6144'
   FIREBASE_PROJECT_ID: 'rankpilot-h3jpc'
+  # Centralized Environment URLs
+  LEAN_URL: 'https://rankpilot-h3jpc--lean-branch-testing-o2qips67.web.app'
+  PERFORMANCE_URL: 'https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app'
+  PRODUCTION_URL: 'https://rankpilot-h3jpc.web.app'
 
 jobs:
   # ==============================================
@@ -30,7 +29,7 @@ jobs:
   performance-validation:
     name: 🎯 Performance Feature Validation
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     
     steps:
       - name: 📥 Checkout Feature Branch
@@ -64,82 +63,38 @@ jobs:
         run: |
           npm run test:performance
           echo "✅ Core Web Vitals validation passed"
+        env:
+          TEST_BASE_URL: "https://rankpilot-h3jpc--performance-testing.web.app"
 
       - name: 📱 Mobile Performance Validation
         run: |
           npm run test:mobile
           echo "✅ Mobile performance targets achieved"
+        env:
+          TEST_BASE_URL: "https://rankpilot-h3jpc--performance-testing.web.app"
 
-  # ==============================================
-  # AUTO-DEPLOYMENT TO STAGING
-  # ==============================================
-  auto-deploy-performance:
-    name: 🚀 Auto-Deploy Performance Features
-    runs-on: ubuntu-latest
-    needs: performance-validation
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
-    
-    steps:
-      - name: 📥 Checkout Staging Branch
-        uses: actions/checkout@v4
-        with:
-          ref: staging
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-
-      - name: 🔄 Merge Performance Features to Staging
+      - name: 🎯 Performance Validation Summary
         run: |
-          git config user.name "RankPilot Performance Bot"
-          git config user.email "performance@rankpilot.app"
-          
-          # Fetch latest performance branch
-          git fetch origin workshop/performance
-          
-          # Attempt fast-forward merge
-          if git merge origin/workshop/performance --ff-only; then
-            echo "✅ Fast-forward merge successful"
-            git push origin staging
-            echo "🚀 Performance features deployed to staging"
-          else
-            echo "⚠️ Fast-forward merge not possible, creating merge commit"
-            git merge origin/workshop/performance --no-ff -m "🚀 Deploy: Performance optimization features - All quality gates passed
-
-            📊 Validated Features:
-            ✅ Core Web Vitals optimization
-            ✅ Mobile-first responsive design
-            ✅ Enhanced testing infrastructure  
-            ✅ Performance monitoring integration
-            ✅ Security and accessibility compliance
-            
-            🎯 Ready for production validation"
-            
-            git push origin staging
-            echo "🚀 Performance features merged to staging"
-          fi
-
-      - name: 🎯 Performance Deployment Summary
-        run: |
-          echo "📊 Performance Pipeline Summary:"
+          echo "� Performance Validation Summary:"
           echo "✅ Feature validation completed"
           echo "✅ Core Web Vitals targets achieved"
           echo "✅ Mobile performance optimized"
-          echo "✅ Auto-deployed to staging environment"
-          echo "🎯 Ready for pre-deployment validation"
+          echo "🎯 Ready for promotion to deployment-ready branch"
 
   # ==============================================
-  # STAGING PERFORMANCE VALIDATION
+  # DEPLOYMENT-READY PERFORMANCE VALIDATION
   # ==============================================
-  staging-performance-test:
-    name: 🧪 Staging Performance Validation
+  deployment-ready-performance-test:
+    name: 🧪 Post-Validation Performance Check
     runs-on: ubuntu-latest
-    needs: auto-deploy-performance
-    if: success()
+    needs: performance-validation
+    if: success() && github.event_name == 'workflow_run'
     
     steps:
-      - name: 📥 Checkout Staging
+      - name: 📥 Checkout Performance Branch
         uses: actions/checkout@v4
         with:
-          ref: staging
+          ref: workshop/performance
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
@@ -164,10 +119,10 @@ jobs:
           # Add lighthouse CI command here when available
           echo "✅ Performance audit completed"
 
-      - name: 🎯 Staging Validation Complete
+      - name: 🎯 Performance Check Complete
         run: |
-          echo "🏆 Staging Performance Validation Summary:"
+          echo "🏆 Performance Check Summary:"
           echo "✅ All performance tests passed"
           echo "✅ Core Web Vitals targets achieved"
           echo "✅ Mobile performance validated"
-          echo "🚀 Ready for production deployment"
+          echo "🚀 Ready for promotion to deployment-ready"

@@ -1,4 +1,7 @@
 # 🚀 Feature Branch Deployment Workflow
+# ⚠️ OPTIONAL: For future feature development branches
+# Currently not in use - main development happens in workshop/performance
+# This workflow is ready for when feature/** branches are needed
 # Deploys feature branches to Firebase preview channels for testing
 # Based on successful patterns from performance-optimization testing
 name: "🔥 Feature Branch Testing"

@@ -1,0 +1,120 @@
+name: 🔄 Workflow Orchestrator - Status Dashboard
+
+on:
+  workflow_run:
+    workflows: 
+      - "🚀 Dev Stage - Workshop Instant Preview"
+      - "🧪 Preview Stage - Validation & Testing"
+      - "⚡ Dev Stage - Performance Optimization"
+      - "🎯 Main Hub - Performance to Deployment-Ready Promotion"
+      - "🎯 Integration Stage - Deployment-Ready to Staging Auto-Deploy"
+    types: [requested, in_progress, completed]
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  workflow-status:
+    name: 📊 Workflow Status Monitor
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📋 Log Workflow Status
+        run: |
+          echo "🔄 WORKFLOW ORCHESTRATOR STATUS"
+          echo "================================="
+          echo "📝 Workflow: ${{ github.event.workflow_run.name }}"
+          echo "🎯 Status: ${{ github.event.workflow_run.status }}"
+          echo "✅ Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "🌿 Branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "🕐 Started: ${{ github.event.workflow_run.created_at }}"
+          echo "🔗 URL: ${{ github.event.workflow_run.html_url }}"
+          echo ""
+          
+          # Determine next step based on current workflow
+          case "${{ github.event.workflow_run.name }}" in
+            "🚀 Dev Stage - Workshop Instant Preview")
+              if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+                echo "➡️ Next: Preview Stage - Validation & Testing will trigger"
+              fi
+              ;;
+            "🧪 Preview Stage - Validation & Testing")
+              if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+                echo "➡️ Next: Performance Optimization will trigger"
+              fi
+              ;;
+            "⚡ Dev Stage - Performance Optimization")
+              if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+                echo "➡️ Next: Performance to Deployment-Ready Promotion will trigger"
+              fi
+              ;;
+            "🎯 Main Hub - Performance to Deployment-Ready Promotion")
+              if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+                echo "➡️ Next: Deployment-Ready to Staging Auto-Deploy will trigger"
+              fi
+              ;;
+            "🎯 Integration Stage - Deployment-Ready to Staging Auto-Deploy")
+              if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+                echo "➡️ Next: Manual PR review required for production deployment"
+              fi
+              ;;
+          esac
+
+      - name: 🚨 Alert on Failures
+        if: github.event.workflow_run.conclusion == 'failure'
+        run: |
+          echo "🚨 WORKFLOW FAILURE DETECTED"
+          echo "============================"
+          echo "❌ Failed Workflow: ${{ github.event.workflow_run.name }}"
+          echo "🌿 Branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "🔗 Details: ${{ github.event.workflow_run.html_url }}"
+          echo ""
+          echo "🛠️ Troubleshooting Steps:"
+          echo "1. Check workflow logs for specific error details"
+          echo "2. Verify all environment variables are properly set"
+          echo "3. Ensure Firebase project permissions are correct"
+          echo "4. Check for any package.json or dependency issues"
+          echo "5. Verify Playwright configurations are valid"
+          
+          # Set failure status for monitoring
+          exit 1
+
+  pipeline-health:
+    name: 🏥 Pipeline Health Check
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🔍 Validate Workflow Configuration
+        run: |
+          echo "🔍 PIPELINE HEALTH CHECK"
+          echo "========================"
+          
+          # Check for common workflow issues
+          echo "📋 Validating workflow files..."
+          find .github/workflows -name "*.yml" -exec echo "✓ {}" \;
+          
+          # Check for package.json test scripts
+          echo "📋 Validating test scripts..."
+          if grep -q "test:lean-critical" package.json; then
+            echo "✅ Lean critical tests configured"
+          else
+            echo "⚠️ Lean critical tests not found"
+          fi
+          
+          if grep -q "test:lean-mobile" package.json; then
+            echo "✅ Lean mobile tests configured"  
+          else
+            echo "⚠️ Lean mobile tests not found"
+          fi
+          
+          # Check for Playwright configurations
+          echo "📋 Validating Playwright configs..."
+          ls playwright.config*.ts | head -5 | while read config; do
+            echo "✓ $config"
+          done
+          
+          echo "✅ Pipeline health check completed"
