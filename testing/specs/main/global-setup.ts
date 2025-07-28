@@ -20,23 +20,33 @@ async function globalSetup(config: FullConfig) {
     const maxRetries = 10;
     let retries = 0;
 
+    // Detect if this is a deployed site for different handling
+    const isDeployedSite = baseUrl.includes('web.app') || baseUrl.includes('firebaseapp.com');
+
     while (retries < maxRetries) {
       try {
         console.log(
           `📡 Attempting to connect (${retries + 1}/${maxRetries})...`
         );
 
-        // Try to load the homepage to warm up Next.js
+        // For deployed sites, use a simpler wait condition
+        const waitCondition = isDeployedSite ? "domcontentloaded" : "networkidle";
+        const timeout = isDeployedSite ? 15000 : 30000;
+
+        // Try to load the homepage
         const response = await page.goto(baseUrl, {
-          waitUntil: "networkidle",
-          timeout: 30000,
+          waitUntil: waitCondition,
+          timeout: timeout,
         });
+
+        console.log(`🔍 Response status: ${response?.status()}, URL: ${response?.url()}`);
 
         if (response?.ok()) {
           console.log("✅ Server is ready!");
 
           // Pre-compile critical pages to speed up tests
-          const pagesToWarm = ["/", "/login", "/dashboard"];
+          // For deployed sites, only warm the homepage to avoid routing issues
+          const pagesToWarm = isDeployedSite ? ["/"] : ["/", "/login", "/dashboard"];
 
           console.log("🔥 Pre-compiling critical pages...");
           for (const path of pagesToWarm) {
@@ -44,10 +54,10 @@ async function globalSetup(config: FullConfig) {
               console.log(`   - Warming ${path}...`);
               await page.goto(`${baseUrl}${path}`, {
                 waitUntil: "domcontentloaded",
-                timeout: 15000,
+                timeout: 10000, // Shorter timeout for warming
               });
-              // Small delay to let compilation finish
-              await page.waitForTimeout(2000);
+              // Shorter delay for deployed sites
+              await page.waitForTimeout(isDeployedSite ? 1000 : 2000);
             } catch (error) {
               console.log(
                 `   ⚠️  ${path} not available (this is OK if not implemented yet)`
@@ -60,8 +70,9 @@ async function globalSetup(config: FullConfig) {
         }
       } catch (error) {
         retries++;
-        console.log(`❌ Connection failed, retrying in 3 seconds...`);
-        await page.waitForTimeout(3000);
+        const delay = isDeployedSite ? 2000 : 3000; // Shorter delay for deployed sites
+        console.log(`❌ Connection failed (${error}), retrying in ${delay / 1000} seconds...`);
+        await page.waitForTimeout(delay);
       }
     }
 

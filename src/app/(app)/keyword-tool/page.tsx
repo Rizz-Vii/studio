@@ -1,30 +1,22 @@
 ﻿// src/app/(app)/keyword-tool/page.tsx
 "use client";
-import { useState, useRef, useEffect } from "react";
-import KeywordToolForm from "@/components/keyword-tool-form";
-import type {
-  SuggestKeywordsInput,
-  SuggestKeywordsOutput,
-} from "@/ai/flows/keyword-suggestions";
-import { suggestKeywords } from "@/ai/flows/keyword-suggestions";
-import { useAuth } from "@/context/AuthContext";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { motion, AnimatePresence } from "framer-motion";
-import LoadingState from "@/components/loading-state";
-import MobileToolLayout, {
-  MobileToolCard,
-  MobileResultsCard,
-} from "@/components/mobile-tool-layout";
 import Breadcrumb from "@/components/breadcrumb";
+import KeywordToolForm from "@/components/keyword-tool-form";
+import LoadingState from "@/components/loading-state";
+import {
+  MobileResultsCard,
+  MobileToolCard,
+} from "@/components/mobile-tool-layout";
+import { useFeedbackCollection } from "@/components/performance-feedback";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -33,13 +25,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
-import { Copy, Search, TrendingUp } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { withTimeout, TimeoutError } from "@/lib/timeout";
 import { getDemoData } from "@/lib/demo-data";
-import { useFeedbackCollection } from "@/components/performance-feedback";
+import { db } from "@/lib/firebase";
+import { getKeywordSuggestions } from "@/lib/services/ai-service";
+import { TimeoutError, withTimeout } from "@/lib/timeout";
+import { cn } from "@/lib/utils";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
+import { Copy, Search, TrendingUp } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const getProgressColor = (score: number) => {
   if (score > 70) return "bg-destructive";
@@ -47,7 +43,7 @@ const getProgressColor = (score: number) => {
   return "bg-success";
 };
 
-const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
+const KeywordResults = ({ results }: { results: any; }) => {
   const { toast } = useToast();
 
   const copyToClipboard = (text: string) => {
@@ -79,7 +75,7 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
       <div className="block md:hidden">
         <MobileResultsCard
           title="Keyword Suggestions"
-          subtitle={`${results.keywords.length} keywords found`}
+          subtitle={`${results.suggestions?.length || 0} keywords found`}
           icon={<Search className="h-5 w-5" />}
           actions={
             <Button
@@ -87,7 +83,7 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
               size="sm"
               onClick={() =>
                 copyToClipboard(
-                  results.keywords.map((k) => k.keyword).join(", ")
+                  (results.suggestions || []).map((k: any) => k.keyword).join(", ")
                 )
               }
             >
@@ -96,7 +92,7 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
           }
         >
           <div className="space-y-3">
-            {results.keywords.map((keyword, index) => (
+            {results.keywords.map((keyword: any, index: number) => (
               <div key={index} className="p-3 bg-gray-50 rounded-lg">
                 <div className="flex justify-between items-start mb-2">
                   <span className="font-medium text-sm">{keyword.keyword}</span>
@@ -137,7 +133,7 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
                 size="sm"
                 onClick={() =>
                   copyToClipboard(
-                    results.keywords.map((k) => k.keyword).join(", ")
+                    results.keywords.map((k: any) => k.keyword).join(", ")
                   )
                 }
                 className="font-body"
@@ -160,7 +156,7 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {results.keywords.map((keyword, index) => (
+                {results.keywords.map((keyword: any, index: number) => (
                   <TableRow key={index}>
                     <TableCell className="font-medium font-body">
                       {keyword.keyword}
@@ -195,7 +191,7 @@ const KeywordResults = ({ results }: { results: SuggestKeywordsOutput }) => {
 export default function KeywordToolPage() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<SuggestKeywordsOutput | null>(null);
+  const [results, setResults] = useState<any | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   // Performance feedback integration
@@ -212,7 +208,7 @@ export default function KeywordToolPage() {
     }
   }, [results]);
 
-  const handleSubmit = async (values: SuggestKeywordsInput) => {
+  const handleSubmit = async (values: { topic: string; includeLongTailKeywords: boolean; }) => {
     setIsLoading(true);
     setSubmitted(true);
     setResults(null);
@@ -223,7 +219,11 @@ export default function KeywordToolPage() {
     try {
       // Try to get real data with timeout
       const result = await withTimeout(
-        suggestKeywords(values),
+        getKeywordSuggestions({
+          query: values.topic,
+          count: values.includeLongTailKeywords ? 20 : 10,
+          includeMetrics: true
+        }),
         15000, // 15 second timeout
         "Keyword analysis is taking longer than expected. Using demo data instead."
       );
@@ -244,7 +244,7 @@ export default function KeywordToolPage() {
           tool: "Keyword Tool",
           timestamp: serverTimestamp(),
           details: values,
-          resultsSummary: `Searched for keywords related to "${values.topic}". Found ${result.keywords.length} suggestions.`,
+          resultsSummary: `Searched for keywords related to "${values.topic}". Found ${(result as any)?.suggestions?.length || 0} suggestions.`,
         });
       }
     } catch (error) {

@@ -3,14 +3,14 @@
  * Implements Firebase Functions v2 best practices with proper error handling
  */
 
-import { onCall, HttpsOptions, HttpsError } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
+import { HttpsError, HttpsOptions, onCall } from "firebase-functions/v2/https";
 import { getAI } from "../lib/ai-memory-manager";
 
 // Optimized HttpsOptions for keyword suggestions
 const httpsOptions: HttpsOptions = {
   timeoutSeconds: 120,
-  memory: "512MiB",
+  memory: "1GiB", // Increased from 512MiB for better performance
   minInstances: 0,
   maxInstances: 10,
   concurrency: 80,
@@ -19,29 +19,29 @@ const httpsOptions: HttpsOptions = {
 };
 
 interface KeywordSuggestionsRequest {
-    query: string;
-    language?: string;
-    count?: number;
-    includeMetrics?: boolean;
+  query: string;
+  language?: string;
+  count?: number;
+  includeMetrics?: boolean;
 }
 
 interface KeywordSuggestion {
-    keyword: string;
-    searchVolume?: number;
-    competition?: "low" | "medium" | "high";
-    difficulty?: number;
-    intent?: "informational" | "commercial" | "transactional" | "navigational";
+  keyword: string;
+  searchVolume?: number;
+  competition?: "low" | "medium" | "high";
+  difficulty?: number;
+  intent?: "informational" | "commercial" | "transactional" | "navigational";
 }
 
 interface KeywordSuggestionsResponse {
-    suggestions: KeywordSuggestion[];
-    relatedQueries?: string[];
-    totalProcessingTime: number;
-    cacheHit: boolean;
+  suggestions: KeywordSuggestion[];
+  relatedQueries?: string[];
+  totalProcessingTime: number;
+  cacheHit: boolean;
 }
 
 // Simple in-memory cache for function instances
-const cache = new Map<string, { data: KeywordSuggestionsResponse; expiry: number }>();
+const cache = new Map<string, { data: KeywordSuggestionsResponse; expiry: number; }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
 /**

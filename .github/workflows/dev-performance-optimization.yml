@@ -104,14 +104,14 @@ jobs:
           npm run test:performance
           echo "✅ Core Web Vitals validation passed"
         env:
-          TEST_BASE_URL: "https://rankpilot-h3jpc--performance-testing.web.app"
+          TEST_BASE_URL: ${{ env.PERFORMANCE_URL }}
 
       - name: 📱 Mobile Performance Validation
         run: |
           npm run test:mobile
           echo "✅ Mobile performance targets achieved"
         env:
-          TEST_BASE_URL: "https://rankpilot-h3jpc--performance-testing.web.app"
+          TEST_BASE_URL: ${{ env.PERFORMANCE_URL }}
 
       - name: 🎯 Performance Validation Summary
         run: |

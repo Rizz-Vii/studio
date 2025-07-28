@@ -1,24 +1,7 @@
 // src/app/(app)/content-analyzer/page.tsx
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
 import ContentAnalyzerForm from "@/components/content-analyzer-form";
-import type {
-  AnalyzeContentInput,
-  AnalyzeContentOutput,
-} from "@/ai/flows/content-optimization";
-import { analyzeContent } from "@/ai/flows/content-optimization";
-import { useAuth } from "@/context/AuthContext";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -26,27 +9,37 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  Loader2,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import LoadingScreen from "@/components/ui/loading-screen";
+import { useAuth } from "@/context/AuthContext";
+import { ACTIVITY_TYPES, TOOL_NAMES } from "@/lib/activity-types";
+import { db } from "@/lib/firebase";
+import { analyzeContent, type ContentAnalysisResponse } from "@/lib/services/ai-service";
+import { TimeoutError, withTimeout } from "@/lib/timeout";
+import { cn } from "@/lib/utils";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  AlertTriangle,
   BookOpen,
   CheckCircle,
-  BarChart2,
-  Target,
-  AlertTriangle,
+  Target
 } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
   Radar,
   RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
   ResponsiveContainer,
-  PolarRadiusAxis,
 } from "recharts";
-import { Progress } from "@/components/ui/progress";
-import LoadingScreen from "@/components/ui/loading-screen";
-import { cn } from "@/lib/utils";
-import { withTimeout, TimeoutError } from "@/lib/timeout";
-import * as ProgressPrimitive from "@radix-ui/react-progress";
-import { ACTIVITY_TYPES, TOOL_NAMES } from "@/lib/activity-types";
 
 const getProgressColor = (score: number) => {
   if (score > 85) return "bg-success";
@@ -83,18 +76,18 @@ ColoredProgress.displayName = "ColoredProgress";
 const AnalysisResults = ({
   analysisResult,
 }: {
-  analysisResult: AnalyzeContentOutput;
+  analysisResult: ContentAnalysisResponse;
 }) => {
   const chartData = [
     {
       subject: "Readability",
-      score: analysisResult.readabilityScore,
+      score: analysisResult.readability.score,
       fullMark: 100,
     },
-    { subject: "Keywords", score: analysisResult.keywordScore, fullMark: 100 },
+    { subject: "SEO", score: analysisResult.seo.score, fullMark: 100 },
     {
-      subject: "Semantics",
-      score: analysisResult.semanticScore,
+      subject: "Sentiment",
+      score: Math.round(analysisResult.sentiment.score * 100),
       fullMark: 100,
     },
   ];
@@ -117,7 +110,7 @@ const AnalysisResults = ({
             <div className="w-full sm:w-1/2">
               <div className="flex items-center space-x-2">
                 <span className="text-4xl font-bold font-headline text-primary">
-                  {analysisResult.overallScore}/100
+                  {Math.round((analysisResult.readability.score + analysisResult.seo.score + (analysisResult.sentiment.score * 100)) / 3)}/100
                 </span>
                 <h3 className="font-semibold font-body">Overall Score</h3>
               </div>
@@ -171,13 +164,13 @@ const AnalysisResults = ({
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-sm font-semibold">
-                      {analysisResult.readabilityScore}/100
+                      {analysisResult.readability.score}/100
                     </span>
                     <ColoredProgress
-                      value={analysisResult.readabilityScore}
+                      value={analysisResult.readability.score}
                       className="w-32"
                       indicatorClassName={getProgressColor(
-                        analysisResult.readabilityScore
+                        analysisResult.readability.score
                       )}
                     />
                   </div>
@@ -185,7 +178,7 @@ const AnalysisResults = ({
               </AccordionTrigger>
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
-                  {analysisResult.readabilitySuggestions.map((suggestion) => (
+                  {analysisResult.readability.suggestions.map((suggestion: string) => (
                     <li key={`readability-${suggestion.slice(0, 32)}`}>
                       {suggestion}
                     </li>
@@ -202,13 +195,13 @@ const AnalysisResults = ({
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-sm font-semibold">
-                      {analysisResult.keywordScore}/100
+                      {analysisResult.seo.score}/100
                     </span>
                     <ColoredProgress
-                      value={analysisResult.keywordScore}
+                      value={analysisResult.seo.score}
                       className="w-32"
                       indicatorClassName={getProgressColor(
-                        analysisResult.keywordScore
+                        analysisResult.seo.score
                       )}
                     />
                   </div>
@@ -216,7 +209,7 @@ const AnalysisResults = ({
               </AccordionTrigger>
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
-                  {analysisResult.keywordSuggestions.map((suggestion) => (
+                  {analysisResult.seo.suggestions.map((suggestion) => (
                     <li key={`keyword-${suggestion.slice(0, 32)}`}>
                       {suggestion}
                     </li>
@@ -233,13 +226,13 @@ const AnalysisResults = ({
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-sm font-semibold">
-                      {analysisResult.semanticScore}/100
+                      {analysisResult.sentiment.score}/100
                     </span>
                     <ColoredProgress
-                      value={analysisResult.semanticScore}
+                      value={analysisResult.sentiment.score}
                       className="w-32"
                       indicatorClassName={getProgressColor(
-                        analysisResult.semanticScore
+                        analysisResult.sentiment.score
                       )}
                     />
                   </div>
@@ -247,7 +240,7 @@ const AnalysisResults = ({
               </AccordionTrigger>
               <AccordionContent className="font-body text-sm p-2 rounded-md">
                 <ul className="list-disc pl-5 space-y-1">
-                  {analysisResult.semanticSuggestions.map((suggestion) => (
+                  {analysisResult.sentiment.suggestions.map((suggestion) => (
                     <li key={`semantic-${suggestion.slice(0, 32)}`}>
                       {suggestion}
                     </li>
@@ -266,7 +259,7 @@ export default function ContentAnalyzerPage() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [analysisResult, setAnalysisResult] =
-    useState<AnalyzeContentOutput | null>(null);
+    useState<ContentAnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -280,15 +273,19 @@ export default function ContentAnalyzerPage() {
     }
   }, [analysisResult, error]);
 
-  const handleSubmit = async (values: AnalyzeContentInput) => {
+  const handleSubmit = async (values: { content: string; targetKeywords: string; }) => {
     setIsLoading(true);
     setSubmitted(true);
     setAnalysisResult(null);
     setError(null);
     try {
-      // Try to get real data with timeout
+      // Call optimized backend service instead of expensive frontend AI
       const result = await withTimeout(
-        analyzeContent(values),
+        analyzeContent({
+          content: values.content,
+          targetKeywords: values.targetKeywords.split(',').map(k => k.trim()),
+          analysisType: "comprehensive"
+        }),
         15000, // 15 second timeout
         "Content analysis is taking longer than expected."
       );
@@ -307,9 +304,9 @@ export default function ContentAnalyzerPage() {
           details: {
             targetKeywords: values.targetKeywords,
             overallScore: result.overallScore,
-            readabilityScore: result.readabilityScore,
-            keywordScore: result.keywordScore,
-            semanticScore: result.semanticScore,
+            readabilityScore: result.readability.score,
+            seoScore: result.seo.score,
+            sentimentScore: result.sentiment.score,
           },
           resultsSummary: `Analyzed content for keywords: "${values.targetKeywords}". Overall Score: ${result.overallScore}/100.`,
         });

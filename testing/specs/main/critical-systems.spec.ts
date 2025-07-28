@@ -44,10 +44,10 @@ test.describe("🚨 Critical System Validation", () => {
 
         // Should redirect to auth or show login prompt
         await page.waitForURL(url =>
-            url.includes("/auth") ||
-            url.includes("/signin") ||
-            url.includes("/login") ||
-            url === page.url() // Stay on same page if showing login modal
+            url.href.includes("/auth") ||
+            url.href.includes("/signin") ||
+            url.href.includes("/login") ||
+            url.href === page.url() // Stay on same page if showing login modal
         );
 
         // Verify we're either redirected or see auth elements
@@ -80,7 +80,7 @@ test.describe("🚨 Critical System Validation", () => {
         expect(faviconResponse.status()).toBeLessThan(400);
 
         // Verify no critical console errors
-        const errors = [];
+        const errors: string[] = [];
         page.on("console", (msg) => {
             if (msg.type() === "error") {
                 errors.push(msg.text());

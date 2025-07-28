@@ -40,7 +40,7 @@ export const systemHealthCheck = onCall(httpsOptions, async (request) => {
   }
 });
 
-// Export AI-powered functions
+// Export AI-powered functions (optimized - redundant functions removed)
 export * from "./api/analyze-content";
 export * from "./api/audit";
 export * from "./api/production-keyword-suggestions";
