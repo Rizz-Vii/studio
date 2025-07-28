@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+// Check if this is a Firebase deployment build
+const isFirebaseDeployment = process.env.FIREBASE_DEPLOY === 'true';
+
 const nextConfig: NextConfig = {
   // Enable React strict mode for better development practices
   reactStrictMode: true,
@@ -41,10 +44,14 @@ const nextConfig: NextConfig = {
       };
     }
 
-    return config;
-  },
+    // Firebase deployment optimizations
+    if (isFirebaseDeployment) {
+      // Suppress webpack stats in Firebase builds
+      config.stats = "errors-only";
+    }
 
-  // Experimental features
+    return config;
+  },  // Experimental features
   experimental: {
     // Configure server actions with proper options
     serverActions: {
@@ -52,6 +59,15 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["localhost:3000"],
     },
   },
+
+  // Logging configuration for Firebase deployments
+  ...(isFirebaseDeployment && {
+    logging: {
+      fetches: {
+        fullUrl: false,
+      },
+    },
+  }),
 
   // Timeouts and limits
   onDemandEntries: {
