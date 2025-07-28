@@ -71,15 +71,12 @@ jobs:
 
       - name: 🚀 Deploy to Performance Testing Channel
         id: deploy-performance
-        uses: FirebaseExtended/action-hosting-deploy@v0.9.0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RANKPILOT_H3JPC }}
-          projectId: ${{ env.FIREBASE_PROJECT_ID }}
-          channelId: performance-testing
-          expires: 30d
-          entryPoint: '.'
+        run: |
+          echo "🚀 Starting Firebase deployment..."
+          npx firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --message "Performance testing deployment from ${{ github.sha }}"
+          echo "✅ Firebase deployment completed"
         env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           FIREBASE_CLI_EXPERIMENTS: webframeworks
           FIREBASE_DEPLOY: true
           NODE_ENV: production
