@@ -1,6 +1,9 @@
 name: ⚡ Dev Stage - Performance Optimization
 
 on:
+  push:
+    branches:
+      - workshop/performance
   pull_request:
     branches: 
       - staging
@@ -49,6 +52,12 @@ jobs:
           npm ci --legacy-peer-deps --prefer-offline
           echo "✅ Dependencies installed with performance optimization"
 
+      - name: 🎭 Install Playwright Browsers
+        run: |
+          npx playwright install chromium
+          npx playwright install-deps
+          echo "✅ Playwright browsers installed for performance testing"
+
       - name: 🔍 Performance-Specific Linting
         run: |
           npm run lint
@@ -58,6 +67,19 @@ jobs:
         run: |
           npm run build
           echo "✅ Performance-optimized build completed"
+
+      - name: 🚀 Deploy to Performance Testing Channel
+        run: |
+          npx firebase-tools deploy --only hosting:rankpilot-h3jpc:performance-testing --project rankpilot-h3jpc
+          echo "✅ Deployed to performance testing environment: ${{ env.PERFORMANCE_URL }}"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: ⏱️ Wait for Deployment Propagation
+        run: |
+          echo "⏱️ Waiting for deployment to propagate..."
+          sleep 30
+          echo "✅ Deployment propagation complete"
 
       - name: 🧪 Core Web Vitals Testing
         run: |
