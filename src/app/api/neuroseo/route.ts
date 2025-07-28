@@ -2,13 +2,8 @@
  * NeuroSEO™ API Routes - Production Ready with Real AI Processing
  */
 
+import { NeuroSEOSuite } from "@/lib/neuroseo";
 import { NextRequest, NextResponse } from "next/server";
-
-// Lazy import to avoid Firebase initialization during build
-const getNeuroSEOSuite = async () => {
-  const { NeuroSEOSuite } = await import("@/lib/neuroseo");
-  return NeuroSEOSuite;
-};
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +19,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize NeuroSEO Suite with real processing
-    const NeuroSEOSuite = await getNeuroSEOSuite();
     const neuroSEO = new NeuroSEOSuite();
 
     // Run comprehensive analysis instead of returning mocks
@@ -51,7 +45,6 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get("userId") || "anonymous";
 
     // Real usage stats instead of mocks
-    const NeuroSEOSuite = await getNeuroSEOSuite();
     const neuroSEO = new NeuroSEOSuite();
 
     // Get actual usage statistics from quota manager

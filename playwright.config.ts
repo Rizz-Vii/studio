@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import { getProxyConfig } from "./testing/specs/main/utils/proxy";
 
 export default defineConfig({
-  testDir: "./tests",
+  testDir: "./testing",
   timeout: 30000,
   workers: process.env.CI ? 1 : undefined,
   reporter: [

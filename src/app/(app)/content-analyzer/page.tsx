@@ -326,13 +326,23 @@ export default function ContentAnalyzerPage() {
   };
 
   return (
-    <div
+    <main
       className={cn(
         "mx-auto transition-all duration-500",
         submitted ? "max-w-7xl" : "max-w-xl"
       )}
     >
-      <div
+      {/* Page Title - DevLast Task 8: Accessibility & Semantics */}
+      <header className="mb-8 text-center">
+        <h1 className="text-3xl font-bold font-headline text-primary mb-2">
+          Optimize Your Content
+        </h1>
+        <p className="text-muted-foreground font-body">
+          Analyze and optimize your content for better SEO performance and readability.
+        </p>
+      </header>
+
+      <section
         className={cn(
           "grid gap-8 transition-all duration-500",
           submitted ? "lg:grid-cols-3" : "lg:grid-cols-1"
@@ -377,7 +387,7 @@ export default function ContentAnalyzerPage() {
             )}
           </AnimatePresence>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

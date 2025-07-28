@@ -450,7 +450,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8">
+    <div className="container mx-auto py-8 px-4 space-y-8" data-testid="dashboard-content">
       <motion.div
         className="space-y-4"
         initial="hidden"
@@ -458,7 +458,7 @@ export default function DashboardPage() {
         variants={itemVariants}
         layoutId="dashboard-header"
       >
-        <div className="flex items-center justify-between">
+        <header className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-headline font-semibold text-foreground">
               Welcome, {profile?.displayName || user?.email}!
@@ -473,7 +473,7 @@ export default function DashboardPage() {
               Loading...
             </Button>
           )}
-        </div>
+        </header>
       </motion.div>
 
       <motion.div

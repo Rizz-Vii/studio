@@ -1,11 +1,10 @@
 ﻿"use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
-import LoadingScreen from "@/components/ui/loading-screen";
 import { FeatureGate } from "@/components/subscription/FeatureGate";
+import { TutorialAccess } from "@/components/tutorials/TutorialAccess";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,18 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +20,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import LoadingScreen from "@/components/ui/loading-screen";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -41,23 +38,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import {
-  Users,
-  UserPlus,
-  Mail,
-  Settings,
-  Shield,
-  Trash2,
-  MoreHorizontal,
+  AlertCircle,
+  BarChart3,
   CheckCircle,
   Clock,
-  AlertCircle,
-  MessageCircle,
   FolderOpen,
-  BarChart3,
+  Mail,
+  MessageCircle,
+  Shield,
+  Trash2,
+  UserPlus,
+  Users
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { TutorialAccess } from "@/components/tutorials/TutorialAccess";
 
 interface TeamMember {
   id: string;
@@ -250,8 +248,8 @@ export default function TeamManagementPage() {
 
   return (
     <FeatureGate requiredTier="enterprise">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
+      <main className="max-w-6xl mx-auto space-y-8">
+        <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Users className="h-8 w-8 text-primary" />
             <div>
@@ -355,7 +353,7 @@ export default function TeamManagementPage() {
               </DialogContent>
             </Dialog>
           </div>
-        </div>
+        </header>
 
         {/* Team Collaboration Quick Access */}
         <div className="grid gap-4 md:grid-cols-3">
@@ -616,7 +614,7 @@ export default function TeamManagementPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </main>
     </FeatureGate>
   );
 }

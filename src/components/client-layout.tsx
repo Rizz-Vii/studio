@@ -1,6 +1,7 @@
 "use client";
 
 import { PerformanceIndicator, WebVitalsMonitor } from "@/components/performance/web-vitals-monitor";
+import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import SiteFooter from "@/components/site-footer";
 import { Toaster } from "@/components/ui/toaster";
 import { UIProvider } from "@/context/UIContext";
@@ -15,6 +16,7 @@ export function ClientLayout({ children }: { children: React.ReactNode; }) {
       <SiteFooter />
       <WebVitalsMonitor />
       <PerformanceIndicator />
+      <PWAInstallPrompt />
     </UIProvider>
   );
 }

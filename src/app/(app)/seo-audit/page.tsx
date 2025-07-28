@@ -1,15 +1,11 @@
 // src/app/(app)/seo-audit/page.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import type { AuditUrlInput, AuditUrlOutput } from "@/ai/flows/seo-audit";
 import { auditUrl } from "@/ai/flows/seo-audit";
-import { useAuth } from "@/context/AuthContext";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import SeoAuditForm from "@/components/seo-audit-form";
-import LoadingScreen from "@/components/ui/loading-screen";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -17,35 +13,40 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { AlertTriangle, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import {
+  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartConfig,
 } from "@/components/ui/chart";
+import LoadingScreen from "@/components/ui/loading-screen";
+import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/context/AuthContext";
+import { getDemoData } from "@/lib/demo-data";
+import { db } from "@/lib/firebase";
+import { TimeoutError, withTimeout } from "@/lib/timeout";
+import { cn } from "@/lib/utils";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  XAxis,
-  YAxis,
+  Cell,
   Pie,
   PieChart,
-  Cell,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { cn } from "@/lib/utils";
-import { withTimeout, TimeoutError } from "@/lib/timeout";
-import { getDemoData } from "@/lib/demo-data";
 
-const statusIcons: { [key: string]: React.ElementType } = {
+const statusIcons: { [key: string]: React.ElementType; } = {
   good: CheckCircle,
   warning: AlertTriangle,
   error: XCircle,
 };
 
-const statusColors: { [key: string]: string } = {
+const statusColors: { [key: string]: string; } = {
   good: "text-success",
   warning: "text-warning",
   error: "text-destructive",
@@ -76,7 +77,7 @@ const imageChartConfig = {
   missingAlt: { label: "Missing Alt Text", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig;
 
-const AuditCharts = ({ items }: { items: AuditUrlOutput["items"] }) => {
+const AuditCharts = ({ items }: { items: AuditUrlOutput["items"]; }) => {
   const chartData = items.map((item) => ({
     name: item.name,
     score: item.score,
@@ -171,7 +172,7 @@ const AuditCharts = ({ items }: { items: AuditUrlOutput["items"] }) => {
   );
 };
 
-const AuditResults = ({ results }: { results: AuditUrlOutput }) => (
+const AuditResults = ({ results }: { results: AuditUrlOutput; }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -300,13 +301,23 @@ export default function SeoAuditPage() {
   };
 
   return (
-    <div
+    <main
       className={cn(
         "mx-auto transition-all duration-500",
         submitted ? "max-w-7xl" : "max-w-xl"
       )}
     >
-      <div
+      {/* Page Title - DevLast Task 8: Accessibility & Semantics */}
+      <header className="mb-8 text-center">
+        <h1 className="text-3xl font-bold font-headline text-primary mb-2">
+          SEO Website Audit
+        </h1>
+        <p className="text-muted-foreground font-body">
+          Comprehensive SEO analysis and optimization recommendations for any website.
+        </p>
+      </header>
+
+      <section
         className={cn(
           "grid gap-8 transition-all duration-500",
           submitted ? "lg:grid-cols-3" : "lg:grid-cols-1"
@@ -349,7 +360,7 @@ export default function SeoAuditPage() {
             )}
           </AnimatePresence>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

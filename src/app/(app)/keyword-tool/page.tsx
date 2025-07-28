@@ -1,5 +1,6 @@
 ﻿// src/app/(app)/keyword-tool/page.tsx
 "use client";
+
 import Breadcrumb from "@/components/breadcrumb";
 import KeywordToolForm from "@/components/keyword-tool-form";
 import LoadingState from "@/components/loading-state";
@@ -270,12 +271,22 @@ export default function KeywordToolPage() {
   };
 
   return (
-    <div className="container mx-auto py-6">
+    <main className="container mx-auto py-6">
       <div className="mb-6">
         <Breadcrumb />
       </div>
 
-      <div
+      {/* Page Title - DevLast Task 8: Accessibility & Semantics */}
+      <header className="mb-8 text-center">
+        <h1 className="text-3xl font-bold font-headline text-primary mb-2">
+          Keyword Research Tool
+        </h1>
+        <p className="text-muted-foreground font-body">
+          Discover high-performing keywords to boost your SEO strategy and content performance.
+        </p>
+      </header>
+
+      <section
         className={cn(
           "mx-auto transition-all duration-500",
           submitted ? "max-w-7xl" : "max-w-xl"
@@ -340,11 +351,11 @@ export default function KeywordToolPage() {
             </AnimatePresence>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Performance Feedback Component */}
       {FeedbackComponent}
-    </div>
+    </main>
   );
 }
 

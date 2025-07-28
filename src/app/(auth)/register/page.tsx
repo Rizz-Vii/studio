@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import LoadingScreen from "@/components/ui/loading-screen";
 import { useAuth } from "@/context/AuthContext";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-import ReCAPTCHA from "react-google-recaptcha";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { Eye, EyeOff } from "lucide-react";
-import LoadingScreen from "@/components/ui/loading-screen";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function RegisterPage() {
   // Auth guard - redirect authenticated users away from register page
@@ -54,7 +54,8 @@ export default function RegisterPage() {
       newErrors.confirmPassword = "Passwords do not match.";
     if (!agreeTerms)
       newErrors.terms = "You must agree to the Terms & Conditions.";
-    if (!captchaToken) newErrors.captcha = "Please verify that you're human.";
+    if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaToken)
+      newErrors.captcha = "Please verify that you're human.";
     return newErrors;
   }
 
@@ -95,12 +96,15 @@ export default function RegisterPage() {
           <input
             id="email"
             type="email"
+            role="textbox"
             autoComplete="email"
+            aria-label="Email address"
+            aria-describedby="email-error"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition"
           />
-          <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+          <p id="email-error" className="text-xs text-red-600 mt-1">{errors.email}</p>
         </div>
         <div className="relative">
           <label htmlFor="password" className="block font-medium mb-1">
@@ -109,7 +113,10 @@ export default function RegisterPage() {
           <input
             id="password"
             type={showPassword ? "text" : "password"}
+            role="textbox"
             autoComplete="new-password"
+            aria-label="Password"
+            aria-describedby="password-error"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg pr-10 focus:outline-none focus:border-blue-500 transition"
@@ -117,12 +124,13 @@ export default function RegisterPage() {
           <button
             type="button"
             tabIndex={-1}
+            aria-label={showPassword ? "Hide password" : "Show password"}
             className="absolute right-3 top-9 text-gray-600"
             onClick={() => setShowPassword((v) => !v)}
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-          <p className="text-xs text-red-600 mt-1">{errors.password}</p>
+          <p id="password-error" className="text-xs text-red-600 mt-1">{errors.password}</p>
         </div>
         <div className="relative">
           <label htmlFor="confirmPassword" className="block font-medium mb-1">
@@ -131,7 +139,10 @@ export default function RegisterPage() {
           <input
             id="confirmPassword"
             type={showConfirm ? "text" : "password"}
+            role="textbox"
             autoComplete="new-password"
+            aria-label="Confirm password"
+            aria-describedby="confirmPassword-error"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg pr-10 focus:outline-none focus:border-blue-500 transition"
@@ -139,20 +150,23 @@ export default function RegisterPage() {
           <button
             type="button"
             tabIndex={-1}
+            aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
             className="absolute right-3 top-9 text-gray-600"
             onClick={() => setShowConfirm((v) => !v)}
           >
             {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-          <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>
+          <p id="confirmPassword-error" className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>
         </div>
-        <div>
-          <ReCAPTCHA
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-            onChange={(token) => setCaptchaToken(token || "")}
-          />
-          <p className="text-xs text-red-600 mt-1">{errors.captcha}</p>
-        </div>
+        {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+          <div>
+            <ReCAPTCHA
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+              onChange={(token) => setCaptchaToken(token || "")}
+            />
+            <p className="text-xs text-red-600 mt-1">{errors.captcha}</p>
+          </div>
+        )}
         <div className="flex flex-col items-center justify-center">
           <div className="flex items-center">
             <input
