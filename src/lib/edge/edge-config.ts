@@ -257,7 +257,8 @@ export function edgeMiddleware(request: NextRequest): NextResponse {
     // Try optimizations in order of priority
     let response = optimizeStaticAssets(request) ||
         optimizeAPIResponses(request) ||
-        optimizeByGeography(request);
+        optimizeByGeography(request) ||
+        NextResponse.next(); // Fallback to default response
 
     // Apply performance monitoring
     response = addPerformanceMonitoring(request, response);

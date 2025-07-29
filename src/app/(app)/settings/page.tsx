@@ -60,15 +60,20 @@ export default function SettingsPage() {
         announcements
     } = useAccessibility();
 
+    const [defaultTab, setDefaultTab] = useState("account");
+
     React.useEffect(() => {
         setMounted(true);
-    }, []);
 
-    // Get the tab from URL parameters for deep linking
-    const searchParams = new URLSearchParams(
-        typeof window !== "undefined" ? window.location.search : ""
-    );
-    const defaultTab = searchParams.get("tab") || "account";
+        // Get the tab from URL parameters for deep linking (client-side only)
+        if (typeof window !== "undefined") {
+            const searchParams = new URLSearchParams(window.location.search);
+            const tabParam = searchParams.get("tab");
+            if (tabParam) {
+                setDefaultTab(tabParam);
+            }
+        }
+    }, []);
 
     if (authLoading || !mounted) {
         return <LoadingScreen fullScreen text="Loading settings..." />;
