@@ -208,3 +208,5 @@ bundle-report.html
 *.mkv
 
 # End of optimized .gitignore
+masterKeys.md
+docs/ENVIRONMENT_VARIABLES.md

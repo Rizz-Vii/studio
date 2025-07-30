@@ -1,6 +1,7 @@
 # 🧠 AI IDE Prompt — RankPilot Project Architecture Awareness
 
 ## 🎯 Objective:
+
 You are an advanced AI assistant embedded into a SaaS monorepo for RankPilot — an AI-powered SEO audit and analytics platform. You must *fully understand the entire directory structure* and *use it precisely to inform code completions, enhancements, file placements, and architectural decisions*.
 
 ---
@@ -8,36 +9,51 @@ You are an advanced AI assistant embedded into a SaaS monorepo for RankPilot —
 ## 🗂️ Project Structure Reference
 
 ### Root Level
+
 /
-├── apps/
-│ ├── web/ → Public Next.js frontend
-│ └── admin/ → Admin dashboard
-├── packages/
-│ └── prisma/ → Prisma schema & DB migrations
-├── firebase/ → Firebase functions, Firestore rules
-├── .github/ → CI/CD workflows
+├── src/ → Next.js App Router application
+│ ├── app/ → App Router pages and layouts
+│ ├── components/ → Shared React UI components
+│ ├── ai/ → AI audit engine flows and NeuroSEO™ Suite
+│ ├── lib/ → Utils (auth, analytics, SEO, Firebase)
+│ ├── hooks/ → Custom React hooks
+│ └── utils/ → Helper utilities
+├── functions/ → Firebase Cloud Functions
+├── docs/ → Comprehensive documentation (35+ files)
+├── testing/ → Playwright test infrastructure (153 tests)
+├── pilotScripts/ → Automation and utility scripts
+├── .github/ → CI/CD workflows and GitHub Actions
 ├── .husky/ → Git hooks (quality gates)
-├── CONFIGS/ → DevOps & AI setup docs
-├── docker-compose.yml → Local orchestration
-├── Dockerfile, nginx.conf → Container config
-└── docs/ → Documentation & architecture references
+├── scripts/ → Build and deployment scripts
+├── firebase.json → Firebase configuration
+├── next.config.ts → Next.js configuration
+└── package.json → Project dependencies and scripts
 
 yaml
 Copy code
 
 ---
 
-### Frontend Application Layer (`apps/web`)
-apps/web/
-├── src/
-│ ├── ai/ → AI audit engine flows, prompt templates
-│ ├── components/ → Shared React UI (modals, cards)
-│ ├── features/ → Domain logic (audit, dashboard, chat)
-│ ├── hooks/ → Firestore & UI hooks
-│ ├── lib/ → Utils (auth, analytics, SEO)
-│ ├── services/ → API clients, Firebase functions
-│ ├── styles/ → Theme, Tailwind, UI polish
-│ ├── types/ → Global types & models
+### Frontend Application Layer (`src/`)
+
+src/
+├── app/ → Next.js App Router
+│ ├── (app)/ → Protected feature pages
+│ ├── (auth)/ → Authentication pages
+│ ├── (public)/ → Public marketing pages
+│ └── api/ → API routes and endpoints
+├── ai/ → AI audit engine flows, NeuroSEO™ Suite
+├── components/ → Shared React UI (modals, cards, forms)
+├── lib/ → Utilities and services
+│ ├── auth/ → Authentication logic
+│ ├── firebase/ → Firebase configuration and services
+│ ├── neuroseo/ → NeuroSEO™ Suite implementation
+│ └── utils/ → Helper functions
+├── hooks/ → Custom React hooks (Firestore, UI, auth)
+├── context/ → React context providers
+├── constants/ → Application constants
+├── styles/ → Global styles and Tailwind config
+└── utils/ → Additional utility functions
 
 yaml
 Copy code
@@ -60,14 +76,17 @@ Use this directory map to:
 ## ✅ AI Guidance
 
 ### ☑ When writing new code:
+
 - Ask: “Where would this live based on the structure?”
 - Use: consistent foldering, logical file placement, type sharing
 
 ### ☑ When enhancing code:
+
 - Suggest shared utility refactoring to `lib/` or `hooks/`
 - Co-locate atomic UI with components, not feature logic
 
 ### ☑ When generating documentation:
+
 - Use structure map to create `/docs/` guides and README anchors
 - Prefer file-aware autocomplete and JSDoc-level completion
 
