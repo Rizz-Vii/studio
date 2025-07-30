@@ -163,7 +163,10 @@
     "mcp:setup": "echo 'MCP Configuration Status:' && cat state.json",
     "mcp:status": "echo 'Checking MCP server status...' && npm run mcp:validate",
     "build:memory-safe": "cross-env NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
-    "build:high-memory": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" next build"
+    "build:high-memory": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" next build",
+    "agents:disable": "echo \"🛡️ Agents disabled for development\"",
+    "agents:enable": "RANKPILOT_AGENTS_ENABLED=true npm run dev",
+    "dev:safe": "RANKPILOT_AGENTS_ENABLED=false npm run dev-no-turbopack"
   },
   "dependencies": {
     "@genkit-ai/firebase": "^1.14.0",
