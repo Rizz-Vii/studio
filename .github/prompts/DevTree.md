@@ -19,7 +19,24 @@ You are an advanced AI assistant embedded into a SaaS monorepo for RankPilot —
 │ ├── hooks/ → Custom React hooks
 │ └── utils/ → Helper utilities
 ├── functions/ → Firebase Cloud Functions
-├── docs/ → Comprehensive documentation (35+ files)
+
+### Root Level
+
+/
+├── src/ → Next.js App Router application
+│ ├── app/ → App Router pages and layouts
+│ ├── components/ → Shared React UI components
+│ ├── ai/ → AI audit engine flows and NeuroSEO™ Suite
+│ ├── lib/ → Utils (auth, analytics, SEO, Firebase)
+│ ├── hooks/ → Custom React hooks
+│ └── utils/ → Helper utilities
+├── functions/ → Firebase Cloud Functions
+├── docs/ → Professionally organized documentation hub
+│ ├── devnext/ → DevNext implementation phases (Part I, II, III)
+│ ├── integrations/ → External service integrations (MCP, Stripe, APIs)
+│ ├── analysis/ → Technical analysis and performance reports  
+│ ├── status-reports/ → Completion tracking and final reports
+│ └── README.md → Master documentation navigation
 ├── testing/ → Playwright test infrastructure (153 tests)
 ├── pilotScripts/ → Automation and utility scripts
 ├── .github/ → CI/CD workflows and GitHub Actions
