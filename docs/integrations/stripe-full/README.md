@@ -6,6 +6,7 @@
 
 ## 📋 **Complete Setup Documentation**
 
+
 ### **Setup & Configuration**
 
 - [**CLI Setup Guide**](./cli-setup-guide.md) - Stripe CLI installation and webhook configuration
@@ -14,24 +15,39 @@
 
 ## 💳 **Subscription System Architecture**
 
+
 ### **5-Tier System**
 
+
 - **Free Tier:** Basic SEO tools and limited NeuroSEO™ access
+
 - **Starter Tier:** Enhanced tools with moderate NeuroSEO™ quotas
+
 - **Agency Tier:** Advanced features with high NeuroSEO™ quotas  
+
 - **Enterprise Tier:** Full feature access with unlimited NeuroSEO™
+
 - **Admin Tier:** Complete system access with management capabilities
+
 
 ### **Payment Processing**
 
+
 - **Stripe Checkout:** Secure payment processing with webhook validation
+
 - **Subscription Management:** Automated tier upgrades and downgrades
+
 - **Usage Tracking:** Real-time quota monitoring and enforcement
+
 - **Billing Automation:** Automated invoicing and payment collection
 
 ## 🔗 **Navigation**
 
+
 - **Basic Stripe Setup:** [Stripe](../stripe/) - Essential payment configuration
+
 - **MCP Integration:** [MCP Full](../mcp-full/) - Complete MCP server setup
+
 - **External Services:** [External](../external/) - Third-party integrations  
+
 - **Integration Hub:** [Integrations](../README.md) - All integration documentation

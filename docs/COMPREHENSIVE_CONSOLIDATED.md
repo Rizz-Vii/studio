@@ -110,6 +110,7 @@ Provides a single source of truth for all project instructions, maintenance prot
 - Integrate real NeuroSEO engine, n8n automations, Stripe APIs
 - Implement quota, analytics, error handling, notifications
 - Usage stats, billing, and admin dashboards
+
 - **Playwright Test Suite** (✅ **Recently Refactored - July 2025**):
   - Comprehensive test suite with quality, integration, and E2E testing
   - Modern authentication patterns with centralized login helpers
@@ -228,11 +229,17 @@ ALWAYS refer to these documents before taking any action:
 
 ##### ✅ **COMPLETED ACHIEVEMENTS:**
 
+
 - **Enhanced UI Component Library** - 13+ components with mobile optimization
+
 - **Mobile Performance Optimization** - WCAG-compliant touch targets (48px minimum)
+
 - **NeuroSEO™ Suite Integration** - 6 AI engines with navigation prominence
+
 - **Comprehensive Testing Infrastructure** - 153 tests across 8 categories
+
 - **Accessibility Compliance** - WCAG 2.1 AA standards implementation
+
 - **Development Environment Optimization** - Zero compilation errors, fast builds
 
 ##### 🎯 **PRODUCTION READINESS:**
@@ -296,12 +303,19 @@ To establish RankPilot as the indispensable "Semantic Intelligence Layer" for th
 
 #### 1. Technical Foundation ✅ **COMPLETED**
 
+
 - **Frontend:** Next.js (App Router), React, Tailwind CSS, shadcn/ui
+
 - **Backend:** Firebase Cloud Functions (Node.js)
+
 - **Database:** Firestore (NoSQL)
+
 - **Authentication:** Firebase Authentication
+
 - **AI Processing:** OpenAI API (GPT-4), Playwright/Puppeteer
+
 - **Deployment:** GitHub Actions & Firebase Hosting
+
 - **Environment:** Development URL: <https://rankpilot-h3jpc.web.app/>
 
 #### 2. Implementation Progress ✅ **MAJOR UPDATE**
@@ -417,7 +431,9 @@ test("User Tier - Access Restrictions", async ({ page }) => {
 
 #### 1. **NeuralCrawler™** ✅
 
+
 - **Location**: `/src/lib/neuroseo/neural-crawler.ts`
+
 - **Capabilities**:
   - JavaScript-enabled content extraction with Playwright
   - Semantic classification and entity recognition
@@ -427,7 +443,9 @@ test("User Tier - Access Restrictions", async ({ page }) => {
 
 #### 2. **SemanticMap™** ✅
 
+
 - **Location**: `/src/lib/neuroseo/semantic-map.ts`
+
 - **Capabilities**:
   - Advanced NLP analysis with semantic clustering
   - Topic visualization and content mapping
@@ -437,7 +455,9 @@ test("User Tier - Access Restrictions", async ({ page }) => {
 
 #### 3. **AI Visibility Engine** ✅
 
+
 - **Location**: `/src/lib/neuroseo/ai-visibility-engine.ts`
+
 - **Capabilities**:
   - LLM query simulation for various search intents
   - AI citation tracking and position analysis
@@ -447,7 +467,9 @@ test("User Tier - Access Restrictions", async ({ page }) => {
 
 #### 4. **TrustBlock™** ✅
 
+
 - **Location**: `/src/lib/neuroseo/trust-block.ts`
+
 - **Capabilities**:
   - E-A-T (Expertise, Authoritativeness, Trustworthiness) auditing
   - Content credibility assessment and fact-checking
@@ -457,7 +479,9 @@ test("User Tier - Access Restrictions", async ({ page }) => {
 
 #### 5. **RewriteGen™** ✅
 
+
 - **Location**: `/src/lib/neuroseo/rewrite-gen.ts`
+
 - **Capabilities**:
   - AI-powered content optimization with multiple variants
   - Readability analysis and enhancement (Flesch-Kincaid scoring)
@@ -467,7 +491,9 @@ test("User Tier - Access Restrictions", async ({ page }) => {
 
 #### 6. **NeuroSEO™ Orchestrator** ✅
 
+
 - **Location**: `/src/lib/neuroseo/index.ts`
+
 - **Capabilities**:
   - Unified analysis pipeline coordinating all 5 engines
   - Comprehensive reporting with actionable insights
@@ -477,7 +503,9 @@ test("User Tier - Access Restrictions", async ({ page }) => {
 
 #### 7. **API Integration** ✅
 
+
 - **Location**: `/src/app/api/neuroseo/route.ts`
+
 - **Capabilities**:
   - RESTful API endpoints with Firebase authentication
   - Request validation and error handling
@@ -486,7 +514,9 @@ test("User Tier - Access Restrictions", async ({ page }) => {
 
 #### 8. **Dashboard Interface** ✅
 
+
 - **Location**: `/src/components/NeuroSEODashboard.tsx`
+
 - **Capabilities**:
   - Professional UI with comprehensive analytics
   - Real-time analysis progress tracking
@@ -1349,14 +1379,20 @@ _This priority matrix serves as the definitive roadmap for RankPilot feature dev
 
 **1. Master Branch → Production Deployment**
 
+
 - **Trigger:** Pull Request merge to master only
+
 - **Target:** `https://rankpilot-h3jpc.web.app` (Production)
+
 - **Features:** Full quality gates, security validation, post-deployment verification
 
 **2. Performance Branch → Testing Channel**
 
+
 - **Trigger:** Push to `feature/performance-optimization-mobile-enhancement`
+
 - **Target:** `https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app`
+
 - **Features:** Performance testing, mobile UX validation, preview channel
 
 ### 🎯 WORKFLOW SPECIFICATIONS
@@ -1473,8 +1509,11 @@ RECAPTCHA_SECRET_KEY
 
 #### Environment Variables Strategy
 
+
 - **Production:** Full production environment variables
+
 - **Performance Testing:** Performance testing specific configuration
+
 - **Functions:** Separate environment file creation for Firebase Functions
 
 ### 📊 WORKFLOW COMPARISON TABLE
@@ -1528,16 +1567,22 @@ git push origin feature/performance-optimization-mobile-enhancement
 
 Both workflows support manual triggering via GitHub Actions UI with options:
 
+
 - **Master:** Deploy functions toggle, skip tests toggle
+
 - **Performance:** Deploy functions toggle
 
 ### 🔍 MONITORING & TROUBLESHOOTING
 
 #### 🎯 Key Metrics to Monitor
 
+
 - **Build Success Rate:** Target 99%+ for both workflows
+
 - **Test Pass Rate:** Track test stability across environments
+
 - **Deployment Time:** Monitor for performance degradation
+
 - **Error Rates:** Track deployment failures and patterns
 
 #### 🚨 Common Issues & Solutions
@@ -1598,19 +1643,30 @@ firebase hosting:channel:delete performance-testing --project rankpilot-h3jpc
 
 #### ✅ Implementation Achievements
 
+
 - **Zero Configuration Errors:** Both workflows validate successfully
+
 - **Secure Secret Management:** All API keys and tokens properly configured
+
 - **Error Handling:** Comprehensive error handling and rollback procedures
+
 - **Performance Optimization:** Specialized performance testing pipeline
+
 - **Mobile Testing:** Dedicated mobile UX validation
+
 - **Production Safety:** PR-only production deployments with quality gates
 
 #### 📈 Expected Improvements
 
+
 - **Deployment Reliability:** 99%+ success rate with error handling
+
 - **Testing Coverage:** Comprehensive test matrix for both environments
+
 - **Development Velocity:** Fast feedback loop with performance branch
+
 - **Production Stability:** Quality gates ensure stable production releases
+
 - **Mobile Performance:** Automated mobile UX validation
 
 ### 🔮 FUTURE ENHANCEMENTS
@@ -1667,18 +1723,28 @@ firebase hosting:channel:delete performance-testing --project rankpilot-h3jpc
 
 #### Current State Analysis (RankPilot Studio)
 
+
 - **Total Files**: 629 (100%)
+
 - **Core Production Files**: 258 (41%)
+
 - **Testing Infrastructure**: 153 (24%)
+
 - **Documentation/Scripts**: 144 (23%)
+
 - **GitHub Actions**: 8 (1%)
+
 - **Essential Configs**: 8 (1%)
+
 - **Additional Development Files**: 58 (9%)
 
 #### Optimization Opportunity
 
+
 - **Production Files**: 266 core files (42% of total)
+
 - **Development Overhead**: 363 support files (58% of total)
+
 - **Lean Architecture Potential**: 58% file reduction opportunity
 
 ### 🎯 The Lean Branch Strategy Framework
@@ -1788,9 +1854,13 @@ feature/branch-name/
 
 ##### Feature Branch Benefits
 
+
 - **Reduced Complexity**: Only relevant files present
+
 - **Faster Cloning**: Smaller repository footprint
+
 - **Accelerated Feedback**: Focused testing and review
+
 - **Simplified Integration**: Clear change boundaries
 
 ### 📈 Performance Optimization Through Batch Size Reduction
@@ -1801,20 +1871,29 @@ feature/branch-name/
 
 Based on Cumulative Flow Diagram analysis:
 
+
 - **Smaller Batches** = Smaller Queues = Faster Cycle Time
+
 - **Independent of Capacity**: Improvements without resource increases
+
 - **Proportional Relationship**: Queue size directly correlates to batch size
 
 ##### 2. Accelerated Feedback Loops
 
+
 - **Rapid Validation**: Issues identified within hours, not weeks
+
 - **Reduced Rework Cost**: Early detection prevents geometric complexity growth
+
 - **Continuous Integration**: Smaller changes integrate smoothly
 
 ##### 3. Risk Mitigation
 
+
 - **Lower Failure Probability**: Smaller changes have fewer failure points
+
 - **Faster Recovery**: Issues isolated to specific features
+
 - **Reduced Blast Radius**: Limited impact of individual changes
 
 #### Economic Optimization Model
@@ -1837,8 +1916,11 @@ Lean Approach:
 
 ##### Holding Cost Minimization
 
+
 - **Faster Time-to-Market**: Reduced queue times
+
 - **Lower Technical Debt**: Continuous integration prevents accumulation
+
 - **Competitive Advantage**: Rapid feature delivery
 
 ### 🔧 Implementation Strategy
@@ -2043,10 +2125,15 @@ export function calculateLeanEfficiency(metrics: LeanMetrics): number {
 
 ##### Lean Architecture KPIs
 
+
 - **Repository Efficiency**: File count reduction percentage
+
 - **Deployment Speed**: Time from commit to production
+
 - **Build Performance**: Build time reduction
+
 - **Developer Experience**: Feature branch complexity reduction
+
 - **Quality Maintenance**: Test coverage in lean deployments
 
 ##### Success Metrics Dashboard
@@ -2120,18 +2207,28 @@ $healthCheck | Format-Table -AutoSize
 
 #### Quantified Benefits
 
+
 - **58% Repository Size Reduction**: From 629 to 258 core production files
+
 - **65% Faster Deployments**: Lean bundles deploy significantly faster
+
 - **40% Reduced Build Times**: Smaller codebase compilation
+
 - **95% Test Coverage Maintenance**: Quality preserved in lean architecture
+
 - **50% Fewer Integration Conflicts**: Simplified merge processes
 
 #### Strategic Advantages
 
+
 - **Enhanced Developer Experience**: Simplified workflows and faster feedback
+
 - **Improved System Reliability**: Smaller attack surface and fewer failure points
+
 - **Accelerated Innovation**: Rapid feature development and deployment
+
 - **Cost Optimization**: Reduced infrastructure and maintenance overhead
+
 - **Competitive Advantage**: Faster time-to-market and response to changes
 
 ### 📚 References and Research Sources
@@ -2148,9 +2245,13 @@ $healthCheck | Format-Table -AutoSize
 
 #### Implementation Resources
 
+
 - **Repository Analysis Scripts**: PowerShell tools for file classification and optimization
+
 - **CI/CD Templates**: GitHub Actions workflows for lean deployment
+
 - **Monitoring Dashboards**: KPI tracking and continuous improvement metrics
+
 - **Training Materials**: Team onboarding and workflow adaptation guides
 
 ---
@@ -2269,11 +2370,17 @@ const config = {
 
 **Components Enhanced:**
 
+
 - **Enhanced Button Component** - Loading states, haptic feedback, mobile optimization
+
 - **Enhanced Card Component** - Smooth animations, multiple variants, touch-friendly
+
 - **Enhanced Form Component** - Real-time validation, accessibility-first design
+
 - **Enhanced Error Boundary** - Network-aware recovery mechanisms
+
 - **Enhanced Navigation System** - NeuroSEO™ prominence, tier-based access
+
 - **Enhanced Mobile Components** - 48px touch targets, responsive design
 
 **Key Features:**
@@ -2288,9 +2395,13 @@ const config = {
 
 **Utilities Implemented:**
 
+
 - **Mobile-Responsive Utilities** - 8 custom hooks for mobile detection and optimization
+
 - **Touch Target Optimization** - WCAG compliant 48px minimum targets
+
 - **Haptic Feedback Simulation** - Enhanced mobile interactions
+
 - **Performance Monitoring** - Real-time metrics and adaptive loading
 
 **Performance Targets Achieved:**
@@ -2304,10 +2415,15 @@ const config = {
 
 **Features Implemented:**
 
+
 - **NeuroSEO™ Suite Prominence** - AI-powered features now primary focus
+
 - **Logical Feature Grouping** - Systematic organization of tools
+
 - **Collapsible Navigation** - Progressive disclosure for better UX
+
 - **Mobile Navigation** - Touch-optimized with bottom sheet pattern
+
 - **Tier-Based Visibility** - Features show/hide based on subscription level
 
 **Navigation Groups:**
@@ -2321,10 +2437,15 @@ const config = {
 
 **Testing Statistics:**
 
+
 - **153 Organized Tests** - Comprehensive coverage across 8 categories
+
 - **Role-Based Testing** - Real Firebase users across 5 tiers
+
 - **Mobile Testing** - Responsive behavior validation (320px-1920px)
+
 - **Accessibility Testing** - WCAG compliance verification
+
 - **Performance Testing** - Core Web Vitals monitoring
 
 **Test Categories:**
@@ -2420,10 +2541,15 @@ All markdown documentation files have been moved from the root directory to the 
 
 To improve maintainability and reduce redundancy, related documentation has been consolidated into comprehensive guides:
 
+
 - **Subscription & Tier System Documentation**: Consolidated into SUBSCRIPTION_TIER_COMPREHENSIVE.md
+
 - **PilotBuddy Documentation**: Consolidated into PILOTBUDDY_COMPREHENSIVE.md
+
 - **Mobile Performance Documentation**: Updated MOBILE_PERFORMANCE_COMPREHENSIVE.md
+
 - **Security & GitIgnore Documentation**: Consolidated into SECURITY_AND_GITIGNORE_COMPREHENSIVE.md
+
 - **Developer Workflow Documentation**: Consolidated into DEVELOPER_WORKFLOW_COMPREHENSIVE.md
 
 #### Benefits
@@ -2438,8 +2564,11 @@ To improve maintainability and reduce redundancy, related documentation has been
 
 The autonomous learning system automatically detected and updated:
 
+
 - **Documentation Count**: Updated from 94 → 109 files
+
 - **Organization Pattern**: Recognized documentation consolidation
+
 - **Project Cleanliness**: Improved root directory structure
 
 ---
@@ -2801,8 +2930,11 @@ foreach ($page in $pages) {
 
 **Expected Results:**
 
+
 - **200 OK**: All public pages load successfully
+
 - **302/401**: Protected pages redirect to auth when unauthenticated
+
 - **404**: Only for genuinely missing pages
 
 #### 1.3 Robots.txt & Canonicals
@@ -3042,8 +3174,11 @@ npx lighthouse https://rankpilot-h3jpc.web.app/neuro-vs-seo --output=json
 
 **Expected Metrics:**
 
+
 - **LCP**: < 2.5s
+
 - **FID**: < 100ms  
+
 - **CLS**: < 0.1
 
 **Current Status:** ✅ **PASS** - Meets performance targets
@@ -3316,18 +3451,24 @@ _This answer sheet provides structured testing protocols and expected results fo
 
 #### 1.1 Core Identity
 
+
 - **Product Name:** RankPilot (internal codename: Studio)
+
 - **Mission:** Serve as the "Semantic Intelligence Layer" for the internet, enabling businesses to gain visibility and authority in the era of AI-driven search (Google SGE, ChatGPT, etc.).
+
 - **Target Personas:**
   - **SEO Consultants (Alex):** Needs deep, actionable insights for client sites.
   - **Marketing Managers (Maria):** Seeks clear, prioritized recommendations and reporting.
   - **Content Writers (David):** Requires guidance for semantic optimization and authority.
   - **Technical SEOs (Chloe):** Demands technical audits, E-E-A-T signals, and trust metrics.
+
 - **Value Proposition:** AI-powered, actionable SEO insights, semantic analysis, and trust scoring, tailored to modern search paradigms.
 
 #### 1.2 Business Goals
 
+
 - **Monetization:** Subscription tiers (Free, Starter, Pro, Agency, Enterprise).
+
 - **Acquisition & Retention:** Feature-rich onboarding, actionable insights, clear upgrade paths, and agency/client management tools.
 
 ---
@@ -3336,56 +3477,82 @@ _This answer sheet provides structured testing protocols and expected results fo
 
 #### 2.1 NeuroSEO™ Feature Suite
 
+
 - **NeuralCrawler™**
   - Extracts content, technical data, and authorship signals from target URLs.
+
 - **SemanticMap™**
   - Performs NLP analysis, identifies topic gaps, and visualizes content clusters.
+
 - **AI Visibility Engine**
   - Simulates search queries, reports on content citations, and provides "why" explanations for rankings.
+
 - **TrustBlock™**
   - Audits E-E-A-T signals, quantifies trust, and provides actionable trust scores.
+
 - **RewriteGen™**
   - AI-powered co-writing for titles, headings, and paragraphs, optimizing for semantic density and authority.
+
 - **Out-of-Scope (v1.0):**
   - No traditional keyword rankings or off-site backlink analysis.
 
 #### 2.2 Core Features (from Blueprint)
 
+
 - **AI Keyword Tool:** AI-driven keyword suggestions, long-tail and high-potential identification.
+
 - **Content Analyzer:** Readability, keyword density, semantic relevance, and actionable advice.
+
 - **SEO Competitors:** Keyword ranking comparison, content gap analysis, and outranking opportunities.
+
 - **SERP Visualization:** Visualizes SERP features, ranking patterns, and user intent.
+
 - **Technical SEO Audit:** Checks title tags, image alts, meta descriptions, broken links, site speed, and mobile-friendliness.
+
 - **Link View (Link Analysis):** Analyzes inbound domains, backlink opportunities, and link quality/relevance.
+
 - **Dashboard Overview:** Displays key SEO metrics, traffic, keyword rankings, and overall SEO score.
+
 - **Actionable Insights:** Prioritized recommendations and a task list with estimated impact.
 
 #### 2.3 UI/UX Design & Workflows
 
 ##### User Workflows
 
+
 - **Workflow 1:** New User Onboarding & First Audit (guided, with backend actions and system feedback).
+
 - **Workflow 2:** Upgrading to Paid Plan (Stripe integration, Firebase Custom Claims, subscription status update).
+
 - **Workflow 3:** Agency Consultant Managing Client Project (client audit, quota check, RewriteGen™ usage, PDF export).
 
 ##### UI Wireframe Descriptions
 
+
 - **Dashboard (/dashboard):**
   - Left Sidebar: Navigation, user profile.
   - Main Content: Header, Usage Card, Recent Audits Table, CTA.
+
 - **Content Audit Input (/audit):**
   - URL input, Run Audit button, Advanced Options.
+
 - **Audit Report View (/report/[auditId]):**
   - Overall Score, AI Semantic Analysis, Trust Signals, On-Page SEO, actionable content linking.
+
 - **Pricing Page (/pricing):**
   - Billing toggle, tier cards (Free, Starter, Pro, Agency), Enterprise section.
 
 ##### Style Guidelines
 
+
 - **Colors:** Primary (#6699CC), Background (#E0E5E8), Accent (#C2AED3)
+
 - **Fonts:** Body ('PT Sans'), Headings ('Space Grotesk')
+
 - **Icons:** Minimalist, clarity-focused
+
 - **Layout:** Clean, structured, ample spacing
+
 - **Animations:** Subtle transitions, loading indicators
 
 ---
@@ -3394,21 +3561,31 @@ _This answer sheet provides structured testing protocols and expected results fo
 
 #### 3.1 Core Stack
 
+
 - **Frontend:** Next.js (App Router), React, Tailwind CSS, shadcn/ui
+
 - **Backend:** Firebase Cloud Functions (Node.js)
+
 - **Database:** Firestore (NoSQL)
+
 - **Authentication:** Firebase Auth (Email/Password, Google OAuth)
+
 - **AI & Processing:** OpenAI API (GPT-4o), Playwright/Puppeteer, Embeddings APIs
+
 - **CI/CD:** GitHub Actions (auto-deploy to Firebase on push to master)
+
 - **Live Deployment:** <https://rankpilot-h3jpc.web.app/>
 
 #### 3.2 Code Management & Standards
 
+
 - **GitIgnore Strategy:** Structured by main, functions, tests, and AI directories; personal ignores and new patterns are managed per documented workflow.
+
 - **Contributing Guidelines:**
   - Fork, clone, and use feature/ or fix/ branch naming.
   - PRs require tests, linting, documentation updates, and clear commit messages.
   - Code review is mandatory.
+
 - **Technical Standards:**
   - **Frontend:** Next.js conventions, hydration-safe forms, accessibility.
   - **Backend:** Cloud Functions targeting Node.js, modular AI flows.
@@ -3417,10 +3594,15 @@ _This answer sheet provides structured testing protocols and expected results fo
 
 #### 3.3 Development Testing Strategy
 
+
 - **Problem Analysis:** Test execution order, slow local compilation, and unimplemented features are acknowledged.
+
 - **Immediate Solutions:** Development-ready tests (`npm run test:local:basic`, `npm run test:local`), server warmup, feature detection logic.
+
 - **Test Commands:** `test:local`, `test:local:basic`, `test:local:debug`, `test:prod`, `test:headed:local`, `test:ui`.
+
 - **Future Phases:** Accessibility, cross-browser visual regression, performance monitoring, integration scenarios.
+
 - **Benefits:** Faster feedback, reliable local testing, and robust CI/CD integration.
 
 ---
@@ -3429,13 +3611,18 @@ _This answer sheet provides structured testing protocols and expected results fo
 
 #### 4.1 Current Progress
 
+
 - **Phase 0:** Foundation & Setup (100% Complete)
+
 - **Phase 1:** Core MVP (60% Complete)
 
 #### 4.2 Immediate Priorities (Sprint 1: Stabilization)
 
+
 - **Security Hardening:** Firestore rules, RBAC, API rate limiting.
+
 - **Monitoring Enhancement:** Error tracking, performance monitoring, user action logging.
+
 - **Performance Optimization:** Caching, bottleneck analysis.
 
 #### 4.3 Future Sprints Focus
@@ -3450,7 +3637,9 @@ _This answer sheet provides structured testing protocols and expected results fo
 4. **Review & Release:** QA, UAT, documentation, deployment.
 5. **Monitoring & Iteration:** Bug fixes, performance, feedback loops.
 
+
 - **Key Principles:** Documentation-first, reliability, performance, security, UX.
+
 - **Workflow:** Feature branches, PR reviews, CI/CD pipeline.
 
 ---
@@ -3459,24 +3648,34 @@ _This answer sheet provides structured testing protocols and expected results fo
 
 #### 5.1 Architectural Philosophy
 
+
 - **Serverless & Managed Services:** GCP, Firebase, "scale-by-design."
 
 #### 5.2 Technical Scaling Pillars
 
+
 - **Compute:** Cloud Functions, Task Queues (Cloud Tasks/Pub/Sub) for async jobs.
+
 - **Database:** Firestore optimization, continuous monitoring.
+
 - **Monitoring & Observability:** Unified Google Cloud Monitoring, critical alerts.
+
 - **CI/CD & DevOps:** Enhanced GitHub Actions, staged deployments, one-click rollback.
 
 #### 5.3 Security & Compliance
 
+
 - **Secrets:** Google Cloud Secret Manager.
+
 - **Audits:** Quarterly vulnerability, annual penetration tests.
+
 - **Compliance:** GDPR/CCPA readiness.
 
 #### 5.4 Organizational Scaling
 
+
 - **Documentation:** Treated as a force multiplier.
+
 - **Feedback Loops:** In-app tools, analytics.
 
 ---
@@ -3485,21 +3684,26 @@ _This answer sheet provides structured testing protocols and expected results fo
 
 #### 6.1 Firebase
 
+
 - **Auth, Firestore, Cloud Functions, Hosting**
 
 #### 6.2 Google Cloud Platform
+
 
 - **Secret Manager, Monitoring, Cloud Tasks, Pub/Sub**
 
 #### 6.3 AI Services
 
+
 - **OpenAI API (GPT-4o), Playwright/Puppeteer**
 
 #### 6.4 Development Tools
 
+
 - **Next.js, React, Tailwind CSS, shadcn/ui, Node.js, GitHub Actions**
 
 #### 6.5 Other Integrations
+
 
 - **Stripe:** Webhook handler for billing and subscription management.
 
@@ -3507,26 +3711,38 @@ _This answer sheet provides structured testing protocols and expected results fo
 
 ### VII. Actionable Protocols & Conventions
 
+
 - **Hydration & Client State:** Always render form fields; use `isMounted` for disabled state, not conditional rendering.
+
 - **Form Handling:** Use `react-hook-form` with Zod, normalize URLs, ensure accessibility.
+
 - **Results Display:** Use `useRef` and `useEffect` for scrolling, animate with `framer-motion`.
+
 - **AI/Backend Integration:** Import AI flows from `/ai/flows/`, log user actions/results to Firestore.
+
 - **Security & Status:** Always check and update `/docs/SECURITY_ROTATION.md`, `/docs/PROJECT_STATUS_AND_NEXT_STEPS.md`, `/docs/AGILE_PRIORITY_PLAN.md`, and `/docs/COMPREHENSIVE_INSTRUCTIONS.md` after major changes.
+
 - **Testing:** Playwright for E2E, see `/tests/`.
+
 - **Build/Dev/Deploy:** `npm run build`, `npm run dev`, GitHub Actions for deploy, `firebase deploy --only functions` for backend.
 
 ---
 
 ### VIII. Documentation & Continuous Improvement
 
+
 - **Documentation:** All major changes must be reflected in `/docs/`.
+
 - **Post-Deployment Documentation Review:** After every successful deployment to live hosting (production), conduct a thorough review of all documentation in `/docs/`:
   - Update all relevant files to accurately reflect the current state of the application, infrastructure, features, and workflows.
   - Ensure that deployment steps, environment variables, security protocols, and user-facing changes are documented.
   - Confirm that `/docs/SECURITY_ROTATION.md`, `/docs/PROJECT_STATUS_AND_NEXT_STEPS.md`, `/docs/AGILE_PRIORITY_PLAN.md`, `/docs/COMPREHENSIVE_INSTRUCTIONS.md`, and any other process-critical files are up to date.
   - Log the documentation review in the appropriate changelog or status file.
+
 - **Security:** Never commit secrets; follow rotation and audit protocols.
+
 - **Prioritization:** Check `/docs/AGILE_PRIORITY_PLAN.md` before new features.
+
 - **Tool Selection:** Adhere to `/docs/MCP_INSTRUCTION_MAP.md`.
 
 ---
@@ -3556,41 +3772,65 @@ RankPilot implements a 5-tier subscription model that provides different levels 
 
 #### 1. Free Tier
 
+
 - **Name**: "free"
+
 - **Price**: $0/month
+
 - **Features**: Basic functionality, limited usage
+
 - **Limits**: 10 keywords, 1 competitor
+
 - **NeuroSEO™ Access**: Basic features only
 
 #### 2. Starter Tier
 
+
 - **Name**: "starter" 
+
 - **Price**: $29/month, $290/year
+
 - **Features**: Enhanced functionality for individuals
+
 - **Limits**: 50 keywords, 5 competitors
+
 - **NeuroSEO™ Access**: Basic features
 
 #### 3. Agency Tier
 
+
 - **Name**: "agency"
+
 - **Price**: $199/month, $1990/year
+
 - **Features**: Professional features for agencies
+
 - **Limits**: Unlimited keywords and competitors
+
 - **NeuroSEO™ Access**: Advanced features
 
 #### 4. Enterprise Tier
 
+
 - **Name**: "enterprise"
+
 - **Price**: $499/month, $4990/year
+
 - **Features**: Full enterprise features
+
 - **Limits**: Everything in Agency plus enterprise features
+
 - **NeuroSEO™ Access**: Unlimited usage
 
 #### 5. Admin Tier
 
+
 - **Name**: "admin"
+
 - **Internal Use**: RankPilot team only
+
 - **Features**: Complete system access
+
 - **NeuroSEO™ Access**: All features + system configuration
 
 ### Tier Hierarchy & Feature Inheritance
@@ -3774,28 +4014,42 @@ export async function updateUserSubscription(
 
 #### 1. Automatic User Subscription Sync ✅
 
+
 - **File**: `src/lib/user-subscription-sync.ts`
+
 - **Function**: `ensureUserSubscription()`
+
 - **Integration**: Added to `AuthContext.tsx` to run on every login
+
 - **Behavior**: Automatically creates proper subscription data when a user logs in
 
 #### 2. Admin Management Tools ✅
 
+
 - **File**: `src/lib/admin-user-management.ts`
+
 - **Functions**: `adminUpdateUserSubscription()`, `fixAllTestUsers()`
+
 - **Interface**: `src/components/admin/AdminUserSubscriptionManager.tsx`
+
 - **Access**: Available in Admin Dashboard → Subscriptions tab
 
 #### 3. Debug Tools ✅
 
+
 - **File**: `src/components/debug/UserSubscriptionDebugger.tsx`
+
 - **Page**: `/debug` - Shows detailed subscription info for current user
+
 - **Features**: Real-time subscription status, UID tracking, raw data inspection
 
 #### 4. UID Consistency Fix ✅
 
+
 - **Problem**: Hardcoded UIDs in test data causing subscription mismatches
+
 - **Solution**: Updated all subscription checks to use Firebase Authentication UIDs
+
 - **Implementation**: Enhanced subscription service to handle edge cases
 
 ### Best Practices

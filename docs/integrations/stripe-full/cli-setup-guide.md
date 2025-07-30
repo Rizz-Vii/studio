@@ -6,6 +6,7 @@
 
 ## 📋 **Stripe CLI Installation & Setup**
 
+
 ### **Step 1: Install Stripe CLI**
 
 **macOS (Homebrew):**
@@ -27,6 +28,7 @@ sudo apt update && sudo apt install stripe
 - Download from: https://github.com/stripe/stripe-cli/releases
 - Extract and add to PATH
 
+
 ### **Step 2: Authenticate with Stripe**
 
 ```bash
@@ -35,6 +37,7 @@ stripe login
 ```
 
 **Follow the browser authentication flow and return to terminal**
+
 
 ### **Step 3: Start Webhook Forwarding for RankPilot**
 
@@ -51,6 +54,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
 
 ## ⚡ **RankPilot Webhook Testing Commands**
+
 
 ### **Test Payment Flow:**
 
@@ -70,6 +74,7 @@ stripe trigger invoice.payment_failed
 # Test subscription cancellation
 stripe trigger customer.subscription.deleted
 ```
+
 
 ### **Test RankPilot-Specific Events:**
 
@@ -92,6 +97,7 @@ stripe checkout sessions create \
 
 ## 🔧 **Development Workflow**
 
+
 ### **Terminal 1: RankPilot Development Server**
 
 ```bash
@@ -99,11 +105,13 @@ cd /workspaces/studio
 npm run dev-no-turbopack
 ```
 
+
 ### **Terminal 2: Stripe Webhook Listener**
 
 ```bash
 stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
+
 
 ### **Terminal 3: Event Testing**
 
@@ -116,6 +124,7 @@ stripe trigger invoice.payment_succeeded
 
 ## 📊 **Real-Time Webhook Monitoring**
 
+
 ### **Monitor RankPilot Webhook Events:**
 
 ```bash
@@ -127,6 +136,7 @@ stripe listen \
   --forward-to localhost:3000/api/stripe/webhook \
   --events checkout.session.completed,customer.subscription.updated,invoice.payment_succeeded
 ```
+
 
 ### **Test Event Payload:**
 
@@ -150,6 +160,7 @@ stripe events create \
 ```
 
 ## 🎯 **Production Webhook Setup**
+
 
 ### **When deploying to production:**
 
@@ -177,6 +188,7 @@ STRIPE_WEBHOOK_SECRET=whsec_your_production_webhook_secret
 
 ## 🚀 **Complete RankPilot Payment Test Sequence**
 
+
 ### **1. Start All Services:**
 
 ```bash
@@ -188,6 +200,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 # Terminal 3: Ready for testing
 ```
+
 
 ### **2. Test Payment Flow:**
 
@@ -201,6 +214,7 @@ curl -X POST http://localhost:3000/api/stripe/checkout \
     "cancelUrl": "http://localhost:3000/pricing"
   }'
 ```
+
 
 ### **3. Simulate Webhook Events:**
 
@@ -216,18 +230,26 @@ curl http://localhost:3000/api/stripe/webhook/test
 
 ✅ **Current Configuration:**
 
+
 - **Webhook Secret:** `whsec_uUnLNcs8nTaMTlVOkkLYoMpWLnLzIv7c`
+
 - **Environment:** Development (Stripe CLI)
+
 - **Endpoint:** `http://localhost:3000/api/stripe/webhook`
+
 - **Status:** Active and ready for testing
 
 ✅ **Price Configuration:**
 
+
 - **Starter Tier Price ID:** `price_1RqFwc2fkoCQ0GTp8wygbgXh`
+
 - **Amount:** A$29.00/month
+
 - **Status:** Active in Stripe Dashboard
 
 ## 🔍 **Troubleshooting**
+
 
 ### **Common Issues:**
 

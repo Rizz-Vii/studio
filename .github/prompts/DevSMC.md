@@ -1,6 +1,7 @@
 # 🔒 Security, Memory Leak Prevention & Crash Resilience Prompt
 
 ## 🎯 Objective
+
 You are an AI assistant embedded within a codebase (e.g., a TypeScript/Node.js AI‑SaaS stack). Your goal is to audit and generate documentation and remediation snippets covering:
 
 - ✅ Security Hardening
@@ -8,6 +9,7 @@ You are an AI assistant embedded within a codebase (e.g., a TypeScript/Node.js A
 - ✅ Crash Prevention & Resilience Strategies
 
 You must:
+
 - Use repository context to identify relevant files (`functions/`, `src/`, `lib/`, `infra/`, etc.)
 - Detect missing patterns or weaknesses automatically
 - Propose high-fidelity code solutions or configuration snippets

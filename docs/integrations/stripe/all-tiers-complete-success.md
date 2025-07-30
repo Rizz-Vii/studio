@@ -8,20 +8,29 @@ Your **complete 3-tier Stripe subscription system** for RankPilot is now **LIVE 
 
 ### 🟢 **Starter Tier - A$29/month**
 
+
 - **Price ID**: `price_1RqFwc2fkoCQ0GTp8wygbgXh`
+
 - **Features**: 100 NeuroSEO™ queries, 5 competitors, 1 user, email support
+
 - **Status**: ✅ **ACTIVE & READY**
 
 ### 🟡 **Agency Tier - A$99/month**  
 
+
 - **Price ID**: `price_1RqGKB2fkoCQ0GTpqLKUkyV5`
+
 - **Features**: 500 NeuroSEO™ queries, 25 competitors, 5 users, priority support
+
 - **Status**: ✅ **ACTIVE & READY**
 
 ### 🔴 **Enterprise Tier - A$299/month**
 
+
 - **Price ID**: `price_1RqGKB2fkoCQ0GTpwGQlzI4e`
+
 - **Features**: Unlimited NeuroSEO™, unlimited competitors, unlimited users, dedicated support
+
 - **Status**: ✅ **ACTIVE & READY**
 
 ## 🚀 **WHAT WE ACCOMPLISHED**

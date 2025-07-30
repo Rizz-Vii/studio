@@ -196,9 +196,13 @@ Measure-Command { npm run dev }
 
 #### Expected Improvements:
 
+
 - **Before optimization**: 100-200ms filesystem benchmark
+
 - **After optimization**: 20-50ms filesystem benchmark
+
 - **Dev server startup**: 30-60s → 3-5s with Turbopack
+
 - **Hot reload**: 3-5s → <1s
 
 ### 🔍 Troubleshooting

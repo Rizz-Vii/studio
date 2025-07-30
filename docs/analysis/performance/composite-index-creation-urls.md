@@ -5,19 +5,23 @@
 Based on the Firestore errors, you need to create these composite indexes manually via Firebase Console:
 
 ### 1. NeuroSEO Analyses Collection
+
 **Collection**: `neuroSeoAnalyses`
 **Query**: `userId == "YVgB3QSJ9LXJVwIZYtNjGFevJfG2" && __name__ desc`
 
 **Firebase Console URL:**
+
 ```
 https://console.firebase.google.com/v1/r/project/rankpilot-h3jpc/firestore/indexes?create_composite=Cj5wcm9qZWN0cy9yYW5rcGlsb3QtaDNqcGMvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL25ldXJvU2VvQW5hbHlzZXMSCwoGdXNlcklkEAESCwoEX19uYW1lEAIaCgJESQAYBnBhcmVudOZmQXdC
 ```
 
 ### 2. Keyword Research Collection
+
 **Collection**: `keywordResearch`
 **Query**: `userId == "YVgB3QSJ9LXJVwIZYtNjGFevJfG2" && __name__ desc`
 
 **Firebase Console URL:**
+
 ```
 https://console.firebase.google.com/v1/r/project/rankpilot-h3jpc/firestore/indexes?create_composite=Cj5wcm9qZWN0cy9yYW5rcGlsb3QtaDNqcGMvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL2tleXdvcmRSZXNlYXJjaBILCgZ1c2VySWQQARILCgRfX25hbWUQAhoKAkhBABgGcGFyZW50wBdB
 ```
@@ -44,6 +48,7 @@ firebase deploy --only firestore:indexes --project rankpilot-h3jpc
 ## Status After Creation
 
 Once these indexes are created:
+
 - ✅ Dashboard will load project data
 - ✅ NeuroSEO analyses will display correctly
 - ✅ Keyword research functionality will work
@@ -54,6 +59,7 @@ Once these indexes are created:
 Test dashboard functionality at: https://rankpilot-studio.web.app/dashboard
 
 Expected behavior:
+
 - Projects section loads without errors
 - NeuroSEO analyses display
 - Keyword research tools function properly

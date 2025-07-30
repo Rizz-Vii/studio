@@ -19,6 +19,7 @@ Ensure:
 For each rule, output missing patterns and recommended code snippet.
 
 Output:
+
 - ✅ Best Practices Present
 - ❌ Issues or omissions
 - 🛠️ Fix suggestions with file path and snippet

@@ -61,16 +61,27 @@ This file serves as a persistent instruction set for GitHub Copilot and any auto
 
 ### VI. Tooling & Ecosystem
 
+
 - **Development Environment**: VS Code, Node.js v20, npm, PowerShell (Windows-optimized).
+
 - **Cloud Services**: Firebase (Auth, Firestore, Functions, Hosting), Google Cloud Platform (Secret Manager, Monitoring).
+
 - **AI Infrastructure**: OpenAI API (GPT-4o), Genkit AI flows, custom NeuroSEO™ engines.
+
 - **Testing Tools**: Playwright for E2E testing, Jest for unit testing.
+
 - **Performance**: Lighthouse, Core Web Vitals, custom monitoring scripts.
+
 - **Frontend Libraries**: Next.js, React, Tailwind CSS, shadcn/ui, framer-motion, Recharts.
+
 - **Backend Services**: Firebase Cloud Functions, Firestore, Task Queues.
+
 - **Payment Processing**: Stripe API, PayPal integration with webhook handling.
+
 - **SEO Analysis**: Custom NeuroSEO™ Suite with 6 specialized engines.
+
 - **Deployment**: GitHub Actions, Firebase Hosting, automated CI/CD pipeline.
+
 - **Monitoring**: Error tracking, performance monitoring, usage analytics.
 
 ### VII. Actionable Protocols & Conventions

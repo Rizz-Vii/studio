@@ -8,7 +8,9 @@ This script creates Stripe products and price IDs for RankPilot's Agency ($99 AU
 
 ### Agency Tier ($99 AUD/month)
 
+
 - **Product**: RankPilot Agency
+
 - **Features**: 
   - 500 NeuroSEO™ queries per month
   - 25 competitor analysis slots
@@ -20,7 +22,9 @@ This script creates Stripe products and price IDs for RankPilot's Agency ($99 AU
 
 ### Enterprise Tier ($299 AUD/month)
 
+
 - **Product**: RankPilot Enterprise
+
 - **Features**:
   - Unlimited NeuroSEO™ queries
   - Unlimited competitor tracking

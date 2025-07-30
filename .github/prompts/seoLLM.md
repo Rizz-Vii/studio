@@ -14,11 +14,13 @@ Ensure:
 - In-app analytics or signal loops feed content metrics back into LLM prompt tuning.
 
 For each recommendation:
+
 - ✅ Confirm implemented
 - ❌ Flag missing
 - 🛠️ Suggest file-level insertion or code snippet
 
 Output a summary:
+
 - Present practices
 - Gaps to fill
 - Practical implementation steps by file path/snippet

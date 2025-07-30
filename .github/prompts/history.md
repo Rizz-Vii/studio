@@ -7,7 +7,9 @@ This document is a comprehensive archive of strategic prompts, research, and arc
 ---
 
 ## 🧠 Core Objective
+
 To instruct a GitHub Copilot or AI IDE agent to:
+
 - Reference live project structure, database schemas, and site context.
 - Generate precise refactors, audits, and implementation plans.
 - Leverage best practices across security, architecture, testing, performance, and SEO.
@@ -17,6 +19,7 @@ To instruct a GitHub Copilot or AI IDE agent to:
 ## 🧭 Index of Covered Topics
 
 ### 🔧 Development & Architecture
+
 - AI IDE prompt creation for full-stack audits
 - Codebase refactor strategies
 - Software design principles (SOLID, DRY, KISS, DDD)
@@ -26,6 +29,7 @@ To instruct a GitHub Copilot or AI IDE agent to:
 - Directory architecture for RankPilot
 
 ### 🚀 Performance & Security
+
 - Memory optimization
 - Crash prevention strategies
 - Memory leak analysis
@@ -33,18 +37,21 @@ To instruct a GitHub Copilot or AI IDE agent to:
 - Security best practices (auth, token handling, Firebase rules)
 
 ### 🔍 Testing & Validation
+
 - Real-time synchronicity testing
 - Component validation logic
 - Project-wide validation maps
 - Comprehensive UI/UX testing prompts
 
 ### 🧩 SEO & AI Search Strategies
+
 - LLM-enhanced SEO techniques
 - Chat-optimized metadata & content suggestions
 - Specialized prompt for SEO Copilot agents
 - Sitemap audit prompts
 
 ### 📚 Documentation & Principle Files
+
 - `PROMPT.md` templates:
   - Refactor and architecture audit
   - SEO strategies
@@ -56,6 +63,7 @@ To instruct a GitHub Copilot or AI IDE agent to:
 - Company-level foundational docs (README, CONTRIBUTING, SECURITY, etc.)
 
 ### 🧠 Chatbot Development (RankPilot Context-Aware)
+
 - Firestore structure blueprint for chat context
 - React UI interface component outline
 - Firebase callable function for NLP/Audit interaction
@@ -63,11 +71,13 @@ To instruct a GitHub Copilot or AI IDE agent to:
 - Chat session logs and summarization logic
 
 ### 💻 DevTools Integration
+
 - Simple browser troubleshooting in VS Code
 - Live site inspection from within IDE
 - Accessing live Firestore + deployment contexts
 
 ### 📁 Folder Architecture (RankPilot-specific)
+
 ```txt
 📁 /src
  ├── 🧩 /components       → Reusable UI components
