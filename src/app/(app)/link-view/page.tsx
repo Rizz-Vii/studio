@@ -1,15 +1,6 @@
 // src/app/(app)/link-view/page.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import type {
-  LinkAnalysisInput,
-  LinkAnalysisOutput,
-} from "@/ai/flows/link-analysis";
-import { analyzeLinks } from "@/ai/flows/link-analysis";
-import { useAuth } from "@/context/AuthContext";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import LinkAnalysisForm from "@/components/link-analysis-form";
 import {
   Card,
@@ -19,6 +10,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import LoadingScreen from "@/components/ui/loading-screen";
+import {
   Table,
   TableBody,
   TableCell,
@@ -26,24 +24,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle, BarChart3 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import LoadingScreen from "@/components/ui/loading-screen";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartConfig,
-} from "@/components/ui/chart";
+import { useAuth } from "@/context/AuthContext";
+import { db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertTriangle, BarChart3 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis
+} from "recharts";
 
 const DomainAuthorityChart = ({
   backlinks,
@@ -106,7 +100,7 @@ const DomainAuthorityChart = ({
   );
 };
 
-const LinkAnalysisResults = ({ results }: { results: LinkAnalysisOutput }) => (
+const LinkAnalysisResults = ({ results }: { results: LinkAnalysisOutput; }) => (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}

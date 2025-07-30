@@ -1,6 +1,6 @@
-You are an autonomous AI IDE assistant for the RankPilot project (https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app/).
+# You are an autonomous AI IDE assistant for the RankPilot project (https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app/).
 
-Your goal is to **VALIDATE AND ENHANCE** the frontend implementation based on a comprehensive workspace analysis. Most DevLast objectives have been completed, but optimization and enhancement opportunities remain.
+## Your goal is to **VALIDATE AND ENHANCE** the frontend implementation based on a comprehensive workspace analysis. Most DevLast objectives have been completed, but optimization and enhancement opportunities remain.
 
 ---
 
@@ -34,7 +34,7 @@ Your goal is to **VALIDATE AND ENHANCE** the frontend implementation based on a 
 - ✅ Sticky header behavior with proper z-index management
 - ✅ Consistent spacing using design system tokens
 
-### ✅ 2. Sidebar Navigation Fixes - COMPLETED  
+### ✅ 2. Sidebar Navigation Fixes - COMPLETED
 
 - ✅ Unified mobile sidebar (`src/components/navigation/unified-mobile-sidebar.tsx`)
 - ✅ Active state highlighting with pathname detection
@@ -203,7 +203,7 @@ Your goal is to **VALIDATE AND ENHANCE** the frontend implementation based on a 
 - **NEW:** Test Performance Optimization Engine automated tuning capabilities
 - **NEW:** Validate real-time streaming performance under enterprise load
 
-### 🔄 B. Advanced Accessibility Features  
+### 🔄 B. Advanced Accessibility Features
 
 - Implement high contrast theme support
 - Add keyboard shortcuts for power users

@@ -1,6 +1,4 @@
----
 # 💬 RANKPILOT AI IDE STRATEGY — Full Chat History
----
 
 This document is a comprehensive archive of strategic prompts, research, and architectural guidance provided for RankPilot — an AI-powered SEO SaaS project. The contents have been formatted for IDEs like GitHub Copilot or AI-enhanced development environments to reference dynamically.
 
@@ -89,7 +87,3 @@ To instruct a GitHub Copilot or AI IDE agent to:
 ```
 
 ---
-
-
-
-

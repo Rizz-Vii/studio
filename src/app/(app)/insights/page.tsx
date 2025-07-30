@@ -3,8 +3,6 @@
 
 import { useEffect, useState } from "react";
 
-import type { GenerateInsightsOutput } from "@/ai/flows/generate-insights";
-import { generateInsights } from "@/ai/flows/generate-insights";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

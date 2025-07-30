@@ -122,7 +122,7 @@ const PolymorphicCard = React.forwardRef<PolymorphicCardElement, PolymorphicCard
             <Comp
                 ref={ref}
                 className={cn(polymorphicCardVariants({ variant, size, spacing }), className)}
-                {...(useMotion ? motionProps : {})}
+                {...(useMotion ? (motionProps as any) : {})}
                 {...props}
             >
                 {cardContent}

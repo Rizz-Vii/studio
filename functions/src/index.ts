@@ -1,58 +1,15 @@
-import { initializeApp } from "firebase-admin/app";
-import { logger } from "firebase-functions";
-import { HttpsOptions, onCall } from "firebase-functions/v2/https";
+// Enhanced Firebase Functions - australia-southeast2
+import { setGlobalOptions } from "firebase-functions/v2";
 
-// Initialize Firebase Admin SDK first
-initializeApp();
-logger.info("Firebase Admin SDK initialized successfully");
+// Import chatbot functions
+import { adminChatHandler, customerChatHandler } from "./chatbot";
+// Import test function
+import { testMinimal } from "./test-minimal";
 
-// Set options for better cold start performance
-const httpsOptions: HttpsOptions = {
-  timeoutSeconds: 60,
-  memory: "256MiB",
-  minInstances: 0,
-  region: "australia-southeast2", // Explicitly set region for consistency
-};
+setGlobalOptions({ region: "australia-southeast2" });
 
-// Global error handler for unhandled promises
-process.on("unhandledRejection", (reason, promise) => {
-  logger.error("Unhandled Rejection at:", promise, "reason:", reason);
-});
+// Export chatbot functions
+export { adminChatHandler, customerChatHandler, testMinimal };
 
-// Health check function to confirm functions are working correctly
-export const systemHealthCheck = onCall(httpsOptions, async (request) => {
-  try {
-    logger.info("System health check function called", {
-      auth: request.auth ? "authenticated" : "unauthenticated",
-      timestamp: new Date().toISOString(),
-    });
-
-    return {
-      status: "ok",
-      timestamp: new Date().toISOString(),
-      runtime: "Node.js v" + process.version,
-      region: httpsOptions.region,
-      service: "Firebase Functions v2"
-    };
-  } catch (error) {
-    logger.error("System health check function failed:", error);
-    throw new Error("System health check failed");
-  }
-});
-
-// Export AI-powered functions (optimized - redundant functions removed)
-export * from "./api/analyze-content";
-export * from "./api/audit";
-export * from "./api/production-keyword-suggestions";
-
-// Export performance monitoring functions
-export {
-  abTestManagement, functionMetrics, performanceDashboard, healthCheck as performanceHealthCheck, realtimeMetrics
-} from "./api/performance-dashboard-functions";
-
-// Export Stripe payment functions
-export * from "./stripe-webhook";
-
-// Export email functions (selective export to avoid deployment conflicts)
-export { sendPaymentReceipt, sendWelcomeEmailFunction } from "./email";
-// Note: sendBillingReminder temporarily disabled due to deployment type conflict
+// Note: sendBillingReminder exists as scheduled function in production
+// but is not exported here to avoid deployment conflicts

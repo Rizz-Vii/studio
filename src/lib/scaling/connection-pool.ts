@@ -4,7 +4,15 @@
  */
 
 import { getApps, initializeApp } from 'firebase/app';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+
+interface QueueItem {
+  endpoint: string;
+  options: RequestInit;
+  resolve: (value: unknown) => void;
+  reject: (reason?: any) => void;
+}
+
 
 interface ConnectionPoolConfig {
   maxConnections: number;
@@ -27,7 +35,7 @@ export class ConnectionPoolManager {
   private activeConnections: Map<string, any> = new Map();
   private connectionCounts: Map<string, number> = new Map();
 
-  private constructor() {}
+  private constructor() { }
 
   static getInstance(): ConnectionPoolManager {
     if (!ConnectionPoolManager.instance) {
@@ -41,7 +49,7 @@ export class ConnectionPoolManager {
    */
   getFirestoreConnection(appName: string = 'default') {
     const connectionKey = `firestore-${appName}`;
-    
+
     if (this.activeConnections.has(connectionKey)) {
       this.incrementConnectionCount(connectionKey);
       return this.activeConnections.get(connectionKey);
@@ -52,7 +60,7 @@ export class ConnectionPoolManager {
       let app;
       const existingApps = getApps();
       const existingApp = existingApps.find(a => a.name === appName);
-      
+
       if (existingApp) {
         app = existingApp;
       } else {
@@ -63,7 +71,7 @@ export class ConnectionPoolManager {
       }
 
       const db = getFirestore(app);
-      
+
       // Connect to emulator in development
       if (process.env.NODE_ENV === 'development' && !this.activeConnections.has(connectionKey)) {
         try {
@@ -75,10 +83,10 @@ export class ConnectionPoolManager {
 
       this.activeConnections.set(connectionKey, db);
       this.incrementConnectionCount(connectionKey);
-      
+
       // Set up connection cleanup
       this.scheduleConnectionCleanup(connectionKey);
-      
+
       return db;
     } catch (error) {
       console.error(`Error creating Firestore connection for ${appName}:`, error);
@@ -103,8 +111,8 @@ export class ConnectionPoolManager {
       baseURL,
       config,
       activeRequests: 0,
-      queue: [],
-      
+      queue: [] as QueueItem[],
+
       async request(endpoint: string, options: RequestInit = {}) {
         if (this.activeRequests >= config.maxConnections) {
           return new Promise((resolve, reject) => {
@@ -117,18 +125,18 @@ export class ConnectionPoolManager {
 
       async executeRequest(endpoint: string, options: RequestInit) {
         this.activeRequests++;
-        
+
         try {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), config.connectionTimeout);
-          
+
           const response = await fetch(`${baseURL}${endpoint}`, {
             ...options,
             signal: controller.signal,
           });
-          
+
           clearTimeout(timeoutId);
-          
+
           // Process queue if available
           if (this.queue.length > 0) {
             const next = this.queue.shift();
@@ -138,7 +146,7 @@ export class ConnectionPoolManager {
                 .catch(next.reject);
             }
           }
-          
+
           return response;
         } catch (error) {
           throw error;
@@ -191,7 +199,7 @@ export class ConnectionPoolManager {
       if (this.connectionCounts.has(key)) {
         const lastUsed = this.connectionCounts.get(key)!;
         const now = Date.now();
-        
+
         if (now - lastUsed > connectionPoolConfig.idleTimeout) {
           this.activeConnections.delete(key);
           this.connectionCounts.delete(key);

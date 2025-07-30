@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatBot } from "@/components/chat";
 import { PerformanceIndicator, WebVitalsMonitor } from "@/components/performance/web-vitals-monitor";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import SiteFooter from "@/components/site-footer";
@@ -17,6 +18,9 @@ export function ClientLayout({ children }: { children: React.ReactNode; }) {
       <WebVitalsMonitor />
       <PerformanceIndicator />
       <PWAInstallPrompt />
+
+      {/* AI Chatbot System - Global availability for all authenticated users */}
+      <ChatBot />
     </UIProvider>
   );
 }

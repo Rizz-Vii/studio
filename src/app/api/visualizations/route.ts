@@ -21,7 +21,17 @@ export async function POST(request: NextRequest) {
         }
 
         const token = authHeader.split('Bearer ')[1];
-        const decodedToken = await adminAuth.verifyIdToken(token);
+        let decodedToken;
+        try {
+            decodedToken = await adminAuth.verifyIdToken(token);
+        } catch (error) {
+            console.warn('[Visualizations API] Firebase admin initialization error:', error);
+            return NextResponse.json({ 
+                error: 'Authentication service unavailable', 
+                mock: true,
+                data: [] 
+            }, { status: 503 });
+        }
         const userId = decodedToken.uid;
 
         // Check subscription tier access

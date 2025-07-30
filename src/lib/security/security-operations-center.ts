@@ -15,6 +15,22 @@
 import { randomBytes } from 'crypto';
 import { EventEmitter } from 'events';
 
+// Custom error types for security operations
+class NetworkError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'NetworkError';
+    }
+}
+
+class DataCorruptionError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'DataCorruptionError';
+    }
+}
+
+
 export interface SecurityIncident {
     id: string;
     title: string;
@@ -515,7 +531,7 @@ export class SecurityOperationsCenter extends EventEmitter {
                     execution.results.push({
                         stepId: step.id,
                         status: 'failure',
-                        error: error instanceof Error ? error.message : 'Unknown error'
+                        error: error instanceof Error ? (error as Error).message : 'Unknown error'
                     });
 
                     // Check for failure handling
@@ -852,16 +868,16 @@ export class SecurityOperationsCenter extends EventEmitter {
             } catch (error) {
                 if (error instanceof NetworkError) {
                     // Retry logic for network errors
-                    console.warn('[SecurityOperationsCenter] Network error during alert processing, retrying:', error.message);
+                    console.warn('[SecurityOperationsCenter] Network error during alert processing, retrying:', (error as Error).message);
                     this.alertProcessingQueue.push(alert); // Re-queue the alert for retry
                 } else if (error instanceof DataCorruptionError) {
                     // Skip and notify for data corruption
-                    console.error('[SecurityOperationsCenter] Data corruption detected in alert, skipping:', error.message);
-                    this.emit('alert-processing-error', { alertId: alert.id, error: error.message, type: 'data-corruption' });
+                    console.error('[SecurityOperationsCenter] Data corruption detected in alert, skipping:', (error as Error).message);
+                    this.emit('alert-processing-error', { alertId: alert.id, error: (error as Error).message, type: 'data-corruption' });
                 } else {
                     // Generic error handling
                     console.error('[SecurityOperationsCenter] Unexpected alert processing error:', error);
-                    this.emit('alert-processing-error', { alertId: alert.id, error: error instanceof Error ? error.message : String(error), type: 'unknown' });
+                    this.emit('alert-processing-error', { alertId: alert.id, error: error instanceof Error ? (error as Error).message : String(error), type: 'unknown' });
                 }
             }
         }

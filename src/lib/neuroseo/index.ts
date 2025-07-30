@@ -3,29 +3,29 @@
  * Part of RankPilot Studio
  */
 
-import { NeuralCrawler, type CrawlResult } from "./neural-crawler";
-// import { SemanticMapEngine, type SemanticAnalysisReport } from "./semantic-map";
+import { UsageQuotaManager, type UsageCheck } from "../usage-quota";
 import {
   AIVisibilityEngine,
   type VisibilityReport,
 } from "./ai-visibility-engine";
-import { TrustBlockEngine, type TrustReport } from "./trust-block";
+import { NeuralCrawler, type CrawlResult } from "./neural-crawler";
 import {
   RewriteGenEngine,
   type RewriteAnalysis,
   type RewriteRequest,
 } from "./rewrite-gen";
-import { UsageQuotaManager, type UsageCheck } from "../usage-quota";
+import { SemanticMap, type SemanticAnalysisResult } from "./semantic-map";
+import { TrustBlockEngine, type TrustReport } from "./trust-block";
 
 export interface NeuroSEOAnalysisRequest {
   urls: string[];
   targetKeywords: string[];
   competitorUrls?: string[];
   analysisType:
-    | "comprehensive"
-    | "seo-focused"
-    | "content-focused"
-    | "competitive";
+  | "comprehensive"
+  | "seo-focused"
+  | "content-focused"
+  | "competitive";
   userPlan: string;
   userId: string;
 }
@@ -35,7 +35,7 @@ export interface NeuroSEOReport {
   timestamp: string;
   request: NeuroSEOAnalysisRequest;
   crawlResults: CrawlResult[];
-  // semanticAnalysis: SemanticAnalysisReport[];
+  semanticAnalysis: SemanticAnalysisResult[];
   visibilityAnalysis: VisibilityReport[];
   trustAnalysis: TrustReport[];
   rewriteRecommendations?: RewriteAnalysis[];
@@ -44,6 +44,17 @@ export interface NeuroSEOReport {
   actionableTasks: ActionableTask[];
   competitivePositioning?: CompetitivePositioning;
   quotaUsage: UsageCheck;
+}
+
+// Simplified version for Content Analyzer compatibility
+export interface SimpleRewriteAnalysis {
+  summary: string;
+  improvements: string[];
+  seoImpact: {
+    readability: number;
+    keywordDensity: number;
+    semanticRelevance: number;
+  };
 }
 
 export interface KeyInsight {
@@ -88,7 +99,7 @@ export interface CompetitivePositioning {
 
 export class NeuroSEOSuite {
   private neuralCrawler: NeuralCrawler;
-  // private semanticEngine: SemanticMapEngine;
+  private semanticEngine: SemanticMap;
   private visibilityEngine: AIVisibilityEngine;
   private trustEngine: TrustBlockEngine;
   private rewriteEngine: RewriteGenEngine;
@@ -96,7 +107,7 @@ export class NeuroSEOSuite {
 
   constructor() {
     this.neuralCrawler = new NeuralCrawler();
-    // this.semanticEngine = new SemanticMapEngine();
+    this.semanticEngine = new SemanticMap();
     this.visibilityEngine = new AIVisibilityEngine();
     this.trustEngine = new TrustBlockEngine();
     this.rewriteEngine = new RewriteGenEngine();
@@ -124,7 +135,7 @@ export class NeuroSEOSuite {
         timestamp: new Date().toISOString(),
         request,
         crawlResults: [],
-        // semanticAnalysis: [],
+        semanticAnalysis: [],
         visibilityAnalysis: [],
         trustAnalysis: [],
         overallScore: 0,
@@ -139,10 +150,10 @@ export class NeuroSEOSuite {
 
       // Phase 2: Semantic Analysis
       console.log("🧠 Starting Semantic Analysis phase...");
-      // report.semanticAnalysis = await this.runSemanticPhase(
-      //   report.crawlResults,
-      //   request.targetKeywords
-      // );
+      report.semanticAnalysis = await this.runSemanticPhase(
+        report.crawlResults,
+        request.targetKeywords
+      );
 
       // Phase 3: AI Visibility Analysis
       console.log("👁️ Starting AI Visibility Analysis phase...");
@@ -700,7 +711,7 @@ export class NeuroSEOSuite {
   }
 
   private estimateEffort(category: string): "low" | "medium" | "high" {
-    const effortMap: { [key: string]: "low" | "medium" | "high" } = {
+    const effortMap: { [key: string]: "low" | "medium" | "high"; } = {
       seo: "medium",
       content: "high",
       technical: "high",
@@ -711,7 +722,7 @@ export class NeuroSEOSuite {
   }
 
   private estimateTimeframe(category: string): string {
-    const timeframeMap: { [key: string]: string } = {
+    const timeframeMap: { [key: string]: string; } = {
       seo: "2-4 weeks",
       content: "1-3 weeks",
       technical: "3-6 weeks",
@@ -722,7 +733,7 @@ export class NeuroSEOSuite {
   }
 
   private generateTaskResources(category: string): TaskResource[] {
-    const resourceMap: { [key: string]: TaskResource[] } = {
+    const resourceMap: { [key: string]: TaskResource[]; } = {
       seo: [
         {
           type: "guide",

@@ -1,7 +1,9 @@
 # 🧠 AI IDE INSTRUCTION PROMPT: Build AI Chatbot for SEO SaaS (RankPilot)
 
 ## 🚀 Objective
+
 Develop a modular, intelligent chatbot that:
+
 - Uses Firestore-stored SEO audits and website content
 - Answers SEO-related queries based on real data
 - Lives within a modern React front-end
@@ -63,6 +65,7 @@ Create `functions/chatbot.ts`:
 - Log each chat into `chatLogs/{uid}/sessions/{sessionId}`
 
 Follow best practices:
+
 - Use try/catch
 - Validate `uid` and `url`
 - Handle empty context gracefully
@@ -82,6 +85,7 @@ Create `components/ChatBot.tsx`:
 - Fully accessible + keyboard friendly
 
 Use:
+
 - `useEffect` for auto-scroll
 - `useState` for conversation state
 - Animate replies with framer-motion if available

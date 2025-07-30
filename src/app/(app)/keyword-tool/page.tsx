@@ -2,7 +2,6 @@
 "use client";
 
 import Breadcrumb from "@/components/breadcrumb";
-import KeywordToolForm from "@/components/keyword-tool-form";
 import LoadingState from "@/components/loading-state";
 import {
   MobileResultsCard,
@@ -30,13 +29,30 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { getDemoData } from "@/lib/demo-data";
 import { db } from "@/lib/firebase";
-import { getKeywordSuggestions } from "@/lib/services/ai-service";
 import { TimeoutError, withTimeout } from "@/lib/timeout";
 import { cn } from "@/lib/utils";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
-import { Copy, Search, TrendingUp } from "lucide-react";
+import {
+  Copy,
+  Search,
+  TrendingUp
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
+// Enhanced keyword data structure for NeuroSEO™ SemanticMap™
+interface EnhancedKeywordData {
+  keyword: string;
+  searchVolume: number;
+  difficulty: number;
+  competition: "low" | "medium" | "high";
+  cpc: number;
+  trend: "rising" | "stable" | "declining";
+  semanticCluster: string;
+  intent: "informational" | "commercial" | "transactional" | "navigational";
+  topicalRelevance: number;
+  opportunities: string[];
+}
 
 const getProgressColor = (score: number) => {
   if (score > 70) return "bg-destructive";

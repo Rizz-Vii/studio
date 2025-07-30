@@ -161,7 +161,9 @@
     "mcp:validate:windows": "powershell -ExecutionPolicy Bypass -File scripts/validate-mcp-tokens.ps1",
     "mcp:test": "npm run mcp:validate && echo 'MCP validation complete - tokens ready for use'",
     "mcp:setup": "echo 'MCP Configuration Status:' && cat state.json",
-    "mcp:status": "echo 'Checking MCP server status...' && npm run mcp:validate"
+    "mcp:status": "echo 'Checking MCP server status...' && npm run mcp:validate",
+    "build:memory-safe": "cross-env NODE_OPTIONS=\"--max-old-space-size=2048\" next build",
+    "build:high-memory": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" next build"
   },
   "dependencies": {
     "@genkit-ai/firebase": "^1.14.0",
