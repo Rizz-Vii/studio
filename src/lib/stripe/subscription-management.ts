@@ -118,10 +118,10 @@ export async function handleSubscriptionSuccess(sessionId: string) {
         subscriptionId: subscription.id,
         customerId: customer.id,
         status: subscription.status,
-        currentPeriodEnd: subscription.current_period_end,
+        currentPeriodEnd: (subscription as any).current_period_end * 1000, // Stripe API compatibility
         userId: session.client_reference_id,
         tier: session.metadata?.tier,
-        trialEnd: subscription.trial_end
+        trialEnd: (subscription as any).trial_end ? (subscription as any).trial_end * 1000 : null
     };
 }
 
