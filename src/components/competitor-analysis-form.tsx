@@ -1,10 +1,15 @@
 // src/components/competitor-analysis-form.tsx
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,16 +21,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import type { CompetitorAnalysisInput } from "@/ai/flows/competitor-analysis";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const formSchema = z.object({
   yourUrl: z.string().min(1, { message: "Please enter your website URL." }),
@@ -40,7 +39,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface CompetitorAnalysisFormProps {
-  onSubmit: (values: CompetitorAnalysisInput) => Promise<void>;
+  onSubmit: (values: FormValues) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -57,30 +56,9 @@ export default function CompetitorAnalysisForm({
     },
   });
 
-  function handleFormSubmit(values: FormValues) {
-    const normalizeUrl = (url: string): string => {
-      const trimmed = url.trim();
-      if (!trimmed) {
-        return "";
-      }
-      if (!/^(https?:\/\/)/i.test(trimmed)) {
-        return `https://${trimmed}`;
-      }
-      return trimmed;
-    };
-
-    const submissionValues: CompetitorAnalysisInput = {
-      yourUrl: normalizeUrl(values.yourUrl),
-      competitorUrls: values.competitorUrls
-        .split(",")
-        .map(normalizeUrl)
-        .filter((url) => url),
-      keywords: values.keywords
-        .split(",")
-        .map((kw) => kw.trim())
-        .filter((kw) => kw),
-    };
-    onSubmit(submissionValues);
+  async function handleSubmit(values: FormValues) {
+    // Pass the raw form values to the handler
+    onSubmit(values);
   }
 
   return (
@@ -93,7 +71,7 @@ export default function CompetitorAnalysisForm({
       </CardHeader>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(handleFormSubmit)}
+          onSubmit={form.handleSubmit(handleSubmit)}
           className="space-y-8"
         >
           <CardContent className="space-y-4">

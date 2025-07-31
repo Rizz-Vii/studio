@@ -1,17 +1,4 @@
 
-interface ChatBotProps {
-    currentUrl?: string;
-    className?: string;
-}
-
-interface CustomerChatBotProps {
-    currentUrl?: string;
-    className?: string;
-}
-
-interface AdminChatBotProps {
-    className?: string;
-}
 /**
  * RankPilot Main ChatBot Component
  * Orchestrates customer and admin chatbots based on user permissions
@@ -20,17 +7,19 @@ interface AdminChatBotProps {
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
+import AdminChatBot from './AdminChatBot';
+import CustomerChatBot from './CustomerChatBot';
 
-// Dynamic imports for better performance
-const CustomerChatBot = dynamic(() => import('./CustomerChatBot.jsx') as Promise<{ default: React.ComponentType<CustomerChatBotProps> }>, {
-    ssr: false,
-});
+// Define interfaces for component props
+interface CustomerChatBotProps {
+    currentUrl?: string;
+    className?: string;
+}
 
-const AdminChatBot = dynamic(() => import('./AdminChatBot.jsx') as Promise<{ default: React.ComponentType<AdminChatBotProps> }>, {
-    ssr: false,
-});
+interface AdminChatBotProps {
+    className?: string;
+}
 
 interface ChatBotProps {
     className?: string;

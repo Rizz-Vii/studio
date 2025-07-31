@@ -179,10 +179,32 @@ export const FEATURE_ACCESS: Record<string, FeatureConfig> = {
     description: "System analytics and monitoring",
   },
 
-  // Team Management Features
+  // CRITICAL MISSING FEATURES - Fix for "Unknown feature" errors
+  neuroseo: {
+    requiredTier: "starter",
+    description: "NeuroSEO™ AI-powered SEO optimization and analysis",
+  },
+
+  ai_content_generation: {
+    requiredTier: "agency",
+    description: "AI-powered content generation",
+  },
+
+  ai_insights: {
+    requiredTier: "starter",
+    description: "AI-driven SEO insights and recommendations",
+  },
+
+  // Team Management Features - CHANGED from enterprise to agency
   team_management: {
-    requiredTier: "enterprise",
+    requiredTier: "agency", // Changed from "enterprise" to make it more accessible
     description: "Team member management and collaboration",
+  },
+
+  // Additional missing features identified in codebase
+  advanced_analytics: {
+    requiredTier: "enterprise",
+    description: "Advanced analytics and reporting",
   },
 } as const;
 

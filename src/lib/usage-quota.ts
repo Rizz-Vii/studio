@@ -123,6 +123,8 @@ export class UsageQuotaManager {
       return {
         allowed: false,
         reason: "Unable to verify usage quota",
+        remaining: 0,
+        limit: 0,
         remainingQuota: 0,
         resetDate: new Date(),
       };
@@ -160,6 +162,8 @@ export class UsageQuotaManager {
         return {
           allowed: false,
           reason: "Invalid usage type",
+          remaining: 0,
+          limit: 0,
           remainingQuota: 0,
           resetDate: quota.currentPeriodEnd,
         };
@@ -169,6 +173,8 @@ export class UsageQuotaManager {
     if (limit === -1) {
       return {
         allowed: true,
+        remaining: -1,
+        limit: -1,
         remainingQuota: -1,
         resetDate: quota.currentPeriodEnd,
       };
@@ -180,6 +186,8 @@ export class UsageQuotaManager {
       return {
         allowed: false,
         reason: `${usageType} limit exceeded (${currentUsage}/${limit})`,
+        remaining: 0,
+        limit: limit,
         remainingQuota: 0,
         resetDate: quota.currentPeriodEnd,
       };
@@ -187,6 +195,8 @@ export class UsageQuotaManager {
 
     return {
       allowed: true,
+      remaining: remainingQuota,
+      limit: limit,
       remainingQuota,
       resetDate: quota.currentPeriodEnd,
     };

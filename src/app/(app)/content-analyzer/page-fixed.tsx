@@ -1,4 +1,3 @@
-import { RewriteAnalysis } from '@/lib/neuroseo/types';
 // src/app/(app)/content-analyzer/page.tsx
 "use client";
 
@@ -20,12 +19,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
-import { ACTIVITY_TYPES, TOOL_NAMES } from "@/lib/activity-types";
+import { TOOL_NAMES } from "@/lib/activity-types";
 import { db } from "@/lib/firebase";
 import {
     type NeuroSEOAnalysisRequest,
     type NeuroSEOReport
 } from "@/lib/neuroseo";
+import { generateId } from "@/lib/utils/generate-id";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { motion } from "framer-motion";
 import {
@@ -196,8 +196,8 @@ export default function ContentAnalyzerPage() {
             const data = await response.json();
 
             // Enhanced mock report for content analysis
-            const mockReport: NeuroSEOReport = {
-                id: `content-${Date.now()}`,
+            const mockReport = {
+                id: generateId(),
                 timestamp: new Date().toISOString(),
                 request: analysisRequest,
                 crawlResults: [],
@@ -206,100 +206,47 @@ export default function ContentAnalyzerPage() {
                 trustAnalysis: [],
                 rewriteRecommendations: [
                     {
-                        summary: "Enhanced version" as any // Optional property with improved clarity and SEO optimization",
-                        improvements: [] as any, // Fixed syntax
-                            "Improved readability score from 65 to 82",
-                            "Added target keywords naturally",
-                            "Enhanced semantic structure",
-                            "Optimized for featured snippets",
-                        ],
-                        seoImpact: {
-                            readability: 8.5,
-                            keywordDensity: 7.2,
-                            semanticRelevance: 9.1,
+                        originalAnalysis: {
+                            wordCount: content.length,
+                            readabilityScore: 85,
+                            keywordDensity: keywords.split(',').reduce((acc: any, k: string) => ({ ...acc, [k.trim()]: 2.5 }), {}),
+                            sentimentScore: 68,
+                            structureScore: 78,
+                            seoScore: 82,
+                            issues: []
                         },
-                    },
+                        variants: [],
+                        recommendations: [],
+                        bestVariant: "enhanced",
+                        comparisonMatrix: {
+                            metrics: ['readability', 'seo', 'sentiment'],
+                            variants: [
+                                {
+                                    id: 'original',
+                                    title: 'Original Content',
+                                    scores: [75, 68, 65]
+                                },
+                                {
+                                    id: 'enhanced',
+                                    title: 'Enhanced Content',
+                                    scores: [85, 82, 68]
+                                }
+                            ],
+                            winner: 'enhanced',
+                            reasoning: 'Enhanced version shows improved readability and SEO metrics'
+                        }
+                    }
                 ],
-                overallScore: 78,
-                keyInsights: [
-                    {
-                        category: "content",
-                        title: "Content Readability Enhancement",
-                        description: "Your content can be significantly improved for better user engagement and SEO performance.",
-                        impact: "high",
-                        confidence: 0.89,
-                        evidence: ["Complex sentence structures identified", "Passive voice usage detected", "Technical jargon without explanations"],
-                        recommendation: "Simplify sentence structure and add explanatory content for technical terms.",
-                    },
-                    {
-                        category: "seo",
-                        title: "Keyword Optimization Opportunity",
-                        description: "Target keywords are underutilized and could be better integrated into the content.",
-                        impact: "medium",
-                        confidence: 0.94,
-                        evidence: ["Low keyword density", "Missing semantic variations", "Weak keyword placement"],
-                        recommendation: "Integrate target keywords more naturally and include semantic variations.",
-                    },
-                    {
-                        category: "trust",
-                        title: "E-A-T Signal Enhancement",
-                        description: "Content lacks authoritative signals and expert credibility markers.",
-                        impact: "medium",
-                        confidence: 0.87,
-                        evidence: ["No author byline", "Missing expert citations", "Lack of authoritative sources"],
-                        recommendation: "Add author credentials, expert quotes, and authoritative source citations.",
-                    },
-                ],
-                actionableTasks: [
-                    {
-                        id: "task-1",
-                        title: "Improve Content Readability",
-                        description: "Rewrite complex sentences and add explanatory content for technical terms.",
-                        category: "content",
-                        priority: "high",
-                        estimatedEffort: "medium",
-                        estimatedImpact: 8,
-                        timeframe: "2-3 hours",
-                        dependencies: [],
-                        resources: [
-                            {
-                                type: "tool",
-                                title: "Hemingway Editor",
-                                description: "Readability improvement tool",
-                            },
-                            {
-                                type: "guide",
-                                title: "Content Readability Best Practices",
-                                description: "Comprehensive guide to writing readable content",
-                            }
-                        ],
-                    },
-                    {
-                        id: "task-2",
-                        title: "Optimize Keyword Integration",
-                        description: "Naturally integrate target keywords and semantic variations throughout the content.",
-                        category: "seo",
-                        priority: "high",
-                        estimatedEffort: "medium",
-                        estimatedImpact: 7,
-                        timeframe: "1-2 hours",
-                        dependencies: ["task-1"],
-                        resources: [
-                            {
-                                type: "tool",
-                                title: "LSI Keywords Tool",
-                                description: "Find semantic keyword variations",
-                            }
-                        ],
-                    },
-                ],
+                overallScore: 82,
+                keyInsights: [],
+                actionableTasks: [],
                 quotaUsage: {
                     allowed: true,
-                    remaining: 100,
+                    remaining: 95,
                     limit: 100,
-                    remainingQuota: 100,
-                    resetDate: new Date()
-                },
+                    remainingQuota: 95,
+                    resetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                }
             };
 
             setReport(mockReport);
@@ -506,36 +453,38 @@ export default function ContentAnalyzerPage() {
                                         {report.rewriteRecommendations.map((rewrite, index) => (
                                             <div key={index} className="space-y-4">
                                                 <div>
-                                                    <h4 className="font-semibold mb-2">AI-Enhanced Version</h4>
+                                                    <h4 className="font-semibold mb-2">AI-Enhanced Analysis</h4>
                                                     <div className="p-3 bg-green-50 rounded border text-sm">
-                                                        {rewrite.summary || 'No summary available'}
+                                                        Content analysis completed with {rewrite.originalAnalysis.wordCount} words
                                                     </div>
                                                 </div>
 
                                                 <div>
-                                                    <h4 className="font-semibold mb-2">Improvements Made</h4>
+                                                    <h4 className="font-semibold mb-2">Analysis Results</h4>
                                                     <ul className="grid md:grid-cols-2 gap-2">
-                                                        {(rewrite.improvements || []).map((improvement, idx) => (
-                                                            <li key={idx} className="flex items-center gap-2 text-sm">
-                                                                <CheckCircle className="h-4 w-4 text-green-500" />
-                                                                {improvement}
-                                                            </li>
-                                                        ))}
+                                                        <li className="flex items-center gap-2 text-sm">
+                                                            <CheckCircle className="h-4 w-4 text-green-500" />
+                                                            Readability Score: {rewrite.originalAnalysis.readabilityScore}
+                                                        </li>
+                                                        <li className="flex items-center gap-2 text-sm">
+                                                            <CheckCircle className="h-4 w-4 text-green-500" />
+                                                            SEO Score: {rewrite.originalAnalysis.seoScore}
+                                                        </li>
                                                     </ul>
                                                 </div>
 
                                                 <div className="grid md:grid-cols-3 gap-4 mt-4">
                                                     <div className="text-center p-3 bg-blue-50 rounded">
-                                                        <div className="font-bold text-blue-600">{rewrite.seoImpact?.readability}</div>
-                                                        <div className="text-xs text-blue-700">Readability Impact</div>
+                                                        <div className="font-bold text-blue-600">{rewrite.originalAnalysis.readabilityScore}</div>
+                                                        <div className="text-xs text-blue-700">Readability Score</div>
                                                     </div>
                                                     <div className="text-center p-3 bg-green-50 rounded">
-                                                        <div className="font-bold text-green-600">{rewrite.seoImpact?.keywordDensity}</div>
-                                                        <div className="text-xs text-green-700">Keyword Optimization</div>
+                                                        <div className="font-bold text-green-600">{rewrite.originalAnalysis.seoScore}</div>
+                                                        <div className="text-xs text-green-700">SEO Score</div>
                                                     </div>
                                                     <div className="text-center p-3 bg-purple-50 rounded">
-                                                        <div className="font-bold text-purple-600">{rewrite.seoImpact?.semanticRelevance}</div>
-                                                        <div className="text-xs text-purple-700">Semantic Relevance</div>
+                                                        <div className="font-bold text-purple-600">{rewrite.originalAnalysis.structureScore}</div>
+                                                        <div className="text-xs text-purple-700">Structure Score</div>
                                                     </div>
                                                 </div>
                                             </div>

@@ -13,6 +13,11 @@ import LoadingScreen from "@/components/ui/loading-screen";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
+import { generateContentBrief } from "@/lib/utils/content-functions";
+import type {
+  ContentBriefInput,
+  ContentBriefOutput
+} from "@/types";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -181,7 +186,10 @@ const BriefResults = ({ briefResult }: { briefResult: ContentBriefOutput; }) => 
               key={i}
               className="font-body p-1 -ml-1 rounded transition-colors hover:bg-muted/50"
             >
-              {heading}
+              <div>
+                <strong>H{heading.level}:</strong> {heading.title}
+                <p className="text-sm text-muted-foreground">{heading.description}</p>
+              </div>
             </li>
           ))}
         </ul>
@@ -209,13 +217,21 @@ export default function ContentBriefPage() {
     }
   }, [briefResult, error]);
 
-  const handleSubmit = async (values: ContentBriefInput) => {
+  const handleSubmit = async (values: { keyword: string; }) => {
     setIsLoading(true);
     setSubmitted(true);
     setBriefResult(null);
     setError(null);
     try {
-      const result = await generateContentBrief(values);
+      // Transform form values to ContentBriefInput
+      const contentBriefInput: ContentBriefInput = {
+        topic: values.keyword,
+        keyword: values.keyword,
+        targetKeywords: [values.keyword],
+        targetAudience: 'general audience',
+        contentType: 'blog post'
+      };
+      const result = await generateContentBrief(contentBriefInput);
       setBriefResult(result);
 
       if (user) {

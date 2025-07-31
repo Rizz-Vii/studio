@@ -168,5 +168,44 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && 
                        (resource.data.userId == request.auth.uid || isAdmin());
     }
+
+    // CRITICAL MISSING COLLECTIONS - Fix for localhost errors
+    
+    // SEO Audits Collection - MISSING RULES CAUSING PERMISSION ERRORS
+    match /seoAudits/{auditId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+    
+    // Link Analyses Collection - MISSING RULES CAUSING PERMISSION ERRORS  
+    match /linkAnalyses/{analysisId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+    
+    // User Presence System - Fix for presence tracking errors
+    match /presence/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Team Chat System - Fix for team management errors
+    match /teamChats/{chatId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
   }
 }

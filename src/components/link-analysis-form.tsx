@@ -1,10 +1,17 @@
 // src/components/link-analysis-form.tsx
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { LinkAnalysisInput } from "@/ai/flows/link-analysis";
+import { useHydration } from "@/components/HydrationContext";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -14,17 +21,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import type { LinkAnalysisInput } from "@/ai/flows/link-analysis";
-import { HydrationProvider, useHydration } from "@/components/HydrationContext";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const formSchema = z.object({
   url: z.string().min(1, { message: "Please enter a valid URL." }),
@@ -33,7 +33,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface LinkAnalysisFormProps {
-  onFormSubmitAction: (values: LinkAnalysisInput) => Promise<void>;
+  onFormSubmitAction: (values: FormValues) => Promise<void>;
   isLoading: boolean;
 }
 

@@ -17,7 +17,13 @@ export class RankPilotAgentSystem {
 
     constructor() {
         this.agentSystem = new AgentSystemBootstrap();
-        this.initializeAgents();
+
+        // Safe activation: Only initialize if explicitly enabled
+        if (process.env.RANKPILOT_AGENTS_ENABLED === 'true' || process.env.NODE_ENV === 'production') {
+            this.initializeAgents();
+        } else {
+            console.log('🛡️ RankPilot Agents: Disabled for IDE compatibility');
+        }
     }
 
     /**

@@ -5,7 +5,10 @@
 
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useHydration } from "@/components/HydrationContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,10 +16,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -24,33 +26,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
-import { useHydration } from "@/components/HydrationContext";
 import { useIsMobile, useNetworkStatus } from "@/lib/mobile-responsive-utils";
-import LoadingState from "@/components/loading-state";
+import type { NeuroSEOAnalysisRequest, NeuroSEOReport } from "@/lib/neuroseo";
 import {
-  Brain,
-  Search,
-  Shield,
-  Edit,
-  TrendingUp,
-  Eye,
   AlertTriangle,
+  Brain,
   CheckCircle,
   Clock,
+  Eye,
+  Search,
+  Shield,
   Target,
-  Zap,
-  BarChart3,
-  Globe,
-  RefreshCw,
-  WifiOff,
+  TrendingUp,
+  Zap
 } from "lucide-react";
-import type { NeuroSEOReport, NeuroSEOAnalysisRequest } from "@/lib/neuroseo";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 interface NeuroSEODashboardProps {
   className?: string;
@@ -477,7 +470,7 @@ export default function NeuroSEODashboard({
           </Card>
 
           {/* Key Insights */}
-          {report.keyInsights.length > 0 && (
+          {report.keyInsights && report.keyInsights.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

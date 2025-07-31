@@ -3,15 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import {
-  NeuroSEOActionableTasks,
-  NeuroSEOCompetitiveDashboard,
-  NeuroSEOEngineOverview,
-  NeuroSEOFeatureGate,
-  NeuroSEOInsightsPanel,
-  NeuroSEOProgressIndicator,
-} from "@/components/neuroseo/NeuroSEOEnhancedComponents";
-import { Button } from "@/components/ui/button";
+import { SeoAuditForm } from "@/components/forms/seo-forms";
 import {
   Card,
   CardContent,
@@ -19,26 +11,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  AlertCircle,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  Pie,
+  PieChart,
+  Progress,
+  XAxis,
+  YAxis
+} from "@/components/ui/chart-components";
 import LoadingScreen from "@/components/ui/loading-screen";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
 import { getDemoData } from "@/lib/demo-data";
 import { db } from "@/lib/firebase";
-import {
-  type NeuroSEOAnalysisRequest,
-  type NeuroSEOReport
-} from "@/lib/neuroseo";
 import { TimeoutError, withTimeout } from "@/lib/timeout";
 import { cn } from "@/lib/utils";
+import type {
+  AuditUrlInput,
+  AuditUrlOutput
+} from "@/types";
+import {
+  containerVariants,
+  imageChartConfig,
+  itemVariants,
+  scoreChartConfig,
+  statusColors,
+  statusIcons
+} from "@/types/charts";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertTriangle,
-  Brain,
-  RefreshCw,
-  Search
+  AlertTriangle
 } from "lucide-react";
 
 // Enhanced SEO Audit with NeuroSEO™ Integration
@@ -101,7 +110,6 @@ const AuditCharts = ({ items }: { items: AuditUrlOutput["items"]; }) => {
               />
               <XAxis dataKey="score" type="number" hide />
               <ChartTooltip
-                cursor={false}
                 content={(props) => <ChartTooltipContent {...props} />}
               />
               <Bar dataKey="score" radius={5} />
@@ -225,7 +233,28 @@ export default function SeoAuditPage() {
     try {
       // Try to get real data with timeout
       const result = await withTimeout(
-        Promise.resolve({ overallScore: 85, items: [], remainingQuota: 100 }),
+        Promise.resolve({
+          url: values.url,
+          overallScore: 85,
+          summary: 'Good SEO performance with some areas for improvement',
+          items: [],
+          performance: {
+            lcp: 2.3,
+            fid: 12,
+            cls: 0.08,
+            ttfb: 450
+          },
+          accessibility: {
+            score: 92,
+            issues: 3
+          },
+          seo: {
+            score: 88,
+            metaTitle: true,
+            metaDescription: true,
+            headings: true
+          }
+        }),
         15000, // 15 second timeout
         "SEO audit is taking longer than expected. Using demo data instead."
       );

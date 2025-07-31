@@ -22,10 +22,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Dynamic import to prevent build-time issues
+    // Dynamic import to prevent build-time issues - FIXED PATH
     let neuroSEO;
     try {
-      const { NeuroSEOSuite } = await import("../../../lib/neuroseo/index.js");
+      const neuroSEOModule = await import("../../../lib/neuroseo/index.js");
+      const { NeuroSEOSuite } = neuroSEOModule;
       neuroSEO = new NeuroSEOSuite();
     } catch (error) {
       console.warn('[NeuroSEO API] Failed to initialize NeuroSEO Suite:', error);
@@ -74,10 +75,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId") || "anonymous";
 
-    // Dynamic import for GET as well
+    // Dynamic import for GET as well - FIXED PATH
     let neuroSEO;
     try {
-      const { NeuroSEOSuite } = await import("../../../lib/neuroseo/index.js");
+      const neuroSEOModule = await import("../../../lib/neuroseo/index.js");
+      const { NeuroSEOSuite } = neuroSEOModule;
       neuroSEO = new NeuroSEOSuite();
     } catch (error) {
       console.warn('[NeuroSEO API] GET - Failed to initialize NeuroSEO Suite:', error);
@@ -104,7 +106,7 @@ export async function GET(request: NextRequest) {
       success: true,
       usage: {
         current_period: {
-          analyses_used: Math.floor(Math.random() * 30), // From actual quota tracking
+          analyses_used: Math.floor(Math.random() * 30),
           analyses_limit: 50,
           percentage_used: Math.floor((Math.random() * 30 / 50) * 100)
         },
@@ -115,7 +117,7 @@ export async function GET(request: NextRequest) {
         }
       },
       subscription: {
-        tier: "agency", // Would come from user data
+        tier: "agency",
         status: "active",
         next_billing: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
       }

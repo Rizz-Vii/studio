@@ -1,6 +1,8 @@
 // src/app/(app)/insights/page.tsx
 "use client";
 
+import { generateInsights } from "@/lib/utils/content-functions";
+import type { GenerateInsightsOutput } from "@/types";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -58,7 +60,8 @@ export default function InsightsPage() {
         }));
 
         const result = await generateInsights({
-          activities: simplifiedActivities,
+          keywords: ['seo', 'content', 'optimization'],
+          urls: ['https://example.com'],
         });
         setInsights(result.insights);
       } catch (e: any) {

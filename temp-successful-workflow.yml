@@ -1,5 +1,5 @@
 ﻿# Performance Branch Testing Deployment Workflow
-# This workflow deploys the performance-optimization-mobile-enhancement branch
+# This workflow deploys the workshop/performance branch
 # to a dedicated Firebase channel for testing purposes
 
 name: Deploy Performance Branch for Testing
@@ -7,7 +7,7 @@ name: Deploy Performance Branch for Testing
 on:
   push:
     branches:
-      - feature/performance-optimization-mobile-enhancement
+      - workshop/performance
   workflow_dispatch:
     inputs:
       deploy_functions:
@@ -220,7 +220,7 @@ jobs:
         run: |
           echo "## ­ƒÜÇ Performance Branch Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** feature/performance-optimization-mobile-enhancement" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** workshop/performance" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Time:** $(date)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -231,7 +231,7 @@ jobs:
           echo "- **Mobile Tests:** ${{ needs.mobile_tests.result }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### ­ƒöù Preview URL:" >> $GITHUB_STEP_SUMMARY
-          echo "Your performance-optimized build is available at the Firebase preview channel." >> $GITHUB_STEP_SUMMARY
+          echo "Your performance build is available at the Firebase preview channel." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### ­ƒôê Performance Monitoring:" >> $GITHUB_STEP_SUMMARY
           echo "- Check the performance dashboard in your deployed app" >> $GITHUB_STEP_SUMMARY
