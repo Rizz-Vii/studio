@@ -1,53 +1,53 @@
 // src/app/(app)/dashboard/page.tsx - Complete Dynamic Database Integration
 "use client";
+import { CoreWebVitalsWidget } from "@/components/performance/core-web-vitals-monitor";
+import ToolGrid from "@/components/tool-grid";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import {
-  Activity,
-  KeyRound,
-  ShieldCheck,
-  Link as LinkIcon,
-  RefreshCw,
-  AlertCircle,
-} from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import LoadingScreen from "@/components/ui/loading-screen";
-import {
+  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartConfig,
 } from "@/components/ui/chart";
+import LoadingScreen from "@/components/ui/loading-screen";
+import { useAuth } from "@/context/AuthContext";
+import { useRealTimeDashboardData } from "@/hooks/use-dashboard-data";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Variants, motion } from "framer-motion";
 import {
-  LineChart,
+  Activity,
+  AlertCircle,
+  KeyRound,
+  Link as LinkIcon,
+  RefreshCw,
+  ShieldCheck,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
   Line,
+  LineChart,
+  Pie,
+  PieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  RadialBar,
+  RadialBarChart,
+  ResponsiveContainer,
   XAxis,
   YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  RadialBarChart,
-  RadialBar,
-  Legend,
-  PolarGrid,
-  PolarAngleAxis,
 } from "recharts";
-import { Variants, motion } from "framer-motion";
-import { useRealTimeDashboardData } from "@/hooks/use-dashboard-data";
-import { useEffect, useState } from "react";
-import ToolGrid from "@/components/tool-grid";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import styles from "./dashboard.module.css";
 
 // ----- CHART CONFIGS -----
@@ -98,7 +98,7 @@ const itemVariants: Variants = {
 // ----- UTILITY FUNCTIONS -----
 
 const getChartColorClass = (colorValue: string): string => {
-  const colorMap: { [key: string]: string } = {
+  const colorMap: { [key: string]: string; } = {
     "hsl(var(--chart-1))": styles.legendDotChart1,
     "hsl(var(--chart-2))": styles.legendDotChart2,
     "hsl(var(--chart-3))": styles.legendDotChart3,
@@ -136,7 +136,7 @@ const DashboardMetricCard: React.FC<{
   </Card>
 );
 
-const SeoScoreTrendChart = ({ data }: { data: any[] }) => (
+const SeoScoreTrendChart = ({ data }: { data: any[]; }) => (
   <Card>
     <CardHeader>
       <CardTitle className="font-headline">Overall SEO Score</CardTitle>
@@ -194,7 +194,7 @@ const SeoScoreTrendChart = ({ data }: { data: any[] }) => (
   </Card>
 );
 
-const KeywordVisibilityChart = ({ visibility }: { visibility: any }) => {
+const KeywordVisibilityChart = ({ visibility }: { visibility: any; }) => {
   const data = [
     {
       name: "Visibility",
@@ -250,7 +250,7 @@ const KeywordVisibilityChart = ({ visibility }: { visibility: any }) => {
   );
 };
 
-const DomainAuthorityChart = ({ data }: { data: any }) => (
+const DomainAuthorityChart = ({ data }: { data: any; }) => (
   <Card>
     <CardHeader>
       <CardTitle className="font-headline">Domain Authority</CardTitle>
@@ -303,7 +303,7 @@ const DomainAuthorityChart = ({ data }: { data: any }) => (
   </Card>
 );
 
-const BacklinksChart = ({ data }: { data: any }) => (
+const BacklinksChart = ({ data }: { data: any; }) => (
   <Card>
     <CardHeader>
       <CardTitle className="font-headline">Backlink Growth</CardTitle>
@@ -346,7 +346,7 @@ const BacklinksChart = ({ data }: { data: any }) => (
   </Card>
 );
 
-const TrafficSourcesChart = ({ data }: { data: any[] }) => (
+const TrafficSourcesChart = ({ data }: { data: any[]; }) => (
   <Card>
     <CardHeader>
       <CardTitle className="font-headline">Traffic Sources</CardTitle>
@@ -414,13 +414,13 @@ const TrafficSourcesChart = ({ data }: { data: any[] }) => (
 export default function DashboardPage() {
   const { user, profile, loading: authLoading } = useAuth();
   const isMobile = useIsMobile();
-  
+
   // Use dynamic dashboard data
-  const { 
-    data: dashboardData, 
-    loading: dataLoading, 
-    error: dataError, 
-    refresh 
+  const {
+    data: dashboardData,
+    loading: dataLoading,
+    error: dataError,
+    refresh
   } = useRealTimeDashboardData(user?.uid || null);
 
   if (authLoading || !user) {
@@ -434,9 +434,9 @@ export default function DashboardPage() {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             {dataError}
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={refresh}
               className="ml-2"
             >
@@ -450,7 +450,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8">
+    <div className="container mx-auto py-8 px-4 space-y-8" data-testid="dashboard-content">
       <motion.div
         className="space-y-4"
         initial="hidden"
@@ -458,7 +458,7 @@ export default function DashboardPage() {
         variants={itemVariants}
         layoutId="dashboard-header"
       >
-        <div className="flex items-center justify-between">
+        <header className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-headline font-semibold text-foreground">
               Welcome, {profile?.displayName || user?.email}!
@@ -473,7 +473,7 @@ export default function DashboardPage() {
               Loading...
             </Button>
           )}
-        </div>
+        </header>
       </motion.div>
 
       <motion.div
@@ -567,6 +567,18 @@ export default function DashboardPage() {
       >
         <motion.div variants={itemVariants}>
           <ToolGrid />
+        </motion.div>
+      </motion.div>
+
+      {/* Core Web Vitals Performance Monitoring */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="mt-8"
+      >
+        <motion.div variants={itemVariants}>
+          <CoreWebVitalsWidget />
         </motion.div>
       </motion.div>
     </div>

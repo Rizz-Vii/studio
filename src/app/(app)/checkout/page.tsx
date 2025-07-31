@@ -1,9 +1,9 @@
 "use client";
 
+import MultiPaymentCheckout from "@/components/payment/multi-payment-checkout";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import MultiPaymentCheckout from "@/components/payment/multi-payment-checkout";
 
 export default function CheckoutPage() {
   const { user, loading } = useAuth();
@@ -28,8 +28,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <main className="container mx-auto px-4 py-8">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold text-center">Checkout</h1>
+      </header>
       <MultiPaymentCheckout />
-    </div>
+    </main>
   );
 }

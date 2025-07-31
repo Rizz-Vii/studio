@@ -1,67 +1,82 @@
-/**
- * @file Playwright configuration for lean channel testing
- * 
- * This configuration is optimized for testing Firebase preview channels
- * as part of the Development Hyperloop workflow.
- * 
- * Key features:
- * - Supports dynamic base URL from environment variables
- * - Focuses on critical path tests for rapid feedback
- * - Optimized timeouts for preview channels
- * - Retries for stability with preview deployments
- */
-
-import { defineConfig } from '@playwright/test';
-// @ts-ignore - Import from mjs file
-import baseConfig from './playwright.config.base.mjs';
+import { defineConfig, devices } from "@playwright/test";
 
 /**
- * See https://playwright.dev/docs/test-configuration
+ * Playwright Configuration for Lean Channel Testing - Enterprise Enhanced
+ * 
+ * Combines production-ready lean testing with enterprise infrastructure capabilities:
+ * - Firebase preview channel testing support
+ * - Advanced reporting with multiple formats
+ * - Mobile and performance testing integration
+ * - Enterprise-grade timeout and retry configurations
  */
 export default defineConfig({
-  ...baseConfig,
+    testDir: "./testing",
+    timeout: 120000, // 2 minutes for lean channel testing
+    workers: process.env.CI ? 1 : 4,
 
-  // We want to explicitly control which tests run in lean mode
-  testMatch: '**/?(*.)@lean.spec.ts',
+    // Enhanced reporting for enterprise environments
+    reporter: [
+        ["html", { outputFolder: "test-results/lean-html", open: 'never' }],
+        ["junit", { outputFile: "test-results/lean-junit.xml" }],
+        ["json", { outputFile: "test-results/lean-report.json" }],
+        ["line"],
+        ["github"]
+    ],
 
-  // Enable parallel tests for faster execution
-  workers: 4,
+    use: {
+        // Enhanced base URL support with multiple fallbacks
+        baseURL: process.env.TEST_URL || process.env.TEST_BASE_URL || process.env.LEAN_URL || "https://rankpilot-h3jpc--lean-branch-testing-o2qips67.web.app",
+        trace: "retain-on-failure",
+        screenshot: "only-on-failure",
+        video: "retain-on-failure",
+        actionTimeout: 30000,
+        navigationTimeout: 60000,
 
-  // Use env var for base URL if provided
-  use: {
-    ...baseConfig.use,
-    baseURL: process.env.TEST_URL || 'http://localhost:3000',
+        // Enterprise lean channel specific settings
+        extraHTTPHeaders: {
+            "Accept": "application/json, text/plain, */*",
+            "Cache-Control": "no-cache"
+        }
+    },
 
-    // Increase timeouts for preview channels which might be slower
-    navigationTimeout: 60000,
-    actionTimeout: 30000,
+    expect: {
+        timeout: 15000
+    },
 
-    // Enable trace for easier debugging when tests fail
-    trace: 'retain-on-failure',
-  },
+    // Enterprise testing projects with comprehensive coverage
+    projects: [
+        {
+            name: "lean-critical",
+            testMatch: ["**/critical-systems.spec.ts", "**/?(*.)@lean.spec.ts"],
+            use: { ...devices["Desktop Chrome"] },
+        },
+        {
+            name: "lean-mobile",
+            testMatch: "**/mobile-nav-consolidated.spec.ts",
+            use: { ...devices["iPhone 14"] },
+        },
+        {
+            name: "lean-performance",
+            testMatch: "**/*performance*.spec.ts",
+            use: { ...devices["Desktop Chrome"] },
+        }
+    ],
 
-  // Run headless by default but can be overridden with HEADLESS=0
-  headless: process.env.HEADLESS !== '0',
+    // Enhanced output configuration
+    outputDir: "test-results/lean-output",
+    preserveOutput: "failures-only",
 
-  // Add retries for stability with preview deployments
-  retries: 1,
+    // Enterprise stability configuration
+    retries: 1,
+    globalTimeout: 15 * 60 * 1000, // 15 minutes
 
-  // Optimize reporters for CI
-  reporter: [
-    ['html', { open: 'never' }],
-    ['list'],
-    ['json', { outputFile: 'test-results/lean-report.json' }],
-  ],
+    // Skip slow tests in lean mode for faster feedback
+    grepInvert: /@slow/,
 
-  // Set custom output directory
-  outputDir: 'test-results/lean',
-
-  // Ensure we clean up after tests
-  preserveOutput: 'failures-only',
-
-  // Faster timeout for entire test run
-  globalTimeout: 15 * 60 * 1000, // 15 minutes
-
-  // Skip slow tests in lean mode
-  grepInvert: /@slow/,
+    // Lean channel health check
+    webServer: process.env.CI ? undefined : {
+        command: 'echo "Enterprise lean channel testing ready"',
+        port: 0,
+        reuseExistingServer: true
+    }
 });

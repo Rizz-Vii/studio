@@ -1,6 +1,10 @@
 # 🚀 RankPilot GitHub Actions Workflows - CONSOLIDATED
 
+<<<<<<< HEAD
 ## 📋 **Streamlined Workflow Overview (8 Total)**
+=======
+This GitHub Actions workflow provides automated testing and deployment for the `workshop/performance` branch.
+>>>>>>> workshop/performance
 
 ### **🎯 Performance Pipeline - Consolidated**
 **File:** `performance-pipeline.yml`
@@ -11,7 +15,12 @@
 - Pull requests to `master` or `staging`
 - Workflow completion from instant deploy
 
+<<<<<<< HEAD
 **Execution:** 3-stage validation (feature validation → auto-deploy → staging test)
+=======
+- You push commits to the `workshop/performance` branch  
+- You can also trigger it manually via GitHub Actions UI
+>>>>>>> workshop/performance
 
 ---
 

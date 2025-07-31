@@ -1,14 +1,687 @@
-# Block crawlers from accessing private user areas and API routes
-User-agent: *
-Disallow: /api/
-Disallow: /dashboard/
-Disallow: /profile/
-Disallow: /adminonly/
-Disallow: /login/
-Disallow: /register/
+# robots.txt - Comprehensive Web Crawler Instructions
+# Last Updated: [Current Date]
+# Domain: [rankpilot-h3jpc.web.app]
+# Contact: [webmaster@yourdomain.com]
 
-# Allow crawlers to access all other public pages
+# =============================================================================
+# SEARCH ENGINE CRAWLERS - MAJOR BOTS
+# =============================================================================
+
+# Google Search Bot
+User-agent: Googlebot
 Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /cache/
+Disallow: /cgi-bin/
+Disallow: /search?
+Disallow: /*?utm_*
+Disallow: /*?sid=*
+Disallow: /*?sessionid=*
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /wp-content/plugins/
+Disallow: /wp-content/themes/
+Allow: /wp-content/themes/*/css/
+Allow: /wp-content/themes/*/js/
+Allow: /wp-content/themes/*/images/
+Crawl-delay: 1
 
-# Location of sitemap
-Sitemap: https://yourdomain.com/sitemap.xml
+# Google Image Bot
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /photos/
+Allow: /gallery/
+Allow: /media/
+Disallow: /private-images/
+Disallow: /user-uploads/private/
+
+# Google News Bot
+User-agent: Googlebot-News
+Allow: /news/
+Allow: /blog/
+Allow: /press/
+Disallow: /draft/
+Disallow: /preview/
+
+# Google Video Bot
+User-agent: Googlebot-Video
+Allow: /videos/
+Allow: /media/
+Disallow: /private-videos/
+
+# Bing Search Bot
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /search?
+Disallow: /*?utm_*
+Crawl-delay: 2
+
+# Yahoo Search Bot
+User-agent: Slurp
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 3
+
+# DuckDuckGo Bot
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 1
+
+# Yandex Bot (Russian search engine)
+User-agent: YandexBot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 2
+
+# Baidu Bot (Chinese search engine)
+User-agent: Baiduspider
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 5
+
+# =============================================================================
+# SOCIAL MEDIA CRAWLERS
+# =============================================================================
+
+# Facebook Bot (for link previews)
+User-agent: facebookexternalhit
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+
+# Twitter Bot (for cards and previews)
+User-agent: Twitterbot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+
+# LinkedIn Bot
+User-agent: LinkedInBot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+
+# Pinterest Bot
+User-agent: Pinterest
+Allow: /images/
+Allow: /photos/
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+
+# WhatsApp Bot (for link previews)
+User-agent: WhatsApp
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+
+# =============================================================================
+# SEO & ANALYTICS CRAWLERS
+# =============================================================================
+
+# Screaming Frog SEO Spider
+User-agent: Screaming Frog SEO Spider
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 2
+
+# Ahrefs Bot
+User-agent: AhrefsBot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 10
+
+# SEMrush Bot
+User-agent: SemrushBot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 10
+
+# Moz Bot
+User-agent: MozBot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 10
+
+# Majestic Bot
+User-agent: MJ12bot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 10
+
+# =============================================================================
+# SECURITY & MALICIOUS BOTS - BLOCK COMPLETELY
+# =============================================================================
+
+# Known malicious or unwanted bots
+User-agent: HTTrack
+Disallow: /
+
+User-agent: WebCopier
+Disallow: /
+
+User-agent: WebZIP
+Disallow: /
+
+User-agent: WebReaper
+Disallow: /
+
+User-agent: WebStripper
+Disallow: /
+
+User-agent: WebSauger
+Disallow: /
+
+User-agent: WebWhacker
+Disallow: /
+
+User-agent: Teleport
+Disallow: /
+
+User-agent: Offline Explorer
+Disallow: /
+
+User-agent: Mass Downloader
+Disallow: /
+
+User-agent: EmailCollector
+Disallow: /
+
+User-agent: EmailSiphon
+Disallow: /
+
+User-agent: EmailWolf
+Disallow: /
+
+User-agent: ExtractorPro
+Disallow: /
+
+User-agent: WebBandit
+Disallow: /
+
+User-agent: Crescent
+Disallow: /
+
+User-agent: CherryPicker
+Disallow: /
+
+User-agent: NICErsPRO
+Disallow: /
+
+User-agent: BlowFish
+Disallow: /
+
+User-agent: BotALot
+Disallow: /
+
+User-agent: psbot
+Disallow: /
+
+User-agent: Python-urllib
+Disallow: /
+
+User-agent: NetAnts
+Disallow: /
+
+User-agent: Mister PiX
+Disallow: /
+
+User-agent: WebAuto
+Disallow: /
+
+User-agent: TheNomad
+Disallow: /
+
+User-agent: WWW-Collector-E
+Disallow: /
+
+User-agent: RMA
+Disallow: /
+
+User-agent: libWeb/clsHTTP
+Disallow: /
+
+User-agent: asterias
+Disallow: /
+
+User-agent: httplib
+Disallow: /
+
+User-agent: turingos
+Disallow: /
+
+User-agent: spanner
+Disallow: /
+
+User-agent: InfoNaviRobot
+Disallow: /
+
+User-agent: Harvest/1.5
+Disallow: /
+
+User-agent: Bullseye/1.0
+Disallow: /
+
+User-agent: Mozilla/4.0 (compatible; BullsEye; Windows 95)
+Disallow: /
+
+User-agent: Crescent Internet ToolPak HTTP OLE Control v.1.0
+Disallow: /
+
+User-agent: CherryPickerSE/1.0
+Disallow: /
+
+User-agent: CherryPickerElite/1.0
+Disallow: /
+
+User-agent: WebBandit/3.50
+Disallow: /
+
+User-agent: NICErsPRO
+Disallow: /
+
+User-agent: Microsoft URL Control - 5.01.4511
+Disallow: /
+
+User-agent: DittoSpyder
+Disallow: /
+
+User-agent: Foobot
+Disallow: /
+
+User-agent: WebmasterWorldForumBot
+Disallow: /
+
+User-agent: SpankBot
+Disallow: /
+
+User-agent: BotALot
+Disallow: /
+
+User-agent: lwp-trivial/1.34
+Disallow: /
+
+User-agent: lwp-trivial
+Disallow: /
+
+User-agent: BunnySlippers
+Disallow: /
+
+User-agent: Microsoft URL Control - 6.00.8169
+Disallow: /
+
+User-agent: URLy Warning
+Disallow: /
+
+User-agent: Wget
+Disallow: /
+
+User-agent: Wget/1.6
+Disallow: /
+
+User-agent: Wget/1.5.3
+Disallow: /
+
+User-agent: Mozilla/4.0 (compatible; MSIE 4.0; Windows 95)
+Disallow: /
+
+User-agent: Mozilla/4.0 (compatible; MSIE 4.0; Windows 98)
+Disallow: /
+
+User-agent: Mozilla/4.0 (compatible; MSIE 4.0; Windows NT)
+Disallow: /
+
+User-agent: Mozilla/4.0 (compatible; MSIE 4.0; Windows 2000)
+Disallow: /
+
+User-agent: Mozilla/4.0 (compatible; MSIE 4.0; Windows ME)
+Disallow: /
+
+# Block AI training bots (optional - remove if you want AI training)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# =============================================================================
+# ARCHIVE & BACKUP CRAWLERS
+# =============================================================================
+
+# Internet Archive Wayback Machine
+User-agent: ia_archiver
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Crawl-delay: 5
+
+# Archive.today
+User-agent: archive.org_bot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Crawl-delay: 10
+
+# =============================================================================
+# E-COMMERCE & PRICE COMPARISON BOTS
+# =============================================================================
+
+# Generic price comparison bots (adjust based on your needs)
+User-agent: PriceGrabber
+Allow: /products/
+Allow: /catalog/
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cart/
+Crawl-delay: 5
+
+User-agent: Shopping.com
+Allow: /products/
+Allow: /catalog/
+Disallow: /admin/
+Disallow: /checkout/
+Crawl-delay: 5
+
+# =============================================================================
+# RESEARCH & ACADEMIC CRAWLERS
+# =============================================================================
+
+# Common Crawl (research archive)
+User-agent: CCBot
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+Disallow: /user/
+Crawl-delay: 10
+
+# =============================================================================
+# DEFAULT RULES FOR ALL OTHER BOTS
+# =============================================================================
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /administrator/
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /wp-content/plugins/
+Disallow: /wp-content/themes/
+Disallow: /cgi-bin/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /tmp/
+Disallow: /cache/
+Disallow: /backup/
+Disallow: /backups/
+Disallow: /old/
+Disallow: /test/
+Disallow: /testing/
+Disallow: /dev/
+Disallow: /development/
+Disallow: /staging/
+Disallow: /beta/
+Disallow: /alpha/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /inc/
+Disallow: /lib/
+Disallow: /libs/
+Disallow: /vendor/
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /.svn/
+Disallow: /.env
+Disallow: /logs/
+Disallow: /log/
+Disallow: /error_log
+Disallow: /access_log
+Disallow: /database/
+Disallow: /db/
+Disallow: /sql/
+Disallow: /phpmyadmin/
+Disallow: /mysql/
+Disallow: /ftp/
+Disallow: /sftp/
+Disallow: /ssh/
+Disallow: /cpanel/
+Disallow: /webmail/
+Disallow: /mail/
+Disallow: /email/
+
+# Block sensitive file types
+Disallow: /*.sql$
+Disallow: /*.log$
+Disallow: /*.bak$
+Disallow: /*.backup$
+Disallow: /*.old$
+Disallow: /*.tmp$
+Disallow: /*.swp$
+Disallow: /*.swo$
+Disallow: /*.env$
+Disallow: /*.config$
+Disallow: /*.conf$
+Disallow: /*.ini$
+Disallow: /*.key$
+Disallow: /*.pem$
+Disallow: /*.crt$
+Disallow: /*.p12$
+Disallow: /*.pfx$
+
+# Block common attack vectors
+Disallow: /*?cmd=
+Disallow: /*?exec=
+Disallow: /*?system=
+Disallow: /*?shell=
+Disallow: /*?passthru=
+Disallow: /*?eval=
+Disallow: /*?base64=
+Disallow: /*?union=
+Disallow: /*?select=
+Disallow: /*?insert=
+Disallow: /*?update=
+Disallow: /*?delete=
+Disallow: /*?drop=
+Disallow: /*?create=
+Disallow: /*?alter=
+Disallow: /*?..%2F
+Disallow: /*?../
+Disallow: /*?%00
+Disallow: /*?null=
+Disallow: /*?void=
+Disallow: /*?script=
+Disallow: /*?javascript:
+Disallow: /*?vbscript:
+Disallow: /*?onload=
+Disallow: /*?onerror=
+Disallow: /*?onclick=
+
+# Block session and tracking parameters
+Disallow: /*?sessionid=*
+Disallow: /*?PHPSESSID=*
+Disallow: /*?sid=*
+Disallow: /*?session=*
+Disallow: /*?token=*
+Disallow: /*?auth=*
+Disallow: /*?key=*
+Disallow: /*?password=*
+Disallow: /*?pwd=*
+Disallow: /*?pass=*
+Disallow: /*?login=*
+Disallow: /*?user=*
+Disallow: /*?username=*
+Disallow: /*?email=*
+Disallow: /*?phone=*
+Disallow: /*?credit=*
+Disallow: /*?card=*
+Disallow: /*?ssn=*
+Disallow: /*?social=*
+
+# Block common spam and tracking parameters
+Disallow: /*?utm_source=*
+Disallow: /*?utm_medium=*
+Disallow: /*?utm_campaign=*
+Disallow: /*?utm_term=*
+Disallow: /*?utm_content=*
+Disallow: /*?fbclid=*
+Disallow: /*?gclid=*
+Disallow: /*?msclkid=*
+Disallow: /*?ref=*
+Disallow: /*?referrer=*
+Disallow: /*?source=*
+Disallow: /*?campaign=*
+Disallow: /*?affiliate=*
+Disallow: /*?partner=*
+
+# Block search and filter parameters that create duplicate content
+Disallow: /search?*
+Disallow: /results?*
+Disallow: /*?search=*
+Disallow: /*?q=*
+Disallow: /*?query=*
+Disallow: /*?s=*
+Disallow: /*?keyword=*
+Disallow: /*?filter=*
+Disallow: /*?sort=*
+Disallow: /*?order=*
+Disallow: /*?page=*
+Disallow: /*?p=*
+Disallow: /*?offset=*
+Disallow: /*?limit=*
+Disallow: /*?per_page=*
+Disallow: /*?category=*
+Disallow: /*?cat=*
+Disallow: /*?tag=*
+Disallow: /*?tags=*
+Disallow: /*?author=*
+Disallow: /*?date=*
+Disallow: /*?year=*
+Disallow: /*?month=*
+
+# Block user-specific and private areas
+Disallow: /user/
+Disallow: /users/
+Disallow: /member/
+Disallow: /members/
+Disallow: /profile/
+Disallow: /profiles/
+Disallow: /account/
+Disallow: /accounts/
+Disallow: /dashboard/
+Disallow: /panel/
+Disallow: /control/
+Disallow: /manage/
+Disallow: /management/
+Disallow: /settings/
+Disallow: /preferences/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /basket/
+Disallow: /order/
+Disallow: /orders/
+Disallow: /payment/
+Disallow: /payments/
+Disallow: /billing/
+Disallow: /invoice/
+Disallow: /invoices/
+Disallow: /receipt/
+Disallow: /receipts/
+
+# Block API endpoints
+Disallow: /api/
+Disallow: /apis/
+Disallow: /rest/
+Disallow: /graphql/
+Disallow: /webhook/
+Disallow: /webhooks/
+Disallow: /callback/
+Disallow: /callbacks/
+Disallow: /endpoint/
+Disallow: /endpoints/
+
+# Block development and testing areas
+Disallow: /wp-content/debug.log
+Disallow: /error_log
+Disallow: /debug/
+Disallow: /trace/
+Disallow: /monitor/
+Disallow: /status/
+Disallow: /health/
+Disallow: /ping/
+Disallow: /stats/
+Disallow: /metrics/
+Disallow: /analytics/
+
+# Default crawl delay for unknown bots
+Crawl-delay: 10
+
+# =============================================================================
+# SITEMAPS
+# =============================================================================
+
+# Main sitemap (update with your actual sitemap URL)
+Sitemap: https://rankpilot-h3jpc.web.app/sitemap.xml
+Sitemap: https://yourdomain.com/sitemap_index.xml
+Sitemap: https://yourdomain.com/news-sitemap.xml
+Sitemap: https://yourdomain.com/image-sitemap.xml
+Sitemap: https://yourdomain.com/video-sitemap.xml
+Host: rankpilot-h3jpc--performance-testing-mw0cwov5.web.app/sitemap.xml
+
+# =============================================================================
+# ADDITIONAL SECURITY NOTES
+# =============================================================================
+
+# Note: This robots.txt file is publicly accessible and should not contain
+# sensitive information. It's a guideline for well-behaved crawlers but
+# malicious bots may ignore these rules.
+#
+# For additional security:
+# 1. Implement server-level blocking for malicious IPs
+# 2. Use .htaccess or nginx rules for more strict access control
+# 3. Monitor server logs for unusual bot activity
+# 4. Consider implementing rate limiting at the server level
+# 5. Use CAPTCHA or other verification for suspicious traffic
+#
+# Last security review: [Date]
+# Next review scheduled: [Date]
+
+# =============================================================================
+# CONTACT INFORMATION
+# =============================================================================
+
+# For questions about this robots.txt file:
+# Email: webmaster@yourdomain.com
+# Website: https://yourdomain.com/contact
+#
+# To report crawling issues or request changes:
+# Email: seo@yourdomain.com
+# 
+# For security-related crawler concerns:
+# Email: security@yourdomain.com
+

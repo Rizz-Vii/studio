@@ -44,9 +44,13 @@ This project and everyone participating in it is governed by a Code of Conduct. 
 
 ### Key Technical Standards
 
+
 - **Frontend:** Next.js (App Router), React, Tailwind CSS, shadcn/ui.
+
 - **Backend:** Firebase Cloud Functions are the target for all scalable backend logic.
+
 - **Database:** Firestore. Adhere to the established data models.
+
 - **Security:** Never commit secrets or API keys. Use `.env.local` for local development and configured secrets (e.g., Google Secret Manager) for production environments.
 
 ---

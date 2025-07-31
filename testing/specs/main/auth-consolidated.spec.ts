@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { UNIFIED_TEST_USERS } from "../../config/unified-test-users";
 import { EnhancedAuth } from "../../utils/enhanced-auth";
 
@@ -289,8 +289,8 @@ test.describe("Authentication - Integration Tests", () => {
     const currentUrl = page.url();
     console.log(`✅ Successfully logged in using enhanced-auth, redirected to: ${currentUrl}`);
 
-    // Verify we're in an authenticated area - match role-based content verification
-    await expect(page.locator('[data-testid="dashboard-content"], main, .main-content')).toBeVisible({ timeout: 30000 });
+    // Verify we're in an authenticated area - look for specific dashboard content
+    await expect(page.locator('[data-testid="dashboard-content"]')).toBeVisible({ timeout: 30000 });
 
     console.log("✅ Authentication test completed successfully");
   });

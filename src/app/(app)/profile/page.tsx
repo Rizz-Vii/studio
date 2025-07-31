@@ -1,13 +1,9 @@
 // src/app/(app)/profile/page.tsx
 "use client";
 
-import React, { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import LoadingScreen from "@/components/ui/loading-screen";
 import ProfileForm from "@/components/profile-form";
-import SEOActivitiesTimeline from "@/components/profile/seo-activities-timeline";
 import SEOAchievementsBadges from "@/components/profile/seo-achievements-badges";
+import SEOActivitiesTimeline from "@/components/profile/seo-activities-timeline";
 import {
   Card,
   CardContent,
@@ -15,12 +11,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import LoadingScreen from "@/components/ui/loading-screen";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Activity, Award, TrendingUp } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Activity, Award, TrendingUp, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 export default function ProfilePage() {
   const { user, profile, activities, loading: authLoading } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [defaultTab, setDefaultTab] = useState("profile");
   const router = useRouter();
 
   React.useEffect(() => {
@@ -34,6 +35,10 @@ export default function ProfilePage() {
         router.push("/settings?tab=billing");
         return;
       }
+      // Set default tab from URL params
+      if (tab) {
+        setDefaultTab(tab);
+      }
     }
   }, [router]);
 
@@ -44,12 +49,6 @@ export default function ProfilePage() {
   if (!user || !profile) {
     return null;
   }
-
-  // Get default tab from URL params
-  const searchParams = new URLSearchParams(
-    typeof window !== "undefined" ? window.location.search : ""
-  );
-  const defaultTab = searchParams.get("tab") || "profile";
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -116,7 +115,7 @@ export default function ProfilePage() {
                     (a) =>
                       a.type === "audit" &&
                       new Date(a.timestamp.toDate()).getMonth() ===
-                        new Date().getMonth()
+                      new Date().getMonth()
                   ).length || 0}
                 </p>
               </CardContent>
@@ -138,7 +137,7 @@ export default function ProfilePage() {
                     (a) =>
                       a.type === "keyword-research" &&
                       new Date(a.timestamp.toDate()).getMonth() ===
-                        new Date().getMonth()
+                      new Date().getMonth()
                   ).length || 0}
                 </p>
               </CardContent>
@@ -160,7 +159,7 @@ export default function ProfilePage() {
                     (a) =>
                       a.type === "serp-analysis" &&
                       new Date(a.timestamp.toDate()).getMonth() ===
-                        new Date().getMonth()
+                      new Date().getMonth()
                   ).length || 0}
                 </p>
               </CardContent>

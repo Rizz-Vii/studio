@@ -1,11 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { useHydration } from "@/components/HydrationContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, CheckCircle, Info, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+import { XCircle } from "lucide-react";
+import React, { createContext, useContext, useRef } from "react";
 
 interface EnhancedFormContextType {
   isSubmitting: boolean;
@@ -16,6 +16,25 @@ interface EnhancedFormContextType {
   setFieldTouched: (name: string, touched: boolean) => void;
   setFieldError: (name: string, error: string) => void;
   clearFieldError: (name: string) => void;
+  /**
+   * Validation schema for type-safe field validation
+   */
+  schema?: any;
+  /**
+   * Field registration for better composition
+   */
+  registerField: (name: string, config?: FieldConfig) => void;
+  unregisterField: (name: string) => void;
+  /**
+   * Submit handler with error boundary
+   */
+  submitWithErrorBoundary: (handler: () => Promise<void>) => Promise<void>;
+}
+
+interface FieldConfig {
+  validate?: (value: any) => string | undefined;
+  transform?: (value: any) => any;
+  defaultValue?: any;
 }
 
 const EnhancedFormContext = createContext<EnhancedFormContextType | null>(null);
@@ -139,6 +158,9 @@ export function EnhancedForm({
     setFieldTouched,
     setFieldError,
     clearFieldError,
+    registerField: () => { }, // Placeholder implementation
+    unregisterField: () => { }, // Placeholder implementation
+    submitWithErrorBoundary: async () => { }, // Placeholder implementation
   };
 
   return (
@@ -306,8 +328,8 @@ export function EnhancedField({
         className={cn(
           "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
           fieldError &&
-            fieldTouched &&
-            "border-destructive focus-visible:ring-destructive"
+          fieldTouched &&
+          "border-destructive focus-visible:ring-destructive"
         )}
         aria-invalid={fieldError && fieldTouched ? "true" : "false"}
         aria-describedby={cn(

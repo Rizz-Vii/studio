@@ -75,12 +75,18 @@
 - Storybook build output
 - Documentation build files
 
+
 ### **Size Impact**
 
+
 - **Before**: 147 lines
+
 - **After**: ~160 lines
+
 - **Coverage**: +25% more file types
+
 - **Performance**: Reduced git operations on cache files
+
 
 ### **Key Benefits**
 
@@ -108,6 +114,7 @@
 - Cache management
 - Build artifact handling
 
+
 ### **Recommended Commands**
 
 ```powershell
@@ -122,6 +129,7 @@ git status --ignored
 ## Check repository size improvement
 git count-objects -vH
 ```
+
 
 ### **Maintenance Notes**
 

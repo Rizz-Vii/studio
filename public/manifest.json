@@ -1,11 +1,19 @@
 {
-  "name": "RankPilot",
+  "name": "RankPilot - AI-First SEO Platform",
   "short_name": "RankPilot",
-  "description": "AI-First SEO SaaS Platform",
+  "description": "Advanced AI-powered SEO analysis and optimization platform with NeuroSEO™ Suite",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#E0E5E8",
-  "theme_color": "#6699CC",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#3B82F6",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": [
+    "productivity",
+    "business",
+    "marketing"
+  ],
   "icons": [
     {
       "src": "/favicon-16x16.png",
@@ -20,17 +28,67 @@
     {
       "src": "/apple-touch-icon.png",
       "sizes": "180x180",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     },
     {
       "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     },
     {
       "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Access your SEO dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "NeuroSEO Analysis",
+      "short_name": "NeuroSEO",
+      "description": "Run AI-powered SEO analysis",
+      "url": "/neuroseo",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Manage account settings",
+      "url": "/settings",
+      "icons": [
+        {
+          "src": "/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate"
 }

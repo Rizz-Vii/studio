@@ -1,15 +1,6 @@
 // src/app/(app)/competitors/page.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import type {
-  CompetitorAnalysisInput,
-  CompetitorAnalysisOutput,
-} from "@/ai/flows/competitor-analysis";
-import { analyzeCompetitors } from "@/ai/flows/competitor-analysis";
-import { useAuth } from "@/context/AuthContext";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import CompetitorAnalysisForm from "@/components/competitor-analysis-form";
 import {
   Card,
@@ -19,6 +10,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import LoadingScreen from "@/components/ui/loading-screen";
+import {
   Table,
   TableBody,
   TableCell,
@@ -26,25 +24,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Users, AlertTriangle, BarChart3 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import LoadingScreen from "@/components/ui/loading-screen";
+import { useAuth } from "@/context/AuthContext";
+import { ACTIVITY_TYPES, TOOL_NAMES } from "@/lib/activity-types";
+import { db } from "@/lib/firebase";
+import type { NeuroSEOAnalysisRequest, NeuroSEOReport } from "@/lib/neuroseo";
+import { TimeoutError } from "@/lib/timeout";
+import { cn } from "@/lib/utils";
+import type {
+  CompetitorAnalysisInput,
+  CompetitorAnalysisOutput
+} from "@/types";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertTriangle, BarChart3, Users } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
   CartesianGrid,
   ResponsiveContainer,
+  XAxis,
+  YAxis,
 } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartConfig,
-} from "@/components/ui/chart";
-import { cn } from "@/lib/utils";
-import { withTimeout, TimeoutError } from "@/lib/timeout";
 
 const RankingsChart = ({
   rankings,
@@ -68,9 +69,9 @@ const RankingsChart = ({
       fill: "hsl(var(--chart-1))",
     },
     ...competitorUrls.map((url, index) => {
-      const competitorData = (firstKeywordData as any)[url];
+      const competitorData = (firstKeywordData as any)[String(url)];
       return {
-        name: new URL(url).hostname,
+        name: new URL(String(url)).hostname,
         rank:
           typeof competitorData?.rank === "number" ? competitorData.rank : 101,
         fill: `hsl(var(--chart-${(index % 5) + 2}))`,
@@ -167,11 +168,11 @@ const CompetitorResults = ({
                 <TableHead className="text-center">Your Rank</TableHead>
                 {competitorHeaders.map((url) => (
                   <TableHead
-                    key={url}
+                    key={String(url)}
                     className="text-center truncate"
-                    title={url}
+                    title={String(url)}
                   >
-                    {new URL(url).hostname}
+                    {new URL(String(url)).hostname}
                   </TableHead>
                 ))}
               </TableRow>
@@ -184,8 +185,8 @@ const CompetitorResults = ({
                     {item.yourRank?.rank ?? "N/A"}
                   </TableCell>
                   {competitorHeaders.map((url) => (
-                    <TableCell key={url} className="text-center">
-                      {(item as any)[url]?.rank ?? "N/A"}
+                    <TableCell key={String(url)} className="text-center">
+                      {(item as any)[String(url)]?.rank ?? "N/A"}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -223,35 +224,123 @@ const CompetitorResults = ({
 };
 
 export default function CompetitorsPage() {
-  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<CompetitorAnalysisOutput | null>(null);
+
+  const { user } = useAuth();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [report, setReport] = useState<NeuroSEOReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [currentEngine, setCurrentEngine] = useState<string>("");
+  const [completedEngines, setCompletedEngines] = useState<string[]>([]);
+
+  // Form state
+  const [yourUrl, setYourUrl] = useState("");
+  const [competitorUrls, setCompetitorUrls] = useState("");
+  const [targetKeywords, setTargetKeywords] = useState("");
+
+  // Get user subscription tier for feature gating
+  const userTier = (user as any)?.subscriptionTier || "free";
 
   const resultsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (results || error) {
-      resultsRef.current?.scrollIntoView({
+    if (report && !isAnalyzing && resultsRef.current) {
+      resultsRef.current.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     }
-  }, [results, error]);
+  }, [report, isAnalyzing]);
 
-  const handleSubmit = async (values: CompetitorAnalysisInput) => {
-    setIsLoading(true);
+  // Simulate analysis progress
+  useEffect(() => {
+    if (isAnalyzing) {
+      const engines = ['neuralCrawler', 'aiVisibility', 'trustBlock', 'semanticMap', 'orchestrator'];
+      let currentIndex = 0;
+
+      const interval = setInterval(() => {
+        if (currentIndex < engines.length) {
+          setCurrentEngine(engines[currentIndex]);
+          setAnalysisProgress((currentIndex + 1) * 20);
+          if (currentIndex > 0) {
+            setCompletedEngines(prev => [...prev, engines[currentIndex - 1]]);
+          }
+          currentIndex++;
+        } else {
+          setCompletedEngines(prev => [...prev, engines[engines.length - 1]]);
+          setCurrentEngine("");
+        }
+      }, 3000);
+
+      return () => clearInterval(interval);
+    } else {
+      setAnalysisProgress(0);
+      setCurrentEngine("");
+      setCompletedEngines([]);
+    }
+  }, [isAnalyzing]);
+
+  const handleSubmit = async (values: { yourUrl: string; competitorUrls: string; keywords: string; }) => {
+    // Transform form values to CompetitorAnalysisInput
+    const competitorUrlList = values.competitorUrls.split('\n').map(url => url.trim()).filter(url => url);
+    const keywordList = values.keywords.split(',').map(keyword => keyword.trim()).filter(keyword => keyword);
+
+    const analysisInput: CompetitorAnalysisInput = {
+      urls: [values.yourUrl, ...competitorUrlList],
+      yourUrl: values.yourUrl,
+      competitorUrls: competitorUrlList,
+      keywords: keywordList,
+      targetKeywords: keywordList,
+      analysisDepth: 'standard'
+    };
+
+    if (!values.yourUrl.trim()) {
+      setError("Please enter your website URL");
+      return;
+    }
+
+    if (!values.competitorUrls.trim()) {
+      setError("Please enter at least one competitor URL");
+      return;
+    }
+
+    if (!user) {
+      setError("Please log in to perform competitive analysis");
+      return;
+    }
+
+    setIsAnalyzing(true);
     setSubmitted(true);
-    setResults(null);
     setError(null);
+    setReport(null);
+
     try {
-      // Try to get real data with timeout
-      const result = await withTimeout(
-        analyzeCompetitors(values),
-        15000, // 15 second timeout
-        "Competitor analysis is taking longer than expected."
-      );
-      setResults(result);
+      const analysisRequest: NeuroSEOAnalysisRequest = {
+        urls: [yourUrl.trim()],
+        targetKeywords: targetKeywords.split(',').map(k => k.trim()).filter(Boolean),
+        competitorUrls: competitorUrls.split(',').map(u => u.trim()).filter(Boolean),
+        analysisType: "competitive",
+        userPlan: userTier,
+        userId: user.uid,
+      };
+
+      // Call NeuroSEO™ API
+      const response = await fetch('/api/neuroseo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(analysisRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setReport(result);
 
       if (user) {
         const userActivitiesRef = collection(
@@ -261,14 +350,15 @@ export default function CompetitorsPage() {
           "activities"
         );
         await addDoc(userActivitiesRef, {
-          type: "Competitor Analysis",
-          tool: "Competitor Analysis",
+          type: ACTIVITY_TYPES.COMPETITOR_ANALYSIS,
+          tool: TOOL_NAMES.COMPETITOR_ANALYSIS,
           timestamp: serverTimestamp(),
           details: {
-            yourUrl: values.yourUrl,
-            competitors: values.competitorUrls,
+            yourUrl: yourUrl.trim(),
+            competitors: competitorUrls.split(',').map(u => u.trim()).filter(Boolean),
+            keywords: targetKeywords.split(',').map(k => k.trim()).filter(Boolean),
           },
-          resultsSummary: `Compared ${values.yourUrl} with ${values.competitorUrls.length} competitors.`,
+          resultsSummary: `NeuroSEO™ competitive analysis completed for ${yourUrl.trim()} vs ${competitorUrls.split(',').length} competitors.`,
         });
       }
     } catch (e: any) {

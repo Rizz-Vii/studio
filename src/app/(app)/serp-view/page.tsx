@@ -1,19 +1,22 @@
 // src/app/(app)/serp-view/page.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import SerpViewForm from "@/components/serp-view-form";
-import type { SerpViewInput, SerpViewOutput } from "@/ai/flows/serp-view";
-import { getSerpData } from "@/ai/flows/serp-view";
+import SerpViewResults from "@/components/serp-view-results";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import LoadingScreen from "@/components/ui/loading-screen";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import SerpViewResults from "@/components/serp-view-results";
-import LoadingScreen from "@/components/ui/loading-screen";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { getSerpData } from "@/lib/utils/content-functions";
+import type {
+  SerpViewInput,
+  SerpViewOutput
+} from "@/types";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export default function SerpViewPage() {
   const { user } = useAuth();
@@ -32,13 +35,20 @@ export default function SerpViewPage() {
     }
   }, [results, error]);
 
-  const handleSubmit = async (values: SerpViewInput) => {
+  const handleSubmit = async (values: { keyword: string; }) => {
     setIsLoading(true);
     setSubmitted(true);
     setResults(null);
     setError(null);
     try {
-      const result = await getSerpData(values);
+      // Transform form values to SerpViewInput
+      const serpInput: SerpViewInput = {
+        keyword: values.keyword,
+        location: 'United States',
+        device: 'desktop',
+        searchEngine: 'google'
+      };
+      const result = await getSerpData(serpInput);
       setResults(result);
 
       if (user) {

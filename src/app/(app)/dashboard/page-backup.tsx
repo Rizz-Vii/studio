@@ -1,53 +1,49 @@
 // src/app/(app)/dashboard/page.tsx
 "use client";
+import ToolGrid from "@/components/tool-grid";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import {
-  Activity,
-  KeyRound,
-  ShieldCheck,
-  Link as LinkIcon,
-  RefreshCw,
-  AlertCircle,
-} from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import LoadingScreen from "@/components/ui/loading-screen";
-import {
+  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  ChartConfig,
 } from "@/components/ui/chart";
+import LoadingScreen from "@/components/ui/loading-screen";
+import { useAuth } from "@/context/AuthContext";
+import { useRealTimeDashboardData } from "@/hooks/use-dashboard-data";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Variants, motion } from "framer-motion";
 import {
-  LineChart,
+  Activity,
+  KeyRound,
+  Link as LinkIcon,
+  ShieldCheck
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
   Line,
+  LineChart,
+  Pie,
+  PieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  RadialBar,
+  RadialBarChart,
+  ResponsiveContainer,
   XAxis,
   YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  RadialBarChart,
-  RadialBar,
-  Legend,
-  PolarGrid,
-  PolarAngleAxis,
 } from "recharts";
-import { Variants, motion } from "framer-motion";
-import { useRealTimeDashboardData } from "@/hooks/use-dashboard-data";
-import { useEffect, useState } from "react";
-import ToolGrid from "@/components/tool-grid";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import styles from "./dashboard.module.css";
 
 // ----- CHART CONFIGS -----
@@ -72,7 +68,7 @@ const pieChartConfig = {
 // ----- UTILITY FUNCTIONS -----
 
 const getChartColorClass = (colorValue: string): string => {
-  const colorMap: { [key: string]: string } = {
+  const colorMap: { [key: string]: string; } = {
     "hsl(var(--chart-1))": styles.legendDotChart1,
     "hsl(var(--chart-2))": styles.legendDotChart2,
     "hsl(var(--chart-3))": styles.legendDotChart3,
@@ -108,7 +104,7 @@ const DashboardMetricCard: React.FC<{
   </Card>
 );
 
-const SeoScoreTrendChart = ({ data }: { data: any[] }) => (
+const SeoScoreTrendChart = ({ data }: { data: any[]; }) => (
   <Card>
     <CardHeader>
       <CardTitle className="font-headline">Overall SEO Score</CardTitle>
@@ -166,7 +162,7 @@ const SeoScoreTrendChart = ({ data }: { data: any[] }) => (
   </Card>
 );
 
-const KeywordVisibilityChart = ({ visibility }: { visibility: any }) => {
+const KeywordVisibilityChart = ({ visibility }: { visibility: any; }) => {
   const data = [
     {
       name: "Visibility",
@@ -221,7 +217,7 @@ const KeywordVisibilityChart = ({ visibility }: { visibility: any }) => {
   );
 };
 
-const DomainAuthorityChart = ({ data }: { data: any }) => (
+const DomainAuthorityChart = ({ data }: { data: any; }) => (
   <Card>
     <CardHeader>
       <CardTitle className="font-headline">Domain Authority</CardTitle>
@@ -274,7 +270,7 @@ const DomainAuthorityChart = ({ data }: { data: any }) => (
   </Card>
 );
 
-const BacklinksChart = ({ data }: { data: any }) => (
+const BacklinksChart = ({ data }: { data: any; }) => (
   <Card>
     <CardHeader>
       <CardTitle className="font-headline">Backlink Growth</CardTitle>
@@ -317,7 +313,7 @@ const BacklinksChart = ({ data }: { data: any }) => (
   </Card>
 );
 
-const TrafficSourcesChart = ({ data }: { data: any[] }) => (
+const TrafficSourcesChart = ({ data }: { data: any[]; }) => (
   <Card>
     <CardHeader>
       <CardTitle className="font-headline">Traffic Sources</CardTitle>
@@ -423,6 +419,7 @@ const dummyBacklinksData = {
 
 export default function DashboardPage() {
   const { user, profile, loading: authLoading } = useAuth();
+  const { data: dashboardData, loading: dataLoading, error, refresh } = useRealTimeDashboardData(user?.uid || null);
   const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
 
@@ -454,7 +451,7 @@ export default function DashboardPage() {
     },
   };
 
-  if (authLoading || !mounted) {
+  if (authLoading || dataLoading || !mounted) {
     return <LoadingScreen fullScreen text="Loading dashboard data..." />;
   }
 
@@ -483,32 +480,32 @@ export default function DashboardPage() {
         <motion.div variants={itemVariants}>
           <DashboardMetricCard
             title="Overall SEO Score"
-            value={String(dummyDashboardData.seoScore.current)}
-            change={dummyDashboardData.seoScore.change}
+            value={String(dashboardData?.seoScore.current || 0)}
+            change={dashboardData?.seoScore.change || 0}
             icon={Activity}
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <DashboardMetricCard
             title="Tracked Keywords"
-            value={dummyDashboardData.trackedKeywords.current.toLocaleString()}
-            change={dummyDashboardData.trackedKeywords.change}
+            value={(dashboardData?.trackedKeywords.current || 0).toLocaleString()}
+            change={dashboardData?.trackedKeywords.change || 0}
             icon={KeyRound}
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <DashboardMetricCard
             title="Domain Authority"
-            value={String(dummyDashboardData.domainAuthority.score)}
-            change={dummyDashboardData.domainAuthority.score - 52}
+            value={String(dashboardData?.domainAuthority.score || 0)}
+            change={(dashboardData?.domainAuthority.score || 0) - 52}
             icon={ShieldCheck}
           />
         </motion.div>
         <motion.div variants={itemVariants}>
           <DashboardMetricCard
             title="Total Backlinks"
-            value={dummyDashboardData.backlinks.total.toLocaleString()}
-            change={dummyDashboardData.backlinks.newLast30Days}
+            value={(dashboardData?.backlinks.total || 0).toLocaleString()}
+            change={dashboardData?.backlinks.newLast30Days || 0}
             icon={LinkIcon}
           />
         </motion.div>
@@ -521,10 +518,10 @@ export default function DashboardPage() {
         animate="visible"
       >
         <motion.div className={styles.chartLargeSpan} variants={itemVariants}>
-          <SeoScoreTrendChart data={dummySeoData} />
+          <SeoScoreTrendChart data={dashboardData?.seoScoreTrend || []} />
         </motion.div>
         <motion.div className={styles.chartMediumSpan} variants={itemVariants}>
-          <TrafficSourcesChart data={dummyTrafficData} />
+          <TrafficSourcesChart data={dashboardData?.trafficSources || []} />
         </motion.div>
       </motion.div>
 
@@ -535,10 +532,10 @@ export default function DashboardPage() {
         animate="visible"
       >
         <motion.div variants={itemVariants}>
-          <KeywordVisibilityChart visibility={dummyVisibility} />
+          <KeywordVisibilityChart visibility={dashboardData?.keywordVisibility || { score: 0, top10: 0 }} />
         </motion.div>
         <motion.div variants={itemVariants}>
-          <BacklinksChart data={dummyBacklinksData} />
+          <BacklinksChart data={dashboardData?.backlinks || { total: 0, newLast30Days: 0, quality: { high: 0, medium: 0, low: 0 } }} />
         </motion.div>
       </motion.div>
 
@@ -549,10 +546,10 @@ export default function DashboardPage() {
         animate="visible"
       >
         <motion.div variants={itemVariants}>
-          <DomainAuthorityChart data={dummyDomainData} />
+          <DomainAuthorityChart data={dashboardData?.domainAuthority || { score: 0, trend: [] }} />
         </motion.div>
         <motion.div variants={itemVariants}>
-          <BacklinksChart data={dummyBacklinksData} />
+          <BacklinksChart data={dashboardData?.backlinks || { total: 0, newLast30Days: 0, quality: { high: 0, medium: 0, low: 0 } }} />
         </motion.div>
       </motion.div>
 

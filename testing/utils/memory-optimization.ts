@@ -201,14 +201,14 @@ export class ProcessManager {
     async killAllProcesses(): Promise<void> {
         console.log(`🔪 Killing ${this.activeProcesses.size} tracked processes...`);
 
-        for (const pid of this.activeProcesses) {
+        Array.from(this.activeProcesses).forEach((pid) => {
             try {
                 process.kill(pid, 'SIGTERM');
                 console.log(`✅ Killed process ${pid}`);
             } catch (error) {
                 console.log(`⚠️ Failed to kill process ${pid}: ${error}`);
             }
-        }
+        });
 
         this.activeProcesses.clear();
     }

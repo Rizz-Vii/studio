@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
-import LoadingScreen from "@/components/ui/loading-screen";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,18 +9,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import LoadingScreen from "@/components/ui/loading-screen";
 import {
   Select,
   SelectContent,
@@ -30,25 +25,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import {
-  BookOpen,
-  Play,
-  Clock,
-  Users,
-  Star,
-  Search,
-  Filter,
-  CheckCircle,
-  Lock,
-  Crown,
-  Zap,
-  Video,
-  FileText,
-  Lightbulb,
-  ExternalLink,
   ArrowRight,
+  BookOpen,
+  Clock,
+  Crown,
+  FileText,
+  Filter,
+  Lightbulb,
+  Lock,
+  Play,
+  Search,
+  Star,
+  Users,
+  Video,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
+import React, { useEffect, useState } from "react";
 
 interface Tutorial {
   id: string;
@@ -531,9 +528,9 @@ export default function TutorialsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <main className="max-w-7xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex items-center gap-3">
+      <header className="flex items-center gap-3">
         <BookOpen className="h-8 w-8 text-primary" />
         <div>
           <h1 className="text-3xl font-bold font-headline">
@@ -544,7 +541,7 @@ export default function TutorialsPage() {
             guides.
           </p>
         </div>
-      </div>
+      </header>
 
       {/* Subscription Tier Info */}
       <Card className="border-l-4 border-l-primary">
@@ -838,7 +835,7 @@ export default function TutorialsPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }
 

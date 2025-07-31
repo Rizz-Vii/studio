@@ -1,41 +1,39 @@
 // src/app/(app)/content-brief/page.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import ContentBriefForm from "@/components/content-brief-form";
-import type {
-  ContentBriefInput,
-  ContentBriefOutput,
-} from "@/ai/flows/content-brief";
-import { generateContentBrief } from "@/ai/flows/content-brief";
-import { useAuth } from "@/context/AuthContext";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import {
-  Loader2,
-  FileText,
-  BrainCircuit,
-  Users,
-  BarChart2,
-  AlertTriangle,
-} from "lucide-react";
 import LoadingScreen from "@/components/ui/loading-screen";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ResponsiveContainer,
-  RadialBarChart,
-  RadialBar,
-  PolarGrid,
-  PolarAngleAxis,
-} from "recharts";
+import { useAuth } from "@/context/AuthContext";
+import { db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
+import { generateContentBrief } from "@/lib/utils/content-functions";
+import type {
+  ContentBriefInput,
+  ContentBriefOutput
+} from "@/types";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  AlertTriangle,
+  BarChart2,
+  BrainCircuit,
+  FileText,
+  Users
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  PolarGrid,
+  RadialBar,
+  RadialBarChart,
+  ResponsiveContainer
+} from "recharts";
 
 const ResultCard = ({
   title,
@@ -60,7 +58,7 @@ const ResultCard = ({
   </Card>
 );
 
-const SeoScoreGauge = ({ score }: { score: number }) => {
+const SeoScoreGauge = ({ score }: { score: number; }) => {
   const data = [
     { name: "SEO Score", value: score, fill: "hsl(var(--primary))" },
   ];
@@ -99,7 +97,7 @@ const SeoScoreGauge = ({ score }: { score: number }) => {
   );
 };
 
-const BriefResults = ({ briefResult }: { briefResult: ContentBriefOutput }) => (
+const BriefResults = ({ briefResult }: { briefResult: ContentBriefOutput; }) => (
   <motion.div
     className="space-y-6"
     initial={{ opacity: 0, y: 20 }}
@@ -188,7 +186,10 @@ const BriefResults = ({ briefResult }: { briefResult: ContentBriefOutput }) => (
               key={i}
               className="font-body p-1 -ml-1 rounded transition-colors hover:bg-muted/50"
             >
-              {heading}
+              <div>
+                <strong>H{heading.level}:</strong> {heading.title}
+                <p className="text-sm text-muted-foreground">{heading.description}</p>
+              </div>
             </li>
           ))}
         </ul>
@@ -216,13 +217,21 @@ export default function ContentBriefPage() {
     }
   }, [briefResult, error]);
 
-  const handleSubmit = async (values: ContentBriefInput) => {
+  const handleSubmit = async (values: { keyword: string; }) => {
     setIsLoading(true);
     setSubmitted(true);
     setBriefResult(null);
     setError(null);
     try {
-      const result = await generateContentBrief(values);
+      // Transform form values to ContentBriefInput
+      const contentBriefInput: ContentBriefInput = {
+        topic: values.keyword,
+        keyword: values.keyword,
+        targetKeywords: [values.keyword],
+        targetAudience: 'general audience',
+        contentType: 'blog post'
+      };
+      const result = await generateContentBrief(contentBriefInput);
       setBriefResult(result);
 
       if (user) {

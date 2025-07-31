@@ -4,14 +4,14 @@
  */
 
 import {
-  getFirestore,
   doc,
   getDoc,
+  getFirestore,
+  increment,
   setDoc,
   updateDoc,
-  increment,
 } from "firebase/firestore";
-import { FREE_PLAN, STRIPE_PLANS, PlanType } from "./stripe";
+import { FREE_PLAN, PlanType, STRIPE_PLANS } from "./stripe";
 
 export interface UsageQuota {
   userId: string;
@@ -37,6 +37,8 @@ export interface UsageCheck {
   allowed: boolean;
   reason?: string;
   remainingQuota: number;
+  remaining: number; // Alias for compatibility
+  limit: number; // Total limit
   resetDate: Date;
 }
 
@@ -121,6 +123,8 @@ export class UsageQuotaManager {
       return {
         allowed: false,
         reason: "Unable to verify usage quota",
+        remaining: 0,
+        limit: 0,
         remainingQuota: 0,
         resetDate: new Date(),
       };
@@ -158,6 +162,8 @@ export class UsageQuotaManager {
         return {
           allowed: false,
           reason: "Invalid usage type",
+          remaining: 0,
+          limit: 0,
           remainingQuota: 0,
           resetDate: quota.currentPeriodEnd,
         };
@@ -167,6 +173,8 @@ export class UsageQuotaManager {
     if (limit === -1) {
       return {
         allowed: true,
+        remaining: -1,
+        limit: -1,
         remainingQuota: -1,
         resetDate: quota.currentPeriodEnd,
       };
@@ -178,6 +186,8 @@ export class UsageQuotaManager {
       return {
         allowed: false,
         reason: `${usageType} limit exceeded (${currentUsage}/${limit})`,
+        remaining: 0,
+        limit: limit,
         remainingQuota: 0,
         resetDate: quota.currentPeriodEnd,
       };
@@ -185,6 +195,8 @@ export class UsageQuotaManager {
 
     return {
       allowed: true,
+      remaining: remainingQuota,
+      limit: limit,
       remainingQuota,
       resetDate: quota.currentPeriodEnd,
     };
@@ -301,7 +313,7 @@ export class UsageQuotaManager {
       },
       daysUntilReset: Math.ceil(
         (quota.currentPeriodEnd.getTime() - new Date().getTime()) /
-          (1000 * 60 * 60 * 24)
+        (1000 * 60 * 60 * 24)
       ),
     };
 
@@ -353,7 +365,7 @@ export class UsageQuotaManager {
   async enforceUsageLimit(
     userId: string,
     usageType: UsageType
-  ): Promise<{ success: boolean; error?: string }> {
+  ): Promise<{ success: boolean; error?: string; }> {
     const usageCheck = await this.checkUsageLimit(userId, usageType);
 
     if (!usageCheck.allowed) {

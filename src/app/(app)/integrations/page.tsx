@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
-import LoadingScreen from "@/components/ui/loading-screen";
 import { FeatureGate } from "@/components/subscription/FeatureGate";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,13 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +18,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import LoadingScreen from "@/components/ui/loading-screen";
 import {
   Select,
   SelectContent,
@@ -34,22 +28,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import {
-  Link,
-  Webhook,
-  Settings,
-  Plus,
-  Edit,
-  Trash2,
-  Copy,
+  BarChart3,
   Check,
-  ExternalLink,
-  Zap,
+  Copy,
   Database,
+  Edit,
+  ExternalLink,
+  Link,
   Mail,
   MessageSquare,
-  BarChart3,
+  Plus,
+  Settings,
+  Trash2,
+  Webhook,
+  Zap,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface Webhook {
@@ -264,10 +264,10 @@ export default function IntegrationsPage() {
           prev.map((integration) =>
             integration.id === editingIntegration.id
               ? {
-                  ...integration,
-                  ...integrationForm,
-                  active: integration.active,
-                }
+                ...integration,
+                ...integrationForm,
+                active: integration.active,
+              }
               : integration
           )
         );
@@ -398,8 +398,8 @@ export default function IntegrationsPage() {
 
   return (
     <FeatureGate requiredTier="enterprise" feature="custom_integrations">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
+      <main className="max-w-6xl mx-auto space-y-8">
+        <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Zap className="h-8 w-8 text-primary" />
             <div>
@@ -411,7 +411,7 @@ export default function IntegrationsPage() {
               </p>
             </div>
           </div>
-        </div>
+        </header>
 
         <Tabs defaultValue="webhooks" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
@@ -903,7 +903,7 @@ export default function IntegrationsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
+      </main>
     </FeatureGate>
   );
 }
