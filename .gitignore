@@ -208,5 +208,20 @@ bundle-report.html
 *.mkv
 
 # End of optimized .gitignore
+
+# Sensitive Configuration Files
+# -----------------------------
 masterKeys.md
 docs/ENVIRONMENT_VARIABLES.md
+state.json
+MCP_CONFIGURATION_PLAN.md
+MCP_CONFIGURATION_SUMMARY.md
+mcp.json
+
+# API Integration Documentation (contains example keys)
+# ----------------------------------------------------
+docs/integrations/api-keys/integration-summary.md
+docs/integrations/mcp-full/configuration-plan.md
+docs/integrations/mcp-full/configuration-summary.md
+docs/integrations/mcp/success-complete.md
+docs/integrations/stripe/integration-complete.md
