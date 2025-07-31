@@ -6,6 +6,7 @@ import { businessOperationsOrchestrator } from './business-operations/BusinessOp
 import { AgentSystemBootstrap } from './core/AgentFramework';
 import { customerSupportOrchestrator } from './customer-support/CustomerSupportOrchestrator';
 import { technicalOperationsOrchestrator } from './technical-operations/TechnicalOperationsOrchestrator';
+import { AgentEnvironmentValidator } from './AgentEnvironmentValidator';
 
 /**
  * Complete Agent System Implementation
@@ -18,15 +19,23 @@ export class RankPilotAgentSystem {
     constructor() {
         this.agentSystem = new AgentSystemBootstrap();
 
-        // Safe activation: Only initialize if explicitly enabled
-        if (process.env.RANKPILOT_AGENTS_ENABLED === 'true' || process.env.NODE_ENV === 'production') {
-            this.initializeAgents();
-        } else {
-            console.log('🛡️ RankPilot Agents: Disabled for IDE compatibility');
-        }
-    }
+        // Comprehensive environment validation
+        const envConfig = AgentEnvironmentValidator.validateEnvironment();
 
-    /**
+        if (envConfig.agentsEnabled) {
+            this.initializeAgents();
+            console.log('🚀 RankPilot AI Agents: ACTIVATED for production deployment');
+
+            // Log deployment readiness
+            const readiness = AgentEnvironmentValidator.validateDeploymentReadiness();
+            if (!readiness.ready) {
+                console.warn('⚠️  Deployment issues detected:', readiness.issues);
+            }
+        } else {
+            console.log('🛡️ RankPilot AI Agents: Disabled for development environment');
+            console.log('   Use RANKPILOT_AGENTS_ENABLED=true to enable manually');
+        }
+    }    /**
      * Initialize and register all orchestrator agents
      */
     private initializeAgents(): void {

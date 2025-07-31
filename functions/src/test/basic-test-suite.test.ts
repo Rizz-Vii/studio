@@ -61,18 +61,10 @@ describe("Firebase Functions Basic Test Suite", () => {
   describe("MetricsCollector", () => {
     it("should record function execution metrics", () => {
       const executionData = {
-        timestamp: Date.now(),
         functionName: "test-function",
-        userId: "user123",
-        duration: 1000,
-        memoryUsed: 64,
+        executionTime: 1000, // renamed from duration
         success: true,
-        userTier: "starter" as const,
-        businessData: {
-          aiTokensUsed: 50,
-          cacheHit: false,
-          resultCount: 10
-        }
+        memoryUsage: 64, // renamed from memoryUsed
       };
 
       expect(() => {
@@ -147,18 +139,10 @@ describe("Firebase Functions Basic Test Suite", () => {
 
       // Record metrics
       MetricsCollector.recordExecution({
-        timestamp: Date.now(),
         functionName: "integration-test",
-        userId: "integration-user",
-        duration: 1200,
-        memoryUsed: 96,
+        executionTime: 1200, // renamed from duration
         success: true,
-        userTier: "agency" as const,
-        businessData: {
-          aiTokensUsed: 150,
-          cacheHit: false,
-          resultCount: 1
-        }
+        memoryUsage: 96, // renamed from memoryUsed
       });
 
       // Complete trace

@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     // Dynamic import to prevent build-time issues - FIXED PATH
     let neuroSEO;
     try {
-      const neuroSEOModule = await import("../../../lib/neuroseo/index.js");
+      const neuroSEOModule = await import("../../../lib/neuroseo/index");
       const { NeuroSEOSuite } = neuroSEOModule;
       neuroSEO = new NeuroSEOSuite();
     } catch (error) {
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     // Dynamic import for GET as well - FIXED PATH
     let neuroSEO;
     try {
-      const neuroSEOModule = await import("../../../lib/neuroseo/index.js");
+      const neuroSEOModule = await import("../../../lib/neuroseo/index");
       const { NeuroSEOSuite } = neuroSEOModule;
       neuroSEO = new NeuroSEOSuite();
     } catch (error) {

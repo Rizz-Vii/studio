@@ -81,8 +81,6 @@ const nextConfig: NextConfig = {
 
   // Configure HTTP compression
   compress: true,
-<<<<<<< HEAD
-=======
 
   // Add custom headers
   async headers() {
@@ -153,7 +151,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
->>>>>>> workshop/performance
 };
 
 export default nextConfig;

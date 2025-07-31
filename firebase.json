@@ -15,7 +15,6 @@
       "firebase-debug.log",
       "firebase-debug.*.log",
       "*.local"
-<<<<<<< HEAD
     ],
     "predeploy": [
       "npm --prefix \"$RESOURCE_DIR\" run build"
@@ -24,12 +23,6 @@
   "hosting": {
     "target": "rankpilot",
     "public": ".next",
-=======
-    ]
-  },
-  "hosting": {
-    "source": ".",
->>>>>>> workshop/performance
     "ignore": [
       "firebase.json",
       "**/.*",

@@ -15,7 +15,7 @@ export function ToolAccessWrapper({
   toolId,
   children,
   fallback,
-}: ToolAccessWrapperProps): JSX.Element {
+}: ToolAccessWrapperProps): React.ReactElement {
   const { canAccessTool, getRestrictedMessage } = useToolAccess();
 
   if (canAccessTool(toolId)) {

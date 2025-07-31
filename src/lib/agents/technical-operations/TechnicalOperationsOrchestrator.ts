@@ -398,7 +398,7 @@ class TechnicalOperationsOrchestrator implements RankPilotAgent {
 
         // Import and execute the actual TypeScript Guardian
         try {
-            const { TypeScriptGuardianAgent } = await import('./typescript-guardian.js');
+            const { TypeScriptGuardianAgent } = await import('./typescript-guardian');
             const guardian = new TypeScriptGuardianAgent();
             return await guardian.execute();
         } catch (error) {
@@ -414,7 +414,7 @@ class TechnicalOperationsOrchestrator implements RankPilotAgent {
         console.log('🏗️ Build System Agent: Optimizing build pipeline...');
 
         try {
-            const { BuildSystemAgent } = await import('./build-system.js');
+            const { BuildSystemAgent } = await import('./build-system');
             const buildAgent = new BuildSystemAgent();
             return await buildAgent.execute();
         } catch (error) {
@@ -430,7 +430,7 @@ class TechnicalOperationsOrchestrator implements RankPilotAgent {
         console.log('🧪 Testing Orchestrator: Managing test suite...');
 
         try {
-            const { TestingOrchestratorAgent } = await import('./testing-orchestrator.js');
+            const { TestingOrchestratorAgent } = await import('./testing-orchestrator');
             const testAgent = new TestingOrchestratorAgent();
             return await testAgent.execute();
         } catch (error) {
@@ -446,7 +446,7 @@ class TechnicalOperationsOrchestrator implements RankPilotAgent {
         console.log('🚀 API Enhancement Agent: Optimizing API performance...');
 
         try {
-            const { APIEnhancementAgent } = await import('./api-enhancement.js');
+            const { APIEnhancementAgent } = await import('./api-enhancement');
             const apiAgent = new APIEnhancementAgent();
             return await apiAgent.execute();
         } catch (error) {
@@ -462,7 +462,7 @@ class TechnicalOperationsOrchestrator implements RankPilotAgent {
         console.log('🌐 Production Deployment Agent: Validating deployment readiness...');
 
         try {
-            const { ProductionDeploymentAgent } = await import('./production-deployment.js');
+            const { ProductionDeploymentAgent } = await import('./production-deployment');
             const deployAgent = new ProductionDeploymentAgent();
             return await deployAgent.execute();
         } catch (error) {

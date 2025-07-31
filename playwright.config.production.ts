@@ -29,10 +29,10 @@ export default defineConfig({
                 ...devices["Desktop Chrome"],
                 launchOptions: {
                     args: [
-                        '--no-sandbox',
                         '--disable-setuid-sandbox',
                         '--max_old_space_size=2048', // Safe for production
                         '--memory-pressure-off',
+                        '--disable-dev-shm-usage'
                     ],
                     env: {
                         NODE_OPTIONS: '--max-old-space-size=2048',
@@ -57,9 +57,10 @@ export default defineConfig({
                 ...devices["iPhone 13"],
                 launchOptions: {
                     args: [
-                        '--no-sandbox',
                         '--disable-setuid-sandbox',
                         '--max_old_space_size=1536', // Conservative for mobile
+                        '--disable-dev-shm-usage',
+                        '--disable-gpu'
                     ],
                     env: {
                         NODE_OPTIONS: '--max-old-space-size=1536',

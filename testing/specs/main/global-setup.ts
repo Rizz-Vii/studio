@@ -12,8 +12,8 @@ async function globalSetup(config: FullConfig) {
   const page = await context.newPage();
 
   try {
-    // Use TEST_BASE_URL if available, otherwise fall back to localhost
-    const baseUrl = process.env.TEST_BASE_URL || "http://localhost:3000";
+    // Use TEST_BASE_URL if available, otherwise fall back to performance testing URL
+    const baseUrl = process.env.TEST_BASE_URL || "https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app";
     console.log(`🌐 Warming up the server at ${baseUrl}...`);
 
     // Wait for the server to be ready and warm up key pages

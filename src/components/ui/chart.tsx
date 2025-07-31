@@ -4,7 +4,8 @@ import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
-import type { TooltipContentProps, DefaultLegendContentProps } from "recharts"; //
+import type { DefaultLegendContentProps } from "recharts";
+import type { TooltipProps } from "recharts";
 
 import {
   NameType,
@@ -12,9 +13,13 @@ import {
 } from "recharts/types/component/DefaultTooltipContent";
 
 // Define an interface for the custom props of ChartTooltipContent
-interface ChartTooltipContentPropsType
-  extends TooltipContentProps<ValueType, NameType> {
-  // Using 'any' for generics for broad compatibility
+interface ChartTooltipContentPropsType {
+  active?: boolean;
+  payload?: any[];
+  label?: any;
+  labelFormatter?: (label: any, payload: any[]) => React.ReactNode;
+  labelClassName?: string;
+  formatter?: any;
   className?: string;
   color?: string;
   hideLabel?: boolean;
@@ -195,7 +200,7 @@ const ChartTooltipContent = React.forwardRef<
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
-          {payload.map((item, index) => {
+          {payload.map((item: any, index: number) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
             const indicatorColor = color || item.payload.fill || item.color;
@@ -209,7 +214,7 @@ const ChartTooltipContent = React.forwardRef<
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
-                  formatter(item.value, item.name, item, index, item.payload)
+                  formatter(item.value, item.name, item, index)
                 ) : (
                   <>
                     {itemConfig?.icon ? (

@@ -59,8 +59,8 @@ async function createRealProvider(): Promise<TelemetryProvider> {
     const OpenTelemetry: OpenTelemetryNodeSDKModule = await import(
       "@opentelemetry/sdk-node"
     );
-    // Corrected import for ATTR_SERVICE_NAME and SemanticResourceAttributes
-    const { ATTR_SERVICE_NAME } = await import(
+    // Corrected import for SEMRESATTRS_SERVICE_NAME and SemanticResourceAttributes
+    const { SEMRESATTRS_SERVICE_NAME } = await import(
       "@opentelemetry/semantic-conventions"
     );
     const { getNodeAutoInstrumentations } = await import(
@@ -84,8 +84,8 @@ async function createRealProvider(): Promise<TelemetryProvider> {
       BatchLogRecordProcessor,
     } = await import("@opentelemetry/sdk-logs");
 
-    // Corrected import for resourceFromAttributes
-    const { resourceFromAttributes } = await import("@opentelemetry/resources");
+    // Corrected import for Resource
+    const { Resource } = await import("@opentelemetry/resources");
 
     const api = await import("@opentelemetry/api"); // Import the API for global accessors
 
@@ -96,11 +96,11 @@ async function createRealProvider(): Promise<TelemetryProvider> {
 
     // Using resourceFromAttributes as per your example
 
-    const resource = resourceFromAttributes({
-      [ATTR_SERVICE_NAME]: "api-service",
+    const resource = new Resource({
+      [SEMRESATTRS_SERVICE_NAME]: "api-service",
     });
 
-    const anotherResource = resourceFromAttributes({
+    const anotherResource = new Resource({
       "service.version": "2.0.0",
       "service.group": "instrumentation-group",
     });
@@ -150,8 +150,10 @@ async function createRealProvider(): Promise<TelemetryProvider> {
     // Pass the processors directly in the constructor options
     const loggerProvider = new LoggerProvider({
       resource: mergedResource, // Use the merged resource here
-      processors: [logProcessor], // THIS IS THE CORRECTION
     });
+
+    // Add the processor after creation
+    loggerProvider.addLogRecordProcessor(logProcessor);
 
     // You can optionally set the global logger provider if you intend to use api.logs.getLogger
     // api.logs.setGlobalLoggerProvider(loggerProvider);
