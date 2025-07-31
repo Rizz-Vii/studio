@@ -1,0 +1,130 @@
+name: 🧪 Preview Stage - Validation & Testing
+
+on:
+  workflow_run:
+    workflows: ["🚀 Dev Stage - Workshop Instant Preview"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      channelId:
+        description: 'Lean channel ID to test against'
+        type: string
+        required: false
+
+env:
+  NODE_VERSION: '20.x'
+  FIREBASE_PROJECT_ID: 'rankpilot-h3jpc'
+  NODE_OPTIONS: '--max-old-space-size=3072'
+  # Centralized Environment URLs
+  LEAN_URL: 'https://rankpilot-h3jpc--lean-branch-testing-o2qips67.web.app'
+  PERFORMANCE_URL: 'https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app'
+  PRODUCTION_URL: 'https://rankpilot-h3jpc.web.app'
+
+jobs:
+  test-lean-channel:
+    name: 🧪 Validate Lean Channel
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          npm ci --prefer-offline
+          npx playwright install --with-deps chromium
+          echo "✅ Dependencies installed"
+      
+      - name: 🔑 Set up Firebase
+        uses: FirebaseExtended/github-actions/setup-firebase@v1.3.1
+      
+      - name: 🎯 Determine Test Environment URL
+        id: test-env
+        run: |
+          # Determine which URL to use based on branch and context
+          if [[ "${{ github.ref }}" == *"performance"* ]] || [[ "${{ github.event.workflow_run.head_branch }}" == *"performance"* ]]; then
+            TEST_URL="${{ env.PERFORMANCE_URL }}"
+            ENV_TYPE="performance"
+            echo "🎯 Using Performance URL for testing"
+          else
+            TEST_URL="${{ env.LEAN_URL }}"
+            ENV_TYPE="lean"
+            echo "🎯 Using Lean URL for testing"
+          fi
+          
+          # Manual override support
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.channelId }}" ]; then
+            TEST_URL="https://${{ inputs.channelId }}---${{ env.FIREBASE_PROJECT_ID }}.web.app"
+            ENV_TYPE="custom"
+            echo "🎯 Using Custom URL: ${{ inputs.channelId }}"
+          fi
+          
+          echo "TEST_URL=$TEST_URL" >> $GITHUB_OUTPUT
+          echo "ENV_TYPE=$ENV_TYPE" >> $GITHUB_OUTPUT
+          echo "📋 Environment: $ENV_TYPE"
+          echo "🔗 Test URL: $TEST_URL"
+      
+      - name: 🌐 Basic Smoke Tests
+        run: |
+          echo "Running basic smoke test against ${{ steps.test-env.outputs.TEST_URL }}"
+          curl -f "${{ steps.test-env.outputs.TEST_URL }}" > /dev/null && \
+            echo "✅ Environment is accessible" || \
+            { echo "❌ Environment health check failed"; exit 1; }
+      
+      - name: 🧪 Run Environment-Specific Tests
+        env:
+          TEST_BASE_URL: ${{ steps.test-env.outputs.TEST_URL }}
+          ENV_TYPE: ${{ steps.test-env.outputs.ENV_TYPE }}
+        run: |
+          echo "Running $ENV_TYPE environment tests against ${{ steps.test-env.outputs.TEST_URL }}"
+          
+          if [ "$ENV_TYPE" == "performance" ]; then
+            echo "🚀 Running Performance Test Suite"
+            npm run test:performance-critical
+          else
+            echo "⚡ Running Lean Test Suite"
+            npm run test:lean-critical
+          fi
+          
+      - name: 📱 Run Mobile Tests
+        env:
+          TEST_BASE_URL: ${{ steps.test-env.outputs.TEST_URL }}
+          ENV_TYPE: ${{ steps.test-env.outputs.ENV_TYPE }}
+        run: |
+          echo "Running mobile tests against ${{ steps.test-env.outputs.TEST_URL }}"
+          
+          if [ "$ENV_TYPE" == "performance" ]; then
+            echo "📱 Running Performance Mobile Tests"
+            npm run test:performance-mobile
+          else
+            echo "📱 Running Lean Mobile Tests"
+            npm run test:lean-mobile
+          fi
+      
+      - name: 📝 Save Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ steps.test-env.outputs.ENV_TYPE }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+      
+      - name: 📊 Test Summary
+        run: |
+          echo "🧪 ${{ steps.test-env.outputs.ENV_TYPE }} ENVIRONMENT TESTS COMPLETE"
+          echo "==============================================="
+          echo "🌍 Environment: ${{ steps.test-env.outputs.ENV_TYPE }}"
+          echo "🔗 URL: ${{ steps.test-env.outputs.TEST_URL }}"
+          echo "🌿 Branch: ${GITHUB_REF#refs/heads/}"
+          echo ""
+          echo "✅ Critical tests completed"

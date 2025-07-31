@@ -10,10 +10,11 @@ import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { EnhancedAuthService } from "@/lib/services/enhanced-auth.service";
 import { Eye, EyeOff } from "lucide-react";
-
-// Google logo SVG
+import LoadingScreen from "@/components/ui/loading-screen";
 const GoogleIcon = () => (
   <svg
     className="mr-2 h-4 w-4"
@@ -44,6 +45,8 @@ const GoogleIcon = () => (
 );
 
 export default function LoginPage() {
+  // Auth guard - redirect authenticated users away from login page
+  const { shouldRender } = useAuthGuard();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -56,15 +59,21 @@ export default function LoginPage() {
 
   const { user, loading, role } = useAuth();
 
+  // Improved redirection logic
   useEffect(() => {
-    if (!loading && user) {
-      if (role === "admin") {
-        router.push("/adminonly");
-      } else if (role === "user") {
-        router.push("/dashboard");
-      }
+    if (!loading && user && shouldRender) {
+      const redirectPath = role === "admin" ? "/adminonly" : "/dashboard";
+      router.push(redirectPath);
     }
-  }, [user, loading, role, router]);
+  }, [user, loading, role, router, shouldRender]);
+
+  if (loading) {
+    return <LoadingScreen fullScreen text="Verifying your credentials..." />;
+  }
+
+  if (!shouldRender) {
+    return <LoadingScreen fullScreen text="Redirecting..." />;
+  }
 
   function validate() {
     const newErrors: typeof errors = {};
@@ -80,9 +89,22 @@ export default function LoginPage() {
     const newErrors = validate();
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // Redirection is handled by the useEffect hook
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      
+      // Update login tracking with enhanced auth service
+      try {
+        await EnhancedAuthService.updateLoginTracking(userCredential.user.uid);
+      } catch (trackingError) {
+        console.warn("Login tracking update failed:", trackingError);
+      }
+      
+      // Redirection is handled by the useEffect hook after auth state updates
     } catch (error: any) {
       setErrors({ form: error?.message || "Login failed. Please try again." });
     }
@@ -104,13 +126,17 @@ export default function LoginPage() {
           createdAt: serverTimestamp(),
         });
       }
-      // Redirection is handled by the useEffect hook
+      // Redirection is handled by the useEffect hook after auth state updates
     } catch (error: any) {
       setErrors({
         form: error?.message || "Google sign-in failed. Please try again.",
       });
     }
   };
+
+  if (loading) {
+    return <LoadingScreen fullScreen text="Verifying your credentials..." />;
+  }
 
   return (
     <div className="inset-0 flex items-center justify-center bg-gray-100">
@@ -170,6 +196,7 @@ export default function LoginPage() {
           )}
           <button
             type="submit"
+            data-testid="login-button"
             className="w-full py-2 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 transition"
             disabled={loading}
           >

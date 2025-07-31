@@ -66,3 +66,25 @@ functions/node_modules/
 functions/.tsbuildinfo
 functions/.env
 functions/.env.*
+
+# Security & Sensitive Files (Enhanced Protection)
+# -----------------------------------------------
+masterKeys.md
+.github/masterKeys.md
+**/masterKeys.md
+mcp.json
+mcp.*.json
+state.json
+**/state.json
+MCP_CONFIGURATION_PLAN.md
+MCP_CONFIGURATION_SUMMARY.md
+docs/integrations/
+**/integrations/
+*MCP*
+*mcp*
+**/*MCP*
+**/*mcp*
+**/*key*.md
+**/*secret*.md
+**/*token*.md
+**/*api-key*.md

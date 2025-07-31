@@ -11,6 +11,8 @@ import {
   BookText,
   Shield,
   Lightbulb,
+  User,
+  Settings,
 } from "lucide-react";
 
 export interface NavItem {
@@ -20,6 +22,8 @@ export interface NavItem {
   label?: string;
   disabled?: boolean;
   adminOnly?: boolean;
+  requiredTier?: "starter" | "agency";
+  feature?: string;
 }
 
 export const navItems: NavItem[] = [
@@ -37,6 +41,7 @@ export const navItems: NavItem[] = [
     title: "Content Brief",
     href: "/content-brief",
     icon: BookText,
+    requiredTier: "starter", // Starter and above
   },
   {
     title: "Keyword Tool",
@@ -52,11 +57,14 @@ export const navItems: NavItem[] = [
     title: "Competitors",
     href: "/competitors",
     icon: Users,
+    requiredTier: "starter", // Starter and above
+    feature: "competitor-analysis",
   },
   {
     title: "SERP View",
     href: "/serp-view",
     icon: Search,
+    requiredTier: "starter", // Starter and above
   },
   {
     title: "SEO Audit",
@@ -67,6 +75,12 @@ export const navItems: NavItem[] = [
     title: "Link View",
     href: "/link-view",
     icon: Link,
+    requiredTier: "starter", // Starter and above
+  },
+  {
+    title: "Profile",
+    href: "/profile",
+    icon: User,
   },
   {
     title: "Admin",

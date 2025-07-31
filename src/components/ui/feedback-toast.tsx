@@ -1,21 +1,21 @@
 "use client";
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, CheckCircle, Info, XCircle } from 'lucide-react';
-import { useUI } from '@/context/UIContext';
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, CheckCircle, Info, XCircle } from "lucide-react";
+import { useUI } from "@/context/UIContext";
 
 const iconMap = {
   success: CheckCircle,
   error: XCircle,
   warning: AlertCircle,
-  info: Info
+  info: Info,
 };
 
 const colorMap = {
-  success: 'bg-success text-success-foreground',
-  error: 'bg-destructive text-destructive-foreground',
-  warning: 'bg-warning text-warning-foreground',
-  info: 'bg-info text-info-foreground'
+  success: "bg-success text-success-foreground",
+  error: "bg-destructive text-destructive-foreground",
+  warning: "bg-warning text-warning-foreground",
+  info: "bg-info text-info-foreground",
 };
 
 export function FeedbackToast() {

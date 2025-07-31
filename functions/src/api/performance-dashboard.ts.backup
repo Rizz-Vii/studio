@@ -1,0 +1,727 @@
+/**
+ * Performance Monitoring Dashboard API
+ * Comprehensive dashboard for monitoring all Firebase Functions components
+ */
+
+import { onRequest } from "firebase-functions/v2/https";
+import { logger } from "firebase-functions";
+import { withSecurity } from "../middleware/security-middleware";
+import { StructuredLogger } from "../lib/structured-logger";
+import { MetricsCollector } from "../lib/metrics-collector";
+import { AIResponseCache } from "../lib/ai-response-cache";
+import { TierBasedRateLimit } from "../lib/tier-based-rate-limit";
+import { AIPromptABTesting } from "../lib/ai-prompt-ab-testing";
+import { FunctionWarmingManager } from "../lib/function-warming";
+
+interface DashboardData {
+    overview: {
+        totalFunctions: number;
+        activeExperiments: number;
+        cacheHitRate: number;
+        overallSuccessRate: number;
+        averageResponseTime: number;
+        totalRequests24h: number;
+        activeUsers: number;
+        systemHealth: "healthy" | "warning" | "critical";
+    };
+    metrics: {
+        functions: Record<string, any>;
+        trends: Array<{
+            timestamp: number;
+            successRate: number;
+            responseTime: number;
+            requestCount: number;
+        }>;
+        topErrors: Array<{
+            functionName: string;
+            errorCount: number;
+            errorRate: number;
+            lastOccurrence: number;
+        }>;
+    };
+    caching: {
+        stats: any;
+        hitRateByTier: Record<string, number>;
+        evictionRate: number;
+        compressionRate: number;
+    };
+    rateLimiting: {
+        globalStats: any;
+        blockedRequestsByTier: Record<string, number>;
+        topBlockedUsers: Array<{
+            userId: string;
+            tier: string;
+            blockedRequests: number;
+        }>;
+    };
+    abTesting: {
+        summary: any;
+        activeExperiments: Array<{
+            id: string;
+            name: string;
+            feature: string;
+            status: string;
+            confidence: number;
+            winner?: string;
+        }>;
+        recentResults: Array<{
+            experimentId: string;
+            variantId: string;
+            timestamp: number;
+            success: boolean;
+            responseTime: number;
+        }>;
+    };
+    warming: {
+        stats: any;
+        recentActivity: any[];
+        trafficPatterns: Record<string, {
+            hourlyPattern: number[];
+            confidence: number;
+        }>;
+        recommendations: any[];
+    };
+    alerts: Array<{
+        id: string;
+        severity: "info" | "warning" | "error" | "critical";
+        message: string;
+        timestamp: number;
+        functionName?: string;
+        resolved: boolean;
+    }>;
+}
+
+/**
+ * Main dashboard endpoint
+ */
+export const performanceDashboard = onRequest(
+  {
+    timeoutSeconds: 30,
+    memory: "512MiB",
+    minInstances: 1,
+    cors: true
+  },
+  withSecurity({
+    requireAuth: true,
+    requireAdmin: true,
+    allowedOrigins: ["https://studio-77j7p.web.app", "http://localhost:3000"]
+  })(async (req, res) => {
+    const traceId = StructuredLogger.generateTraceId();
+
+    try {
+      const trace = StructuredLogger.startTrace("performance-dashboard", req.user?.uid || "unknown", req.user?.tier || "unknown");
+
+      StructuredLogger.logBusinessEvent(trace.traceId, "dashboard_access", {
+        userId: req.user?.uid,
+        userTier: req.user?.tier,
+        requestedSections: req.query.sections || "all"
+      });
+
+      const dashboardData = await generateDashboardData(req.query.sections as string);
+
+      StructuredLogger.completeTrace(trace.traceId, {
+        success: true,
+        duration: Date.now() - trace.startTime,
+        memoryUsed: process.memoryUsage().heapUsed / 1024 / 1024,
+        businessMetrics: {
+          sectionsGenerated: Object.keys(dashboardData).length,
+          totalDataPoints: calculateDataPoints(dashboardData)
+        }
+      });
+
+      res.status(200).json({
+        success: true,
+        data: dashboardData,
+        generatedAt: new Date().toISOString(),
+        traceId: trace.traceId
+      });
+
+    } catch (error) {
+      logger.error("Dashboard generation failed", {
+        error: error instanceof Error ? error.message : "Unknown error",
+        traceId,
+        userId: req.user?.uid
+      });
+
+      StructuredLogger.errorTrace(traceId, error as Error, {
+        context: "dashboard_generation",
+        userId: req.user?.uid
+      });
+
+      res.status(500).json({
+        success: false,
+        error: "Dashboard generation failed",
+        traceId
+      });
+    }
+  })
+);
+
+/**
+ * Real-time metrics endpoint
+ */
+export const realtimeMetrics = onRequest(
+  {
+    timeoutSeconds: 10,
+    memory: "256MiB",
+    cors: true
+  },
+  withSecurity({
+    requireAuth: true,
+    requireAdmin: true
+  })(async (req, res) => {
+    const traceId = StructuredLogger.generateTraceId();
+
+    try {
+      const realtimeData = {
+        timestamp: Date.now(),
+        metrics: {
+          activeRequests: getActiveRequestCount(),
+          currentLoad: getCurrentSystemLoad(),
+          memoryUsage: process.memoryUsage(),
+          cacheStats: AIResponseCache.getStats(),
+          rateLimitStats: TierBasedRateLimit.getGlobalStats()
+        },
+        alerts: getActiveAlerts(),
+        traceId
+      };
+
+      res.status(200).json(realtimeData);
+
+    } catch (error) {
+      logger.error("Realtime metrics failed", { error, traceId });
+      res.status(500).json({
+        success: false,
+        error: "Realtime metrics unavailable",
+        traceId
+      });
+    }
+  })
+);
+
+/**
+ * Function-specific metrics endpoint
+ */
+export const functionMetrics = onRequest(
+  {
+    timeoutSeconds: 15,
+    memory: "256MiB",
+    cors: true
+  },
+  withSecurity({
+    requireAuth: true,
+    requireAdmin: true
+  })(async (req, res) => {
+    const functionName = req.query.function as string;
+    const timeRange = req.query.range as string || "24h";
+    const traceId = StructuredLogger.generateTraceId();
+
+    if (!functionName) {
+      return res.status(400).json({
+        success: false,
+        error: "Function name is required"
+      });
+    }
+
+    try {
+      const metrics = await getFunctionSpecificMetrics(functionName, timeRange);
+
+      res.status(200).json({
+        success: true,
+        data: metrics,
+        functionName,
+        timeRange,
+        traceId
+      });
+
+    } catch (error) {
+      logger.error("Function metrics failed", { error, functionName, traceId });
+      res.status(500).json({
+        success: false,
+        error: "Function metrics unavailable",
+        traceId
+      });
+    }
+  })
+);
+
+/**
+ * A/B test management endpoint
+ */
+export const abTestManagement = onRequest(
+  {
+    timeoutSeconds: 20,
+    memory: "256MiB",
+    cors: true
+  },
+  withSecurity({
+    requireAuth: true,
+    requireAdmin: true
+  })(async (req, res) => {
+    const traceId = StructuredLogger.generateTraceId();
+    const action = req.query.action as string;
+
+    try {
+      let result;
+
+      switch (action) {
+      case "list":
+        result = {
+          experiments: AIPromptABTesting.getActiveExperiments(),
+          summary: AIPromptABTesting.getExperimentSummary()
+        };
+        break;
+
+      case "analyze":
+        const experimentId = req.query.experimentId as string;
+        if (!experimentId) {
+          return res.status(400).json({ error: "Experiment ID required" });
+        }
+        result = AIPromptABTesting.analyzeExperiment(experimentId);
+        break;
+
+      case "create":
+        if (req.method !== "POST") {
+          return res.status(405).json({ error: "POST method required" });
+        }
+        result = AIPromptABTesting.createExperiment(req.body);
+        break;
+
+      case "update":
+        if (req.method !== "PUT") {
+          return res.status(405).json({ error: "PUT method required" });
+        }
+        const updateId = req.query.experimentId as string;
+        const status = req.body.status;
+        result = AIPromptABTesting.updateExperimentStatus(updateId, status, req.body.reason);
+        break;
+
+      default:
+        return res.status(400).json({ error: "Invalid action" });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: result,
+        action,
+        traceId
+      });
+
+    } catch (error) {
+      logger.error("A/B test management failed", { error, action, traceId });
+      res.status(500).json({
+        success: false,
+        error: "A/B test management failed",
+        traceId
+      });
+    }
+  })
+);
+
+/**
+ * System health check endpoint
+ */
+export const healthCheck = onRequest(
+  {
+    timeoutSeconds: 10,
+    memory: "128MiB",
+    cors: true
+  },
+  async (req, res) => {
+    const startTime = Date.now();
+    const health = {
+      status: "healthy" as "healthy" | "warning" | "critical",
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      checks: {
+        cache: false,
+        rateLimiter: false,
+        metrics: false,
+        abTesting: false,
+        warming: false
+      },
+      responseTime: 0
+    };
+
+    try {
+      // Check cache system
+      const cache = new AIResponseCache();
+      await AIResponseCache.set("health-check", { status: "ok" }, {
+        aiModel: "test",
+        promptHash: "health-check",
+        tokens: 0,
+        userTier: "free"
+      });
+      const cacheResult = await AIResponseCache.get("health-check");
+      health.checks.cache = cacheResult !== null;
+
+      // Check rate limiter
+      const rateLimitResult = await TierBasedRateLimit.checkLimit(
+        "health-check-user",
+        "admin",
+        "health-check"
+      );
+      health.checks.rateLimiter = rateLimitResult.allowed;
+
+      // Check metrics collection
+      const metricsReport = MetricsCollector.generateReport();
+      health.checks.metrics = metricsReport !== null;
+
+      // Check A/B testing
+      const abSummary = AIPromptABTesting.getExperimentSummary();
+      health.checks.abTesting = typeof abSummary.total === "number";
+
+      // Check warming system
+      const warmingStats = FunctionWarmingManager.getWarmingStats();
+      health.checks.warming = typeof warmingStats.totalConfigs === "number";
+
+      // Determine overall health
+      const failedChecks = Object.values(health.checks).filter(check => !check).length;
+      if (failedChecks === 0) {
+        health.status = "healthy";
+      } else if (failedChecks <= 2) {
+        health.status = "warning";
+      } else {
+        health.status = "critical";
+      }
+
+      health.responseTime = Date.now() - startTime;
+
+      res.status(health.status === "critical" ? 503 : 200).json(health);
+
+    } catch (error) {
+      logger.error("Health check failed", { error });
+      health.status = "critical";
+      health.responseTime = Date.now() - startTime;
+
+      res.status(503).json({
+        ...health,
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  }
+);
+
+/**
+ * Generate complete dashboard data
+ */
+async function generateDashboardData(sections?: string): Promise<DashboardData> {
+  const requestedSections = sections ? sections.split(",") : ["all"];
+  const shouldInclude = (section: string) =>
+    requestedSections.includes("all") || requestedSections.includes(section);
+
+  const data: Partial<DashboardData> = {};
+
+  // Overview section
+  if (shouldInclude("overview")) {
+    const metricsReport = MetricsCollector.generateReport();
+    const cacheStats = AIResponseCache.getStats();
+    const rateLimitStats = TierBasedRateLimit.getGlobalStats();
+    const abSummary = AIPromptABTesting.getExperimentSummary();
+
+    data.overview = {
+      totalFunctions: Object.keys(metricsReport.functions).length,
+      activeExperiments: abSummary.active,
+      cacheHitRate: cacheStats.hitRate,
+      overallSuccessRate: metricsReport.overallStats.successRate,
+      averageResponseTime: metricsReport.overallStats.averageResponseTime,
+      totalRequests24h: metricsReport.overallStats.totalRequests,
+      activeUsers: rateLimitStats.activeUsers,
+      systemHealth: determineSystemHealth(metricsReport, cacheStats, rateLimitStats)
+    };
+  }
+
+  // Metrics section
+  if (shouldInclude("metrics")) {
+    const metricsReport = MetricsCollector.generateReport();
+    data.metrics = {
+      functions: metricsReport.functions,
+      trends: generateTrends(),
+      topErrors: generateTopErrors(metricsReport)
+    };
+  }
+
+  // Caching section
+  if (shouldInclude("caching")) {
+    const cache = new AIResponseCache();
+    const stats = AIResponseCache.getStats();
+
+    data.caching = {
+      stats,
+      hitRateByTier: calculateHitRateByTier(cache),
+      evictionRate: 0, // Not tracked in current implementation
+      compressionRate: calculateCompressionRate(cache)
+    };
+  }
+
+  // Rate limiting section
+  if (shouldInclude("rateLimiting")) {
+    const globalStats = TierBasedRateLimit.getGlobalStats();
+
+    data.rateLimiting = {
+      globalStats,
+      blockedRequestsByTier: calculateBlockedByTier(),
+      topBlockedUsers: getTopBlockedUsers()
+    };
+  }
+
+  // A/B testing section
+  if (shouldInclude("abTesting")) {
+    const summary = AIPromptABTesting.getExperimentSummary();
+    const activeExperiments = AIPromptABTesting.getActiveExperiments();
+
+    data.abTesting = {
+      summary,
+      activeExperiments: activeExperiments.map(exp => ({
+        id: exp.id,
+        name: exp.name,
+        feature: exp.feature,
+        status: exp.status,
+        confidence: 0, // Would need to calculate from analysis
+        winner: undefined // Would need analysis result
+      })),
+      recentResults: [] // Would need to track recent results
+    };
+  }
+
+  // Warming section
+  if (shouldInclude("warming")) {
+    const stats = FunctionWarmingManager.getWarmingStats();
+    const patterns = FunctionWarmingManager.getTrafficPatterns();
+    const recommendations = FunctionWarmingManager.getPredictiveWarmingRecommendations();
+
+    data.warming = {
+      stats,
+      recentActivity: stats.recentActivity,
+      trafficPatterns: Object.fromEntries(
+        Array.from(patterns.entries()).map(([name, pattern]) => [
+          name,
+          {
+            hourlyPattern: pattern.hourlyPattern,
+            confidence: pattern.confidence
+          }
+        ])
+      ),
+      recommendations
+    };
+  }
+
+  // Alerts section
+  if (shouldInclude("alerts")) {
+    data.alerts = generateAlerts();
+  }
+
+  return data as DashboardData;
+}
+
+/**
+ * Helper functions
+ */
+function determineSystemHealth(
+  metrics: any,
+  cache: any,
+  rateLimit: any
+): "healthy" | "warning" | "critical" {
+  const criticalThresholds = {
+    errorRate: 0.1, // 10%
+    responseTime: 10000, // 10 seconds
+    cacheHitRate: 0.3, // 30%
+    blockRate: 0.2 // 20%
+  };
+
+  const warningThresholds = {
+    errorRate: 0.05, // 5%
+    responseTime: 5000, // 5 seconds
+    cacheHitRate: 0.5, // 50%
+    blockRate: 0.1 // 10%
+  };
+
+  const current = {
+    errorRate: metrics.overallStats.errorRate,
+    responseTime: metrics.overallStats.averageResponseTime,
+    cacheHitRate: cache.hitRate,
+    blockRate: rateLimit.blockRate / 100
+  };
+
+  // Check for critical conditions
+  if (current.errorRate > criticalThresholds.errorRate ||
+        current.responseTime > criticalThresholds.responseTime ||
+        current.cacheHitRate < criticalThresholds.cacheHitRate ||
+        current.blockRate > criticalThresholds.blockRate) {
+    return "critical";
+  }
+
+  // Check for warning conditions
+  if (current.errorRate > warningThresholds.errorRate ||
+        current.responseTime > warningThresholds.responseTime ||
+        current.cacheHitRate < warningThresholds.cacheHitRate ||
+        current.blockRate > warningThresholds.blockRate) {
+    return "warning";
+  }
+
+  return "healthy";
+}
+
+function generateTrends(): Array<{
+    timestamp: number;
+    successRate: number;
+    responseTime: number;
+    requestCount: number;
+}> {
+  // In real implementation, this would query historical data
+  // For now, return mock trend data
+  const trends = [];
+  const now = Date.now();
+  const oneHour = 60 * 60 * 1000;
+
+  for (let i = 23; i >= 0; i--) {
+    trends.push({
+      timestamp: now - (i * oneHour),
+      successRate: 0.95 + (Math.random() - 0.5) * 0.1,
+      responseTime: 2000 + Math.random() * 1000,
+      requestCount: Math.floor(100 + Math.random() * 200)
+    });
+  }
+
+  return trends;
+}
+
+function generateTopErrors(metricsReport: any): Array<{
+    functionName: string;
+    errorCount: number;
+    errorRate: number;
+    lastOccurrence: number;
+}> {
+  return Object.entries(metricsReport.functions)
+    .map(([name, metrics]: [string, any]) => ({
+      functionName: name,
+      errorCount: metrics.errorCount,
+      errorRate: metrics.errorRate,
+      lastOccurrence: Date.now() - Math.random() * 86400000
+    }))
+    .filter(error => error.errorCount > 0)
+    .sort((a, b) => b.errorCount - a.errorCount)
+    .slice(0, 10);
+}
+
+function calculateHitRateByTier(cache: AIResponseCache): Record<string, number> {
+  // In real implementation, this would analyze cache stats by tier
+  return {
+    free: 0.60,
+    starter: 0.75,
+    agency: 0.85,
+    enterprise: 0.90,
+    admin: 0.95
+  };
+}
+
+function calculateCompressionRate(cache: AIResponseCache): number {
+  const stats = AIResponseCache.getStats();
+  // Mock calculation - in real implementation, track compression stats
+  return 0.35; // 35% compression rate
+}
+
+function calculateBlockedByTier(): Record<string, number> {
+  // Mock data - in real implementation, analyze rate limit stats
+  return {
+    free: 15,
+    starter: 8,
+    agency: 3,
+    enterprise: 1,
+    admin: 0
+  };
+}
+
+function getTopBlockedUsers(): Array<{
+    userId: string;
+    tier: string;
+    blockedRequests: number;
+}> {
+  // Mock data - in real implementation, query rate limit data
+  return [
+    { userId: "user-123", tier: "free", blockedRequests: 25 },
+    { userId: "user-456", tier: "starter", blockedRequests: 12 },
+    { userId: "user-789", tier: "free", blockedRequests: 8 }
+  ];
+}
+
+function generateAlerts(): Array<{
+    id: string;
+    severity: "info" | "warning" | "error" | "critical";
+    message: string;
+    timestamp: number;
+    functionName?: string;
+    resolved: boolean;
+}> {
+  const now = Date.now();
+  return [
+    {
+      id: "alert-001",
+      severity: "warning",
+      message: "High error rate detected in keyword-suggestions function",
+      timestamp: now - 300000, // 5 minutes ago
+      functionName: "keyword-suggestions",
+      resolved: false
+    },
+    {
+      id: "alert-002",
+      severity: "info",
+      message: "Cache hit rate improved to 85%",
+      timestamp: now - 1800000, // 30 minutes ago
+      resolved: true
+    }
+  ];
+}
+
+function getActiveRequestCount(): number {
+  // Mock implementation - would track actual active requests
+  return Math.floor(Math.random() * 50) + 10;
+}
+
+function getCurrentSystemLoad(): number {
+  // Mock implementation - would get actual system load
+  return Math.random() * 0.8 + 0.1; // 10-90% load
+}
+
+function getActiveAlerts(): any[] {
+  return generateAlerts().filter(alert => !alert.resolved);
+}
+
+async function getFunctionSpecificMetrics(functionName: string, timeRange: string): Promise<any> {
+  // Mock implementation - would query specific function metrics
+  return {
+    functionName,
+    timeRange,
+    executionCount: 1250,
+    averageResponseTime: 2100,
+    errorRate: 0.03,
+    memoryUsage: 128,
+    topUsers: [
+      { userId: "user-1", requests: 45, tier: "agency" },
+      { userId: "user-2", requests: 32, tier: "starter" }
+    ],
+    hourlyBreakdown: generateTrends()
+  };
+}
+
+function calculateDataPoints(data: any): number {
+  // Calculate total data points in dashboard response
+  let count = 0;
+
+  const countObject = (obj: any): void => {
+    if (Array.isArray(obj)) {
+      count += obj.length;
+      obj.forEach(item => countObject(item));
+    } else if (typeof obj === "object" && obj !== null) {
+      count += Object.keys(obj).length;
+      Object.values(obj).forEach(value => countObject(value));
+    } else {
+      count += 1;
+    }
+  };
+
+  countObject(data);
+  return count;
+}

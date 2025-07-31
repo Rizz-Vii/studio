@@ -1,0 +1,36 @@
+/* Sidebar Component Styles */
+
+/* CSS Custom Properties for Sidebar */
+.sidebar-wrapper {
+  --sidebar-width: 18rem;
+  --sidebar-width-icon: 4rem;
+}
+
+.sidebar-wrapper-mobile {
+  --sidebar-width: 20rem;
+}
+
+/* Mobile Sidebar Sheet Content */
+.sidebar-sheet-content-mobile {
+  --sidebar-width: 20rem;
+  width: var(--sidebar-width);
+}
+
+/* Utility classes for different sidebar widths */
+.sidebar-width-default {
+  --sidebar-width: 18rem;
+}
+
+.sidebar-width-mobile {
+  --sidebar-width: 20rem;
+}
+
+.sidebar-width-icon {
+  --sidebar-width-icon: 4rem;
+}
+
+/* Sidebar Provider with custom properties - allows override of CSS variables */
+.sidebar-provider-with-custom-width {
+  --sidebar-width: var(--custom-sidebar-width, 18rem);
+  --sidebar-width-icon: var(--custom-sidebar-width-icon, 4rem);
+}

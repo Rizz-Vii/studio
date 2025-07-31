@@ -75,7 +75,7 @@ export async function initTelemetry(): Promise<TelemetryProvider> {
       // Dynamically import the server-side telemetry module.
       // This ensures that the heavy OpenTelemetry SDK dependencies are only loaded
       // on the server where they are needed.
-      const serverTelemetry = await import("./server-telemetry");
+      const serverTelemetry = await import("./server-telemetry.js");
 
       // Check if the createTelemetryProvider function exists and is callable.
       if (

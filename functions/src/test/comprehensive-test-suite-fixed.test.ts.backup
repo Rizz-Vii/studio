@@ -1,0 +1,638 @@
+/**
+ * Comprehensive Test Suite - FIXED VERSION
+ * Covers all Firebase Functions infrastructure with correct interfaces
+ */
+
+import { expect } from "chai";
+import { describe, it, beforeEach, afterEach } from "mocha";
+import * as sinon from "sinon";
+
+// Import modules to test
+import { StructuredLogger } from "../lib/structured-logger";
+import { AIResponseCache } from "../lib/ai-response-cache";
+import { MetricsCollector } from "../lib/metrics-collector";
+import { TierBasedRateLimiter } from "../lib/tier-based-rate-limit";
+import { AIPromptABTesting } from "../lib/ai-prompt-ab-testing";
+import { FunctionWarming } from "../lib/function-warming";
+
+describe("Firebase Functions Enhanced Infrastructure", () => {
+  let sandbox: sinon.SinonSandbox;
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+  });
+
+  describe("StructuredLogger", () => {
+    it("should create trace with unique ID", () => {
+      const mockRequest = {
+        auth: { uid: "user123" },
+        data: {},
+        rawRequest: {
+          headers: { "user-agent": "test-agent" }
+        }
+      } as any;
+
+      const trace = StructuredLogger.startTrace(mockRequest, "test-function");
+
+      expect(trace.traceId).to.be.a("string");
+      expect(trace.traceId).to.have.length.greaterThan(10);
+      expect(trace.functionName).to.equal("test-function");
+      expect(trace.userId).to.equal("user123");
+      expect(trace.userTier).to.equal("free");
+    });
+
+    it("should complete trace with success metrics", () => {
+      const mockRequest = {
+        auth: { uid: "user123" },
+        data: {},
+        rawRequest: { headers: {} }
+      } as any;
+
+      const trace = StructuredLogger.startTrace(mockRequest, "test-function");
+
+      StructuredLogger.completeTrace(trace.traceId, {
+        success: true,
+        responseSize: 1024
+      });
+
+      // Test passes if no errors thrown
+      expect(trace.traceId).to.be.a("string");
+    });
+
+    it("should log business events", () => {
+      const mockRequest = {
+        auth: { uid: "user123" },
+        data: {},
+        rawRequest: { headers: {} }
+      } as any;
+
+      const trace = StructuredLogger.startTrace(mockRequest, "test-function");
+
+      StructuredLogger.logBusinessEvent(trace.traceId, "ai_request", {
+        model: "gpt-4",
+        tokens: 150
+      });
+
+      expect(trace.traceId).to.be.a("string");
+    });
+
+    it("should handle errors gracefully", () => {
+      const mockRequest = {
+        auth: { uid: "user123" },
+        data: {},
+        rawRequest: { headers: {} }
+      } as any;
+
+      const trace = StructuredLogger.startTrace(mockRequest, "test-function");
+      const error = new Error("Test error");
+
+      StructuredLogger.errorTrace(trace.traceId, error, { context: "testing" });
+
+      expect(trace.traceId).to.be.a("string");
+    });
+
+    it("should generate unique trace IDs", () => {
+      const id1 = StructuredLogger.generateTraceId();
+      const id2 = StructuredLogger.generateTraceId();
+
+      expect(id1).to.not.equal(id2);
+      expect(id1).to.have.length.greaterThan(20);
+    });
+  });
+
+  describe("MetricsCollector", () => {
+    let collector: MetricsCollector;
+
+    beforeEach(() => {
+      collector = new MetricsCollector();
+    });
+
+    it("should record function execution", () => {
+      collector.recordExecution({
+        functionName: "test-function",
+        duration: 150,
+        memoryUsed: 256,
+        success: true,
+        timestamp: Date.now(),
+        userId: "user123",
+        userTier: "starter"
+      });
+
+      const metrics = collector.getFunctionMetrics("test-function");
+      expect(metrics).to.not.be.null;
+      expect(metrics?.executionCount).to.equal(1);
+      expect(metrics?.averageDuration).to.equal(150);
+    });
+
+    it("should track error rates", () => {
+      // Successful execution
+      collector.recordExecution({
+        functionName: "test-function",
+        duration: 100,
+        memoryUsed: 256,
+        success: true,
+        timestamp: Date.now(),
+        userId: "user123",
+        userTier: "starter"
+      });
+
+      // Failed execution
+      collector.recordExecution({
+        functionName: "test-function",
+        duration: 200,
+        memoryUsed: 256,
+        success: false,
+        timestamp: Date.now(),
+        userId: "user123",
+        userTier: "starter",
+        error: "Test error"
+      });
+
+      const metrics = collector.getFunctionMetrics("test-function");
+      expect(metrics?.errorRate).to.equal(50); // 1 out of 2 failed
+    });
+
+    it("should generate comprehensive reports", () => {
+      collector.recordExecution({
+        functionName: "function1",
+        duration: 100,
+        memoryUsed: 256,
+        success: true,
+        timestamp: Date.now(),
+        userId: "user123",
+        userTier: "starter"
+      });
+
+      collector.recordExecution({
+        functionName: "function2",
+        duration: 200,
+        memoryUsed: 512,
+        success: true,
+        timestamp: Date.now(),
+        userId: "user456",
+        userTier: "agency"
+      });
+
+      const report = collector.generateReport();
+      expect(report.summary.totalFunctions).to.equal(2);
+      expect(report.summary.totalExecutions).to.equal(2);
+    });
+
+    it("should record A/B test results", () => {
+      collector.recordABTestResult("prompt-test-1", "A", true, {
+        tokens: 100,
+        responseTime: 1500
+      });
+
+      const report = collector.generateReport();
+      expect(report.insights).to.be.an("array");
+    });
+  });
+
+  describe("AIResponseCache", () => {
+    beforeEach(() => {
+      // Clear cache before each test
+      AIResponseCache.clear();
+    });
+
+    it("should store and retrieve cache entries", async () => {
+      const key = "test-key";
+      const testData = { result: "test data", tokens: 100 };
+
+      await AIResponseCache.set(key, testData, {
+        aiModel: "gpt-4",
+        promptHash: "hash123",
+        tokens: 100,
+        userTier: "starter"
+      });
+
+      const retrieved = await AIResponseCache.get<typeof testData>(key);
+      expect(retrieved).to.deep.equal(testData);
+    });
+
+    it("should respect TTL based on user tier", async () => {
+      const testData = { result: "test" };
+
+      await AIResponseCache.set("free-key", testData, {
+        aiModel: "gpt-4",
+        promptHash: "hash1",
+        tokens: 50,
+        userTier: "free"
+      });
+
+      await AIResponseCache.set("enterprise-key", testData, {
+        aiModel: "gpt-4",
+        promptHash: "hash2",
+        tokens: 50,
+        userTier: "enterprise"
+      });
+
+      // Both should be available immediately
+      const freeData = await AIResponseCache.get("free-key");
+      const enterpriseData = await AIResponseCache.get("enterprise-key");
+
+      expect(freeData).to.not.be.null;
+      expect(enterpriseData).to.not.be.null;
+    });
+
+    it("should compress large data", async () => {
+      const largeData = { content: "x".repeat(10000) }; // 10KB of data
+      const largeKey = "large-key";
+
+      await AIResponseCache.set(largeKey, largeData, {
+        aiModel: "gpt-4",
+        promptHash: "large-hash",
+        tokens: 1000,
+        userTier: "agency"
+      });
+
+      const retrieved = await AIResponseCache.get(largeKey);
+      expect(retrieved).to.deep.equal(largeData);
+    });
+
+    it("should warm cache with multiple entries", async () => {
+      const warmingData = [
+        { key: "warm1", data: { result: "data1" }, userTier: "starter" },
+        { key: "warm2", data: { result: "data2" }, userTier: "agency" }
+      ];
+
+      await AIResponseCache.warmCache(warmingData);
+
+      for (const item of warmingData) {
+        const retrieved = await AIResponseCache.get(item.key);
+        expect(retrieved).to.not.be.null;
+      }
+    });
+
+    it("should provide cache statistics", async () => {
+      // Add some cache entries
+      for (let i = 0; i < 5; i++) {
+        await AIResponseCache.set(`key-${i}`, { data: i }, {
+          aiModel: "gpt-4",
+          promptHash: `hash-${i}`,
+          tokens: 50,
+          userTier: "free"
+        });
+      }
+
+      const stats = AIResponseCache.getStats();
+      expect(stats.size).to.equal(5);
+      expect(stats.hitRate).to.be.a("number");
+    });
+  });
+
+  describe("TierBasedRateLimiter", () => {
+    let rateLimiter: TierBasedRateLimiter;
+
+    beforeEach(() => {
+      rateLimiter = new TierBasedRateLimiter();
+    });
+
+    it("should allow requests within limits", async () => {
+      const allowed = await rateLimiter.checkLimit("user123", "starter", "ai-request");
+      expect(allowed).to.be.true;
+    });
+
+    it("should track quota usage", async () => {
+      await rateLimiter.checkLimit("user123", "starter", "ai-request");
+      await rateLimiter.checkLimit("user123", "starter", "ai-request");
+
+      const usage = rateLimiter.getQuotaUsage("user123");
+      expect(usage.requestsUsed).to.be.greaterThan(0);
+    });
+
+    it("should handle different tiers appropriately", async () => {
+      const freeAllowed = await rateLimiter.checkLimit("user1", "free", "ai-request");
+      const enterpriseAllowed = await rateLimiter.checkLimit("user2", "enterprise", "ai-request");
+
+      expect(freeAllowed).to.be.true;
+      expect(enterpriseAllowed).to.be.true;
+    });
+
+    it("should enforce burst limits", async () => {
+      // Test burst allowance
+      let consecutiveAllowed = 0;
+      for (let i = 0; i < 20; i++) {
+        const allowed = await rateLimiter.checkLimit("burst-user", "free", "ai-request");
+        if (allowed) consecutiveAllowed++;
+      }
+
+      expect(consecutiveAllowed).to.be.greaterThan(0);
+    });
+  });
+
+  describe("AIPromptABTesting", () => {
+    let abTesting: AIPromptABTesting;
+
+    beforeEach(() => {
+      abTesting = new AIPromptABTesting();
+    });
+
+    it("should assign users to test variants", () => {
+      const experiment = {
+        id: "test-exp-1",
+        name: "Prompt Optimization",
+        variants: [
+          { id: "A", prompt: "Original prompt", weight: 50 },
+          { id: "B", prompt: "Optimized prompt", weight: 50 }
+        ],
+        isActive: true
+      };
+
+      abTesting.createExperiment(experiment);
+      const variant = abTesting.getUserVariant("user123", "test-exp-1");
+
+      expect(variant).to.be.oneOf(["A", "B"]);
+    });
+
+    it("should record experiment results", () => {
+      const experiment = {
+        id: "test-exp-2",
+        name: "Response Quality",
+        variants: [
+          { id: "A", prompt: "Prompt A", weight: 50 },
+          { id: "B", prompt: "Prompt B", weight: 50 }
+        ],
+        isActive: true
+      };
+
+      abTesting.createExperiment(experiment);
+      abTesting.recordResult("test-exp-2", "user123", "A", true, {
+        responseTime: 1200,
+        tokens: 150
+      });
+
+      const results = abTesting.getExperimentResults("test-exp-2");
+      expect(results.totalParticipants).to.equal(1);
+    });
+
+    it("should calculate statistical significance", () => {
+      const experiment = {
+        id: "test-exp-3",
+        name: "Statistical Test",
+        variants: [
+          { id: "A", prompt: "Control", weight: 50 },
+          { id: "B", prompt: "Treatment", weight: 50 }
+        ],
+        isActive: true
+      };
+
+      abTesting.createExperiment(experiment);
+
+      // Record multiple results
+      for (let i = 0; i < 100; i++) {
+        const variant = i % 2 === 0 ? "A" : "B";
+        const success = variant === "B" ? i % 3 === 0 : i % 4 === 0; // B performs better
+        abTesting.recordResult("test-exp-3", `user${i}`, variant, success);
+      }
+
+      const analysis = abTesting.analyzeExperiment("test-exp-3");
+      expect(analysis.isSignificant).to.be.a("boolean");
+      expect(analysis.confidenceLevel).to.be.a("number");
+    });
+  });
+
+  describe("FunctionWarming", () => {
+    let functionWarming: FunctionWarming;
+
+    beforeEach(() => {
+      functionWarming = new FunctionWarming();
+    });
+
+    it("should register functions for warming", () => {
+      functionWarming.registerFunction("ai-suggestions", {
+        minInstances: 2,
+        warmingInterval: 300000, // 5 minutes
+        healthCheckPath: "/health"
+      });
+
+      const config = functionWarming.getWarmingConfig("ai-suggestions");
+      expect(config?.minInstances).to.equal(2);
+    });
+
+    it("should predict warming needs", () => {
+      // Simulate traffic pattern
+      const trafficData = [
+        { timestamp: Date.now() - 3600000, requests: 100 }, // 1 hour ago
+        { timestamp: Date.now() - 1800000, requests: 150 }, // 30 min ago
+        { timestamp: Date.now() - 900000, requests: 200 }   // 15 min ago
+      ];
+
+      const prediction = functionWarming.predictWarmingNeeds("ai-suggestions", trafficData);
+      expect(prediction.recommendedInstances).to.be.a("number");
+      expect(prediction.confidence).to.be.a("number");
+    });
+
+    it("should execute warming strategy", async () => {
+      functionWarming.registerFunction("test-function", {
+        minInstances: 1,
+        warmingInterval: 60000,
+        healthCheckPath: "/health"
+      });
+
+      const result = await functionWarming.executeWarmingStrategy("test-function");
+      expect(result.success).to.be.a("boolean");
+    });
+  });
+
+  describe("Integration Tests", () => {
+    it("should handle complete request lifecycle", async () => {
+      const mockRequest = {
+        auth: { uid: "user123" },
+        data: { query: "test query" },
+        rawRequest: { headers: {} }
+      } as any;
+
+      const trace = StructuredLogger.startTrace(mockRequest, "integration-test");
+
+      // Check if data is cached
+      const cached = await AIResponseCache.get("integration-key");
+      expect(cached).to.be.null;
+
+      // Store result in cache
+      const testData = { result: "AI response", tokens: 150 };
+      await AIResponseCache.set("integration-key", testData, {
+        aiModel: "gpt-4",
+        promptHash: "integration-hash",
+        tokens: 150,
+        userTier: "agency"
+      });
+
+      // Record metrics
+      const collector = new MetricsCollector();
+      collector.recordExecution({
+        functionName: "integration-test",
+        duration: 1500,
+        memoryUsed: 512,
+        success: true,
+        timestamp: Date.now(),
+        userId: "user123",
+        userTier: "agency",
+        businessData: {
+          aiTokensUsed: 150,
+          cacheHit: false
+        }
+      });
+
+      // Complete trace
+      StructuredLogger.completeTrace(trace.traceId, {
+        success: true,
+        responseSize: JSON.stringify(testData).length
+      });
+
+      // Verify cached data
+      const cachedData = await AIResponseCache.get("integration-key");
+      expect(cachedData).to.deep.equal(testData);
+    });
+
+    it("should handle rate limiting with cache fallback", async () => {
+      const rateLimiter = new TierBasedRateLimiter();
+
+      // Store fallback data
+      await AIResponseCache.set("rate-limit-fallback", { result: "cached fallback" }, {
+        aiModel: "gpt-4",
+        promptHash: "fallback-hash",
+        tokens: 50,
+        userTier: "free"
+      });
+
+      // Test rate limiting
+      let requests = 0;
+      for (let i = 0; i < 10; i++) {
+        const allowed = await rateLimiter.checkLimit("heavy-user", "free", "ai-request");
+        if (allowed) {
+          requests++;
+        } else {
+          // Use cached fallback
+          const fallbackData = await AIResponseCache.get("rate-limit-fallback");
+          expect(fallbackData).to.not.be.null;
+          break;
+        }
+      }
+
+      expect(requests).to.be.greaterThan(0);
+    });
+  });
+
+  describe("Error Handling and Resilience", () => {
+    it("should handle cache failures gracefully", async () => {
+      // Simulate cache failure
+      const originalGet = AIResponseCache.get;
+      (AIResponseCache as any).get = () => { throw new Error("Cache unavailable"); };
+
+      try {
+        const result = await AIResponseCache.get("any-key");
+        expect(result).to.be.null;
+      } catch (error) {
+        // Should not throw
+        expect.fail("Cache should handle errors gracefully");
+      } finally {
+        (AIResponseCache as any).get = originalGet;
+      }
+    });
+
+    it("should handle metrics collection failures", () => {
+      const collector = new MetricsCollector();
+
+      // Invalid data should not crash
+      expect(() => {
+        collector.recordExecution({
+          functionName: "",
+          duration: -1,
+          memoryUsed: 0,
+          success: true,
+          timestamp: 0,
+          userId: "",
+          userTier: "invalid" as any
+        });
+      }).to.not.throw();
+    });
+  });
+
+  describe("Performance Tests", () => {
+    it("should handle concurrent cache operations", async () => {
+      const concurrentOps = [];
+
+      // Create multiple concurrent cache operations
+      for (let i = 0; i < 10; i++) {
+        concurrentOps.push(
+          AIResponseCache.set(`concurrent-${i}`, { data: i }, {
+            aiModel: "gpt-4",
+            promptHash: `hash-${i}`,
+            tokens: 50,
+            userTier: "starter"
+          })
+        );
+      }
+
+      await Promise.all(concurrentOps);
+
+      // Retrieve all concurrently
+      const retrievalPromises = [];
+      for (let i = 0; i < 10; i++) {
+        retrievalPromises.push(AIResponseCache.get(`concurrent-${i}`));
+      }
+
+      const results = await Promise.all(retrievalPromises);
+      const successCount = results.filter((r: any) => r !== null).length;
+
+      expect(successCount).to.equal(10);
+    });
+
+    it("should maintain performance under load", async () => {
+      const startTime = Date.now();
+      const operations = 100;
+
+      for (let i = 0; i < operations; i++) {
+        await AIResponseCache.set(`perf-${i}`, { data: i }, {
+          aiModel: "gpt-4",
+          promptHash: `perf-hash-${i}`,
+          tokens: 25,
+          userTier: "starter"
+        });
+      }
+
+      const duration = Date.now() - startTime;
+      const opsPerSecond = (operations / duration) * 1000;
+
+      expect(opsPerSecond).to.be.greaterThan(10); // At least 10 ops/sec
+    });
+  });
+
+  describe("Edge Cases", () => {
+    it("should handle empty cache gracefully", async () => {
+      const result = await AIResponseCache.get("non-existent-key");
+      expect(result).to.be.null;
+    });
+
+    it("should handle invalid user tiers", async () => {
+      const rateLimiter = new TierBasedRateLimiter();
+      const allowed = await rateLimiter.checkLimit("user123", "invalid-tier" as any, "ai-request");
+      expect(allowed).to.be.a("boolean");
+    });
+  });
+
+  // Helper functions
+  function createMockTrace(): any {
+    const mockRequest = {
+      auth: { uid: "mock-user" },
+      data: {},
+      rawRequest: { headers: {} }
+    } as any;
+
+    return StructuredLogger.startTrace(mockRequest, "mock-function");
+  }
+
+  function createMockCacheEntry(tier: string = "starter") {
+    return AIResponseCache.set(`test-key-${Date.now()}`, { mockData: true }, {
+      aiModel: "gpt-4",
+      promptHash: "mock-hash",
+      tokens: 100,
+      userTier: tier
+    });
+  }
+});

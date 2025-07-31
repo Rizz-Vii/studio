@@ -2,42 +2,210 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUser() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
     // By default, deny all reads and writes
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Helper function to check if the user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
+    // User profiles - Enhanced RBAC
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow delete: if isAdmin();
+      allow list: if isAuthenticated() && isAdmin();
+
+      // User activities subcollection
+      match /activities/{activityId} {
+        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+        allow create: if isAuthenticated() && isOwner(userId);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      }
+
+      // User usage tracking subcollection
+      match /usage/{usageId} {
+        allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+        allow create: if isAuthenticated() && isOwner(userId);
+        allow update: if isAuthenticated() && isOwner(userId);
+        allow delete: if isAdmin();
+      }
     }
 
-    // Helper function to get the user's role from their document
-    function getUserRole(uid) {
-      return get(/databases/$(database)/documents/users/$(uid)).data.role;
+    // SEO audits collection - Enhanced with usage limits
+    match /audits/{auditId} {
+      allow read: if isValidUser() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isValidUser() && (
+        request.resource.data.userId == request.auth.uid
+      );
+      allow update, delete: if isValidUser() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
     }
 
-    // Users can read and update their own profiles
-    match /users/{userId} {
-      allow read, update: if isAuthenticated() && request.auth.uid == userId;
-      // Admins can read any user's profile
-      allow get: if isAuthenticated() && getUserRole(request.auth.uid) == 'admin';
+    // Keywords collection
+    match /keywords/{keywordId} {
+      allow read: if isValidUser() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isValidUser() && (
+        request.resource.data.userId == request.auth.uid
+      );
+      allow update, delete: if isValidUser() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+    }
+
+    // Rate limiting collection - Enhanced
+    match /rateLimits/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId) && (
+        request.time.toMillis() - (resource == null ? 0 : resource.data.lastRequest.toMillis()) > 1000
+      );
+    }
+
+    // Subscription data
+    match /subscriptions/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create, update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Usage quotas and limits
+    match /quotas/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create, update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // NeuroSEO™ Analyses Collection - NEW
+    match /neuroSeoAnalyses/{analysisId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Keyword Research Collection - NEW  
+    match /keywordResearch/{researchId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Usage Tracking Collection - NEW
+    match /usage/{usageId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Projects Collection - FIXED MISSING RULES
+    match /projects/{projectId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Backlinks Collection - FIXED MISSING RULES  
+    match /backlinks/{backlinkId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Domain Authority Collection - FIXED MISSING RULES
+    match /domainAuthority/{domainId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // CRITICAL MISSING COLLECTIONS - Fix for localhost errors
+    
+    // SEO Audits Collection - MISSING RULES CAUSING PERMISSION ERRORS
+    match /seoAudits/{auditId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
     }
     
-    // Users can only create their own user document upon signup
-    match /users/{userId} {
-      allow create: if isAuthenticated() && request.auth.uid == userId;
+    // Link Analyses Collection - MISSING RULES CAUSING PERMISSION ERRORS  
+    match /linkAnalyses/{analysisId} {
+      allow read: if isAuthenticated() && 
+                     (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && 
+                       (resource.data.userId == request.auth.uid || isAdmin());
     }
     
-    // Allow admins to list all users (for the admin dashboard)
-    match /users/{userId} {
-        allow list: if isAuthenticated() && getUserRole(request.auth.uid) == 'admin';
+    // User Presence System - Fix for presence tracking errors
+    match /presence/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Users can read and write to their own 'activities' subcollection
-    match /users/{userId}/activities/{activityId} {
-      allow read, write, create, delete: if isAuthenticated() && request.auth.uid == userId;
+    // Team Chat System - Fix for team management errors
+    match /teamChats/{chatId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
   }
 }

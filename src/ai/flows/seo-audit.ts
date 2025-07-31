@@ -135,7 +135,8 @@ const auditUrlFlow = ai.defineFlow(
         // @ts-ignore: node-fetch v2 does not support timeout, v3+ does
         timeout: 15000,
       });
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
       const html = await response.text();
       const $ = cheerio.load(html);
       pageContent = $("body").text();

@@ -1,30 +1,31 @@
 // src/app/(app)/insights/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { generateInsights } from "@/ai/flows/generate-insights";
-import type { GenerateInsightsOutput } from "@/ai/flows/generate-insights";
-import { useAuth } from "@/context/AuthContext";
+import { generateInsights } from "@/lib/utils/content-functions";
+import type { GenerateInsightsOutput } from "@/types";
+import { useEffect, useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   CardDescription,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Lightbulb, AlertTriangle, ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import LoadingScreen from "@/components/ui/loading-screen";
 import {
   Tooltip,
-  TooltipProvider,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import LoadingScreen from "@/components/ui/loading-screen";
+import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
+import { AlertTriangle, ArrowRight, Lightbulb } from "lucide-react";
+import Link from "next/link";
 
 export default function InsightsPage() {
   const { user, activities, loading: authLoading } = useAuth();
@@ -59,7 +60,8 @@ export default function InsightsPage() {
         }));
 
         const result = await generateInsights({
-          activities: simplifiedActivities,
+          keywords: ['seo', 'content', 'optimization'],
+          urls: ['https://example.com'],
         });
         setInsights(result.insights);
       } catch (e: any) {
@@ -72,7 +74,7 @@ export default function InsightsPage() {
     fetchInsights();
   }, [user, activities, authLoading]);
 
-  const priorityColors: { [key: string]: string } = {
+  const priorityColors: { [key: string]: string; } = {
     High: "bg-destructive",
     Medium: "bg-warning",
     Low: "bg-success",
@@ -101,15 +103,15 @@ export default function InsightsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8">
+    <main className="max-w-4xl mx-auto">
+      <header className="mb-8">
         <h1 className="text-3xl font-bold font-headline">
           Actionable Insights
         </h1>
         <p className="text-muted-foreground font-body">
           AI-generated recommendations based on your recent activity.
         </p>
-      </div>
+      </header>
 
       {error && (
         <Card className="border-destructive">
@@ -194,6 +196,6 @@ export default function InsightsPage() {
           ))}
         </motion.div>
       )}
-    </div>
+    </main>
   );
 }

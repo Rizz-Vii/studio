@@ -27,13 +27,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import "./sidebar.css";
 
 // --- Constants ---
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "12rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
-const SIDEBAR_WIDTH_ICON = "3.5rem";
+const SIDEBAR_WIDTH = "18rem";
+const SIDEBAR_WIDTH_MOBILE = "20rem";
+const SIDEBAR_WIDTH_ICON = "4rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
 // --- Context ---
@@ -68,6 +69,7 @@ type SidebarProviderProps = React.ComponentProps<"div"> & {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  // Remove style prop to prevent inline styles
 };
 
 const SidebarProvider = forwardRef<HTMLDivElement, SidebarProviderProps>(
@@ -77,7 +79,6 @@ const SidebarProvider = forwardRef<HTMLDivElement, SidebarProviderProps>(
       open: openProp,
       onOpenChange: setOpenProp,
       className,
-      style,
       children,
       ...props
     },
@@ -192,17 +193,7 @@ const SidebarProvider = forwardRef<HTMLDivElement, SidebarProviderProps>(
       <SidebarContext.Provider value={contextValue}>
         <TooltipProvider delayDuration={0}>
           <div
-            style={
-              {
-                "--sidebar-width": SIDEBAR_WIDTH,
-                "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
-                ...style,
-              } as React.CSSProperties // Keep this cast as it's common for CSS variables
-            }
-            className={cn(
-              "group/sidebar-wrapper", // Removed flex layout from here
-              className
-            )}
+            className={cn("group/sidebar-wrapper sidebar-wrapper", className)}
             ref={ref as any} // Cast ref to any
             {...props}
           >
@@ -230,7 +221,7 @@ const Sidebar = forwardRef<
     setOpenMobile,
     pinned,
     isUserMenuOpen,
-    hydrated
+    hydrated,
   } = useSidebar();
 
   // Prevent hydration mismatch
@@ -257,12 +248,10 @@ const Sidebar = forwardRef<
         <SheetContent
           data-sidebar="sidebar"
           data-mobile="true"
-          className="w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
-          style={
-            {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-            } as React.CSSProperties
-          }
+          className={cn(
+            "w-[var(--sidebar-width)] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
+            "sidebar-sheet-content-mobile"
+          )}
           side={side}
           ref={ref as any} // Cast ref to any
         >
@@ -337,7 +326,8 @@ SidebarTrigger.displayName = "SidebarTrigger";
 const SidebarHeader = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => { // Use ComponentPropsWithoutRef
+>(({ className, ...props }, ref) => {
+  // Use ComponentPropsWithoutRef
   return (
     <div
       ref={ref as any} // Cast ref to any
@@ -352,7 +342,8 @@ SidebarHeader.displayName = "SidebarHeader";
 const SidebarFooter = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => { // Use ComponentPropsWithoutRef
+>(({ className, ...props }, ref) => {
+  // Use ComponentPropsWithoutRef
   return (
     <div
       ref={ref as any} // Cast ref to any
@@ -367,7 +358,8 @@ SidebarFooter.displayName = "SidebarFooter";
 const SidebarContent = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => { // Use ComponentPropsWithoutRef
+>(({ className, ...props }, ref) => {
+  // Use ComponentPropsWithoutRef
   return (
     <div
       ref={ref as any} // Cast ref to any
@@ -404,14 +396,13 @@ const SidebarMenu = forwardRef<HTMLUListElement, SidebarMenuProps>(
   }
 );
 
-
 SidebarMenu.displayName = "SidebarMenu";
 
 const SidebarMenuItem = motion.create(
-  forwardRef<HTMLLIElement, React.ComponentPropsWithoutRef<"li">>( // Use ComponentPropsWithoutRef
+  forwardRef<HTMLLIElement, React.ComponentPropsWithoutRef<"li">>(
     ({ className, ...props }, ref) => (
       <li
-        ref={ref as any} // Cast ref to any
+        ref={ref}
         data-sidebar="menu-item"
         className={cn("group/menu-item relative", className)}
         {...props}

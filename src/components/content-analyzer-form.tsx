@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { EnhancedButton } from "@/components/ui/enhanced-button";
 import {
   Form,
   FormControl,
@@ -19,22 +19,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+  EnhancedCard,
+  EnhancedCardContent,
+  EnhancedCardDescription,
+  EnhancedCardFooter,
+  EnhancedCardHeader,
+  EnhancedCardTitle,
+} from "@/components/ui/enhanced-card";
+import { FileText, Sparkles } from "lucide-react";
+import { useHydration } from "@/components/HydrationContext";
+import { useIsMobile } from "@/lib/mobile-responsive-utils";
 
 const formSchema = z.object({
   content: z
     .string()
-    .min(50, { message: "Content must be at least 50 characters long." }),
+    .min(50, { message: "Content must be at least 50 characters long." })
+    .max(10000, { message: "Content must be less than 10,000 characters." }),
   targetKeywords: z
     .string()
-    .min(3, { message: "Target keywords must be at least 3 characters long." }),
+    .min(3, { message: "Target keywords must be at least 3 characters long." })
+    .max(200, { message: "Target keywords must be less than 200 characters." }),
 });
 
 type ContentAnalyzerFormValues = z.infer<typeof formSchema>;
@@ -48,6 +52,9 @@ export default function ContentAnalyzerForm({
   onSubmit,
   isLoading,
 }: ContentAnalyzerFormProps) {
+  const hydrated = useHydration();
+  const isMobile = useIsMobile();
+
   const form = useForm<ContentAnalyzerFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,81 +64,160 @@ export default function ContentAnalyzerForm({
   });
 
   async function handleFormSubmit(values: ContentAnalyzerFormValues) {
-    await onSubmit(values as AnalyzeContentInput);
+    try {
+      await onSubmit(values as AnalyzeContentInput);
+    } catch (error) {
+      console.error("Content analysis failed:", error);
+      // Error handling could be improved with toast notifications
+    }
   }
 
+  const contentLength = form.watch("content")?.length || 0;
+  const keywordsLength = form.watch("targetKeywords")?.length || 0;
+
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="font-headline">Optimize Your Content</CardTitle>
-        <CardDescription className="font-body">
+    <EnhancedCard
+      className="h-full"
+      variant="elevated"
+    >
+      <EnhancedCardHeader>
+        <EnhancedCardTitle className="font-headline flex items-center gap-2">
+          <FileText className="h-5 w-5 text-primary" />
+          Optimize Your Content
+        </EnhancedCardTitle>
+        <EnhancedCardDescription className="font-body">
           Paste your content and target keywords to get AI-powered optimization
-          suggestions.
-        </CardDescription>
-      </CardHeader>
+          suggestions, readability analysis, and SEO improvements.
+        </EnhancedCardDescription>
+      </EnhancedCardHeader>
+
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleFormSubmit)}
-          className="space-y-8"
+          className="space-y-6"
+          aria-busy={isLoading}
+          aria-disabled={isLoading}
         >
-          <CardContent className="space-y-4">
+          <EnhancedCardContent className="space-y-6">
             <FormField
               control={form.control}
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-body">Content</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Paste your article, blog post, or page content here..."
-                      className="min-h-[200px] font-body"
-                      {...field}
-                      disabled={isLoading}
-                    />
+                    <div className="space-y-2">
+                      <FormLabel
+                        className="font-body text-sm font-medium flex items-center justify-between"
+                        htmlFor="content-input"
+                      >
+                        Content to Analyze
+                        <span
+                          className={`text-xs ${
+                            contentLength > 9000
+                              ? "text-red-500"
+                              : contentLength > 7000
+                                ? "text-yellow-500"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {contentLength}/10,000 characters
+                        </span>
+                      </FormLabel>
+                      <Textarea
+                        id="content-input"
+                        placeholder="Paste your article, blog post, or page content here..."
+                        className="min-h-[200px] font-body resize-y"
+                        {...field}
+                        disabled={!hydrated || isLoading}
+                        aria-describedby="content-description content-error"
+                      />
+                      <FormDescription
+                        id="content-description"
+                        className="font-body text-sm text-muted-foreground"
+                      >
+                        Paste the text content you want to analyze for SEO
+                        optimization, readability, and engagement.
+                      </FormDescription>
+                      <FormMessage id="content-error" />
+                    </div>
                   </FormControl>
-                  <FormDescription className="font-body">
-                    The text content you want to analyze.
-                  </FormDescription>
-                  <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="targetKeywords"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-body">Target Keywords</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="e.g., SEO best practices, content marketing"
-                      {...field}
-                      className="font-body"
-                      disabled={isLoading}
-                    />
+                    <div className="space-y-2">
+                      <FormLabel
+                        className="font-body text-sm font-medium flex items-center justify-between"
+                        htmlFor="keywords-input"
+                      >
+                        Target Keywords
+                        <span
+                          className={`text-xs ${
+                            keywordsLength > 180
+                              ? "text-red-500"
+                              : keywordsLength > 150
+                                ? "text-yellow-500"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {keywordsLength}/200 characters
+                        </span>
+                      </FormLabel>
+                      <Input
+                        id="keywords-input"
+                        placeholder="e.g., SEO best practices, content marketing, digital optimization"
+                        {...field}
+                        className="font-body"
+                        disabled={!hydrated || isLoading}
+                        autoComplete="off"
+                        aria-describedby="keywords-description keywords-error"
+                      />
+                      <FormDescription
+                        id="keywords-description"
+                        className="font-body text-sm text-muted-foreground"
+                      >
+                        Comma-separated list of keywords you want to optimize
+                        for. These will guide the analysis and recommendations.
+                      </FormDescription>
+                      <FormMessage id="keywords-error" />
+                    </div>
                   </FormControl>
-                  <FormDescription className="font-body">
-                    Comma-separated list of keywords you are targeting.
-                  </FormDescription>
-                  <FormMessage />
                 </FormItem>
               )}
             />
-          </CardContent>
-          <CardFooter>
-            <Button
+          </EnhancedCardContent>
+
+          <EnhancedCardFooter>
+            <EnhancedButton
               type="submit"
-              disabled={isLoading}
-              className="font-body w-full sm:w-auto"
+              className="w-full"
+              size={isMobile ? "mobile" : "default"}
+              loading={isLoading}
+              loadingText="Analyzing content..."
+              leftIcon={
+                !isLoading ? <Sparkles className="h-4 w-4" /> : undefined
+              }
+              disabled={
+                !hydrated ||
+                isLoading ||
+                !form.watch("content") ||
+                !form.watch("targetKeywords")
+              }
+              variant="gradient"
             >
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              Analyze Content
-            </Button>
-          </CardFooter>
+              {isLoading
+                ? "Analyzing Content..."
+                : "Analyze & Optimize Content"}
+            </EnhancedButton>
+          </EnhancedCardFooter>
         </form>
       </Form>
-    </Card>
+    </EnhancedCard>
   );
 }
