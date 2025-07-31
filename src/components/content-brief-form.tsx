@@ -1,10 +1,15 @@
 // src/components/content-brief-form.tsx
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -15,16 +20,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import type { ContentBriefInput } from "@/ai/flows/content-brief";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const formSchema = z.object({
   keyword: z
@@ -35,7 +34,7 @@ const formSchema = z.object({
 type ContentBriefFormValues = z.infer<typeof formSchema>;
 
 interface ContentBriefFormProps {
-  onSubmit: (values: ContentBriefInput) => Promise<void>;
+  onSubmit: (values: ContentBriefFormValues) => Promise<void>;
   isLoading: boolean;
 }
 

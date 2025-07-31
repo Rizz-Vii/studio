@@ -48,6 +48,33 @@ coverage/
 *.spec.js.map
 *.test.js.map
 
+# Security & Sensitive Files
+# --------------------------
+masterKeys.md
+.github/masterKeys.md
+**/masterKeys.md
+mcp.json
+mcp.*.json
+state.json
+**/state.json
+*.pem
+*.key
+*.env.local
+*.env.production
+*.env.staging
+**/*key*.md
+**/*secret*.md
+**/*token*.md
+
+# Integration & Configuration Files (contain secrets)
+# --------------------------------------------------
+docs/integrations/
+**/integrations/
+*MCP*
+*mcp*
+**/*MCP*
+**/*mcp*
+
 # Test Debug Files
 # ---------------
 debug-*.png

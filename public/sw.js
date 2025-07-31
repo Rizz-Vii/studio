@@ -14,15 +14,13 @@ const CACHE_NAME = 'rankpilot-v1.0.0';
 const STATIC_CACHE = 'rankpilot-static-v1';
 const DYNAMIC_CACHE = 'rankpilot-dynamic-v1';
 
-// Static assets to cache immediately
+// Static assets to cache immediately - FIXED: removed non-existent routes
 const STATIC_ASSETS = [
     '/',
     '/dashboard',
-    '/settings',
-    '/neuroseo',
     '/favicon.ico',
-    '/manifest.json',
-    // Core CSS and JS will be auto-cached by Next.js
+    '/manifest.json'
+    // Removed '/settings' and '/neuroseo' as they cause 404 errors in cache.addAll()
 ];
 
 // API endpoints to cache with network-first strategy
@@ -33,19 +31,40 @@ const DYNAMIC_CACHE_PATHS = [
     '/api/settings'
 ];
 
-// Install event - cache static assets
+// Install event - cache static assets with individual error handling
 self.addEventListener('install', (event) => {
     console.log('[SW] Installing service worker...');
 
     event.waitUntil(
-        caches.open(STATIC_CACHE)
-            .then((cache) => {
-                console.log('[SW] Caching static assets');
-                return cache.addAll(STATIC_ASSETS);
-            })
-            .then(() => {
+        (async () => {
+            try {
+                const cache = await caches.open(STATIC_CACHE);
+
+                // Cache assets individually to prevent cache.addAll() failures
+                const cachePromises = STATIC_ASSETS.map(async (url) => {
+                    try {
+                        const response = await fetch(url);
+                        if (response.ok) {
+                            await cache.put(url, response);
+                            console.log(`✅ [SW] Cached: ${url}`);
+                        } else {
+                            console.warn(`⚠️ [SW] Failed to cache ${url}: ${response.status}`);
+                        }
+                    } catch (error) {
+                        console.error(`❌ [SW] Cache error for ${url}:`, error);
+                        // Continue with other assets instead of failing entirely
+                    }
+                });
+
+                await Promise.allSettled(cachePromises); // Use allSettled instead of all
+                console.log('🚀 [SW] Installation complete');
+
                 return self.skipWaiting();
-            })
+            } catch (error) {
+                console.error('❌ [SW] Installation failed:', error);
+                throw error;
+            }
+        })()
     );
 });
 

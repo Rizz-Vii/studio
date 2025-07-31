@@ -54,7 +54,7 @@ import {
   Users
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface TeamMember {
@@ -102,13 +102,7 @@ export default function TeamManagementPage() {
   });
   const [isInviting, setIsInviting] = useState(false);
 
-  useEffect(() => {
-    if (user && canUseFeature("team_management")) {
-      fetchTeamMembers();
-    }
-  }, [user, canUseFeature]);
-
-  const fetchTeamMembers = async () => {
+  const fetchTeamMembers = useCallback(async () => {
     try {
       // Mock data - replace with actual API call
       const mockMembers: TeamMember[] = [
@@ -148,7 +142,13 @@ export default function TeamManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty dependency array since this is mock data
+
+  useEffect(() => {
+    if (user && canUseFeature("team_management")) {
+      fetchTeamMembers();
+    }
+  }, [user, canUseFeature, fetchTeamMembers]); // Include fetchTeamMembers in dependencies
 
   const sendInvite = async () => {
     if (!inviteForm.email) {

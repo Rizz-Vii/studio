@@ -2,6 +2,7 @@
 "use client";
 
 import Breadcrumb from "@/components/breadcrumb";
+import { KeywordToolForm } from "@/components/forms/seo-forms";
 import LoadingState from "@/components/loading-state";
 import {
   MobileResultsCard,
@@ -31,6 +32,7 @@ import { getDemoData } from "@/lib/demo-data";
 import { db } from "@/lib/firebase";
 import { TimeoutError, withTimeout } from "@/lib/timeout";
 import { cn } from "@/lib/utils";
+import { getKeywordSuggestions } from "@/lib/utils/content-functions";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -237,7 +239,7 @@ export default function KeywordToolPage() {
       // Try to get real data with timeout
       const result = await withTimeout(
         getKeywordSuggestions({
-          query: values.topic,
+          seed: values.topic,
           count: values.includeLongTailKeywords ? 20 : 10,
           includeMetrics: true
         }),

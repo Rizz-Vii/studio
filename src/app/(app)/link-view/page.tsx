@@ -27,6 +27,11 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
+import { analyzeLinks } from "@/lib/utils/content-functions";
+import type {
+  LinkAnalysisInput,
+  LinkAnalysisOutput
+} from "@/types";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, BarChart3 } from "lucide-react";
@@ -171,13 +176,19 @@ export default function LinkViewPage() {
     }
   }, [results, error]);
 
-  const handleSubmit = async (values: LinkAnalysisInput) => {
+  const handleSubmit = async (values: { url: string; }) => {
     setIsLoading(true);
     setSubmitted(true);
     setResults(null);
     setError(null);
     try {
-      const result = await analyzeLinks(values);
+      // Transform form values to LinkAnalysisInput
+      const analysisInput: LinkAnalysisInput = {
+        url: values.url,
+        analysisType: 'comprehensive',
+        limit: 100
+      };
+      const result = await analyzeLinks(analysisInput);
       setResults(result);
 
       if (user) {

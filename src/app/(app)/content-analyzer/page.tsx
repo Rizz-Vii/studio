@@ -19,21 +19,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  AlertCircle,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  Pie,
+  PieChart,
+  Progress,
+  XAxis,
+  YAxis
+} from "@/components/ui/chart-components";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import LoadingScreen from "@/components/ui/loading-screen";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
-import { getDemoData } from "@/lib/demo-data";
 import { db } from "@/lib/firebase";
 import {
   type NeuroSEOAnalysisRequest,
   type NeuroSEOReport
 } from "@/lib/neuroseo";
-import { TimeoutError, withTimeout } from "@/lib/timeout";
-import { cn } from "@/lib/utils";
+import type {
+  AuditUrlOutput
+} from "@/types";
+import {
+  containerVariants,
+  imageChartConfig,
+  itemVariants,
+  scoreChartConfig,
+  statusColors,
+  statusIcons
+} from "@/types/charts";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   AlertTriangle,
   Brain,
@@ -60,7 +82,7 @@ export default function SeoAuditPage() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   // Get user subscription tier for feature gating
-  const userTier = user?.subscriptionTier || "free";
+  const userTier = (user as any)?.subscriptionTier || "free";
 
   // Scroll to results when analysis completes
   useEffect(() => {
@@ -206,6 +228,7 @@ export default function SeoAuditPage() {
           allowed: true,
           remaining: 4,
           limit: 5,
+          remainingQuota: 4,
           resetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         },
       };
@@ -444,7 +467,6 @@ const AuditCharts = ({ items }: { items: AuditUrlOutput["items"]; }) => {
               />
               <XAxis dataKey="score" type="number" hide />
               <ChartTooltip
-                cursor={false}
                 content={(props) => <ChartTooltipContent {...props} />}
               />
               <Bar dataKey="score" radius={5} />
@@ -543,134 +565,3 @@ const AuditResults = ({ results }: { results: AuditUrlOutput; }) => (
   </motion.div>
 );
 
-export default function SeoAuditPage() {
-  const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<AuditUrlOutput | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
-
-  const resultsRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (results || error) {
-      resultsRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [results, error]);
-
-  const handleSubmit = async (values: AuditUrlInput) => {
-    setIsLoading(true);
-    setSubmitted(true);
-    setResults(null);
-    setError(null);
-    try {
-      // Try to get real data with timeout
-      const result = await withTimeout(
-        auditUrl(values),
-        15000, // 15 second timeout
-        "SEO audit is taking longer than expected. Using demo data instead."
-      );
-      setResults(result);
-
-      if (user) {
-        const userActivitiesRef = collection(
-          db,
-          "users",
-          user.uid,
-          "activities"
-        );
-        await addDoc(userActivitiesRef, {
-          type: "SEO Audit",
-          tool: "SEO Audit",
-          timestamp: serverTimestamp(),
-          details: {
-            url: values.url,
-            overallScore: result.overallScore,
-          },
-          resultsSummary: `Audited ${values.url}. Overall Score: ${result.overallScore}/100.`,
-        });
-      }
-    } catch (e: any) {
-      if (e instanceof TimeoutError) {
-        console.warn("SEO audit timed out, using demo data:", e.message);
-        // Use demo data as fallback
-        const demoData = getDemoData("seo-audit");
-        if (demoData) {
-          setResults(demoData);
-        } else {
-          setError("Analysis timed out and no demo data available.");
-        }
-      } else {
-        setError(e.message || "An unexpected error occurred during the audit.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <main
-      className={cn(
-        "mx-auto transition-all duration-500",
-        submitted ? "max-w-7xl" : "max-w-xl"
-      )}
-    >
-      {/* Page Title - DevLast Task 8: Accessibility & Semantics */}
-      <header className="mb-8 text-center">
-        <h1 className="text-3xl font-bold font-headline text-primary mb-2">
-          SEO Website Audit
-        </h1>
-        <p className="text-muted-foreground font-body">
-          Comprehensive SEO analysis and optimization recommendations for any website.
-        </p>
-      </header>
-
-      <section
-        className={cn(
-          "grid gap-8 transition-all duration-500",
-          submitted ? "lg:grid-cols-3" : "lg:grid-cols-1"
-        )}
-      >
-        <motion.div layout className="lg:col-span-1">
-          <SeoAuditForm onSubmit={handleSubmit} isLoading={isLoading} />
-        </motion.div>
-
-        <div className="lg:col-span-2" ref={resultsRef}>
-          <AnimatePresence mode="wait">
-            {isLoading && (
-              <motion.div key="loading">
-                <LoadingScreen text="Auditing page..." />
-              </motion.div>
-            )}
-            {error && (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                <Card className="border-destructive">
-                  <CardHeader>
-                    <CardTitle className="text-destructive font-headline flex items-center gap-2">
-                      <AlertTriangle /> Audit Failed
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p>{error}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-            {results && (
-              <motion.div key="results">
-                <AuditResults results={results} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </section>
-    </main>
-  );
-}

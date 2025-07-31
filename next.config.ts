@@ -91,6 +91,10 @@ const nextConfig: NextConfig = {
             value: "on",
           },
           {
+            key: "Permissions-Policy",
+            value: "payment=(), microphone=(), camera=(), geolocation=(), interest-cohort=()"
+          },
+          {
             key: "Strict-Transport-Security",
             value: "max-age=31536000; includeSubDomains",
           },

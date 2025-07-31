@@ -30,6 +30,10 @@ import { db } from "@/lib/firebase";
 import type { NeuroSEOAnalysisRequest, NeuroSEOReport } from "@/lib/neuroseo";
 import { TimeoutError } from "@/lib/timeout";
 import { cn } from "@/lib/utils";
+import type {
+  CompetitorAnalysisInput,
+  CompetitorAnalysisOutput
+} from "@/types";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, BarChart3, Users } from "lucide-react";
@@ -220,8 +224,8 @@ const CompetitorResults = ({
 };
 
 export default function CompetitorsPage() {
-    const [isLoading, setIsLoading] = useState(false);
-    const [results, setResults] = useState<CompetitorAnalysisOutput | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<CompetitorAnalysisOutput | null>(null);
 
   const { user } = useAuth();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -278,15 +282,26 @@ export default function CompetitorsPage() {
     }
   }, [isAnalyzing]);
 
-  const handleSubmit = async (values: CompetitorAnalysisInput) => {
-    // Form values handled by form component
+  const handleSubmit = async (values: { yourUrl: string; competitorUrls: string; keywords: string; }) => {
+    // Transform form values to CompetitorAnalysisInput
+    const competitorUrlList = values.competitorUrls.split('\n').map(url => url.trim()).filter(url => url);
+    const keywordList = values.keywords.split(',').map(keyword => keyword.trim()).filter(keyword => keyword);
 
-    if (!yourUrl.trim()) {
+    const analysisInput: CompetitorAnalysisInput = {
+      urls: [values.yourUrl, ...competitorUrlList],
+      yourUrl: values.yourUrl,
+      competitorUrls: competitorUrlList,
+      keywords: keywordList,
+      targetKeywords: keywordList,
+      analysisDepth: 'standard'
+    };
+
+    if (!values.yourUrl.trim()) {
       setError("Please enter your website URL");
       return;
     }
 
-    if (!competitorUrls.trim()) {
+    if (!values.competitorUrls.trim()) {
       setError("Please enter at least one competitor URL");
       return;
     }

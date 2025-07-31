@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - workshop/performance
+      - workshop/performance-clean
   workflow_dispatch:
     inputs:
       deploy_functions:
