@@ -25,7 +25,7 @@ export default defineConfig({
 
     use: {
         // Enhanced base URL support with multiple fallbacks
-        baseURL: process.env.TEST_URL || process.env.TEST_BASE_URL || process.env.LEAN_URL || "https://rankpilot-h3jpc--lean-branch-testing-o2qips67.web.app",
+        baseURL: process.env.TEST_URL || process.env.TEST_BASE_URL || process.env.LEAN_URL || "https://rankpilot-h3jpc.web.app",
         trace: "retain-on-failure",
         screenshot: "only-on-failure",
         video: "retain-on-failure",

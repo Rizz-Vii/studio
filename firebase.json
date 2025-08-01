@@ -9,6 +9,8 @@
     "source": "functions",
     "codebase": "default",
     "runtime": "nodejs20",
+    "memory": "512MB",
+    "timeout": "60s",
     "ignore": [
       "node_modules",
       ".git",
@@ -22,7 +24,7 @@
   },
   "hosting": {
     "target": "rankpilot",
-    "public": ".next",
+    "source": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -31,6 +33,7 @@
     "frameworksBackend": {
       "region": "australia-southeast2",
       "secrets": [
+        "ANTHROPIC_API_KEY",
         "GEMINI_API_KEY",
         "GOOGLE_API_KEY",
         "OPENAI_API_KEY",
@@ -46,7 +49,7 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.firebaseapp.com https://*.firebase.com https://js.stripe.com https://*.paypal.com https://www.paypal.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.firebaseapp.com https://*.firebase.com https://api.openai.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://firebaseremoteconfig.googleapis.com https://firebaseappcheck.googleapis.com https://content-firebaseappdistribution.googleapis.com https://*.googleapis.com https://api.stripe.com https://*.paypal.com https://www.paypal.com https://*.cloudfunctions.net http://localhost:* ws://localhost:*; frame-src 'self' https://js.stripe.com https://*.stripe.com https://*.paypal.com https://www.google.com; object-src 'none';"
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.firebaseapp.com https://*.firebase.com https://js.stripe.com https://*.paypal.com https://www.paypal.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.firebaseapp.com https://*.firebase.com https://api.openai.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://firebaseremoteconfig.googleapis.com https://firebaseappcheck.googleapis.com https://content-firebaseappdistribution.googleapis.com https://*.googleapis.com https://api.stripe.com https://*.paypal.com https://www.paypal.com https://*.cloudfunctions.net https://www.google-analytics.com https://www.googletagmanager.com http://localhost:* ws://localhost:*; frame-src 'self' https://js.stripe.com https://*.stripe.com https://*.paypal.com https://www.google.com; object-src 'none';"
           },
           {
             "key": "X-Content-Type-Options",

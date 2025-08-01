@@ -52,10 +52,18 @@ function initializeFirebaseAdmin(): admin.app.App {
 
   // Method 3: Application Default Credentials (for production)
   if (process.env.NODE_ENV === 'production') {
-    return admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-      projectId: process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    });
+    try {
+      return admin.initializeApp({
+        credential: admin.credential.applicationDefault(),
+        projectId: process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'rankpilot-h3jpc'
+      });
+    } catch (error) {
+      console.warn('[Firebase Admin] Application Default Credentials failed:', error);
+      // Fallback to empty initialization for Cloud Functions environment
+      return admin.initializeApp({
+        projectId: 'rankpilot-h3jpc'
+      });
+    }
   }
 
   throw new Error('No valid Firebase admin configuration found');

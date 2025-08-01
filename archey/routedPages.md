@@ -1,3 +1,5 @@
+
+
 Route (app)                                  Size  First Load JS
 ┌ ○ /                                      148 kB         426 kB
 ├ ○ /_not-found                             202 B        99.8 kB

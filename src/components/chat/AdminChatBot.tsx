@@ -13,6 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
+import type { AdminChatBotProps, AdminChatMessage, ChatResponse, AdminQuickCommand } from '@/types/chatbot';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     AlertTriangle,
@@ -30,35 +31,6 @@ import {
     X
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-
-// Types
-interface AdminChatMessage {
-    id: string;
-    message: string;
-    response: string;
-    timestamp: string;
-    isUser: boolean;
-    tokensUsed?: number;
-    metadata?: {
-        systemMetrics?: boolean;
-        performanceData?: boolean;
-    };
-}
-
-interface AdminChatResponse {
-    response: string;
-    sessionId: string;
-    timestamp: string;
-    tokensUsed: number;
-    context: {
-        type: string;
-        dataUsed: string[];
-    };
-}
-
-interface AdminChatBotProps {
-    className?: string;
-}
 
 export default function AdminChatBot({ className }: AdminChatBotProps) {
     // State management
@@ -168,7 +140,7 @@ What would you like to analyze today?`,
                 throw new Error(errorData.error || 'Failed to send admin message');
             }
 
-            const data: AdminChatResponse = await response.json();
+            const data: ChatResponse = await response.json();
 
             // Update session ID if new
             if (data.sessionId && data.sessionId !== sessionId) {
@@ -208,12 +180,12 @@ What would you like to analyze today?`,
     };
 
     // Quick command buttons
-    const quickCommands = [
-        { label: 'System Status', command: '/system status', icon: Shield },
-        { label: 'User Analytics', command: '/users analytics', icon: Users },
-        { label: 'Performance', command: '/performance report', icon: TrendingUp },
-        { label: 'Error Analysis', command: '/errors analyze', icon: AlertTriangle },
-        { label: 'Billing Overview', command: '/billing overview', icon: BarChart3 },
+    const quickCommands: AdminQuickCommand[] = [
+        { label: 'System Status', command: '/system status', icon: Shield, category: 'system' },
+        { label: 'User Analytics', command: '/users analytics', icon: Users, category: 'users' },
+        { label: 'Performance', command: '/performance report', icon: TrendingUp, category: 'performance' },
+        { label: 'Error Analysis', command: '/errors analyze', icon: AlertTriangle, category: 'system' },
+        { label: 'Billing Overview', command: '/billing overview', icon: BarChart3, category: 'billing' },
     ];
 
     // Admin toggle button

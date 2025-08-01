@@ -12,41 +12,16 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
+import type { CustomerChatBotProps, CustomerChatMessage, ChatResponse } from '@/types/chatbot';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bot, Loader2, Maximize2, MessageCircle, Minimize2, Send, User, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-
-// Types
-interface ChatMessage {
-    id: string;
-    message: string;
-    response: string;
-    timestamp: string;
-    isUser: boolean;
-    tokensUsed?: number;
-}
-
-interface ChatResponse {
-    response: string;
-    sessionId: string;
-    timestamp: string;
-    tokensUsed: number;
-    context: {
-        type: string;
-        dataUsed: string[];
-    };
-}
-
-interface CustomerChatBotProps {
-    currentUrl?: string;
-    className?: string;
-}
 
 export default function CustomerChatBot({ currentUrl, className }: CustomerChatBotProps) {
     // State management
     const [isOpen, setIsOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [messages, setMessages] = useState<CustomerChatMessage[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [sessionId, setSessionId] = useState<string>('');
@@ -78,7 +53,7 @@ export default function CustomerChatBot({ currentUrl, className }: CustomerChatB
     // Initialize with welcome message
     useEffect(() => {
         if (isOpen && messages.length === 0) {
-            const welcomeMessage: ChatMessage = {
+            const welcomeMessage: CustomerChatMessage = {
                 id: `welcome_${Date.now()}`,
                 message: '',
                 response: `👋 Hi! I'm RankPilot AI, your SEO assistant. I can help you with:
@@ -101,12 +76,16 @@ What can I help you with today?`,
     const sendMessage = async () => {
         if (!inputValue.trim() || isLoading || !user) return;
 
-        const userMessage: ChatMessage = {
+        const userMessage: CustomerChatMessage = {
             id: `user_${Date.now()}`,
             message: inputValue,
             response: '',
             timestamp: new Date().toISOString(),
             isUser: true,
+            metadata: {
+                currentUrl,
+                userTier: profile?.subscriptionTier || 'free',
+            },
         };
 
         // Add user message immediately
@@ -145,13 +124,20 @@ What can I help you with today?`,
             }
 
             // Add AI response
-            const aiMessage: ChatMessage = {
+            const aiMessage: CustomerChatMessage = {
                 id: `ai_${Date.now()}`,
                 message: '',
                 response: data.response,
                 timestamp: data.timestamp,
                 isUser: false,
                 tokensUsed: data.tokensUsed,
+                metadata: {
+                    auditContext: data.context.dataUsed.includes('audit_data'),
+                    siteContext: data.context.dataUsed.includes('site_content'),
+                    neuroSEOContext: data.context.dataUsed.includes('neuroseo_insights'),
+                    userTier: profile?.subscriptionTier || 'free',
+                    currentUrl,
+                },
             };
 
             setMessages(prev => [...prev, aiMessage]);

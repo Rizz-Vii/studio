@@ -6,24 +6,11 @@
 
 'use client';
 
+import type { ChatBotProps } from '@/types/chatbot';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
 import AdminChatBot from './AdminChatBot';
 import CustomerChatBot from './CustomerChatBot';
-
-// Define interfaces for component props
-interface CustomerChatBotProps {
-    currentUrl?: string;
-    className?: string;
-}
-
-interface AdminChatBotProps {
-    className?: string;
-}
-
-interface ChatBotProps {
-    className?: string;
-}
 
 export default function ChatBot({ className }: ChatBotProps) {
     const { user, profile } = useAuth();

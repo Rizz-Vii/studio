@@ -10,7 +10,7 @@ export default defineConfig({
         ["line"],
     ],
     use: {
-        baseURL: "https://rankpilot-h3jpc--performance-testing-mw0cwov5.web.app",
+        baseURL: "https://rankpilot-h3jpc.web.app",
         trace: "retain-on-failure",
         screenshot: "only-on-failure",
         video: "retain-on-failure",
@@ -55,17 +55,7 @@ export default defineConfig({
             name: "production-mobile",
             use: {
                 ...devices["iPhone 13"],
-                launchOptions: {
-                    args: [
-                        '--disable-setuid-sandbox',
-                        '--max_old_space_size=1536', // Conservative for mobile
-                        '--disable-dev-shm-usage',
-                        '--disable-gpu'
-                    ],
-                    env: {
-                        NODE_OPTIONS: '--max-old-space-size=1536',
-                    }
-                },
+                // Simplified launch options for WebKit compatibility
             },
         },
     ],

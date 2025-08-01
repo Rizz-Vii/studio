@@ -4,13 +4,21 @@ const pluginImport = require("eslint-plugin-import");
 
 module.exports = [
   {
-    ignores: ["lib/**/*", "generated/**/*", "eslint.config.js"],
+    ignores: [
+      "lib/**/*", 
+      "generated/**/*", 
+      "eslint.config.js",
+      "**/*.js",
+      "gcloud/**/*",
+      "google-cloud-sdk/**/*",
+      "**/node_modules/**/*"
+    ],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
       parser: parserTs,
       parserOptions: {
-        project: ["./tsconfig.json", "./tsconfig.dev.json"],
+        project: ["./tsconfig.json"],
       },
     },
     plugins: {

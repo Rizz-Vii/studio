@@ -1,34 +1,32 @@
 # 🚀 RankPilot GitHub Actions Workflows - CONSOLIDATED
 
-<<<<<<< HEAD
 ## 📋 **Streamlined Workflow Overview (8 Total)**
-=======
-This GitHub Actions workflow provides automated testing and deployment for the `workshop/performance` branch.
->>>>>>> workshop/performance
+
+This GitHub Actions workflow provides automated testing and deployment for performance optimization branches.
 
 ### **🎯 Performance Pipeline - Consolidated**
+
 **File:** `performance-pipeline.yml`
 **Purpose:** Complete performance CI/CD with auto-deployment to staging
 
 **Triggers:**
+
 - Push to `workshop/performance` or `workshop/*` branches
 - Pull requests to `master` or `staging`
 - Workflow completion from instant deploy
+- Manual trigger via GitHub Actions UI
 
-<<<<<<< HEAD
 **Execution:** 3-stage validation (feature validation → auto-deploy → staging test)
-=======
-- You push commits to the `workshop/performance` branch  
-- You can also trigger it manually via GitHub Actions UI
->>>>>>> workshop/performance
 
 ---
 
 ### **� Development Hyperloop - Instant Deploy**
+
 **File:** `instant-lean-deploy.yml`  
 **Purpose:** Instant preview deployment for workshop branches
 
 **Triggers:**
+
 - Push to `workshop/*` branches (excluding docs)
 - Manual workflow dispatch
 
@@ -37,10 +35,12 @@ This GitHub Actions workflow provides automated testing and deployment for the `
 ---
 
 ### **🧪 Lean Channel Testing**
+
 **File:** `lean-channel-tests.yml`
 **Purpose:** Automated testing on deployed preview channels
 
 **Triggers:**
+
 - Completion of instant deploy workflow
 - Manual dispatch with channel specification
 
@@ -49,10 +49,12 @@ This GitHub Actions workflow provides automated testing and deployment for the `
 ---
 
 ### **🔄 Workshop Auto-Merge Pipeline**
+
 **File:** `workshop-auto-merge.yml`
 **Purpose:** Auto-merge successful workshop branches to deployment-ready
 
 **Triggers:**
+
 - Completion of workshop workflows
 - Success status from hyperloop and performance workflows
 
@@ -61,10 +63,12 @@ This GitHub Actions workflow provides automated testing and deployment for the `
 ---
 
 ### **🎯 Deployment-Ready Auto-Staging**
+
 **File:** `deployment-ready-auto-staging.yml`
 **Purpose:** Auto-merge deployment-ready to staging after tests
 
 **Triggers:**
+
 - Successful completion of deployment-ready validation
 - Comprehensive test suite completion
 
@@ -73,10 +77,12 @@ This GitHub Actions workflow provides automated testing and deployment for the `
 ---
 
 ### **🚨 Staging Success PR Alert**
+
 **File:** `staging-success-pr-alert.yml`
 **Purpose:** GitHub issue alerts when staging validation completes
 
 **Triggers:**
+
 - Successful pre-deployment pipeline completion
 - Staging validation success
 
@@ -85,10 +91,12 @@ This GitHub Actions workflow provides automated testing and deployment for the `
 ---
 
 ### **🏭 Production Deployment**
+
 **File:** `production-deploy.yml`
 **Purpose:** Production deployment to rankpilot-h3jpc.web.app
 
 **Triggers:**
+
 - Push to `master` branch
 - Manual workflow dispatch
 
@@ -120,6 +128,7 @@ This GitHub Actions workflow provides automated testing and deployment for the `
 ## 🚀 **Getting Started**
 
 ### **Performance Feature Development:**
+
 ```bash
 # Work on performance branch
 git checkout feature/performance-optimization-mobile-enhancement
@@ -128,6 +137,7 @@ git push origin feature/performance-optimization-mobile-enhancement
 ```
 
 ### **Manual Production Deployment:**
+
 ```bash
 # Trigger via GitHub Actions UI
 # or push to master after preDeploy validation
@@ -139,6 +149,7 @@ git push origin master
 ## 📈 **Monitoring & Reports**
 
 All workflows generate comprehensive reports including:
+
 - Performance metrics and Core Web Vitals
 - Security audit results
 - Test coverage and accessibility compliance
@@ -148,10 +159,13 @@ View reports in GitHub Actions → Workflow runs → Artifacts
 npm run test:performance
 
 # Run mobile-specific tests
+
 npm run test -- --grep="mobile"
 
 # Run with UI for debugging
+
 npm run test:ui
+
 ```
 
 ## 🔧 **Manual Deployment with Functions**

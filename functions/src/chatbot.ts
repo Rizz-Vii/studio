@@ -22,37 +22,40 @@ const db = getFirestore();
 // Get API key from environment variables (Firebase Functions v2 pattern)
 const openaiApiKey = process.env.OPENAI_API_KEY;
 
-// Initialize OpenAI only if API key is available
+// Initialize OpenAI lazily to avoid build-time warnings
 let openai: OpenAI | null = null;
-try {
-  if (openaiApiKey) {
-    openai = new OpenAI({
-      apiKey: openaiApiKey,
-    });
-    logger.info("OpenAI client initialized successfully");
-  } else {
-    logger.warn("OPENAI_API_KEY not found in config or environment");
+
+function getOpenAIClient(): OpenAI | null {
+  if (!openai && openaiApiKey) {
+    try {
+      openai = new OpenAI({
+        apiKey: openaiApiKey,
+      });
+      logger.info("OpenAI client initialized successfully");
+    } catch (error) {
+      logger.error("Failed to initialize OpenAI client", error);
+      return null;
+    }
   }
-} catch (error) {
-  logger.error("Failed to initialize OpenAI client", error);
+  return openai;
 }// Types for request/response
 interface ChatRequest {
-    uid: string;
-    message: string;
-    url?: string;
-    sessionId?: string;
-    chatType: "customer" | "admin";
+  uid: string;
+  message: string;
+  url?: string;
+  sessionId?: string;
+  chatType: "customer" | "admin";
 }
 
 interface ChatResponse {
-    response: string;
-    sessionId: string;
-    timestamp: string;
-    tokensUsed: number;
-    context: {
-        type: string;
-        dataUsed: string[];
-    };
+  response: string;
+  sessionId: string;
+  timestamp: string;
+  tokensUsed: number;
+  context: {
+    type: string;
+    dataUsed: string[];
+  };
 }
 
 /**
@@ -121,12 +124,13 @@ export const customerChatHandler = onCall(
       }
 
       // Validate OpenAI availability
-      if (!openai) {
+      const openaiClient = getOpenAIClient();
+      if (!openaiClient) {
         throw new HttpsError("failed-precondition", "AI service is currently unavailable");
       }
 
       // Call OpenAI
-      const completion = await openai.chat.completions.create({
+      const completion = await openaiClient.chat.completions.create({
         model: "gpt-4o",
         messages,
         max_tokens: 1000,
@@ -248,12 +252,13 @@ export const adminChatHandler = onCall(
       }
 
       // Validate OpenAI availability
-      if (!openai) {
+      const openaiClient = getOpenAIClient();
+      if (!openaiClient) {
         throw new HttpsError("failed-precondition", "AI service is currently unavailable");
       }
 
       // Call OpenAI with admin-specific configuration
-      const completion = await openai.chat.completions.create({
+      const completion = await openaiClient.chat.completions.create({
         model: "gpt-4o",
         messages,
         max_tokens: 1500,

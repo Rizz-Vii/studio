@@ -4,6 +4,7 @@
  */
 
 import { functions } from '@/lib/firebase';
+import type { ChatResponse } from '@/types/chatbot';
 import { httpsCallable } from 'firebase/functions';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -11,17 +12,6 @@ import { NextRequest, NextResponse } from 'next/server';
 interface AdminChatRequest {
     message: string;
     sessionId?: string;
-}
-
-interface ChatResponse {
-    response: string;
-    sessionId: string;
-    timestamp: string;
-    tokensUsed: number;
-    context: {
-        type: string;
-        dataUsed: string[];
-    };
 }
 
 export async function POST(request: NextRequest) {

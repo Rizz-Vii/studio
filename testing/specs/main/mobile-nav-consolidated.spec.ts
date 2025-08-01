@@ -30,10 +30,9 @@ test.describe("Mobile Navigation - Comprehensive Suite", () => {
         await page.goto("/", { waitUntil: "domcontentloaded" });
         await page.waitForTimeout(2000); // Wait for React hydration
 
-        // Check for hamburger menu - Fix selector to match actual element
+        // Check for hamburger menu - Use standardized testid
         const hamburger = page
-          .locator('[data-testid="public-mobile-menu"]') // Fixed: actual testid found in error
-          .or(page.locator('[data-testid="mobile-menu"]'))
+          .locator('[data-testid="mobile-menu-button"]') // Standardized testid
           .or(page.locator('button[aria-label*="menu"]'))
           .or(page.locator(".hamburger"))
           .or(page.locator("[aria-expanded]").filter({ hasText: /menu/i }));
@@ -131,8 +130,7 @@ test.describe("Mobile Navigation - Comprehensive Suite", () => {
         .or(page.locator('[data-testid="desktop-nav"]'))
         .or(page.locator(".navbar"));
 
-      const hamburgerDesktop = page.locator('[data-testid="public-mobile-menu"]')
-        .or(page.locator('[data-testid="mobile-menu"]'));
+      const hamburgerDesktop = page.locator('[data-testid="mobile-menu-button"]')
 
       if ((await desktopNav.count()) > 0) {
         console.log("✅ Desktop navigation found");
@@ -150,8 +148,7 @@ test.describe("Mobile Navigation - Comprehensive Suite", () => {
       await page.waitForTimeout(500); // Allow responsive transition
 
       const hamburgerMobile = page
-        .locator('[data-testid="public-mobile-menu"]')
-        .or(page.locator('[data-testid="mobile-menu"]'))
+        .locator('[data-testid="mobile-menu-button"]')
         .or(page.locator('button[aria-label*="menu"]'));
 
       const hamburgerVisibleMobile = await hamburgerMobile
@@ -176,7 +173,7 @@ test.describe("Mobile Navigation - Comprehensive Suite", () => {
       await page.waitForTimeout(1000);
 
       // Use specific selector for auth pages to avoid multiple element conflicts
-      const hamburger = page.locator('[data-testid="auth-mobile-menu"]').first();
+      const hamburger = page.locator('[data-testid="mobile-menu-button"]').first();
 
       if ((await hamburger.count()) > 0) {
         console.log("✅ Mobile nav available on login page");
@@ -210,7 +207,7 @@ test.describe("Mobile Navigation - Comprehensive Suite", () => {
       } else {
         console.log("📋 Testing dashboard mobile nav...");
 
-        const hamburger = page.locator('[data-testid="mobile-menu"]');
+        const hamburger = page.locator('[data-testid="mobile-menu-button"]');
 
         if ((await hamburger.count()) > 0) {
           await hamburger.click();
@@ -238,7 +235,7 @@ test.describe("Mobile Navigation - Comprehensive Suite", () => {
       await page.goto("/", { waitUntil: "domcontentloaded" });
       await page.waitForTimeout(1000);
 
-      const hamburger = page.locator('[data-testid="public-mobile-menu"]').first();
+      const hamburger = page.locator('[data-testid="mobile-menu-button"]').first();
 
       if ((await hamburger.count()) > 0) {
         // Test keyboard focus with timeout and error handling
@@ -290,7 +287,7 @@ test.describe("Mobile Navigation - Comprehensive Suite", () => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto("/", { waitUntil: "domcontentloaded" });
 
-      const hamburger = page.locator('[data-testid="public-mobile-menu"]').first();
+      const hamburger = page.locator('[data-testid="mobile-menu-button"]').first();
 
       if ((await hamburger.count()) > 0) {
         // Check touch target size (should be at least 44x44px)
@@ -336,7 +333,7 @@ test.describe("Mobile Navigation - Comprehensive Suite", () => {
         await page.goto(pagePath, { waitUntil: "domcontentloaded" });
         await page.waitForTimeout(1000);
 
-        const hamburger = page.locator('[data-testid="public-mobile-menu"],[data-testid="auth-mobile-menu"]').first();
+        const hamburger = page.locator('[data-testid="mobile-menu-button"]').first();
 
         const hasHamburger = (await hamburger.count()) > 0;
 

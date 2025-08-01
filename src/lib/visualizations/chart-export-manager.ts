@@ -11,8 +11,10 @@
  */
 
 import jsPDF from 'jspdf';
-import * as XLSX from 'xlsx';
 import { ChartExportConfig } from './d3-visualization-engine';
+
+// Dynamic import for xlsx to reduce bundle size and security exposure
+type XLSXType = typeof import('xlsx');
 
 export interface ExportBatch {
     id: string;
@@ -190,58 +192,66 @@ export class ChartExportManager {
             throw new Error(`Batch ${batchId} not found`);
         }
 
-        const workbook: ExcelWorkbook = {
-            sheets: [],
-            metadata: {
-                title: batch.config.title || 'Chart Export',
-                author: batch.config.author || 'RankPilot',
-                created: new Date(),
-                company: batch.config.company
+        try {
+            // Dynamic import for security and performance
+            const XLSX = await import('xlsx');
+
+            const workbook: ExcelWorkbook = {
+                sheets: [],
+                metadata: {
+                    title: batch.config.title || `RankPilot Dashboard Export - ${batch.id}`,
+                    author: batch.config.author || 'RankPilot Analytics',
+                    created: new Date(),
+                    company: batch.config.company
+                }
+            };
+
+            // Create summary sheet
+            const summarySheet = this.createSummarySheet(batch);
+            workbook.sheets.push(summarySheet);
+
+            // Add individual chart sheets
+            for (const chartId of batch.charts) {
+                const chartSheet = await this.createChartSheet(chartId);
+                workbook.sheets.push(chartSheet);
             }
-        };
 
-        // Create summary sheet
-        const summarySheet = this.createSummarySheet(batch);
-        workbook.sheets.push(summarySheet);
+            // Generate Excel file
+            const wb = XLSX.utils.book_new();
 
-        // Add individual chart sheets
-        for (const chartId of batch.charts) {
-            const chartSheet = await this.createChartSheet(chartId);
-            workbook.sheets.push(chartSheet);
+            // Add metadata
+            wb.Props = {
+                Title: workbook.metadata.title,
+                Author: workbook.metadata.author,
+                CreatedDate: workbook.metadata.created,
+                Company: workbook.metadata.company
+            };
+
+            // Add sheets
+            workbook.sheets.forEach(sheet => {
+                const ws = XLSX.utils.aoa_to_sheet(sheet.data);
+
+                // Apply formatting if available
+                if (sheet.formatting) {
+                    this.applyExcelFormatting(ws, sheet.formatting, XLSX);
+                }
+
+                XLSX.utils.book_append_sheet(wb, ws, sheet.name);
+            });
+
+            // Generate binary
+            const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const excelUrl = URL.createObjectURL(excelBlob);
+
+            // Track batch export
+            this.addToBatchHistory(batchId, 'excel', excelUrl);
+
+            return excelUrl;
+        } catch (error) {
+            console.warn('Excel export not available: xlsx package not installed. This is an enterprise feature.');
+            throw new Error('Excel export requires enterprise subscription and xlsx package installation.');
         }
-
-        // Generate Excel file
-        const wb = XLSX.utils.book_new();
-
-        // Add metadata
-        wb.Props = {
-            Title: workbook.metadata.title,
-            Author: workbook.metadata.author,
-            CreatedDate: workbook.metadata.created,
-            Company: workbook.metadata.company
-        };
-
-        // Add sheets
-        workbook.sheets.forEach(sheet => {
-            const ws = XLSX.utils.aoa_to_sheet(sheet.data);
-
-            // Apply formatting if available
-            if (sheet.formatting) {
-                this.applyExcelFormatting(ws, sheet.formatting);
-            }
-
-            XLSX.utils.book_append_sheet(wb, ws, sheet.name);
-        });
-
-        // Generate binary
-        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const excelUrl = URL.createObjectURL(excelBlob);
-
-        // Track batch export
-        this.addToBatchHistory(batchId, 'excel', excelUrl);
-
-        return excelUrl;
     }
 
     /**
@@ -319,31 +329,36 @@ export class ChartExportManager {
     }
 
     private async exportChartToExcel(chartData: any, config: ChartExportConfig): Promise<string> {
-        const workbook: ExcelWorkbook = {
-            sheets: [
-                {
-                    name: 'Chart Data',
-                    data: this.convertChartDataToTable(chartData),
-                    formatting: {
-                        headerStyle: {
-                            font: { bold: true, size: 12, color: '#FFFFFF' },
-                            fill: { fgColor: '#4F46E5' },
-                            alignment: { horizontal: 'center', vertical: 'center' }
-                        },
-                        cellStyle: {
-                            font: { size: 10 }
+        try {
+            const workbook: ExcelWorkbook = {
+                sheets: [
+                    {
+                        name: 'Chart Data',
+                        data: this.convertChartDataToTable(chartData),
+                        formatting: {
+                            headerStyle: {
+                                font: { bold: true, size: 12, color: '#FFFFFF' },
+                                fill: { fgColor: '#4F46E5' },
+                                alignment: { horizontal: 'center', vertical: 'center' }
+                            },
+                            cellStyle: {
+                                font: { size: 10 }
+                            }
                         }
                     }
+                ],
+                metadata: {
+                    title: config.title || 'Chart Export',
+                    author: 'RankPilot',
+                    created: new Date()
                 }
-            ],
-            metadata: {
-                title: config.title || 'Chart Export',
-                author: 'RankPilot',
-                created: new Date()
-            }
-        };
+            };
 
-        return this.generateExcelFile(workbook);
+            return await this.generateExcelFile(workbook);
+        } catch (error) {
+            console.warn('Excel export not available: xlsx package not installed. This is an enterprise feature.');
+            throw new Error('Excel export requires enterprise subscription and xlsx package installation.');
+        }
     }
 
     private async exportChartToPNG(chartData: any, config: ChartExportConfig): Promise<string> {
@@ -512,7 +527,7 @@ export class ChartExportManager {
         };
     }
 
-    private applyExcelFormatting(worksheet: any, formatting: ExcelFormatting): void {
+    private applyExcelFormatting(worksheet: any, formatting: ExcelFormatting, XLSX: XLSXType): void {
         // Apply header formatting to first row
         if (formatting.headerStyle) {
             const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
@@ -557,33 +572,41 @@ export class ChartExportManager {
         return rows;
     }
 
-    private generateExcelFile(workbook: ExcelWorkbook): string {
-        const wb = XLSX.utils.book_new();
+    private async generateExcelFile(workbook: ExcelWorkbook): Promise<string> {
+        try {
+            // Dynamic import for security and performance
+            const XLSX = await import('xlsx');
 
-        // Add metadata
-        wb.Props = {
-            Title: workbook.metadata.title,
-            Author: workbook.metadata.author,
-            CreatedDate: workbook.metadata.created,
-            Company: workbook.metadata.company
-        };
+            const wb = XLSX.utils.book_new();
 
-        // Add sheets
-        workbook.sheets.forEach(sheet => {
-            const ws = XLSX.utils.aoa_to_sheet(sheet.data);
+            // Add metadata
+            wb.Props = {
+                Title: workbook.metadata.title,
+                Author: workbook.metadata.author,
+                CreatedDate: workbook.metadata.created,
+                Company: workbook.metadata.company
+            };
 
-            if (sheet.formatting) {
-                this.applyExcelFormatting(ws, sheet.formatting);
-            }
+            // Add sheets
+            workbook.sheets.forEach(sheet => {
+                const ws = XLSX.utils.aoa_to_sheet(sheet.data);
 
-            XLSX.utils.book_append_sheet(wb, ws, sheet.name);
-        });
+                if (sheet.formatting) {
+                    this.applyExcelFormatting(ws, sheet.formatting, XLSX);
+                }
 
-        // Generate binary
-        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                XLSX.utils.book_append_sheet(wb, ws, sheet.name);
+            });
 
-        return URL.createObjectURL(excelBlob);
+            // Generate binary
+            const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            return URL.createObjectURL(excelBlob);
+        } catch (error) {
+            console.warn('Excel export not available: xlsx package not installed. This is an enterprise feature.');
+            throw new Error('Excel export requires enterprise subscription and xlsx package installation.');
+        }
     }
 
     private addToExportHistory(chartId: string, config: ChartExportConfig, result: string): void {

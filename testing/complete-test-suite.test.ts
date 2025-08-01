@@ -15,13 +15,16 @@ test.describe('🚀 RankPilot Enterprise Test Suite - Complete Validation', () =
             'admin-dashboard.test.ts',
             'neuroseo-suite.test.ts',
             'security-auth.test.ts',
-            'performance-api.test.ts'
+            'performance-api.test.ts',
+            'critical-payment-integration.spec.ts',
+            'critical-error-handling.spec.ts',
+            'critical-functions-health.spec.ts'
         ];
 
         console.log('🧪 Enterprise Test Suite Files:', testFiles);
-        console.log('✅ All 5 major test categories prepared for validation');
+        console.log('✅ All 8 major test categories prepared for validation');
 
-        expect(testFiles.length).toBe(5);
+        expect(testFiles.length).toBe(8);
     });
 
     test('Pre-Deployment Validation Checklist', async () => {
@@ -30,7 +33,10 @@ test.describe('🚀 RankPilot Enterprise Test Suite - Complete Validation', () =
             'Admin Dashboard': 'Enterprise admin features with role-based access control',
             'NeuroSEO™ Suite': '6 AI engines + orchestrator with performance testing',
             'Security & Auth': '5-tier authentication with XSS/CSRF protection',
-            'Performance & API': 'Core Web Vitals + API integration validation'
+            'Performance & API': 'Core Web Vitals + API integration validation',
+            'Payment Integration': 'Stripe subscription flows + webhook processing',
+            'Error Handling': 'Timeout, offline, and failure recovery mechanisms',
+            'Functions Health': 'Firebase Functions stability + memory management'
         };
 
         console.log('📋 Pre-Deployment Validation Checklist:');
@@ -38,7 +44,7 @@ test.describe('🚀 RankPilot Enterprise Test Suite - Complete Validation', () =
             console.log(`  ✅ ${category}: ${description}`);
         });
 
-        expect(Object.keys(validationChecklist).length).toBe(5);
+        expect(Object.keys(validationChecklist).length).toBe(8);
     });
 
     test('Test Environment Configuration', async ({ page }) => {

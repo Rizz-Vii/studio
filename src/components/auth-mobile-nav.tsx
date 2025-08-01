@@ -58,10 +58,10 @@ export default function AuthMobileNav() {
         variant="ghost"
         size="icon"
         onClick={toggleMenu}
-        className="md:hidden h-12 w-12 min-h-[48px] min-w-[48px]"
+        className="md:hidden h-12 w-12 min-h-[48px] min-w-[48px] touch-manipulation"
         aria-label="Toggle mobile menu"
         aria-expanded={isOpen}
-        data-testid="auth-mobile-menu"
+        data-testid="mobile-menu-button"
       >
         <Menu className="h-6 w-6" />
       </Button>

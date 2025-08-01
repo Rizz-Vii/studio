@@ -19,6 +19,8 @@ export function useKeyboardNavigation(config: KeyboardNavConfig = {}) {
   const { setLastFocusedElement, scrollToTop } = useUI();
 
   const handleTab = useCallback((e: KeyboardEvent) => {
+    if (typeof window === 'undefined') return; // SSR check
+    
     if (e.key === "Tab") {
       const focusable = document.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -38,6 +40,8 @@ export function useKeyboardNavigation(config: KeyboardNavConfig = {}) {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (typeof window === 'undefined') return; // SSR check
+      
       // Store last focused element
       if (document.activeElement instanceof HTMLElement) {
         setLastFocusedElement(document.activeElement);
@@ -58,6 +62,8 @@ export function useKeyboardNavigation(config: KeyboardNavConfig = {}) {
   );
 
   useEffect(() => {
+    if (typeof window === 'undefined') return; // SSR check
+    
     if (enableShortcuts) {
       document.addEventListener("keydown", handleKeyDown);
     }
@@ -66,6 +72,8 @@ export function useKeyboardNavigation(config: KeyboardNavConfig = {}) {
     }
 
     return () => {
+      if (typeof window === 'undefined') return; // SSR check for cleanup
+      
       if (enableShortcuts) {
         document.removeEventListener("keydown", handleKeyDown);
       }

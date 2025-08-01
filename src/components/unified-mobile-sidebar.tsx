@@ -75,20 +75,7 @@ export default function UnifiedMobileSidebar({
 
   const closeMenu = () => setIsOpen(false);
 
-  if (!isMounted || !isMobile) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden h-12 w-12 min-h-[48px] min-w-[48px] opacity-0"
-        aria-label="Loading menu"
-        disabled
-      >
-        <Menu className="h-6 w-6" />
-      </Button>
-    );
-  }
-
+  // Always render the button - let CSS handle mobile/desktop visibility
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
@@ -96,12 +83,12 @@ export default function UnifiedMobileSidebar({
           variant="ghost"
           size="icon"
           className={cn(
-            "md:hidden h-12 w-12 min-h-[48px] min-w-[48px]",
+            "md:hidden h-12 w-12 min-h-[48px] min-w-[48px] touch-manipulation",
             className
           )}
           aria-label="Toggle mobile menu"
           aria-expanded={isOpen}
-          data-testid={`${mode}-mobile-menu`}
+          data-testid="mobile-menu-button"
         >
           <Menu className="h-6 w-6" />
         </Button>

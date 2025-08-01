@@ -2,13 +2,21 @@
 // Implementation Date: July 30, 2025
 // Priority: CRITICAL - Phase 2 Testing & Quality Assurance
 
-import { exec } from 'child_process';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { promisify } from 'util';
+
+// Server-side only imports
+let execAsync: any = null;
+let fs: any = null;
+let path: any = null;
+if (typeof window === 'undefined') {
+  const { exec } = require('child_process');
+  const { promisify } = require('util');
+  execAsync = promisify(exec);
+  fs = require('fs/promises');
+  path = require('path');
+}
+
 import { AgentCapability, RankPilotAgent, SafetyConstraint } from '../core/AgentFramework';
 
-const execAsync = promisify(exec);
 
 /**
  * Testing Orchestrator Agent - Autonomous testing validation and optimization

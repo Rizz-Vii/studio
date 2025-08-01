@@ -90,9 +90,15 @@ export class PWAManager {
 
         // Handle install prompt
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
+            // Store the event for later use, but don't prevent default immediately
             this.installPrompt = e as PWAInstallPrompt;
-            this.showInstallPrompt();
+
+            // Only prevent default if we want to show custom UI
+            // For now, let the browser handle the prompt naturally
+            console.log('[PWA] Install prompt available');
+
+            // Optionally show custom install prompt UI
+            // this.showInstallPrompt();
         });
 
         // Handle app installed
@@ -207,12 +213,14 @@ export class PWAManager {
         }
 
         try {
+            const applicationServerKey = this.urlBase64ToUint8Array(
+                process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
+                'BMqSvZWj5OwrOhNM2NQpjqPzqKJFVj1DdM7Z4lNXfqGoCz4O9g-GNp2K7-Qh-ILRgYlCjFkf8ZKqVl_qDlH-J9U'
+            );
+
             const subscription = await this.registration.pushManager.subscribe({
                 userVisibleOnly: true,
-                applicationServerKey: this.urlBase64ToUint8Array(
-                    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
-                    'BMqSvZWj5OwrOhNM2NQpjqPzqKJFVj1DdM7Z4lNXfqGoCz4O9g-GNp2K7-Qh-ILRgYlCjFkf8ZKqVl_qDlH-J9U'
-                )
+                applicationServerKey: applicationServerKey.buffer as ArrayBuffer,
             });
 
             // Send subscription to server
@@ -265,7 +273,7 @@ export class PWAManager {
             .replace(/_/g, '/');
 
         const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
+        const outputArray = new Uint8Array(new ArrayBuffer(rawData.length));
 
         for (let i = 0; i < rawData.length; ++i) {
             outputArray[i] = rawData.charCodeAt(i);
